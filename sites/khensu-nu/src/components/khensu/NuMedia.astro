@@ -95,8 +95,13 @@ const t720 = g720.tiles as Record<string, { vmaf: number; actual_kbps: number }>
 const v720 = (k: string) => `VMAF ${t720[k].vmaf.toFixed(0)}`;
 const videos = [
   {
-    title: 'Every codec at 500 kbit/s, 720p',
-    sub: 'Top row encoded on an iPhone Air. Bottom row encoded on a Mac, since iPhone has no encoder for them. 1:1 crops of 720 × 1280 frames.',
+    title: '5× smaller than Instagram’s own file',
+    sub: 'Every codec at 500 kbit/s, 720p. Top row encoded on an iPhone Air, bottom row on a Mac, since iPhone has no encoder for them. 1:1 crops of 720 × 1280 frames.',
+    stats: [
+      { big: `${(2437.958 / 500).toFixed(1)}×`, small: 'fewer bytes than Instagram serves' },
+      { big: `${(2437.958 / 500).toFixed(1)}×`, small: 'faster to arrive on the same connection' },
+      { big: 'Same look', small: 'nu-media’s quality target at this size' },
+    ],
     src: '/khensu/codec/compare-720p.mp4', poster: '/khensu/codec/compare-720p.jpg', w: 1440, h: 1280, cols: 4, rows: 2, maxw: '46rem',
     tiles: [
       { name: 'Original', note: 'Instagram, 2.44 Mbit/s' },
@@ -268,6 +273,11 @@ const chips = [
       {videos.map((v) => (
         <figure class="card wide" data-scene="reveal">
           <figcaption><b>{v.title}</b><span>{v.sub}</span></figcaption>
+          {v.stats && (
+            <ul class="stats" role="list">
+              {v.stats.map((x) => <li><b>{x.big}</b><small>{x.small}</small></li>)}
+            </ul>
+          )}
           <div class="cmp" style={`max-width:${v.maxw}`}>
             <video src={v.src} poster={v.poster} width={v.w} height={v.h} autoplay muted loop playsinline preload="auto"
               aria-label={`${v.title}: the original and each codec side by side`} />
@@ -591,6 +601,17 @@ const chips = [
   }
 
   /* Comparison video with a label in each tile. */
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 2.2rem;
+    margin: 0 0 1.1rem;
+    padding: 0;
+    list-style: none;
+  }
+  .stats li { display: flex; flex-direction: column; }
+  .stats b { font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; color: #b9b0ff; }
+  .stats small { opacity: 0.7; }
   .cmp {
     position: relative;
     border-radius: 14px;
