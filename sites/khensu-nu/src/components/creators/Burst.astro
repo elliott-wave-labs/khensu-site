@@ -1,9 +1,8 @@
 ---
-// Four numbers that burst out of a cloud of particles and explode into each other as the page scrolls.
+// Three numbers that burst out of a cloud of particles and explode into each other as the page scrolls.
 // The list is the content; the canvas only draws it. Reduced motion and no-JS show the list as a grid.
 const items = [
-  { g: '0%', t: 'Platform cut', s: 'on creator subscriptions and tips' },
-  { g: '100%', t: 'Of every view and tip, gift or payment', s: 'to you. The fan pays the network fee on top' },
+  { g: '100%', t: 'Creator cut', s: 'of every view and tip, gift or payment. The fan pays the network fee on top' },
   { g: '42¢', t: 'Minimum payout', s: 'Every payment lands in your wallet as it’s sent' },
   { g: '<1¢', t: 'Network fee', s: 'a payment, paid to the people running nodes. Estimate' },
 ];
@@ -14,7 +13,7 @@ const items = [
     <canvas aria-hidden="true"></canvas>
     <div class="wrap burst-head">
       <p class="eyebrow">by the numbers</p>
-      <h2 id="burst-title">Four numbers.<em>All of them in your favour.</em></h2>
+      <h2 id="burst-title">Three numbers.<em>All of them in your favour.</em></h2>
     </div>
     <ol class="burst-list" role="list">
       {items.map((it, i) => (
@@ -96,7 +95,7 @@ const items = [
 
   /* Pinned particle version. */
   :global(.cr-motion) .burst {
-    height: 460vh;
+    height: 360vh;
   }
   :global(.cr-motion) .burst-stage {
     position: sticky;
@@ -159,7 +158,31 @@ const items = [
     letter-spacing: -0.02em;
   }
   :global(.cr-motion) .burst-s {
-    max-width: 30rem;
+    max-width: 38rem;
     font-size: 1.05rem;
+  }
+  @media (max-height: 820px) {
+    :global(.cr-motion) .burst-head {
+      padding-top: calc(130px + 0.5rem);
+    }
+    :global(.cr-motion) .burst-head .eyebrow {
+      margin-bottom: 0.4rem;
+    }
+    :global(.cr-motion) .burst-head h2 em {
+      display: inline;
+    }
+    :global(.cr-motion) .burst-head h2 em::before {
+      content: ' ';
+    }
+    :global(.cr-motion) .burst-list {
+      bottom: clamp(1rem, 4vh, 2.5rem);
+      height: 5rem;
+    }
+    :global(.cr-motion) .burst-t {
+      font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+    }
+    :global(.cr-motion) .burst-s {
+      font-size: 0.92rem;
+    }
   }
 </style>

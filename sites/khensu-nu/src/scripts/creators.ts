@@ -126,22 +126,35 @@ for (const scene of document.querySelectorAll<HTMLElement>('[data-burst]')) {
   let H = 0;
   let dpr = 1;
 
+  // Glyphs fill the band between the heading and the label, with room for the particle glow at both edges.
+  const band = (h: number) => {
+    const top = scene.querySelector('.burst-head')!.getBoundingClientRect().bottom - canvas.getBoundingClientRect().top;
+    const bottom = scene.querySelector('.burst-list')!.getBoundingClientRect().top - canvas.getBoundingClientRect().top;
+    if (!(bottom - top > 40)) return { top: h * 0.3, bottom: h * 0.75 };
+    const pad = Math.min(36, Math.max(10, (bottom - top) * 0.12));
+    return { top: top + pad, bottom: bottom - pad };
+  };
+
   const sample = (text: string, w: number, h: number, step: number) => {
     const off = document.createElement('canvas');
     off.width = w;
     off.height = h;
     const o = off.getContext('2d')!;
-    let size = Math.min(h * 0.4, (w * 0.86) / Math.max(1.6, text.length * 0.62));
+    const b = band(h);
+    let size = Math.min((b.bottom - b.top) / 0.76, (w * 0.86) / Math.max(1.6, text.length * 0.62));
     o.font = `700 ${size}px Inter, system-ui, sans-serif`;
-    const mw = o.measureText(text).width;
-    if (mw > w * 0.84) {
-      size *= (w * 0.84) / mw;
+    let m = o.measureText(text);
+    if (m.width > w * 0.84) {
+      size *= (w * 0.84) / m.width;
       o.font = `700 ${size}px Inter, system-ui, sans-serif`;
+      m = o.measureText(text);
     }
     o.textAlign = 'center';
-    o.textBaseline = 'middle';
+    o.textBaseline = 'alphabetic';
     o.fillStyle = '#fff';
-    o.fillText(text, w / 2, h * 0.54);
+    const asc = m.actualBoundingBoxAscent;
+    const desc = m.actualBoundingBoxDescent;
+    o.fillText(text, w / 2, (b.top + b.bottom) / 2 + (asc - desc) / 2);
     const data = o.getImageData(0, 0, w, h).data;
     const pts: [number, number][] = [];
     for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) if (data[(y * w + x) * 4 + 3] > 128) pts.push([x, y]);
