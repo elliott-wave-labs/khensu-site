@@ -7,7 +7,7 @@ const EARTH = '/khensu/hero/earth.jpg';
 const SHIELD_ALT = 'suñůlink.shield in solid brass with the khensu.ñü mark inlaid in stone and platinum, over Earth wrapped in the khensu.ñü network';
 
 export const CARDS: Record<string, Card> = {
-  home: { title: 'khensu.ñü', em: 'webË, private by design.', line: 'Post-quantum. Run profitably by the people.', bg: EARTH, product: '/khensu/renders/og-maroon.png', alt: 'suñůlink.shield in maroon titanium with the stone inlay, over Earth at night wrapped in the khensu.ñü network' },
+  home: { title: 'khensu.ñü', em: 'webË, private by design.', line: 'Post-quantum. Run profitably by the people.', bg: EARTH, product: '/khensu/renders/og-maroon.png', alt: 'suñůlink.shield in maroon titanium with the ñü.isheru stone inlay, over Earth at night wrapped in the khensu.ñü network' },
   webe: { title: 'webË', em: 'A people-run internet.', line: 'Names, sites, feeds, payments and contracts, post-quantum and run by the people.', bg: EARTH, alt: 'The webË network wrapped around Earth at night' },
   media: { title: 'ñü.media', em: 'Same look, a fraction of the bits.', line: 'Photos and video measured against JPEG, HEIC, H.264, HEVC and AV1.', bg: '/khensu/codec/compare-720p.jpg', screen: '/khensu/creators/compare-nu.webp', alt: 'ñü.media against H.264 at the same bitrate' },
   quality: { title: 'How we measure', em: 'Check every number.', line: 'The tests behind ñü.media, with public tools you can run yourself.', bg: '/khensu/codec/compare-aurora.jpg', alt: 'An aurora clip compared across codecs' },
