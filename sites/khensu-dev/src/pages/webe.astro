@@ -1,0 +1,78 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="webE" description="The webE specification, how to build apps and sites on webE, and how to extend khensu.nu through code and consensus.">
+  <p class="eyebrow">webE · specification</p>
+  <h1>webE: a new network, alongside the internet</h1>
+  <p class="lede">
+    webE is an open protocol for names without DNS, content without CDNs, websites, feeds, forums and live media, all
+    delivered over a post-quantum stealth network. Nodes only relay, cache and count; encoding, encryption, ranking,
+    moderation and rendering happen on devices. khensu.nu is the first webE app. Anyone can build another.
+  </p>
+
+  <h2 id="spec">Specification</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>Transport</td><td>Outfox mix network with ML-KEM-1024, constant stealth ticks, two-relay MOQ paths over padded trunks, all carried as ordinary HTTPS</td></tr>
+      <tr><td>Names</td><td><code>name.khensu.nu</code>, resolved from the key transparency log through private lookups, never from DNS or certificate authorities</td></tr>
+      <tr><td>Objects</td><td>Content-addressed chunks, signed site manifests and roots, erasure-coded across operators</td></tr>
+      <tr><td>Fetch and publish</td><td>Two-relay stealth fetch; publishing through the ticks or the owner’s node, never as a visible burst</td></tr>
+      <tr><td>Applications</td><td>Sites, feeds, forums, labels and live tracks</td></tr>
+      <tr><td>Clients</td><td>The khensu.nu app’s viewer for <code>webe://</code>, a Chromium extension, then a Chromium patch</td></tr>
+    </tbody>
+  </table>
+  <p>The full documents, in <code>khensu-specs</code>:</p>
+  <table>
+    <thead><tr><th>Document</th><th>Covers</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>WEBE.md</code></td><td>Names, objects, fetch, publish, sites, feeds, forums, labels, clients</td><td>Draft 0.1</td></tr>
+      <tr><td><code>PROTOCOL.md</code></td><td>Wire formats, MLS suite, mix packets, stealth ticks, calls</td><td>Draft</td></tr>
+      <tr><td><code>THREAT-MODEL.md</code></td><td>Who we defend against and what remains</td><td>Draft</td></tr>
+      <tr><td><code>design/nu-media.md</code></td><td>Images, video and HDR in minimal wire bits</td><td>Design</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Five Internet-Drafts are planned from these: Outfox with ML-KEM-1024, a stealth profile for MOQ, naming from a
+    transparency log, signed content-addressed sites and feeds over MOQ, and two-relay stealth fetch. The specification
+    repository opens with its design review; until then, <a href="mailto:hello@elliottwave.studio?subject=webE%20specification">ask for access</a>.
+  </p>
+
+  <h2 id="build">Build an app on webE</h2>
+  <ul>
+    <li><strong>Sites:</strong> a site is a signed manifest plus static files and optional WebAssembly, published at <code>your-name.khensu.nu</code> and hosted by the network. There is no server-side code. A site can embed feeds, forums and live tracks by reference.</li>
+    <li><strong>Apps:</strong> <code>khensu-core</code> (Apache-2.0, Rust) gives you the transport, MLS groups, names and objects, with Swift bindings as an XCFramework for iPhone, iPad and Mac. Your app gets the same stealth and post-quantum encryption as khensu.nu, with no extra work.</li>
+    <li><strong>Browsers:</strong> the Chromium extension resolves <code>webe://</code> and <code>https://*.khensu.nu</code> through a local daemon, so webE pages open in an ordinary browser.</li>
+    <li><strong>Develop locally:</strong> <code>khensu-devnet</code> runs a node, the mix network, the chain and the push gateway on one machine.</li>
+  </ul>
+  <p>Every webE app keeps the same rules, enforced by the protocol and by review:</p>
+  <ul>
+    <li>Stealth can’t be turned off, and there is no faster visible mode.</li>
+    <li>Nothing processes user data on a server; nodes only relay, cache and count.</li>
+    <li>ML-KEM-1024 and ML-DSA-87 only, with no classical fallback.</li>
+    <li>Content is signed by its publisher and addressed by its hash, so no node can alter it.</li>
+    <li>Sites can’t reach the ordinary web or other names unless their policy lists them, which blocks third-party tracking by construction.</li>
+  </ul>
+
+  <h2 id="extend">Extend khensu.nu</h2>
+  <p>There are two ways to change khensu.nu: pull requests for code, and consensus for the network’s rules.</p>
+  <h3>Code: pull requests</h3>
+  <ul>
+    <li>Send pull requests to any repository once it opens. Outside contributors sign a contributor licence agreement once, through a bot on the first pull request.</li>
+    <li><code>khensu-core</code> is Apache-2.0; the apps, node, chain, services and sites are AGPL-3.0, so modified versions that others use must publish their changes.</li>
+    <li>Cryptography and protocol changes start with a written design, as a pull request to <code>khensu-specs</code>, and need review before any code.</li>
+    <li>Node and app builds are reproducible, and every release hash is published to the transparency log, so anyone can check that what runs is what was merged.</li>
+  </ul>
+  <h3>Network rules: consensus</h3>
+  <ul>
+    <li>Rules that every node enforces (fees, eligibility, penalties, cipher suites) change only through the chain’s governance: a proposal needs 2/3 of the epoch’s 21-member committee and the founder’s signature.</li>
+    <li>Every rule change waits a 30-day timelock, during which the committee can veto it. Emergency fixes take 48 hours and may only tighten rules, such as disabling a cipher.</li>
+    <li>Nobody, including the founder, can use governance to read content, unmask users or make stealth optional.</li>
+    <li>Committee seats go by lottery, weighted by node reputation and stake, so running a reliable node is how you get a vote.</li>
+  </ul>
+  <p>
+    See <a href="/contribute">Contribute</a> and <a href="/repositories">Repositories and licences</a>, or write to
+    <a href="mailto:hello@elliottwave.studio?subject=Building%20on%20webE">hello@elliottwave.studio</a>.
+  </p>
+</Base>
