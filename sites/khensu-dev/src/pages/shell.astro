@@ -18,17 +18,17 @@ const decel = (d: number) => (v * v) / (2 * d) / g;
 const fmt = (n: number, digits = 0) => n.toLocaleString('en-US', { maximumFractionDigits: digits, minimumFractionDigits: digits });
 ---
 
-<Base title="SunuLink" description="Specifications for SunuLink for iPhone 18 Pro: a post-quantum mesh transceiver in a ceramic-coated titanium shell that finishes level with the lenses, paired to your iPhone's Secure Enclave.">
-  <p class="eyebrow">SunuLink · post-quantum mesh transceiver</p>
-  <h1>SunuLink makes your phone a stealth, encrypted node that powers the network</h1>
+<Base title="suñůlink" description="Specifications for suñůlink for iPhone 18 Pro: a post-quantum mesh transceiver in a ceramic-coated titanium shell that finishes level with the lenses, paired to your iPhone's Secure Enclave.">
+  <p class="eyebrow">suñůlink · post-quantum mesh transceiver</p>
+  <h1>suñůlink makes your phone a stealth, encrypted node that powers the network</h1>
   <p class="lede">
-    It earns you khensu.nu coin for the work it does, and talks to nearby SunuLinks and home nodes over NuMesh, our
+    It earns you khensu.nu coin for the work it does, and talks to nearby suñůlinks and home nodes over NuMesh, our
     long-range mesh, so it keeps working without a carrier. In an emergency your iPhone’s own Emergency SOS via
     satellite still works, and satellite links through home stations are planned, so the network can bypass today’s
     telecom networks completely.
   </p>
   <p class="lede">
-    SunuLink is one model for iPhone 18 Pro and iPhone 18 Pro Max, coming to iPhone 18 when it arrives. Ceramic-coated titanium in
+    suñůlink is one model for iPhone 18 Pro and iPhone 18 Pro Max, coming to iPhone 18 when it arrives. Ceramic-coated titanium in
     your iPhone’s colour, or solid brass. It turns the phone into a node with its own battery, finishes level with the
     lenses so your iPhone is no thicker at its thickest point, and leaves the iPhone’s own USB-C port open.
   </p>
@@ -43,7 +43,7 @@ const fmt = (n: number, digits = 0) => n.toLocaleString('en-US', { maximumFracti
       <tr><td>Housing</td><td>CNC-machined Grade 5 titanium (Ti-6Al-4V), with a ceramic finish: a plasma electrolytic oxide layer grown from the titanium itself, sealed with a colour-matched ceramic topcoat in Burgundy, Glacier, Silver or Black. Or bare solid brass (C26000), which ages to a warm patina shaped by how it’s handled, so each one becomes unique.</td></tr>
       <tr><td>Weight</td><td>About 93 g in titanium, 136 g in brass</td></tr>
       <tr><td>Battery</td><td>6.2 Wh, about 5 hours as a node on its own. Extended battery option: about 7.5 Wh, about 6 hours</td></tr>
-      <tr><td>USB-C</td><td>SunuLink has its own USB-C port in its bottom edge, above the iPhone’s. The iPhone’s port stays open: charge both at once, from two cables or one dual USB-C cable, and keep using the iPhone’s port for drives, displays, audio and CarPlay.</td></tr>
+      <tr><td>USB-C</td><td>suñůlink has its own USB-C port in its bottom edge, above the iPhone’s. The iPhone’s port stays open: charge both at once, from two cables or one dual USB-C cable, and keep using the iPhone’s port for drives, displays, audio and CarPlay.</td></tr>
       <tr><td>Attachment</td><td>MagSafe-compatible magnet ring and a 0.5 mm micro-suction urethane layer that is also the shock isolator</td></tr>
       <tr><td>Antennas</td><td>A band in the bottom edge, so nearby nodes reach each other directly where there’s no internet</td></tr>
       <tr><td>Camera</td><td>Clears every lens, flash and sensor, outside each one’s field of view</td></tr>
@@ -79,13 +79,13 @@ const fmt = (n: number, digits = 0) => n.toLocaleString('en-US', { maximumFracti
 
   <h2 id="strength">Stronger than the phone</h2>
   <p>
-    iPhone 18 Pro is an aluminium unibody with a Ceramic Shield back. SunuLink’s housing is Grade 5 titanium, which is stronger
+    iPhone 18 Pro is an aluminium unibody with a Ceramic Shield back. suñůlink’s housing is Grade 5 titanium, which is stronger
     and harder than any aluminium alloy used in phones, so on the back it is a shield, not just a cover.
   </p>
   <table>
     <thead><tr><th>Material</th><th>Yield strength</th><th>Note</th></tr></thead>
     <tbody>
-      <tr><td>Grade 5 titanium, Ti-6Al-4V (SunuLink’s housing)</td><td>at least 828 MPa (ASTM B348)</td><td>About 1.6× high-strength aluminium</td></tr>
+      <tr><td>Grade 5 titanium, Ti-6Al-4V (suñůlink’s housing)</td><td>at least 828 MPa (ASTM B348)</td><td>About 1.6× high-strength aluminium</td></tr>
       <tr><td>7075-T6 aluminium</td><td>about 500 MPa</td><td>The strongest common 7000-series alloy. Apple doesn’t publish the iPhone 18 Pro alloy.</td></tr>
       <tr><td>C26000 brass, half hard (the brass housing)</td><td>about 360 MPa</td><td>Softer than titanium; chosen for its antimicrobial surface and the patina it grows with age, which makes each one unique</td></tr>
     </tbody>
@@ -99,7 +99,7 @@ const fmt = (n: number, digits = 0) => n.toLocaleString('en-US', { maximumFracti
     0.1 mm, around {fmt(decel(rigid))} g.
   </p>
   <p>
-    SunuLink is held on by a 0.5 mm microcellular urethane layer instead. In a back or edge impact SunuLink stops
+    suñůlink is held on by a 0.5 mm microcellular urethane layer instead. In a back or edge impact suñůlink stops
     first and the layer lets the phone decelerate over about 0.3 mm of usable stroke, around {fmt(decel(stroke))} g on
     average: about a third of the rigid case. The layer firms up at impact speeds and returns to shape after each hit.
   </p>
@@ -109,13 +109,13 @@ const fmt = (n: number, digits = 0) => n.toLocaleString('en-US', { maximumFracti
       <tr><td>Drop height</td><td>{h} m, the usual test height</td></tr>
       <tr><td>Impact speed</td><td>{fmt(v, 2)} m/s</td></tr>
       <tr><td>Phone mass</td><td>about {phone * 1000} g</td></tr>
-      <tr><td>Energy at impact</td><td>{fmt(0.5 * phone * v * v, 1)} J for the phone alone, {fmt(0.5 * (phone + shell) * v * v, 1)} J with SunuLink</td></tr>
+      <tr><td>Energy at impact</td><td>{fmt(0.5 * phone * v * v, 1)} J for the phone alone, {fmt(0.5 * (phone + shell) * v * v, 1)} J with suñůlink</td></tr>
       <tr><td>Rigid stop</td><td>about 0.1 mm: {fmt(decel(rigid))} g average</td></tr>
       <tr><td>Through the shock layer</td><td>about 0.3 mm of 0.5 mm: {fmt(decel(stroke))} g average</td></tr>
     </tbody>
   </table>
   <p>
-    SunuLink covers the back and frames the camera. It doesn’t cover the screen, so a drop flat onto the glass is still
+    suñůlink covers the back and frames the camera. It doesn’t cover the screen, so a drop flat onto the glass is still
     the iPhone’s Ceramic Shield 2 against the ground. These are first-order estimates; production units are tested to
     MIL-STD-810H Method 516.8 drops at 1.2 m and 1.5 m onto steel-backed plywood, with the results published here.
   </p>
@@ -124,7 +124,7 @@ const fmt = (n: number, digits = 0) => n.toLocaleString('en-US', { maximumFracti
   <p>
     At setup, the khensu app creates a post-quantum ML-DSA-87 key inside your iPhone’s Secure Enclave
     (<a href="https://developer.apple.com/documentation/cryptokit/enhancing-your-app-s-privacy-and-security-with-quantum-secure-workflows">CryptoKit, iOS 26</a>),
-    usable only with Face ID, and signs SunuLink’s own identity key with it. SunuLink keeps its keys sealed in the
+    usable only with Face ID, and signs suñůlink’s own identity key with it. suñůlink keeps its keys sealed in the
     i.MX 93’s EdgeLock Secure Enclave and takes instructions only from the paired key. It carries only sealed,
     fixed-size packets on a constant schedule, so it never holds a readable message or learns who is talking to whom.
     If you lose it, revoke it from your iPhone; there’s nothing on it for the finder to read.
