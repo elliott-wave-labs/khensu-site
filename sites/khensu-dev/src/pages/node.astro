@@ -1,14 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base title="Run a node" description="Run a khensu.ñü node on a Raspberry Pi 5, an old phone, or your computer in the background.">
   <p class="eyebrow">Run a node</p>
   <h1>Be part of the network</h1>
-  <p class="lede">
-    A node needs a connection and a power socket, nothing more. It forwards traffic it can’t read, keeps encrypted
-    mailboxes for people who are offline, and earns for the work it can prove it did.
-  </p>
+  <StatStrip
+    items={[
+      { n: 3400, label: 'About this many people a day on an old iPhone 15 Pro' },
+      { n: 1700, label: 'About this many people a day on a Raspberry Pi 5' },
+      { n: 50, unit: '%', label: 'Or less of a Mac’s idle processing power' },
+      { n: 0, pre: '$', label: 'To start on a phone you already own' },
+    ]}
+  >
+    Figures from the hardware table below: each node shares half its connection, the iPhone on 2 Gbit fibre over Wi-Fi 6E and the Pi on gigabit fibre.
+  </StatStrip>
+  <p class="lede">A connection and a power socket, nothing more. It earns for the work it can prove it did.</p>
+  <p>It forwards traffic it can’t read and keeps encrypted mailboxes for people who are offline.</p>
 
   <h2>Hardware</h2>
   <table>

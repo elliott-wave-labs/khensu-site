@@ -1,16 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base title="Repositories and licences" description="Where khensu.ñü’s code lives, its licences, and when each repository opens.">
   <p class="eyebrow">Repositories and licences</p>
   <h1>Open source, component by component</h1>
+  <StatStrip
+    items={[
+      { n: 8, label: 'Repositories, each with its own licence' },
+      { n: 4, label: 'Specifications public now' },
+      { n: 3, label: 'Licences: Apache-2.0, AGPL-3.0 and CC BY 4.0' },
+    ]}
+  />
   <p class="lede">
-    Every part of khensu.ñü will be open source. Each repository opens once its design review is finished; until
-    then they’re private.<br />
-    The specifications are public now: the <a href="/specs/protocol">protocol</a>, <a href="/specs/webe">webË</a>,
-    the <a href="/specs/threat-model">threat model</a> and <a href="/specs/nu-media">ñü-media</a>.
+    The <a href="/specs/protocol">protocol</a>, <a href="/specs/webe">webË</a>, the
+    <a href="/specs/threat-model">threat model</a> and <a href="/specs/nu-media">ñü.media</a> specifications are public now.
   </p>
+  <p>Each repository opens once its design review is finished; until then they’re private.</p>
 
   <table>
     <thead><tr><th>Repository</th><th>Contents</th><th>Licence</th></tr></thead>

@@ -44,37 +44,71 @@ const cutLabel = 'What the artist keeps when fans pay $100: ' +
   keep.map((r) => `${r.name} ${keptText(r)}${r.ours ? ', less a network fee estimated under 1 cent a payment' : ` (${r.kind})`}`).join('; ') +
   '. The shares are the same at any amount up to $1 billion.';
 const perLabel = `${data.perThousand.title}, in US dollars: ` +
-  per.map((r) => `${r.name} ${r.display}${r.ours ? ' in an example where the fan pays $1 a month for 100 plays' : ` (${r.kind})`}`).join('; ') + '.';
+  per.map((r) => `${r.name} ${r.display}${r.ours ? ', a cent a play with no cut' : ` (${r.kind})`}`).join('; ') + '.';
 
 const points = [
   { t: 'Paid straight to you', b: 'Subscriptions, tips, pay-per-view and live tickets go from a fan’s wallet to yours. No platform cut and no card processor in between.' },
   { t: 'Funded by fans, not advances', b: 'Raise the money for a film, an album or a tour with ñüFi. Backers pay only if you reach your goal, and you keep your rights.' },
   { t: 'Everyone on the credits paid', b: 'Set the split once, and every payment is shared between collaborators automatically. No label recoupment first.' },
+  { t: 'Every right stays yours', b: 'Publishing rights, copyright, trademarks and IP, like nowhere else. khensu.ñü takes no licence to your work, no share of your masters or publishing, and never trains AI on it.' },
 ];
 ---
 
-<section class="section creator-pay khensu" aria-labelledby="creator-pay-title">
+<section class="section creator-pay khensu" id="creator-pay-section" aria-labelledby="creator-pay-title">
   <div class="wrap">
     <p class="eyebrow">for artists</p>
     <h2 id="creator-pay-title" class="big">Fans pay artists directly.<br /><em>Nobody takes a cut in between.</em></h2>
     <p class="lede">
       Studios, labels and streaming services keep most of what people spend on art. On khensu.ñü, fans pay the people
-      who made it, in the app, and the only charge is a network fee of a fraction of a cent.
+      who made it, in the app, and the only charge is a network fee of a fraction of a cent. And you keep every right
+      to your work: publishing, copyright, trademarks and IP, like nowhere else.
     </p>
 
-    <div class="stats" aria-label="How khensu.ñü payments work">
+    <div class="stats" aria-label="How khensu.ñü payments work" hidden={page}>
       <p class="target">how payments work</p>
       <div class="sv"><b>0%</b><span>platform cut</span></div>
       <div class="sv"><b>100%</b><span>of every tip to the artist</span></div>
       <div class="sv"><b>&lt;1¢</b><span>network fee a payment, estimate</span></div>
-      <div class="sv"><b>$0</b><span>minimum cashout</span></div>
+      <div class="sv"><b>42¢</b><span>minimum payout</span></div>
     </div>
 
     <div class="charts">
+      <figure class="card cp-card" data-scene="reveal">
+        <figcaption><b>Views and plays: {data.perThousand.title.replace(/^What reaches/, 'what reaches')}</b><span>US dollars per 1,000 streams or views. On khensu.ñü, a cent a play with no cut</span></figcaption>
+        <div role="img" aria-label={perLabel}>
+          <ul class="bars per" role="list" aria-hidden="true">
+            {per.map((r, i) => (
+              <li class:list={[{ ours: r.ours }]} style={`--i:${i}`}>
+                <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
+                <span class="track">
+                  {!r.ours && <span class="ghost" style={`--w:${pct(r.paid[1])}`} />}
+                  <span class="fill">
+                    <span class:list={['seg', r.ours ? 'ours-seg' : 'plat']} style={`--w:${pct(r.artist[0])}`} />
+                    {r.artist[1] > r.artist[0] && <span class="seg range" style={`--w:${pct(r.artist[1] - r.artist[0])}`} />}
+                  </span>
+                </span>
+                <span class="value"><b>{r.display}</b> <small class="kind">{r.kind}</small></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <ul class="key" role="list">
+          <li><i class="k-ghost" />Paid for the plays, before label or platform share</li>
+          <li><i class="k-plat" />Reaches the artist</li>
+          <li class="k-ours"><i />khensu.ñü, all to the artist</li>
+        </ul>
+        <p class="src">
+          Estimates checked {data.checked}; services pay from a monthly pool, not a fixed rate, and pay varies by country,
+          plan and audience. Signed-artist figures apply a 15–20% royalty to the rights holders’ payout, before recoupment.
+          On khensu.ñü every play pays the artist 1¢ and khensu.ñü takes no cut, so $10 per 1,000 plays reaches the artist in full. The play rate is the same for everyone; artists set prices only for what they sell, such as albums, tickets and in-app purchases; tips arrive in full, and paid content
+          bought inside the iPhone app follows Apple’s purchase rules.
+          Sources: {perSources.map((s, i) => <>{i ? '; ' : ''}<a href={s.url} rel="noopener">{s.name}</a></>)}.
+        </p>
+      </figure>
       <figure class="card cp-card keep-card" data-scene="reveal">
         <figcaption>
-          <b>What the artist keeps when fans pay <output class="amt" data-amt>$100</output></b>
-          <span>The shares stay the same from $100 to $1 billion. Drag to change the amount.</span>
+          <b>Everything you sell: what you keep when fans pay <output class="amt" data-amt>$100</output></b>
+          <span>Subscriptions, tickets to digital or real-world events, and one-off purchases such as albums, downloads and in-app purchases. The shares stay the same from $100 to $1 billion; drag to change the amount.</span>
         </figcaption>
         <label class="scale">
           <span class="sr-only">Amount fans pay, from $100 to $1 billion</span>
@@ -90,7 +124,7 @@ const points = [
               <li class:list={[{ ours: r.ours }]} style={`--i:${i}`}>
                 <span class="label">
                   <b>{r.name}</b>
-                  <small>{r.ours ? 'No platform cut and no minimum cashout. Each payment lands in your wallet as it’s sent, less a network fee under 1¢ paid to node operators' : r.note}</small>
+                  <small>{r.ours ? 'No platform cut and a 42¢ minimum payout. Each payment lands in your wallet as it’s sent, less a network fee under 1¢ paid to node operators' : r.note}</small>
                 </span>
                 <span class="track"><span class="fill">{segs(r).map((s) => <span class={s.cls} style={`--w:${s.w}`} />)}</span></span>
                 <span class="value">
@@ -113,43 +147,11 @@ const points = [
           first year, otherwise 30%. The Spotify row is an estimate: about two-thirds of Spotify’s revenue goes to rights
           holders, and a typical new-artist label deal pays the artist 15–20% of that, before any advance is recouped;
           songwriting royalties are paid separately. Card fees are worked out at typical payment sizes. khensu.ñü’s network
-          fee is an estimate.
+          fee is an estimate. Apps built on khensu.ñü pay a flat 10% of their own in-app purchases and app subscriptions, never scaled up or down; creator subscriptions, tickets, sales and tips pay no cut.
           Sources: {cutSources.map((s, i) => <>{i ? '; ' : ''}<a href={s.url} rel="noopener">{s.name}</a></>)}.
         </p>
       </figure>
 
-      <figure class="card cp-card" data-scene="reveal">
-        <figcaption><b>{data.perThousand.title}</b><span>US dollars per 1,000 streams or views</span></figcaption>
-        <div role="img" aria-label={perLabel}>
-          <ul class="bars per" role="list" aria-hidden="true">
-            {per.map((r, i) => (
-              <li class:list={[{ ours: r.ours }]} style={`--i:${i}`}>
-                <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
-                <span class="track">
-                  {!r.ours && <span class="ghost" style={`--w:${pct(r.paid[1])}`} />}
-                  <span class="fill">
-                    <span class:list={['seg', r.ours ? 'ours-seg' : 'plat']} style={`--w:${pct(r.artist[0])}`} />
-                    {r.artist[1] > r.artist[0] && <span class="seg range" style={`--w:${pct(r.artist[1] - r.artist[0])}`} />}
-                  </span>
-                </span>
-                <span class="value"><b>{r.display}</b> <small class="kind">{r.ours ? 'example' : r.kind}</small></span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <ul class="key" role="list">
-          <li><i class="k-ghost" />Paid for the plays, before label or platform share</li>
-          <li><i class="k-plat" />Reaches the artist</li>
-          <li class="k-ours"><i />khensu.ñü, artist sets the price</li>
-        </ul>
-        <p class="src">
-          Estimates checked {data.checked}; services pay from a monthly pool, not a fixed rate, and pay varies by country,
-          plan and audience. Signed-artist figures apply a 15–20% royalty to the rights holders’ payout, before recoupment.
-          khensu.ñü’s row is an example, not a measurement: the artist sets the price, tips arrive in full, and paid content
-          bought inside the iPhone app follows Apple’s purchase rules.
-          Sources: {perSources.map((s, i) => <>{i ? '; ' : ''}<a href={s.url} rel="noopener">{s.name}</a></>)}.
-        </p>
-      </figure>
     </div>
 
     <ul class="points" role="list">
@@ -245,6 +247,9 @@ const points = [
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     gap: 1rem;
     margin: 2.5rem 0;
+  }
+  .stats[hidden] {
+    display: none;
   }
   .stats .target {
     grid-column: 1 / -1;

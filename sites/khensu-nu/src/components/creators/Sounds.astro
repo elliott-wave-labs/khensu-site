@@ -1,0 +1,720 @@
+---
+// Sounds, the music and healing-sounds tab in the khensu.ñü app, as a working phone mock: Music and Healing switch,
+// tapping a tile puts it in the now-playing bar. The art is drawn in CSS.
+import Phone from './Phone.astro';
+
+const music = {
+  featured: { t: 'Glass Hours', by: 'Ada Rho', art: 'a1', note: 'New album · $8, or stream it' },
+  row: [
+    { t: 'Night Bus', by: 'Nile Static', art: 'a2' },
+    { t: 'Saltwater Choir', by: 'Mara Vey', art: 'a3' },
+    { t: 'Low Sun', by: 'Tamsin Oko', art: 'a4' },
+  ],
+  list: [
+    { t: 'Paper Planets', by: 'Ada Rho', art: 'a5', price: 'Subscribed' },
+    { t: 'Kasbah Rain', by: 'Youssef B.', art: 'a6', price: '$1 to own' },
+    { t: 'Half Light', by: 'Nile Static', art: 'a7', price: 'Live · $12' },
+  ],
+};
+const healing = [
+  { t: '528 Hz', by: 'Solfeggio frequency', art: 'h1' },
+  { t: 'Theta 6 Hz', by: 'Binaural beats', art: 'h2' },
+  { t: 'Rain on glass', by: 'Nature', art: 'h3' },
+  { t: 'Ocean at night', by: 'Nature', art: 'h4' },
+  { t: 'Singing bowls', by: 'Tibetan bowls', art: 'h5' },
+  { t: 'Deep sleep', by: '8 hours · fades out', art: 'h6' },
+];
+const tabs = [
+  { n: 'Chats', d: 'M4 5h16v11H10l-6 4z' },
+  { n: 'Feed', d: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
+  { n: 'Sounds', d: 'M9 18V6l11-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM20 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z', on: true },
+  { n: 'Calls', d: 'M6 3.5h3.2l1.8 4.6-2.4 1.5a11 11 0 0 0 5.8 5.8l1.5-2.4 4.6 1.8v3.2a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 4.5 5.1 1.5 1.5 0 0 1 6 3.5z' },
+  { n: 'Wallet', d: 'M3 6.5h18v13H3zM3 10h18M16 15h2' },
+];
+const floats = [
+  { art: 'a2', cls: 's1' },
+  { art: 'h1', cls: 's2' },
+  { art: 'a3', cls: 's3' },
+  { art: 'h4', cls: 's4' },
+  { art: 'a6', cls: 's5' },
+  { art: 'h5', cls: 's6' },
+];
+const points = [
+  { t: 'Upload. Sell or stream.', b: 'Put out a track, an album or a live set yourself. Sell it, stream it, or both.' },
+  { t: 'Paid for every play.', b: 'Every play pays the artist 1¢, $10 per 1,000, and khensu.ñü takes no cut. You set the price of what you sell, such as albums, downloads and tickets, with no platform cut.' },
+  { t: 'Your rights stay yours.', b: 'Masters, publishing and copyright stay with you. khensu.ñü takes no licence and no share.' },
+  { t: 'A healing library.', b: 'Solfeggio frequencies, binaural beats, rain, ocean, singing bowls and sleep sounds, from the people who record them.' },
+  { t: 'Private by design.', b: 'Everything plays over the stealth network. Nothing is processed on servers, so nobody builds a profile of what you play.' },
+  { t: 'Offline, too.', b: 'Download anything you’ve bought or subscribed to, and play it with no connection at all.' },
+];
+---
+
+<section class="snd" id="sounds-section" data-par aria-labelledby="snd-title">
+  <div class="snd-floats" aria-hidden="true">
+    {floats.map((f) => <span class:list={['art', 'sf', f.art, f.cls]}></span>)}
+  </div>
+  <div class="wrap snd-head">
+    <p class="eyebrow">sounds</p>
+    <h2 id="snd-title">Sounds.<em>Music and healing, straight from the artist.</em></h2>
+    <p class="snd-lede">
+      <strong>A new tab in khensu.ñü, next to Chats and Feed.</strong> Artists upload their own music. Every play pays
+      the artist 1¢ with no cut, fans buy albums and tickets straight from the artist, and it all plays privately.
+    </p>
+  </div>
+
+  <div class="snd-stage">
+    <div class="snd-phone" data-sounds>
+      <Phone>
+        <div class="app">
+          <div class="nav" aria-hidden="true">
+            <span class="me">Y</span>
+            <span class="nav-r">
+              <span class="gc"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14" /></svg></span>
+              <span class="gc"><svg viewBox="0 0 24 24"><path d="M6 12h.01M12 12h.01M18 12h.01" /></svg></span>
+            </span>
+          </div>
+          <p class="large" aria-hidden="true">Sounds</p>
+          <div class="seg" role="group" aria-label="Sounds library">
+            <button type="button" data-seg="music" aria-pressed="true">Music</button>
+            <button type="button" data-seg="healing" aria-pressed="false">Healing</button>
+          </div>
+
+          <div class="pane" data-pane="music">
+            <button type="button" class="feat" data-track={music.featured.t} data-by={music.featured.by} data-art={music.featured.art}>
+              <span class:list={['art', 'feat-art', music.featured.art]}></span>
+              <span class="feat-txt"><small>{music.featured.note}</small><b>{music.featured.t}</b><span>{music.featured.by}</span></span>
+            </button>
+            <p class="h">Artists you back</p>
+            <div class="row">
+              {music.row.map((m) => (
+                <button type="button" class="sq" data-track={m.t} data-by={m.by} data-art={m.art}>
+                  <span class:list={['art', m.art]}></span>
+                  <b>{m.t}</b><small>{m.by}</small>
+                </button>
+              ))}
+            </div>
+            <p class="h">Fresh uploads</p>
+            <ul class="list" role="list">
+              {music.list.map((m) => (
+                <li>
+                  <button type="button" data-track={m.t} data-by={m.by} data-art={m.art}>
+                    <span class:list={['art', 'th', m.art]}></span>
+                    <span class="lt"><b>{m.t}</b><small>{m.by}</small></span>
+                    <span class="price">{m.price}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="pane" data-pane="healing" hidden>
+            <div class="heal">
+              {healing.map((h) => (
+                <button type="button" class="ht" data-track={h.t} data-by={h.by} data-art={h.art}>
+                  <span class:list={['art', h.art]}></span>
+                  <span class="ht-txt"><b>{h.t}</b><small>{h.by}</small></span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div class="np playing" data-np>
+            <span class="art np-art a1" data-np-art></span>
+            <span class="np-txt"><b data-np-title>Glass Hours</b><small data-np-sub>Ada Rho</small></span>
+            <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <button type="button" class="np-btn" data-np-toggle aria-pressed="true" aria-label="Pause">
+              <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" /></svg>
+              <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" /></svg>
+            </button>
+            <span class="np-bar" aria-hidden="true"><i></i></span>
+          </div>
+
+          <div class="tabbar" aria-hidden="true">
+            <span class="tabs">
+              {tabs.map((t) => (
+                <span class:list={['tab', { on: t.on }]}>
+                  <svg viewBox="0 0 24 24"><path d={t.d} /></svg>
+                  <span>{t.n}</span>
+                </span>
+              ))}
+            </span>
+            <span class="gc lg"><svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zM15.5 15.5 20 20" /></svg></span>
+          </div>
+        </div>
+      </Phone>
+      <p class="snd-hint">Try it: switch to Healing, or tap anything to play it.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <ul class="snd-points" role="list">
+      {points.map((p, i) => (
+        <li style={`--i:${i}`}><b>{p.t}</b><span>{p.b}</span></li>
+      ))}
+    </ul>
+    <p class="snd-foot">
+      Artists set their own prices for albums, downloads and tickets; every play pays the artist 1¢, with no cut.
+      Paid content bought inside the iPhone app follows Apple’s purchase rules; tips go 100% to the artist.
+    </p>
+  </div>
+</section>
+
+<style>
+  .snd {
+    --v: 0;
+    position: relative;
+    overflow: hidden;
+    padding: clamp(5rem, 11vw, 9rem) 0;
+    background:
+      radial-gradient(50% 40% at 50% 46%, rgba(139, 123, 255, 0.22), transparent 70%),
+      radial-gradient(40% 30% at 30% 70%, rgba(24, 224, 200, 0.1), transparent 70%),
+      #000;
+    border-top: 1px solid var(--line);
+  }
+  .snd-head {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    display: grid;
+    justify-items: center;
+  }
+  h2 {
+    font-size: clamp(2.6rem, 6vw, 5.2rem);
+    font-weight: 600;
+  }
+  h2 em {
+    background: linear-gradient(100deg, #b9b0ff, #8b7bff 40%, #18e0c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .snd-lede {
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    color: rgba(255, 255, 255, 0.56);
+    max-width: 40rem;
+  }
+  .snd-lede strong {
+    color: #fff;
+    font-weight: 500;
+  }
+  .snd-stage {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    justify-items: center;
+    margin-top: 3rem;
+  }
+  .snd-phone {
+    --phone-w: min(350px, 86vw);
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    translate: 0 calc(var(--v) * -40px);
+  }
+  .snd-hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-faint);
+  }
+
+  /* Album art floating behind the phone at different depths. */
+  .snd-floats {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .art.sf {
+    --d: 1;
+    position: absolute;
+    width: clamp(90px, 14vw, 200px);
+    aspect-ratio: 1;
+    border-radius: 22px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    translate: 0 calc(var(--v) * var(--d) * -220px);
+    opacity: 0.85;
+  }
+  .sf.s1 { --d: 1.4; left: 6%; top: 20%; rotate: -8deg; }
+  .sf.s2 { --d: 0.7; left: 16%; top: 36%; rotate: 6deg; width: clamp(70px, 10vw, 140px); opacity: 0.6; filter: blur(1px); }
+  .sf.s3 { --d: 1.9; left: 4%; top: 50%; rotate: 4deg; }
+  .sf.s4 { --d: 1.2; right: 6%; top: 22%; rotate: 9deg; }
+  .sf.s5 { --d: 0.6; right: 17%; top: 38%; rotate: -5deg; width: clamp(70px, 10vw, 140px); opacity: 0.6; filter: blur(1px); }
+  .sf.s6 { --d: 1.7; right: 5%; top: 52%; rotate: -10deg; }
+
+  /* Art, drawn in CSS. */
+  .art {
+    display: block;
+    border-radius: 3cqw;
+    background-size: cover;
+  }
+  .a1 { background: radial-gradient(circle at 30% 30%, #fff8 0 6%, transparent 7%), radial-gradient(circle at 70% 75%, #18e0c8 0 18%, transparent 40%), conic-gradient(from 120deg at 40% 60%, #8b7bff, #3a2a8a, #b9b0ff, #1a1240, #8b7bff); }
+  .a2 { background: repeating-linear-gradient(0deg, #0c0f2a 0 8%, #1d2b6e 8% 9%), radial-gradient(circle at 70% 30%, #ff5f8a 0 14%, transparent 15%), linear-gradient(160deg, #1b1f5c, #05060f); background-blend-mode: screen, normal, normal; }
+  .a3 { background: radial-gradient(120% 60% at 50% 110%, #18e0c8, transparent 60%), radial-gradient(80% 50% at 50% 0%, #7ab8ff, transparent 70%), linear-gradient(#0a2a4a, #021018); }
+  .a4 { background: radial-gradient(circle at 50% 62%, #ffb38a 0 22%, #ff6a5b 23% 26%, transparent 27%), linear-gradient(180deg, #3b1a4f, #c4556a 70%, #2a0f22); }
+  .a5 { background: radial-gradient(circle at 30% 40%, #c9c0ff 0 12%, transparent 13%), radial-gradient(circle at 65% 60%, #8b7bff 0 20%, transparent 21%), radial-gradient(circle at 80% 25%, #18e0c8 0 6%, transparent 7%), #120f24; }
+  .a6 { background: repeating-linear-gradient(100deg, rgba(255, 255, 255, 0.08) 0 2px, transparent 2px 9px), linear-gradient(170deg, #5a2a2a, #c26a3c 50%, #2a1410); }
+  .a7 { background: conic-gradient(from 0deg at 50% 50%, #000, #2b2b3a, #b9b0ff, #2b2b3a, #000); }
+  .h1 { background: repeating-radial-gradient(circle at 50% 50%, #18e0c8 0 2%, transparent 2% 9%), radial-gradient(circle, #0a4a48, #021614); }
+  .h2 { background: repeating-linear-gradient(90deg, transparent 0 10%, rgba(185, 176, 255, 0.4) 10% 11%), radial-gradient(60% 60% at 30% 50%, #8b7bff, transparent), radial-gradient(60% 60% at 70% 50%, #4a3cff, transparent), #0b0920; }
+  .h3 { background: repeating-linear-gradient(105deg, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px 14px), linear-gradient(#2c3e55, #0d1622); }
+  .h4 { background: radial-gradient(circle at 70% 25%, #e8ecff 0 6%, transparent 7%), repeating-linear-gradient(0deg, #08203a 0 6%, #0f3a5e 6% 7%), linear-gradient(#020812, #0a2c4a); }
+  .h5 { background: radial-gradient(circle at 50% 55%, transparent 0 20%, #c9a96e00 20%), repeating-radial-gradient(circle at 50% 60%, rgba(255, 255, 255, 0.25) 0 1%, transparent 1% 8%), radial-gradient(circle at 50% 60%, #7a5cff, #1a0f3a); }
+  .h6 { background: radial-gradient(circle at 68% 32%, transparent 0 14%, #0a0b1a 14.5%), radial-gradient(circle at 60% 36%, #d8d4ff 0 18%, transparent 18.5%), linear-gradient(#0a0b1a, #1c1640); }
+
+  /* The app screen. */
+  .app {
+    position: absolute;
+    inset: 0;
+    padding: 13.5cqw 5cqw 0;
+    background: radial-gradient(90% 40% at 50% 0%, rgba(139, 123, 255, 0.28), transparent 70%), #0b0c0e;
+    color: #f2f1ec;
+  }
+  .app svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .app button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    text-align: start;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .app button:focus-visible {
+    outline: 2px solid #b9b0ff;
+    outline-offset: 2px;
+  }
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 10cqw;
+  }
+  .me {
+    display: grid;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 4cqw;
+    background: linear-gradient(135deg, #b9b0ff, #18e0c8);
+    color: #0b0c0e;
+  }
+  .nav-r {
+    display: flex;
+    gap: 2cqw;
+  }
+  .gc {
+    display: grid;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+  }
+  .gc svg {
+    width: 5cqw;
+    height: 5cqw;
+  }
+  .large {
+    margin: 1cqw 0 2.5cqw;
+    font-size: 9.6cqw;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .seg {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0.8cqw;
+    border-radius: 5cqw;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 3.5cqw;
+  }
+  .app .seg button {
+    height: 8cqw;
+    border-radius: 4.2cqw;
+    text-align: center;
+    font-size: 3.6cqw;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    transition: background 0.3s, color 0.3s;
+  }
+  .app .seg button[aria-pressed='true'] {
+    background: rgba(255, 255, 255, 0.9);
+    color: #0b0c0e;
+  }
+  .pane[hidden] {
+    display: none;
+  }
+  .pane {
+    animation: pane-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  @keyframes pane-in {
+    from { opacity: 0; transform: translateY(2cqw); }
+  }
+  .app .feat {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 44cqw;
+    border-radius: 5cqw;
+    overflow: hidden;
+  }
+  .feat-art {
+    position: absolute;
+    inset: 0;
+    border-radius: 0;
+  }
+  .feat-txt {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    padding: 3.5cqw 4cqw;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  }
+  .feat-txt small {
+    font-size: 2.9cqw;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .feat-txt b {
+    font-size: 5.6cqw;
+    letter-spacing: -0.02em;
+  }
+  .feat-txt span {
+    font-size: 3.3cqw;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .h {
+    margin: 4cqw 0 2cqw;
+    font-size: 4.4cqw;
+    font-weight: 700;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3cqw;
+  }
+  .app .sq {
+    display: grid;
+    gap: 0.6cqw;
+    min-width: 0;
+  }
+  .sq .art {
+    aspect-ratio: 1;
+  }
+  .sq b,
+  .lt b,
+  .ht-txt b {
+    font-size: 3.3cqw;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sq small,
+  .lt small,
+  .ht-txt small {
+    font-size: 2.8cqw;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2.4cqw;
+  }
+  .app .list button {
+    display: flex;
+    align-items: center;
+    gap: 3cqw;
+    width: 100%;
+  }
+  .th {
+    width: 11cqw;
+    height: 11cqw;
+    border-radius: 2.4cqw;
+    flex: none;
+  }
+  .lt {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+  }
+  .price {
+    flex: none;
+    padding: 1cqw 2.6cqw;
+    border-radius: 4cqw;
+    font-size: 2.9cqw;
+    font-weight: 600;
+    background: rgba(139, 123, 255, 0.22);
+    color: #d5cfff;
+  }
+  .heal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3cqw;
+  }
+  .app .ht {
+    position: relative;
+    display: block;
+    height: 33cqw;
+    border-radius: 4.5cqw;
+    overflow: hidden;
+  }
+  .ht .art {
+    position: absolute;
+    inset: 0;
+    border-radius: 0;
+  }
+  .ht-txt {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    padding: 2.4cqw 3cqw;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.65), transparent);
+  }
+  .ht-txt b {
+    font-size: 3.8cqw;
+  }
+
+  .np {
+    position: absolute;
+    left: 4.5cqw;
+    right: 4.5cqw;
+    bottom: 24cqw;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 2.6cqw;
+    height: 14cqw;
+    padding: 0 2cqw 0 2cqw;
+    border-radius: 5cqw;
+    background: rgba(40, 38, 54, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8cqw 14cqw rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    overflow: hidden;
+  }
+  .np-art {
+    width: 10cqw;
+    height: 10cqw;
+    border-radius: 2.4cqw;
+    flex: none;
+  }
+  .np-txt {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+  }
+  .np-txt b {
+    font-size: 3.5cqw;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .np-txt small {
+    font-size: 2.8cqw;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .eq {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.7cqw;
+    height: 4.4cqw;
+  }
+  .eq i {
+    width: 0.9cqw;
+    height: 30%;
+    border-radius: 0.4cqw;
+    background: #b9b0ff;
+  }
+  .playing .eq i {
+    animation: eq 0.9s ease-in-out infinite alternate;
+  }
+  .eq i:nth-child(2) { animation-delay: -0.3s; }
+  .eq i:nth-child(3) { animation-delay: -0.6s; }
+  .eq i:nth-child(4) { animation-delay: -0.15s; }
+  @keyframes eq {
+    from { height: 25%; }
+    to { height: 100%; }
+  }
+  .app .np-btn {
+    display: grid;
+    place-items: center;
+    width: 10cqw;
+    height: 10cqw;
+    border-radius: 50%;
+  }
+  .np-btn svg {
+    width: 6cqw;
+    height: 6cqw;
+    fill: currentColor;
+    stroke-width: 2.6;
+  }
+  .np-btn .i-pause {
+    fill: none;
+    stroke-width: 3;
+  }
+  .np-btn .i-play,
+  .playing .np-btn .i-pause {
+    display: block;
+  }
+  .np-btn .i-pause,
+  .playing .np-btn .i-play {
+    display: none;
+  }
+  .np-bar {
+    position: absolute;
+    left: 4cqw;
+    right: 4cqw;
+    bottom: 0.9cqw;
+    height: 0.6cqw;
+    border-radius: 1cqw;
+    background: rgba(255, 255, 255, 0.14);
+    overflow: hidden;
+  }
+  .np-bar i {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #8b7bff, #18e0c8);
+    transform-origin: left;
+    transform: scaleX(0.35);
+  }
+  .playing .np-bar i {
+    animation: prog 40s linear infinite;
+  }
+  @keyframes prog {
+    from { transform: scaleX(0.35); }
+    to { transform: scaleX(1); }
+  }
+
+  .tabbar {
+    position: absolute;
+    left: 4.5cqw;
+    right: 4.5cqw;
+    bottom: 7.5cqw;
+    z-index: 3;
+    display: flex;
+    gap: 2.4cqw;
+    align-items: center;
+  }
+  .tabs {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    height: 14cqw;
+    border-radius: 7cqw;
+    padding: 0 1.2cqw;
+    background: rgba(40, 40, 46, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4cqw;
+    font-size: 2.3cqw;
+    color: #c9ccd2;
+    padding: 0 1.6cqw;
+    margin: 1.2cqw 0;
+    border-radius: 6cqw;
+  }
+  .tab svg {
+    width: 5.2cqw;
+    height: 5.2cqw;
+  }
+  .tab.on {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+  }
+  .tab.on svg {
+    color: #c9c0ff;
+  }
+  .gc.lg {
+    width: 14cqw;
+    height: 14cqw;
+    flex: none;
+    background: rgba(40, 40, 46, 0.6);
+  }
+  .gc.lg svg {
+    width: 5.6cqw;
+    height: 5.6cqw;
+  }
+
+  .snd-points {
+    position: relative;
+    z-index: 2;
+    list-style: none;
+    margin: 4rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .snd-points li {
+    display: grid;
+    align-content: start;
+    gap: 0.45rem;
+    padding: 1.5rem;
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+  }
+  .snd-points b {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+  .snd-points span {
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .snd-foot {
+    position: relative;
+    z-index: 2;
+    margin-top: 1.5rem;
+    max-width: none;
+    font-size: 0.76rem;
+    color: var(--text-faint);
+  }
+  @media (max-width: 900px) {
+    .snd-points { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .snd-points { grid-template-columns: 1fr; }
+    .sf.s2, .sf.s5 { display: none; }
+    .sf.s1, .sf.s3 { left: -6%; }
+    .sf.s4, .sf.s6 { right: -6%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .playing .eq i, .playing .np-bar i, .pane { animation: none; }
+  }
+</style>

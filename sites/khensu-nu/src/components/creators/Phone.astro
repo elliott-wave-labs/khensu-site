@@ -1,0 +1,121 @@
+---
+// iPhone 18 Pro frame for the creators page: titanium band, Dynamic Island, 10:10 status bar. Content fills the
+// screen from the slot; size it with --phone-w on the parent.
+interface Props { class?: string; label?: string; light?: boolean }
+const { class: cls, label, light = false } = Astro.props;
+---
+
+<figure class:list={['cph', cls, { light }]} aria-label={label} role={label ? 'img' : undefined}>
+  <span class="cph-btn b1" aria-hidden="true"></span>
+  <span class="cph-btn b2" aria-hidden="true"></span>
+  <span class="cph-btn b3" aria-hidden="true"></span>
+  <div class="cph-screen">
+    <slot />
+    <div class="cph-status" aria-hidden="true">
+      <span class="cph-time">10:10</span>
+      <span class="cph-island"></span>
+      <span class="cph-sig"><i></i><i></i><i></i><i></i><b></b></span>
+    </div>
+    <span class="cph-home" aria-hidden="true"></span>
+  </div>
+</figure>
+
+<style>
+  .cph {
+    position: relative;
+    container-type: inline-size;
+    width: var(--phone-w, 300px);
+    aspect-ratio: 9 / 19.5;
+    margin: 0;
+    padding: 2.4%;
+    border-radius: 15.5% / 7.2%;
+    background: linear-gradient(150deg, #4a4c52, #1b1c20 32%, #0e0f12 60%, #34363c);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+      0 0 0 2px #050506,
+      0 50px 100px -30px rgba(0, 0, 0, 0.9),
+      0 20px 50px rgba(0, 0, 0, 0.55);
+    flex: none;
+  }
+  .cph-btn {
+    position: absolute;
+    width: 1.2%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #2a2b30, #55575e);
+  }
+  .b1 { left: -1%; top: 18%; height: 4%; }
+  .b2 { left: -1%; top: 25%; height: 7.5%; }
+  .b3 { right: -1%; top: 27%; height: 11%; background: linear-gradient(270deg, #2a2b30, #55575e); }
+  .cph-screen {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 13.4% / 6.2%;
+    background: #000;
+    color: #f2f1ec;
+    font-family: -apple-system, 'SF Pro Text', var(--font-sans);
+    font-size: 4.1cqw;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    isolation: isolate;
+  }
+  .cph-status {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 12.5cqw;
+    padding: 3.6cqw 7.5cqw 0 9cqw;
+    font-weight: 600;
+    font-size: 4.3cqw;
+    pointer-events: none;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  }
+  .cph-island {
+    position: absolute;
+    left: 50%;
+    top: 3.2cqw;
+    width: 31cqw;
+    height: 9.2cqw;
+    margin-left: -15.5cqw;
+    border-radius: 5cqw;
+    background: #000;
+  }
+  .cph-sig {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.6cqw;
+    height: 3cqw;
+  }
+  .cph-sig i {
+    width: 0.9cqw;
+    border-radius: 0.3cqw;
+    background: currentColor;
+  }
+  .cph-sig i:nth-child(1) { height: 35%; }
+  .cph-sig i:nth-child(2) { height: 55%; }
+  .cph-sig i:nth-child(3) { height: 78%; }
+  .cph-sig i:nth-child(4) { height: 100%; }
+  .cph-sig b {
+    width: 6cqw;
+    height: 3cqw;
+    margin-left: 1.4cqw;
+    border-radius: 0.9cqw;
+    border: 0.35cqw solid rgba(255, 255, 255, 0.55);
+    background: linear-gradient(90deg, currentColor 78%, transparent 78%) content-box;
+    padding: 0.35cqw;
+  }
+  .cph-home {
+    position: absolute;
+    z-index: 5;
+    bottom: 2.2cqw;
+    left: 50%;
+    width: 36cqw;
+    height: 1.4cqw;
+    margin-left: -18cqw;
+    border-radius: 1cqw;
+    background: rgba(255, 255, 255, 0.85);
+  }
+</style>

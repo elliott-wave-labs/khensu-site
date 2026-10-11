@@ -5,6 +5,7 @@ import ArHero from '../components/khensu/ArHero.astro';
 import ProductBar from '../components/khensu/ProductBar.astro';
 import Highlights from '../components/khensu/Highlights.astro';
 import RevealText from '../components/khensu/RevealText.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 
 // No card processor: reservations are free and go by email, so no server handles them. Payment opens in the
 // khensu.ñü app over the network's own shielded payments, and every reservation is invited to pay there first.
@@ -105,14 +106,23 @@ const chakras = [
 
   <section class="price-band">
     <div class="wrap price-in" data-reveal>
-      <p>
-        A post-quantum node for your iPhone in titanium or brass, with the khensu.ñü mark set flush into the back
-        in natural stone and platinum.
-      </p>
+      <p>A post-quantum node for your iPhone, inlaid with stone.</p>
       <div class="price-cta">
         <span><b>From ${Math.min(...editions.map((e) => e.price))}</b> · Ships {SHIPS}</span>
         <a class="btn primary" href="#order">Buy</a>
       </div>
+    </div>
+    <div class="wrap">
+      <StatStrip
+        items={[
+          { n: 0, unit: 'mm', label: 'Above the lenses: your iPhone gets no thicker' },
+          { n: 74, unit: 'g', label: 'In titanium, or 93 g in solid brass' },
+          { n: 6.5, dec: 1, unit: 'Wh', label: 'Its own battery, about 5 hours relaying' },
+          { n: 50, unit: '%', label: 'Charged in 15 minutes from a 20 W USB-C charger' },
+        ]}
+      >
+        Figures for iPhone 18 Pro. Battery life and charge time vary with use and settings.
+      </StatStrip>
     </div>
   </section>
 
@@ -255,7 +265,7 @@ const chakras = [
         <div><dt>5 hours</dt><dd>relaying on a full charge, then a sip of your iPhone’s battery</dd></div>
         <div><dt>15 min</dt><dd>to 50% over USB-C from a wall charger or power bank, full in about 45</dd></div>
         <div><dt>0 mm</dt><dd>added above your iPhone’s lenses: level with the lens tops, clear of every field of view</dd></div>
-        <div><dt>93 g</dt><dd>in titanium; about 136 g in brass</dd></div>
+        <div><dt>74 g</dt><dd>in titanium; about 93 g in brass</dd></div>
       </dl>
     </div>
   </section>
@@ -308,7 +318,7 @@ const chakras = [
       <p class="footnote">
         For iPhone 18 Pro and Pro Max, with more models in {SHIPS}. Stones are natural, so colour and pattern vary, and
         they are softer than the metal around them: sealed, but they may show fine wear over years, like a watch dial.
-        Stone photographs are illustrative; every inlay is cut from its own stones. Chakras and meanings are traditional beliefs, shared for their history, not as claims. Moldavite is certified genuine; its total is an estimate (<a href="https://en.wikipedia.org/wiki/Moldavite">Moldavite</a>), and diamond output is from the <a href="https://kimberleyprocessstatistics.org/">Kimberley Process statistics</a>, about 111 million carats in 2023. Sources are traceable, and our lapis does not come from Afghanistan. Battery
+        Every inlay is cut from its own stones, so yours has its own pattern. Chakras and meanings are traditional beliefs, shared for their history, not as claims. Moldavite is certified genuine; its total is an estimate (<a href="https://en.wikipedia.org/wiki/Moldavite">Moldavite</a>), and diamond output is from the <a href="https://kimberleyprocessstatistics.org/">Kimberley Process statistics</a>, about 111 million carats in 2023. Sources are traceable, and our lapis does not come from Afghanistan. Battery
         life and charge time vary with use and settings. The 3D view and AR use the CAD model, and
         the inlay is composed from stone photographs to show the design, not a specific shield. iPhone is a trademark of Apple Inc.
       </p>
@@ -371,6 +381,7 @@ const chakras = [
   .price-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.2rem 3rem; }
   .price-in p { margin: 0; max-width: 40rem; color: var(--text-dim); font-size: clamp(1.05rem, 1.6vw, 1.25rem); }
   .price-cta { display: flex; align-items: center; gap: 1.2rem; }
+  .price-band :global(.stat-strip) { margin: clamp(2rem, 5vw, 3rem) 0 0; }
   .price-cta b { color: var(--text); font-weight: 600; }
   .order-head { margin-bottom: 2rem; }
   .story { background: #000; padding: clamp(5rem, 12vw, 10rem) 0; }

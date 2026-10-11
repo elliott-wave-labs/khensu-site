@@ -1,0 +1,170 @@
+---
+// "Your fans see this": the reel as a fan's iPhone shows it, sent at 351 kbit/s and rebuilt to 4K on the device.
+// Figures from src/data/iphone-ladder-reel.json (benchmark).
+import Phone from './Phone.astro';
+import run from '../../data/iphone-ladder-reel.json';
+const V = '/khensu/creators';
+const nu = (run as any).tiles.rates['500']['nu-media'];
+const kbps = Math.round(nu.actual_kbps);
+---
+
+<section class="fans" id="fans-see-section" data-par aria-labelledby="fans-title">
+  <img class="fans-bg" src={`${V}/fans-4k.webp`} alt="" width="1080" height="1920" loading="lazy" aria-hidden="true" />
+  <div class="wrap fans-grid">
+    <div class="fans-phone">
+      <Phone label="The same reel on a fan’s iPhone, rebuilt to 4K, with an anonymous viewer badge and a tip being sent">
+        <video class="reel" src={`${V}/fans-4k.mp4`} poster={`${V}/fans-4k.webp`} muted loop playsinline preload="none" data-loop width="1080" height="1920"></video>
+        <div class="fan-ui" aria-hidden="true">
+          <span class="fan-badge">4K · ñü.media</span>
+          <span class="fan-anon"><i></i>Watching anonymously</span>
+          <span class="fan-tip"><b>$5.00</b> tip sent · 100% to the creator</span>
+        </div>
+      </Phone>
+    </div>
+    <div class="fans-copy">
+      <p class="eyebrow">your fans see this</p>
+      <h2 id="fans-title">Your fans see this.<em>From {kbps} kbit/s.</em></h2>
+      <p class="fans-lede">
+        <strong>ñü.media sends a smaller picture and the fan’s own device rebuilds it,</strong> here all the way to 4K.
+        Nothing is processed on a server, and your fans watch, tip and subscribe without anyone building a profile of them.
+      </p>
+      <ul class="fans-stats" role="list">
+        <li><b data-count data-to={kbps} data-suf=" kbit/s">{kbps} kbit/s</b><span>sent for this reel, video only</span><small>benchmark</small></li>
+        <li><b>4K</b><span>rebuilt on-device, never on a server</span><small>benchmark</small></li>
+        <li><b>Anonymous</b><span>fans pay through shielded payments; there’s no public list of who backs whom</span></li>
+      </ul>
+      <p class="fans-note">
+        Measured 11 October 2026: the reel’s 360 × 640 base layer encoded on iPhone Air at {kbps} kbit/s, then rebuilt with
+        Apple’s on-device super resolution. Source: @deemsterhotline on Instagram, used with thanks.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fans {
+    --v: 0;
+    position: relative;
+    overflow: hidden;
+    padding: clamp(5rem, 11vw, 9rem) 0;
+    background: #000;
+    border-top: 1px solid var(--line);
+  }
+  .fans-bg {
+    position: absolute;
+    inset: -20% -10%;
+    width: 120%;
+    height: 140%;
+    object-fit: cover;
+    filter: blur(70px) saturate(1.4);
+    opacity: 0.28;
+    translate: 0 calc(var(--v) * 8%);
+    mask-image: radial-gradient(closest-side, #000 20%, transparent);
+    pointer-events: none;
+  }
+  .fans-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+  .fans-phone {
+    --phone-w: min(340px, 78vw);
+    justify-self: center;
+    translate: 0 calc(var(--v) * 70px);
+  }
+  .reel {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fan-ui {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+  .fan-ui > span {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 1.6cqw;
+    padding: 1.6cqw 3.4cqw;
+    border-radius: 6cqw;
+    font-size: 3.4cqw;
+    font-weight: 600;
+    background: rgba(20, 20, 26, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(14px) saturate(170%);
+  }
+  .fan-badge { top: 15cqw; left: 5cqw; }
+  .fan-anon { top: 15cqw; right: 5cqw; }
+  .fan-anon i {
+    width: 2.2cqw;
+    height: 2.2cqw;
+    border-radius: 50%;
+    background: #18e0c8;
+    box-shadow: 0 0 2cqw #18e0c8;
+  }
+  .fan-tip { left: 5cqw; right: 5cqw; bottom: 9cqw; justify-content: center; }
+  .fan-tip b { color: #b9b0ff; }
+  h2 {
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+    font-weight: 600;
+  }
+  h2 em {
+    background: linear-gradient(100deg, #b9b0ff, #18e0c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .fans-lede {
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    color: rgba(255, 255, 255, 0.56);
+  }
+  .fans-lede strong {
+    color: #fff;
+    font-weight: 500;
+  }
+  .fans-stats {
+    list-style: none;
+    margin: 2rem 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+    gap: 1.4rem;
+  }
+  .fans-stats li {
+    display: grid;
+    align-content: start;
+    gap: 0.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .fans-stats b {
+    font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .fans-stats span {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+  .fans-stats small {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: #18e0c8;
+  }
+  .fans-note {
+    font-size: 0.76rem;
+    color: var(--text-faint);
+  }
+  @media (max-width: 860px) {
+    .fans-grid { grid-template-columns: 1fr; }
+    .fans-phone { order: 2; }
+  }
+</style>

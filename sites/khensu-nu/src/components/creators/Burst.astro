@@ -1,0 +1,161 @@
+---
+// Four numbers that burst out of a cloud of particles and explode into each other as the page scrolls.
+// The list is the content; the canvas only draws it. Reduced motion and no-JS show the list as a grid.
+const items = [
+  { g: '0%', t: 'Platform cut', s: 'on creator subscriptions and tips' },
+  { g: '100%', t: 'Of every tip', s: 'to you. The fan pays the network fee on top' },
+  { g: '42¢', t: 'Minimum payout', s: 'Every payment lands in your wallet as it’s sent' },
+  { g: '<1¢', t: 'Network fee', s: 'a payment, paid to the people running nodes. Estimate' },
+];
+---
+
+<section class="burst" id="numbers-section" data-burst aria-labelledby="burst-title">
+  <div class="burst-stage">
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap burst-head">
+      <p class="eyebrow">by the numbers</p>
+      <h2 id="burst-title">Four numbers.<em>All of them in your favour.</em></h2>
+    </div>
+    <ol class="burst-list" role="list">
+      {items.map((it, i) => (
+        <li data-glyph={it.g} style={`--i:${i}`}>
+          <b class="burst-n">{it.g}</b>
+          <span class="burst-t">{it.t}</span>
+          <span class="burst-s">{it.s}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .burst {
+    position: relative;
+    background: #000;
+    border-top: 1px solid var(--line);
+  }
+  .burst-stage {
+    padding: clamp(4rem, 9vw, 7rem) 0;
+  }
+  canvas {
+    display: none;
+  }
+  .burst-head {
+    text-align: center;
+  }
+  h2 {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 600;
+  }
+  h2 em {
+    background: linear-gradient(100deg, #b9b0ff, #18e0c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .burst-list {
+    list-style: none;
+    margin: 2.5rem auto 0;
+    padding: 0 var(--gutter);
+    max-width: var(--wrap);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+    gap: 1rem;
+  }
+  .burst-list li {
+    display: grid;
+    align-content: end;
+    gap: 0.3rem;
+    min-height: 12rem;
+    padding: 1.6rem;
+    border-radius: 24px;
+    background: radial-gradient(120% 90% at 20% 0%, rgba(139, 123, 255, 0.24), transparent 60%), rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+  .burst-n {
+    font-size: clamp(3.2rem, 6vw, 5rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    background: linear-gradient(120deg, #fff, #c9c0ff 50%, #18e0c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .burst-t {
+    font-size: 1.15rem;
+    font-weight: 500;
+  }
+  .burst-s {
+    color: rgba(255, 255, 255, 0.56);
+    font-size: 0.95rem;
+  }
+
+  /* Pinned particle version. */
+  :global(.cr-motion) .burst {
+    height: 460vh;
+  }
+  :global(.cr-motion) .burst-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding: 0;
+    overflow: hidden;
+  }
+  :global(.cr-motion) canvas {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  :global(.cr-motion) .burst-head {
+    position: relative;
+    padding-top: calc(130px + clamp(1rem, 4vh, 2.5rem));
+  }
+  :global(.cr-motion) .burst-head h2 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+  }
+  :global(.cr-motion) .burst-list {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(2.5rem, 9vh, 6rem);
+    display: block;
+    margin: 0;
+    height: 6.5rem;
+    text-align: center;
+  }
+  :global(.cr-motion) .burst-list li {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    padding: 0;
+    align-content: start;
+    justify-items: center;
+    background: none;
+    box-shadow: none;
+    opacity: 0;
+    translate: 0 14px;
+    transition: opacity 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), translate 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  :global(.cr-motion) .burst-list li.on {
+    opacity: 1;
+    translate: 0 0;
+  }
+  :global(.cr-motion) .burst-n {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  :global(.cr-motion) .burst-t {
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  :global(.cr-motion) .burst-s {
+    max-width: 30rem;
+    font-size: 1.05rem;
+  }
+</style>

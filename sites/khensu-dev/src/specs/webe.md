@@ -308,6 +308,9 @@ check(state, submission) -> bool            // optional, for work orders (14.6)
 | `issue(credential)` | A blind-issued anonymous credential (`PROTOCOL.md` 11) |
 | `admit(group)` | An MLS Add to a group the contract holds a commit key for |
 | `count(tally)` | A tally added to an anonymous counter |
+| `invoke(app, intent)` | A signed, encrypted intent delivered to another webË app or contract's mailbox, which acts on it under its own rules; the reply comes back as an action |
+| `fetch(request)` | A request to the legacy internet, carried by a `gateway(14)` node (`WORK.md` 9a); the response returns with a signed transcript proof |
+| `order(task)` | A compute task posted to `compute(15)` nodes (`WORK.md` 9b), such as a volunteer science work unit; the result returns with its validation receipt |
 | `close` | The instance ends and its state is deleted at the next era close |
 
 ### 14.4 Proved steps
@@ -356,6 +359,7 @@ struct {
 
 - **Work by people:** a translation, design, review or report is submitted as an encrypted object; the requester, the reviewer or the `check` function accepts it.
 - **Work by nodes:** a node submits signed work receipts from `WORK.md`; the contract checks them against the epoch header's `receipts_root`. This is how a site owner pays for extra storage replicas or a creator pays for public media renditions.
+- **Any task:** a contract can trigger another app on the network (`invoke`), call the legacy internet (`fetch`), or order background computing (`order`): for example donating spare node time to Einstein@Home's search for gravitational waves and pulsars, paid in reputation or notes when the project validates the result.
 - **Any reward:** shielded notes, an anonymous credential, an anonymous reputation point, admission to a group, or nothing at all.
 
 ### 14.7 Ballots

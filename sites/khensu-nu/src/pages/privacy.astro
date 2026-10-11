@@ -1,12 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base title="Privacy" description="khensu.ñü’s website sets no cookies and runs no analytics. The app keeps your data on your devices.">
   <section class="page-head">
     <div class="wrap">
       <p class="eyebrow">privacy</p>
-      <h1>We can’t sell your data. We don’t have it.</h1>
+      <h1>We can’t sell your data.<br />We don’t have it.</h1>
+      <StatStrip
+        items={[
+          { n: 0, label: 'Cookies, analytics or trackers on this site' },
+          { n: 0, label: 'Names, phone numbers or emails in the app' },
+          { n: 20, unit: 's', label: 'The longest a push token is held, in memory only' },
+          { n: 16, label: 'Privacy laws met, from GDPR to POPIA' },
+        ]}
+      />
+      <p class="lede">Your messages, calls, payments and files stay readable only on your devices.</p>
     </div>
   </section>
   <section class="section">
@@ -28,3 +38,9 @@ import Base from '../layouts/Base.astro';
     </div>
   </section>
 </Base>
+
+<style>
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
+</style>

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 ---
 
@@ -8,20 +9,26 @@ import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
   <section class="page-head">
     <div class="wrap">
       <p class="eyebrow">app store</p>
-      <h1>khensu.ñü for iPhone, iPad and Mac.</h1>
-    </div>
-  </section>
-  <section class="section">
-    <div class="wrap prose">
-      <p>
-        One app for iPhone, iPad and Mac. This page opens khensu.ñü on the App Store the moment Apple lists it, so it
-        is safe to share.
-      </p>
-      <p>
-        It needs iOS, iPadOS or macOS 26. Everything runs on your device: no iCloud, no Siri, no server-side
-        processing of any kind.
-      </p>
-      <p><a class="btn primary" href="/webe#run-a-node-section">Run a node</a></p>
+      <h1>khensu.ñü for iPhone, iPad and Mac.<br />Everything runs on your device.</h1>
+      <StatStrip
+        items={[
+          { n: 5, label: 'Mix network hops for every message' },
+          { n: 2, unit: 's', label: 'One steady burst while the app is open, typing or not' },
+          { n: 0, label: 'Servers that process your data: no iCloud, no Siri' },
+          { n: 26, label: 'iOS, iPadOS or macOS, the version it needs' },
+        ]}
+      />
+      <p class="lede">This page opens khensu.ñü on the App Store the moment Apple lists it, so it is safe to share.</p>
+      <div class="btn-row"><a class="btn primary" href="/webe#run-a-node-section">Run a node</a></div>
     </div>
   </section>
 </Base>
+
+<style>
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
+  .btn-row {
+    margin-top: 1.6rem;
+  }
+</style>

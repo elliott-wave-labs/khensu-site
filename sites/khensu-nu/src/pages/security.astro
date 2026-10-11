@@ -1,0 +1,306 @@
+---
+import Base from '../layouts/Base.astro';
+import RevealText from '../components/khensu/RevealText.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
+
+const DEV = 'https://dev.khensu.nu';
+
+const stats = [
+  { n: 1024, label: 'ML-KEM-1024 on every key exchange, the strongest post-quantum level' },
+  { n: 5, label: 'Hops through the mixnet, across operators, networks and countries' },
+  { n: 0, label: 'Servers that can read a message, a contact or a payment' },
+  { n: 24, unit: 'h', label: 'At most before every device rotates its keys and heals' },
+];
+
+const guards = [
+  { t: 'Only your group can read it', text: 'Messages, calls, photos, files, names, avatars, typing and read receipts are end-to-end encrypted with MLS. Nodes, Apple and we see ciphertext only.' },
+  { t: 'Safe from quantum computers', text: 'Every key exchange is ML-KEM-1024 and every signature ML-DSA-87, exactly the NSA’s CNSA 2.0 suite. Nothing recorded today can be opened later.' },
+  { t: 'Nobody sees who talks to whom', text: 'Every message crosses five hops. No packet carries a sender, each hop knows only the next one, and fixed-size packets with cover traffic hide when you’re talking.' },
+  { t: 'Heals after a break-in', text: 'Message keys are deleted after use, and every device refreshes its keys at least every 24 hours or 1,000 messages. A device that was compromised and recovered is safe again at its next update.' },
+  { t: 'Your phone, locked down', text: 'Keys live in the Secure Enclave and history is unreadable while the phone is locked. App lock, a duress passcode, hidden profiles and panic wipe are built in.' },
+  { t: 'Private money', text: 'Shielded payments hide the amount, the sender and the recipient, and are sent through the mixnet. The wallet is yours; we never hold keys or funds.' },
+];
+
+const adversaries = [
+  { who: 'A node operator, or a group of them', can: 'Reads, delays, drops and replays anything passing through, up to 20% of the network', result: 'Content and identity stay safe. A full path is controlled at most 0.03% of the time.' },
+  { who: 'An internet-wide observer', can: 'Watches every link, like an ISP coalition or an intelligence agency', result: 'Messages, receipts and typing stay hidden in the crowd. Live call timing is a stated limit.' },
+  { who: 'A future quantum computer', can: 'Records everything today and decrypts it later', result: 'Nothing to decrypt. No classical cryptography protects anything.' },
+  { who: 'Us, Elliott Wave LLC', can: 'Runs the push gateway, credential issuer, transparency log and the first nodes', result: 'We can’t read, redirect or link your messages, contacts or payments.' },
+  { who: 'Apple', can: 'Runs notifications, App Attest and the App Store', result: 'Sees that a device uses khensu.ñü and a fixed “New message” alert. Never content or contacts.' },
+  { who: 'Someone with your locked phone', can: 'Has the device but not the passcode', result: 'Everything is unreadable, with keys held in the Secure Enclave.' },
+  { who: 'Someone who forces you to unlock', can: 'Has your phone and your face or passcode', result: 'Duress passcode wipes, hidden profiles stay hidden, panic wipe erases keys first.' },
+  { who: 'A malicious group member', can: 'Is legitimately in your group', result: 'Can’t impersonate others or read history from before they joined or after they left.' },
+  { who: 'Spammers and fake accounts', can: 'Creates accounts or nodes in bulk', result: 'First contact needs a zero-knowledge rate-limit proof; node weight needs stake and reputation.' },
+  { who: 'A censor', can: 'Blocks domains, addresses and protocols', result: 'Connections look like ordinary web browsing, with bridges and seed lists built in.' },
+];
+
+const limits = [
+  { t: 'Authorship provable for up to 7 days', text: 'Until a retired signing key is revealed, a recipient could show someone that your device signed a message. After 7 days they can’t. Use disappearing messages if that matters.' },
+  { t: 'Anonymity grows with the network', text: 'You hide among the people sending at the same time. The app shows an Early network notice until there are enough nodes, operators and countries.' },
+  { t: 'Phones mask activity while the app is open', text: 'iOS pauses background apps, so cover traffic runs while khensu.ñü is open. A Mac node or suñůlink.shield keeps it running around the clock.' },
+  { t: 'Live calls can be timed', text: 'Calls can’t wait in a mixnet. Two relays run by different operators, constant-rate media and random padding hide most of it, but an observer of both ends can match start and end times.' },
+];
+
+const supply = [
+  { b: 'Reproducible builds.', t: 'Anyone can rebuild the node, firmware and Raspberry Pi image and get the same bytes.' },
+  { b: 'Every release in the log.', t: 'App and node release hashes go into the transparency log, so an unexpected release is visible to everyone.' },
+  { b: 'Archived on every change.', t: 'Every code push, release and upgrade is archived on the network automatically. A release that isn’t archived won’t install.' },
+  { b: 'Signed by more than one key.', t: 'Releases need an offline release key and locked-down CI, with hardware security keys on every account.' },
+  { b: 'A founder switch.', t: 'If the founder misses six weekly check-ins, the trusted committee nodes take over release signing and every line of private code is released to everyone.' },
+];
+---
+
+<Base
+  title="Security"
+  description="Post-quantum end-to-end encryption, a five-hop mixnet, and no server that can read anything. Who khensu.ñü defends against, the limits we state openly, and how to report a vulnerability."
+>
+  <div class="khensu">
+    <section class="page-head">
+      <div class="wrap">
+        <p class="eyebrow">security</p>
+        <h1>Nothing to read.<br /><span class="dim">Nobody to trust.</span></h1>
+        <StatStrip items={stats} />
+        <p class="lede">Every protection is always on. There is no setting that turns encryption, the mixnet or stealth off.</p>
+        <nav class="chips" aria-label="On this page">
+          <a href="#security-protections">Protections</a>
+          <a href="#security-adversaries">Who we defend against</a>
+          <a href="#security-limits">Known limits</a>
+          <a href="#security-releases">Releases</a>
+          <a href="#security-report">Report a vulnerability</a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="section band">
+      <div class="wrap">
+        <RevealText
+          parts={[
+            ['Most apps ask you to trust the company that runs the servers. '],
+            ['khensu.ñü is built so there’s nothing to trust.', true],
+            [' Your devices hold the only readable copies. The network carries sealed packets it can’t open or trace. '],
+            ['Even we can’t read it or hand it over.', true],
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="section" id="security-protections">
+      <div class="wrap">
+        <p class="eyebrow">protections</p>
+        <h2>Six layers.<br /><span class="dim">All on, for everyone.</span></h2>
+        <div class="grid three">
+          {guards.map((g) => (
+            <article class="glass"><h3>{g.t}</h3><p>{g.text}</p></article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="security-adversaries">
+      <div class="wrap">
+        <p class="eyebrow">threat model</p>
+        <h2>Who we defend against.<br /><span class="dim">Including ourselves.</span></h2>
+        <p class="intro">Each attacker, what they can do, and what they get. The full threat model is public.</p>
+        <div class="table" tabindex="0">
+          <table>
+            <thead><tr><th scope="col">Attacker</th><th scope="col">What they can do</th><th scope="col">What they get</th></tr></thead>
+            <tbody>
+              {adversaries.map((a) => (
+                <tr><th scope="row">{a.who}</th><td>{a.can}</td><td>{a.result}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="security-limits">
+      <div class="wrap">
+        <p class="eyebrow">known limits</p>
+        <h2>Stated, not hidden.</h2>
+        <p class="intro">No system is perfect. These are the edges of what khensu.ñü protects, and what to do about each.</p>
+        <div class="grid two">
+          {limits.map((l) => (
+            <article class="glass"><h3>{l.t}</h3><p>{l.text}</p></article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="security-releases">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">releases</p>
+          <h2>Every build, checkable.<br /><span class="dim">Every change, archived.</span></h2>
+        </div>
+        <ul class="checks" role="list">
+          {supply.map((s) => (
+            <li><b>{s.b}</b> {s.t}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="security-report">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">report a vulnerability</p>
+          <h2>Found something?<br /><span class="dim">Tell us first.</span></h2>
+        </div>
+        <div class="prose">
+          <p>
+            Email <a href="mailto:security@elliottwave.studio?subject=khensu.nu%20security">security@elliottwave.studio</a>
+            with what you found, how to reproduce it and what an attacker could do with it. Please don’t open a public issue.
+          </p>
+          <p>
+            We acknowledge every report within three working days and keep you updated until it’s fixed. We won’t take legal
+            action against good-faith research that avoids harming people and gives us time to fix it. Actively exploited
+            vulnerabilities are reported to ENISA within 24 hours, as the EU Cyber Resilience Act requires.
+          </p>
+          <div class="btn-row">
+            <a class="btn primary" href={`${DEV}/specs/threat-model`}>The full threat model</a>
+            <a class="btn" href={`${DEV}/security`}>Security for developers</a>
+            <a class="btn" href="/compliance">Compliance</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .dim {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
+  .band {
+    background: #000;
+  }
+  h2 {
+    margin-bottom: 1.2rem;
+  }
+  .intro {
+    color: var(--text-dim);
+    max-width: 52rem;
+    margin-bottom: 2rem;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+  .chips a {
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  .chips a:hover {
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .glass {
+    padding: 1.3rem 1.4rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .glass h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  .glass p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .grid.three {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+  .grid.two {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  }
+  .table {
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  table {
+    width: 100%;
+    min-width: 44rem;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.8rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  thead th {
+    border-top: 0;
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    color: var(--text-faint);
+  }
+  tbody th {
+    font-weight: 500;
+    color: var(--text);
+  }
+  td {
+    color: var(--text-dim);
+  }
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .prose p {
+    color: var(--text-dim);
+  }
+  .checks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    color: var(--text-dim);
+  }
+  .checks li {
+    padding-left: 1.6rem;
+    position: relative;
+  }
+  .checks li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+  }
+  .checks b {
+    color: var(--text);
+    font-weight: 500;
+  }
+  @media (max-width: 820px) {
+    .split {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

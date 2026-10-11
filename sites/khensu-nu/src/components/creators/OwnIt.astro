@@ -1,0 +1,305 @@
+---
+// Rights: khensu.ñü takes no licence to a creator's work. Other platforms let you keep copyright but take a broad
+// licence in their terms; each quoted phrase is from the linked terms page, checked 11 October 2026.
+const rights = [
+  { t: 'Publishing rights', b: 'Your songs, your words, your scripts. Every publishing right stays with you.' },
+  { t: 'Copyright', b: 'Your recordings, films, photos and posts. You own them, with no licence granted to us.' },
+  { t: 'Trademarks', b: 'Your name, your handle and your brand stay yours, on name.khensu.nu and everywhere else.' },
+  { t: 'Your IP', b: 'Characters, formats, ideas and everything you build on them. All of it is yours.' },
+];
+const none = ['No content licence', 'No master or publishing share', 'No sublicensing', 'No AI training on your work', 'No exclusivity'];
+const terms = [
+  { name: 'YouTube', grant: 'Worldwide, non-exclusive, royalty-free, sublicensable and transferable', url: 'https://www.youtube.com/t/terms', src: 'YouTube Terms of Service' },
+  { name: 'Instagram', grant: 'Non-exclusive, royalty-free, transferable, sub-licensable, worldwide', url: 'https://help.instagram.com/581066165581870', src: 'Instagram Terms of Use' },
+  { name: 'TikTok', grant: 'Irrevocable, royalty-free, sub-licensable through multiple tiers, worldwide; includes training its machine learning models', url: 'https://www.tiktok.com/legal/page/us/terms-of-service/en', src: 'TikTok Terms of Service (US)' },
+  { name: 'Spotify for Artists', grant: 'Transferable, sub-licensable, royalty-free, fully paid, worldwide, for content you post there', url: 'https://www.spotify.com/us/legal/spotify-for-artists-terms-and-conditions/', src: 'Spotify for Artists Terms and Conditions' },
+];
+---
+
+<section class="own" id="rights-section" data-par data-scene="reveal" aria-labelledby="own-title">
+  <div class="own-glow" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="own-head">
+      <p class="eyebrow">your rights</p>
+      <h2 id="own-title">You own it.<em>All of it.</em></h2>
+      <p class="own-lede">
+        <strong>Publishing rights, copyright, trademarks and IP stay yours, like nowhere else.</strong>{" "}
+        khensu.ñü takes no licence to your work at all, and you can leave with everything, any time.
+      </p>
+    </div>
+
+    <ul class="rights" role="list">
+      {rights.map((r, i) => (
+        <li style={`--i:${i}`}><span class="r-n">{String(i + 1).padStart(2, '0')}</span><b>{r.t}</b><span>{r.b}</span></li>
+      ))}
+    </ul>
+
+    <div class="own-grid">
+      <div class="takes">
+        <p class="takes-k">What khensu.ñü takes from your work</p>
+        <p class="takes-v">Nothing.</p>
+        <ul role="list">
+          {none.map((n) => <li><i aria-hidden="true"></i>{n}</li>)}
+          <li class="leave"><i aria-hidden="true"></i>Leave any time, with your work, your followers and your money</li>
+        </ul>
+      </div>
+
+      <figure class="cmp">
+        <figcaption><b>What you grant other platforms</b><span>You keep the copyright there too, but their terms take a licence to use it</span></figcaption>
+        <ul role="list">
+          <li class="ours"><b>khensu.ñü</b><span>No licence of any kind</span></li>
+          {terms.map((t) => (
+            <li><b>{t.name}</b><span>{t.grant}</span></li>
+          ))}
+        </ul>
+      </figure>
+    </div>
+
+    <p class="own-foot">
+      Each platform’s licence terms in its own words, checked 11 October 2026; they change, and they cover content you
+      post or submit to that service: {terms.map((t, i) => <>{i ? '; ' : ''}<a href={t.url} rel="noopener">{t.src}</a></>)}.
+      khensu.ñü carries your work end to end encrypted and never processes it on a server. YouTube, Instagram, TikTok and
+      Spotify are trademarks of their owners; no affiliation. Not legal advice.
+    </p>
+  </div>
+</section>
+
+<style>
+  .own {
+    --v: 0;
+    position: relative;
+    overflow: hidden;
+    padding: clamp(5rem, 11vw, 9rem) 0;
+    background: #000;
+    border-top: 1px solid var(--line);
+  }
+  .own-glow {
+    position: absolute;
+    left: 50%;
+    top: 10%;
+    width: 900px;
+    height: 900px;
+    margin-left: -450px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(139, 123, 255, 0.24), rgba(24, 224, 200, 0.14), rgba(139, 123, 255, 0.05), rgba(139, 123, 255, 0.24));
+    filter: blur(110px);
+    rotate: calc(var(--v) * 90deg);
+    translate: 0 calc(var(--v) * 80px);
+    pointer-events: none;
+  }
+  .own-head {
+    position: relative;
+    text-align: center;
+    display: grid;
+    justify-items: center;
+  }
+  h2 {
+    font-size: clamp(3.2rem, 9vw, 7.5rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+  }
+  h2 em {
+    background: linear-gradient(100deg, #fff, #b9b0ff 40%, #18e0c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .own-lede {
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.56);
+    max-width: 40rem;
+  }
+  .own-lede strong {
+    color: #fff;
+    font-weight: 500;
+  }
+  .rights {
+    position: relative;
+    list-style: none;
+    margin: 3.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .rights li {
+    --k: clamp(0, calc((var(--e, 1) - var(--i) * 0.1) / 0.4), 1);
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    min-height: 15rem;
+    padding: 1.6rem;
+    border-radius: 26px;
+    background: radial-gradient(120% 80% at 0% 0%, rgba(139, 123, 255, 0.22), transparent 60%), rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    opacity: var(--k);
+    translate: 0 calc((1 - var(--k)) * 40px);
+  }
+  .r-n {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #18e0c8;
+  }
+  .rights b {
+    margin-top: auto;
+    padding-top: 3rem;
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .rights span:last-child {
+    color: var(--text-dim);
+    line-height: 1.45;
+  }
+
+  .own-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .takes,
+  .cmp {
+    margin: 0;
+    padding: clamp(1.4rem, 3vw, 2rem);
+    border-radius: 26px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+  .takes-k {
+    margin: 0;
+    color: var(--text-dim);
+  }
+  .takes-v {
+    margin: 0.2rem 0 1.2rem;
+    font-size: clamp(3rem, 6vw, 4.6rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(120deg, #fff, #18e0c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .takes ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .takes li {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .takes i {
+    position: relative;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+  .takes i::before,
+  .takes i::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 1.6px;
+    margin: -0.8px 0 0 -5px;
+    background: rgba(255, 255, 255, 0.7);
+    rotate: 45deg;
+  }
+  .takes i::after {
+    rotate: -45deg;
+  }
+  .takes .leave i {
+    background: rgba(24, 224, 200, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(24, 224, 200, 0.6);
+  }
+  .takes .leave i::before {
+    width: 5px;
+    margin: 1px 0 0 -5px;
+    background: #18e0c8;
+  }
+  .takes .leave i::after {
+    width: 9px;
+    margin: -1px 0 0 -2px;
+    background: #18e0c8;
+  }
+  .takes .leave {
+    color: #fff;
+    font-weight: 500;
+  }
+  .cmp figcaption {
+    display: grid;
+    gap: 0.2rem;
+    margin-bottom: 1.2rem;
+  }
+  .cmp figcaption b {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+  .cmp figcaption span {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+  }
+  .cmp ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+  .cmp li {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .cmp li b {
+    font-weight: 500;
+  }
+  .cmp li span {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+  .cmp li.ours {
+    border-top: 0;
+  }
+  .cmp li.ours b,
+  .cmp li.ours span {
+    color: #18e0c8;
+    font-weight: 600;
+  }
+  .own-foot {
+    position: relative;
+    margin-top: 1.5rem;
+    max-width: none;
+    font-size: 0.74rem;
+    line-height: 1.55;
+    color: var(--text-faint);
+  }
+  .own-foot a {
+    color: var(--text-dim);
+  }
+  @media (max-width: 960px) {
+    .rights { grid-template-columns: 1fr 1fr; }
+    .own-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .rights { grid-template-columns: 1fr; }
+    .rights li { min-height: 0; }
+    .rights b { padding-top: 1rem; }
+    .cmp li { grid-template-columns: 1fr; gap: 0.2rem; }
+  }
+</style>

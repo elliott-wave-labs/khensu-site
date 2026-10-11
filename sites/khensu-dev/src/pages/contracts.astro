@@ -1,14 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base title="Contracts" description="Write post-quantum webË contracts: private, self-enforcing agreements for any work, proved with STARKs and settled in the shielded pool.">
   <p class="eyebrow">contracts</p>
   <h1>Agreements that enforce themselves</h1>
-  <p class="lede">
-    A webË contract runs on the parties’ own devices and proves every step with a STARK.<br />
-    The chain sees only the proof. Nobody sees who agreed to what.
-  </p>
+  <StatStrip
+    items={[
+      { n: 5, label: 'Steps, from write to settle' },
+      { n: 1, label: 'STARK proof for every step, made on a party’s device' },
+      { n: 8, label: 'Audited standard contracts, ready to use' },
+      { n: 3, unit: 'of 5', label: 'Key holders seal a ballot until it closes' },
+    ]}
+  />
+  <p class="lede">The chain sees only the proof. Nobody sees who agreed to what.</p>
 
   <h2 id="how">How a contract works</h2>
   <ol>
@@ -31,6 +37,9 @@ import Base from '../layouts/Base.astro';
       <tr><td>A reviewer both sides chose</td><td>A code review or an article, judged by an editor named in the terms</td></tr>
       <tr><td>A test in the contract</td><td>A bug proof, a solved puzzle or data that matches a schema</td></tr>
       <tr><td>A node’s work receipt</td><td>A year of archive storage for a site, or public renditions of a film (<a href="/work">network work</a>)</td></tr>
+      <tr><td>Another app on the network</td><td>A vote closes and the contract triggers the co-op’s booking app to order the roof (<code>invoke</code>)</td></tr>
+      <tr><td>A gateway’s transcript proof</td><td>A call to a legacy internet API or webhook, with proof the answer came from that server (<code>fetch</code>)</td></tr>
+      <tr><td>A project’s validator</td><td>Spare node time for Einstein@Home’s gravitational-wave search, paid when the project validates each work unit (<code>order</code>)</td></tr>
     </tbody>
   </table>
   <p>Rewards: shielded notes, an anonymous credential, a reputation point, admission to a group, or nothing at all.</p>

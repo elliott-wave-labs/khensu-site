@@ -1,0 +1,291 @@
+// Creators page motion: parallax (--v), scroll-scrubbed counters, videos that play only while visible, the
+// particle burst into the big numbers, the H.264 / ñü.media wipe and the Sounds phone. Without this script, or with
+// reduced motion, every scene shows its final state and videos show their posters.
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+const root = document.documentElement;
+const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const smooth = (x: number) => {
+  const t = clamp(x);
+  return t * t * (3 - 2 * t);
+};
+if (!reduce.matches) root.classList.add('cr-motion');
+
+// Parallax: --v runs from about -1 (element below the viewport centre) to 1 (above it).
+const par = [...document.querySelectorAll<HTMLElement>('[data-par]')];
+// Counters: data-to, data-dec, data-pre, data-suf; counted up as the number crosses the lower part of the screen.
+const counts = [...document.querySelectorAll<HTMLElement>('[data-count]')];
+const fmt = (el: HTMLElement, v: number) => {
+  const dec = Number(el.dataset.dec ?? 0);
+  return (el.dataset.pre ?? '') + v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + (el.dataset.suf ?? '');
+};
+// Pinned scenes get --s, 0 to 1 through their scroll length.
+const pins = [...document.querySelectorAll<HTMLElement>('[data-pin]')];
+const hooks: ((vh: number) => void)[] = [];
+
+function frame() {
+  const vh = innerHeight;
+  const still = reduce.matches;
+  for (const el of par) {
+    const r = el.getBoundingClientRect();
+    const v = still ? 0 : clamp((vh / 2 - (r.top + r.height / 2)) / vh, -1.2, 1.2);
+    el.style.setProperty('--v', v.toFixed(4));
+  }
+  for (const el of counts) {
+    const r = el.getBoundingClientRect();
+    const p = still ? 1 : smooth((vh * 0.98 - r.top) / (vh * 0.3));
+    const to = Number(el.dataset.to);
+    const text = fmt(el, to * p);
+    if (el.textContent !== text) el.textContent = text;
+  }
+  for (const el of pins) {
+    const r = el.getBoundingClientRect();
+    const s = still ? 1 : clamp(-r.top / Math.max(1, r.height - vh));
+    el.style.setProperty('--s', s.toFixed(4));
+  }
+  for (const h of hooks) h(vh);
+}
+
+let queued = false;
+const schedule = () => {
+  if (queued) return;
+  queued = true;
+  requestAnimationFrame(() => {
+    queued = false;
+    frame();
+  });
+};
+addEventListener('scroll', schedule, { passive: true });
+addEventListener('resize', schedule);
+reduce.addEventListener('change', () => {
+  root.classList.toggle('cr-motion', !reduce.matches);
+  schedule();
+});
+
+// Videos: muted loops that play only while on screen, and never under reduced motion.
+const vids = [...document.querySelectorAll<HTMLVideoElement>('video[data-loop]')];
+const io = new IntersectionObserver(
+  (entries) => {
+    for (const e of entries) {
+      const v = e.target as HTMLVideoElement;
+      if (e.isIntersecting && !reduce.matches) {
+        if (v.preload === 'none') v.preload = 'auto';
+        v.play().catch(() => {});
+      } else v.pause();
+    }
+  },
+  { threshold: 0.2 },
+);
+for (const v of vids) {
+  v.muted = true;
+  if (reduce.matches) v.removeAttribute('autoplay');
+  io.observe(v);
+}
+
+// Wipe: ñü.media over H.264 at the same bitrate. The divider eases in with scroll until someone drags it.
+for (const wipe of document.querySelectorAll<HTMLElement>('[data-wipe]')) {
+  const input = wipe.querySelector<HTMLInputElement>('input[type=range]')!;
+  const [a, b] = [...wipe.querySelectorAll<HTMLVideoElement>('video')];
+  let touched = false;
+  const set = (x: number) => wipe.style.setProperty('--x', `${x}%`);
+  input.addEventListener('input', () => {
+    touched = true;
+    set(Number(input.value));
+  });
+  hooks.push((vh) => {
+    if (touched || reduce.matches) return;
+    const r = wipe.getBoundingClientRect();
+    const p = smooth((vh - r.top) / (vh * 0.9));
+    const x = 88 - 38 * p;
+    input.value = String(Math.round(x));
+    set(x);
+  });
+  // Keep the two loops on the same frame.
+  if (a && b) {
+    const sync = () => {
+      if (!a.paused && Math.abs(a.currentTime - b.currentTime) > 0.08) b.currentTime = a.currentTime;
+    };
+    a.addEventListener('timeupdate', sync);
+    a.addEventListener('play', () => b.play().catch(() => {}));
+    a.addEventListener('pause', () => b.pause());
+  }
+}
+
+// Burst: particles form each big number, then explode and re-form into the next as the scene scrolls.
+for (const scene of document.querySelectorAll<HTMLElement>('[data-burst]')) {
+  const canvas = scene.querySelector('canvas')!;
+  const ctx = canvas.getContext('2d');
+  const items = [...scene.querySelectorAll<HTMLElement>('[data-glyph]')];
+  if (!ctx || !items.length) continue;
+  const glyphs = items.map((li) => li.dataset.glyph!);
+  type P = { tx: Float32Array; ty: Float32Array; bx: number; by: number; hue: number; r: number };
+  let parts: P[] = [];
+  let W = 0;
+  let H = 0;
+  let dpr = 1;
+
+  const sample = (text: string, w: number, h: number, step: number) => {
+    const off = document.createElement('canvas');
+    off.width = w;
+    off.height = h;
+    const o = off.getContext('2d')!;
+    let size = Math.min(h * 0.4, (w * 0.86) / Math.max(1.6, text.length * 0.62));
+    o.font = `700 ${size}px Inter, system-ui, sans-serif`;
+    const mw = o.measureText(text).width;
+    if (mw > w * 0.84) {
+      size *= (w * 0.84) / mw;
+      o.font = `700 ${size}px Inter, system-ui, sans-serif`;
+    }
+    o.textAlign = 'center';
+    o.textBaseline = 'middle';
+    o.fillStyle = '#fff';
+    o.fillText(text, w / 2, h * 0.54);
+    const data = o.getImageData(0, 0, w, h).data;
+    const pts: [number, number][] = [];
+    for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) if (data[(y * w + x) * 4 + 3] > 128) pts.push([x, y]);
+    return pts;
+  };
+
+  const build = () => {
+    const r = canvas.getBoundingClientRect();
+    dpr = Math.min(2, devicePixelRatio || 1);
+    W = Math.max(1, Math.round(r.width));
+    H = Math.max(1, Math.round(r.height));
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    const step = W < 600 ? 4 : 6;
+    const shapes = glyphs.map((g) => sample(g, W, H, step));
+    const n = Math.min(3200, Math.max(...shapes.map((s) => s.length)));
+    parts = Array.from({ length: n }, (_, i) => {
+      const tx = new Float32Array(shapes.length + 1);
+      const ty = new Float32Array(shapes.length + 1);
+      // Shape 0 is a loose cloud; 1..n are the glyphs.
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.sqrt(Math.random()) * Math.max(W, H) * 0.7;
+      tx[0] = W / 2 + Math.cos(a) * d;
+      ty[0] = H * 0.54 + Math.sin(a) * d * 0.6;
+      shapes.forEach((s, k) => {
+        const [x, y] = s[(i * 7919) % s.length] ?? [W / 2, H / 2];
+        tx[k + 1] = x;
+        ty[k + 1] = y;
+      });
+      const ba = Math.random() * Math.PI * 2;
+      const bd = (0.25 + Math.random() * 0.75) * Math.max(W, H) * 0.55;
+      return { tx, ty, bx: Math.cos(ba) * bd, by: Math.sin(ba) * bd, hue: Math.random(), r: 0.8 + Math.random() * 1.1 };
+    });
+  };
+
+  const draw = (s: number) => {
+    // g runs 0..N: a cloud gathers into glyph 1, then each whole number is an explosion into the next glyph.
+    const N = glyphs.length;
+    const g = s * N;
+    let a = 1;
+    let b = 1;
+    let k = 0;
+    let blast = 0;
+    let active: number;
+    if (g < 0.45) {
+      a = 0;
+      k = smooth(g / 0.45);
+      active = k > 0.4 ? 0 : -1;
+    } else {
+      const j = Math.round(g);
+      if (j >= 1 && j <= N - 1 && Math.abs(g - j) < 0.25) {
+        a = j;
+        b = j + 1;
+        k = smooth((g - j + 0.25) / 0.5);
+        blast = Math.sin(Math.PI * k);
+        active = k < 0.5 ? j - 1 : j;
+      } else {
+        a = b = Math.min(N, Math.floor(g - 0.25) + 1);
+        active = a - 1;
+      }
+    }
+    if (a === 0) b = 1;
+    items.forEach((li, j) => li.classList.toggle('on', j === active));
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const t = performance.now() / 1000;
+    ctx.globalCompositeOperation = 'lighter';
+    for (const p of parts) {
+      let x = p.tx[a] + (p.tx[b] - p.tx[a]) * k + p.bx * blast;
+      let y = p.ty[a] + (p.ty[b] - p.ty[a]) * k + p.by * blast;
+      x += Math.sin(t * 1.3 + p.hue * 40) * 0.6;
+      y += Math.cos(t * 1.1 + p.hue * 30) * 0.6;
+      const pulse = 0.5 + 0.5 * Math.sin(t * 2.6 + p.hue * 60);
+      const rad = p.r * (W < 600 ? 0.8 : 1) * (0.75 + pulse * 0.6);
+      const green = p.hue > 0.5;
+      ctx.globalAlpha = 0.18 + pulse * 0.22;
+      ctx.fillStyle = green ? '#2ee59d' : '#9b7bff';
+      ctx.beginPath();
+      ctx.arc(x, y, rad * 3.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.75 + pulse * 0.25;
+      ctx.fillStyle = green ? '#b8ffe0' : '#e2d9ff';
+      ctx.beginPath();
+      ctx.arc(x, y, rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  };
+
+  const progress = () => clamp(-scene.getBoundingClientRect().top / Math.max(1, scene.offsetHeight - innerHeight));
+  let running = false;
+  const loop = () => {
+    if (!running) return;
+    draw(progress());
+    requestAnimationFrame(loop);
+  };
+  const vis = new IntersectionObserver(([e]) => {
+    running = e.isIntersecting && !reduce.matches;
+    if (running) requestAnimationFrame(loop);
+  });
+  const start = () => {
+    if (reduce.matches) return;
+    build();
+    vis.observe(scene);
+    let rt = 0;
+    addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(() => {
+        if (Math.round(canvas.getBoundingClientRect().width) !== W) build();
+      }, 150);
+    });
+  };
+  document.fonts.ready.then(start, start);
+}
+
+// Sounds phone: Music and Healing tabs, and tapping a tile puts it in the now-playing bar. Nothing here scrolls.
+for (const app of document.querySelectorAll<HTMLElement>('[data-sounds]')) {
+  const segs = [...app.querySelectorAll<HTMLButtonElement>('[data-seg]')];
+  const panes = [...app.querySelectorAll<HTMLElement>('[data-pane]')];
+  const np = app.querySelector<HTMLElement>('[data-np]')!;
+  const npTitle = np.querySelector<HTMLElement>('[data-np-title]')!;
+  const npSub = np.querySelector<HTMLElement>('[data-np-sub]')!;
+  const npArt = np.querySelector<HTMLElement>('[data-np-art]')!;
+  const toggle = np.querySelector<HTMLButtonElement>('[data-np-toggle]')!;
+  for (const b of segs) {
+    b.addEventListener('click', () => {
+      for (const o of segs) o.setAttribute('aria-pressed', String(o === b));
+      for (const p of panes) p.hidden = p.dataset.pane !== b.dataset.seg;
+    });
+  }
+  const setPlaying = (on: boolean) => {
+    np.classList.toggle('playing', on);
+    toggle.setAttribute('aria-pressed', String(on));
+    toggle.setAttribute('aria-label', on ? 'Pause' : 'Play');
+  };
+  toggle.addEventListener('click', () => setPlaying(!np.classList.contains('playing')));
+  for (const t of app.querySelectorAll<HTMLButtonElement>('[data-track]')) {
+    t.addEventListener('click', () => {
+      npTitle.textContent = t.dataset.track!;
+      npSub.textContent = t.dataset.by!;
+      npArt.className = `art np-art ${t.dataset.art}`;
+      setPlaying(true);
+    });
+  }
+}
+
+frame();

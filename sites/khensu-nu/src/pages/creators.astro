@@ -1,6 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import CreatorPay from '../components/khensu/CreatorPay.astro';
+import Economics from '../components/khensu/Economics.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import RevealText from '../components/khensu/RevealText.astro';
+import CrHero from '../components/creators/CrHero.astro';
+import Burst from '../components/creators/Burst.astro';
+import Payouts from '../components/creators/Payouts.astro';
+import FansSee from '../components/creators/FansSee.astro';
+import DataSaving from '../components/creators/DataSaving.astro';
+import Sounds from '../components/creators/Sounds.astro';
+import OwnIt from '../components/creators/OwnIt.astro';
+import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 import data from '../data/creator-pay.json';
 
 type Src = { name: string; url: string; checked: string };
@@ -15,47 +26,73 @@ const sourceRows: { figure: string; value: string; kind: string; sources: Src[] 
   ...film.rows.map((r) => ({ figure: `Film, $100 of tickets: ${r.name}`, value: r.display, kind: r.kind, sources: film.sources as Src[] })),
   { figure: 'Label advance repaid from a 20% royalty', value: '$100,000 needs $500,000 of revenue', kind: data.recoup.kind, sources: data.recoup.sources as Src[] },
 ];
+
+const old = [
+  { k: 'Music', big: '15–20%', s: 'of a label’s share reaches a new artist', b: 'Spotify pays about two-thirds of its music revenue to rights holders, from a monthly pool; widely reported estimates come to $3–5 per 1,000 streams. A typical new-artist deal pays the artist 15–20% of the label’s share, and nothing until the advance, recording and marketing are earned back.' },
+  { k: 'Film', big: '~50%', s: 'of every ticket kept by the cinema', b: 'The distributor then takes its fee, traditionally 30% in the US and Canada, and repays marketing, prints, overhead and the cost of the film before anything counts as profit. That’s why “net points” on a hit often pay nothing.' },
+  { k: 'Video and live', big: '45–55%', s: 'of ad revenue kept by YouTube', b: 'YouTube keeps 45% on long videos and 55% on Shorts, Twitch keeps half of most subscriptions, and app stores take 15–30% of purchases made inside apps.' },
+];
+const fund = [
+  { t: 'All or nothing.', b: 'Pledges are held in escrow on the network. Reach your goal by the deadline and the money is released to you; if not, every backer is refunded automatically. No company holds the money, khensu.ñü included.' },
+  { t: 'Terms that can’t change.', b: 'Your goal, deadline and rewards are signed and published before anyone pays, so they can’t be altered afterwards.' },
+  { t: 'Private backers.', b: 'You see totals and which rewards people chose; who backed you stays private unless they choose to share it.' },
+  { t: 'Your rights stay yours.', b: 'Backers get the rewards you offer, such as a ticket, a download or a signed copy. They don’t get your film, your masters or a share of your income.' },
+];
+const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
 ---
 
 <Base
-  title="For artists"
-  description="How khensu.ñü lets fans pay artists, musicians and filmmakers directly, with no platform cut, and fund films, albums and tours with ñüFi instead of studio or label advances."
+  title="For creators"
+  description="Creators on khensu.ñü keep everything: no platform cut on subscriptions, tips 100% to you, a 42¢ minimum payout, instant payouts, and every right to your work. Plus Sounds, ñü.media video at less data, and ñüFi funding."
 >
-  <div class="khensu">
-    <section class="page-head">
+  <div class="khensu cr">
+    <CrHero />
+    <ProductBar name="khensu.ñü for creators" action={appLabel} href={APP_STORE_URL} />
+
+    <section class="intro" aria-label="Introduction">
       <div class="wrap">
-        <p class="eyebrow">for artists</p>
-        <h1>Art, paid for by the people who love it.<br /><span class="dim">Not by studios, labels or ad markets.</span></h1>
-        <p class="lede">
-          Today most of what people spend on films, music and video is kept by the companies in between. khensu.ñü lets
-          fans pay artists directly, and lets artists raise money for their next work from the people who want to see it.
-        </p>
+        <RevealText
+          parts={[
+            ['Today most of what people spend on films, music and video is kept by the companies in between. '],
+            ['On khensu.ñü, fans pay the people who made it.', true],
+            [' Directly, instantly and privately, with '],
+            ['no platform cut', true],
+            [' and '],
+            ['every right left with you.', true],
+          ]}
+        />
       </div>
     </section>
 
-    <section class="section">
-      <div class="wrap prose">
-        <h2>Where the money goes today</h2>
-        <p>
-          <b>Music.</b> Spotify says it pays out about two-thirds of its music revenue to rights holders. It pays them
-          from a monthly pool, split by share of streams, not a fixed rate; widely reported estimates come to about
-          $3–5 for every 1,000 streams. For an artist signed to a label, that money goes to the label first. A typical
-          deal for a new artist pays them 15–20% of it, and nothing at all until the label has earned back the advance,
-          recording and marketing costs out of the artist’s share.
-        </p>
-        <p>
-          <b>Film.</b> In a studio deal, the studio pays for the film and owns it. Cinemas keep roughly half of every
-          ticket. The distributor then takes its fee, traditionally 30% in the US and Canada, and repays marketing,
-          prints, overhead and the cost of the film before anything counts as profit. That is why people with “net
-          points” on a hit film are often paid nothing beyond their fee.
-        </p>
-        <p>
-          <b>Video and live streams.</b> YouTube keeps 45% of ad revenue on long videos and 55% on Shorts, Twitch keeps
-          half of most subscriptions, and app stores take 15–30% of purchases made inside apps.
-        </p>
-      </div>
+    <Burst />
 
+    <CreatorPay page />
+
+    <Payouts />
+
+    <FansSee />
+
+    <DataSaving />
+
+    <Sounds />
+
+    <OwnIt />
+
+    <section class="section old" id="old-deal-section" aria-labelledby="old-title">
       <div class="wrap">
+        <p class="eyebrow">where the money goes today</p>
+        <h2 id="old-title" class="cr-h">The old deal.<br /><span class="dim">Most of it never reaches you.</span></h2>
+        <ul class="old-cards" role="list" data-scene="reveal">
+          {old.map((o, i) => (
+            <li style={`--i:${i}`}>
+              <small>{o.k}</small>
+              <b>{o.big}</b>
+              <span class="old-s">{o.s}</span>
+              <p>{o.b}</p>
+            </li>
+          ))}
+        </ul>
+
         <figure class="card film" data-scene="reveal">
           <figcaption><b>{film.title}</b><span>Against the same $100 pledged to a film on ñüFi Back</span></figcaption>
           <div role="img" aria-label={filmLabel}>
@@ -84,76 +121,78 @@ const sourceRows: { figure: string; value: string; kind: string; sources: Src[] 
       </div>
     </section>
 
-    <CreatorPay page />
+    <section class="section fund" id="nufi-back-section" data-par aria-labelledby="fund-title">
+      <div class="wrap">
+        <p class="eyebrow">ñüFi back</p>
+        <h2 id="fund-title" class="cr-h">Fund the next film, album or tour.<br /><span class="dim">From the people who want it.</span></h2>
+        <p class="cr-lede">
+          Instead of asking a studio or a label for an advance, ask your fans. <strong>ñüFi Back works like Kickstarter,
+          with no platform cut.</strong> ñüFi Give is for gifts of any size; lending and investment run through licensed
+          partners, whose fees are shown before anyone commits.
+        </p>
+        <ul class="fund-cards" role="list">
+          {fund.map((f, i) => (
+            <li style={`--i:${i}`}><b>{f.t}</b><span>{f.b}</span></li>
+          ))}
+        </ul>
 
-    <section class="section" id="fans-pay-section">
+        <div class="duo">
+          <div class="duo-card">
+            <p class="duo-k">Every collaborator, paid automatically</p>
+            <p class="duo-big">One split.<br />Paid as it arrives.</p>
+            <p>
+              Set a split once (the director, the writer, the composer and the cast) and every payment is shared between
+              their wallets as it comes in. No one waits for an accountant’s statement, and no one has to trust the person
+              holding the money.
+            </p>
+          </div>
+          <div class="duo-card">
+            <p class="duo-k">Nothing to pay back</p>
+            <p class="duo-big"><span data-count data-to="500000" data-pre="$">$500,000</span><br /><small>to repay a $100,000 advance</small></p>
+            <p>
+              A label advance is repaid out of the artist’s share. At a 20% royalty, a $100,000 advance is repaid only
+              after the recording earns $500,000. On khensu.ñü nobody advances you money, so there’s nothing to recoup:
+              the first payment from the first fan is yours.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Economics />
+
+    <section class="section close" id="get-started-section" data-par aria-labelledby="close-title">
+      <video class="close-vid" src="/khensu/creators/hero.mp4" poster="/khensu/creators/hero.webp" muted loop playsinline preload="none" data-loop aria-hidden="true" width="540" height="960"></video>
+      <div class="wrap close-in">
+        <h2 id="close-title" class="cr-h">Make the thing.<em>Keep the money. Keep the rights.</em></h2>
+        <div class="close-cta">
+          <a class="btn primary" href={APP_STORE_URL}>{appLabel}</a>
+          <a class="btn" href="/media">See ñü.media</a>
+        </div>
+        <p class="close-credit">Video: @deemsterhotline on Instagram, used with thanks.</p>
+      </div>
+    </section>
+
+    <section class="section fine" id="the-fine-print-section" aria-labelledby="fine-title">
       <div class="wrap prose">
-        <h2>How fans pay you</h2>
-        <p>
-          Payments happen inside the khensu.ñü app, through the network’s shielded payments. Money goes from a fan’s
-          wallet to yours as an encrypted message over the network, so there is no public record of who paid whom, and no
-          card processor, bank or platform account sits in the middle. Nobody holds your money for you, so nobody can
-          freeze it or make you wait for a payout date.
-        </p>
-        <p>
-          khensu.ñü takes no cut. The only charge is a network fee of a fraction of a cent for each payment, which goes to
-          the people who run the network’s nodes; that fee is an estimate. For tips, the fan pays the fee on top, so
-          you receive 100%.
-        </p>
-        <ul class="ways">
-          <li><b>Subscriptions.</b> Fans pay you monthly for your work, at a price you set.</li>
-          <li><b>Tips.</b> From a chat, a post in the Feed or a live room, in any amount.</li>
-          <li><b>Pay-per-view.</b> Charge for a film, an episode, an album or a single track.</li>
-          <li><b>Live tickets.</b> Sell entry to a live room, a premiere or a concert stream.</li>
-        </ul>
-        <p>
-          A share of khensu.ñü’s own subscriptions also goes to the creators each subscriber actually watches or
-          listens to, split by the minute, so none of their money goes to anyone they never played.
-        </p>
-
-        <h2>Fund the next film, album or tour with ñüFi</h2>
-        <p>
-          Instead of asking a studio or a label for an advance, you can ask the people who want the work. ñüFi Back works
-          like Kickstarter, with no platform cut:
-        </p>
-        <ul class="ways">
-          <li><b>All or nothing.</b> Pledges are held in escrow on the network. If you reach your goal by the deadline, the money is released to you. If not, every backer is refunded automatically. No company holds the money, khensu.ñü included.</li>
-          <li><b>Terms that can’t change.</b> Your goal, deadline and rewards are signed and published before anyone pays, so they can’t be altered afterwards.</li>
-          <li><b>Private backers.</b> You see totals and which rewards people chose; who backed you stays private unless they choose to share it.</li>
-          <li><b>Your rights stay yours.</b> Backers get the rewards you offer, such as a ticket, a download or a signed copy. They don’t get your film, your masters or a share of your income.</li>
-        </ul>
-        <p>
-          ñüFi Give is for gifts of any size, and ñüFi Back is for funding the work. Lending and investment run through
-          licensed partners, whose fees are shown before anyone commits.
-        </p>
-
-        <h2>Every collaborator, paid automatically</h2>
-        <p>
-          Films and records are made by many people. Set a split once (for example, the director, the writer, the
-          composer and the cast) and every payment that comes in is shared between their wallets as it arrives. No one
-          waits for an accountant’s statement, and no one has to trust the person holding the money.
-        </p>
-
-        <h2>Nothing to pay back</h2>
-        <p>
-          A label advance is repaid out of the artist’s share, not the label’s. With a 20% royalty, a $100,000 advance is
-          repaid only after the recording has earned $500,000. On khensu.ñü, nobody advances you money, so there is
-          nothing to recoup: the first payment from the first fan is yours.
-        </p>
-
-        <h2>Where the network fee goes</h2>
+        <h2 id="fine-title">Where the network fee goes</h2>
         <p>
           The network fee pays the people who run khensu.ñü’s nodes for carrying your payments and your work. If you run a
           node, or carry a suñůlink.shield, the network also pays it for the relay work it can prove it did, into the same
           wallet. What a node earns depends on the work it does; this is not a promise of earnings.
         </p>
+        <p>
+          Every play pays you 1¢, $10 per 1,000 plays, and khensu.ñü takes no cut of it. A fan’s money only ever goes to
+          what they actually watched or played.
+        </p>
 
         <h2>What is measured and what isn’t</h2>
         <p>
-          khensu.ñü’s 0% cut and $0 minimum cashout are rules of how payments work. Its network fee is an estimate and its per-play figure an example.
-          Other platforms’ figures are their published terms, or estimates where they don’t publish one, and each is
-          labelled. Payments are offered region by region, following legal review in each, and paid digital content bought inside the
-          iPhone app follows Apple’s purchase rules.
+          khensu.ñü’s 0% cut and 42¢ minimum payout are rules of how payments work. Its network fee is an estimate and its
+          per-play figure an example. ñü.media figures are benchmarks, measured on the reel shown on this page. Other
+          platforms’ figures are their published terms, or estimates where they don’t publish one, and each is labelled.
+          Payments are offered region by region, following legal review in each, and paid digital content bought inside
+          the iPhone app follows Apple’s purchase rules.
         </p>
 
         <h2>Every number and where it comes from</h2>
@@ -176,8 +215,8 @@ const sourceRows: { figure: string; value: string; kind: string; sources: Src[] 
           </table>
         </div>
         <p class="footnote">
-          Spotify, Apple Music, App Store, YouTube, Twitch, Patreon, OnlyFans and Kickstarter are trademarks of their
-          owners; no affiliation or endorsement. Not an offer of securities or a promise of earnings.
+          Spotify, Apple Music, App Store, YouTube, Twitch, Patreon, OnlyFans, Instagram, TikTok and Kickstarter are
+          trademarks of their owners; no affiliation or endorsement. Not an offer of securities or a promise of earnings.
         </p>
       </div>
     </section>
@@ -186,34 +225,213 @@ const sourceRows: { figure: string; value: string; kind: string; sources: Src[] 
 
 <script>
   import '../scripts/scenes.ts';
+  import '../scripts/creators.ts';
 </script>
 
 <style>
+  .cr {
+    background: #000;
+  }
+  .cr :global(.section) {
+    background: #000;
+  }
+  .intro {
+    padding: clamp(5rem, 12vw, 10rem) 0;
+    background: #000;
+  }
+  .intro :global(.reveal-text) {
+    font-size: clamp(1.5rem, 3.2vw, 2.6rem);
+    max-width: 56rem;
+    line-height: 1.25;
+  }
+  .cr-h {
+    font-size: clamp(2.4rem, 5.4vw, 4.6rem);
+    font-weight: 600;
+  }
+  .cr-h em {
+    background: linear-gradient(100deg, #b9b0ff, #18e0c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
   .dim {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.5);
   }
-  .prose b {
+  .cr-lede {
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    color: rgba(255, 255, 255, 0.56);
+    max-width: 44rem;
+  }
+  .cr-lede strong {
+    color: #fff;
     font-weight: 500;
-    color: var(--text);
   }
-  .prose p {
+
+  .old-cards {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .old-cards li {
+    --k: clamp(0, calc((var(--e, 1) - var(--i) * 0.12) / 0.4), 1);
+    display: grid;
+    align-content: start;
+    gap: 0.3rem;
+    padding: 1.6rem;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    opacity: var(--k);
+    translate: 0 calc((1 - var(--k)) * 30px);
+  }
+  .old-cards small {
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+  }
+  .old-cards b {
+    font-size: clamp(2.6rem, 5vw, 3.8rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+  .old-s {
+    font-weight: 500;
+  }
+  .old-cards p {
+    margin: 0.6rem 0 0;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .fund {
+    --v: 0;
+    overflow: hidden;
+    background: radial-gradient(50% 40% at 80% 20%, rgba(24, 224, 200, 0.1), transparent 70%), #000 !important;
+  }
+  .fund-cards {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .fund-cards li {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    translate: 0 calc(var(--v) * (var(--i) - 1.5) * -14px);
+  }
+  .fund-cards b {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+  .fund-cards span {
+    color: var(--text-dim);
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+  .duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .duo-card {
+    padding: clamp(1.5rem, 3vw, 2.2rem);
+    border-radius: 26px;
+    background: radial-gradient(120% 90% at 0% 0%, rgba(139, 123, 255, 0.2), transparent 60%), rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+  .duo-card p {
     color: var(--text-dim);
   }
-  .ways {
-    display: grid;
-    gap: 0.6rem;
-    margin: 0 0 1.5rem;
+  .duo-k {
+    font-size: 0.85rem;
+    margin: 0;
+  }
+  .duo-big {
+    margin: 0.4rem 0 1rem;
+    color: #fff !important;
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  .duo-big small {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0;
     color: var(--text-dim);
   }
 
+  .close {
+    --v: 0;
+    position: relative;
+    overflow: hidden;
+    min-height: min(90svh, 820px);
+    display: grid;
+    align-items: center;
+  }
+  .close-vid {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 56svh);
+    height: 130%;
+    object-fit: cover;
+    translate: -50% calc(-50% + var(--v) * 8%);
+    opacity: 0.4;
+    mask-image: radial-gradient(closest-side, #000 40%, transparent);
+  }
+  .close-in {
+    position: relative;
+    text-align: center;
+    display: grid;
+    justify-items: center;
+  }
+  .close .cr-h {
+    font-size: clamp(2.8rem, 7vw, 6rem);
+  }
+  .close-cta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-top: 1rem;
+  }
+  .close-credit {
+    margin-top: 1.5rem;
+    font-size: 0.74rem;
+    color: var(--text-faint);
+  }
+
+  .prose p {
+    color: var(--text-dim);
+  }
+  .fine h2 {
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    margin-top: 2rem;
+  }
+
   .film {
-    margin: 2.5rem 0 0;
+    margin: 1rem 0 0;
     padding: clamp(1.25rem, 3vw, 2rem);
     display: grid;
     gap: 1.2rem;
     background: rgba(255, 255, 255, 0.045);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 22px;
+    border-radius: 24px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
   figcaption {
@@ -228,7 +446,7 @@ const sourceRows: { figure: string; value: string; kind: string; sources: Src[] 
   small {
     color: var(--text-dim);
   }
-  small {
+  .stack small {
     font-size: 0.78rem;
   }
   .stack {
@@ -362,7 +580,14 @@ const sourceRows: { figure: string; value: string; kind: string; sources: Src[] 
     max-width: none;
   }
 
+  @media (max-width: 960px) {
+    .old-cards { grid-template-columns: 1fr; }
+    .fund-cards { grid-template-columns: 1fr 1fr; }
+    .duo { grid-template-columns: 1fr; }
+  }
   @media (max-width: 760px) {
+    .fund-cards { grid-template-columns: 1fr; }
+    .fund-cards li { translate: none; }
     .stack li {
       grid-template-columns: 1fr;
       gap: 0.4rem;

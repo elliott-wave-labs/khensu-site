@@ -1,14 +1,14 @@
 ---
-// Green-screen demo: the original CC0 clip beside ñü-media's keyed composite, frame-locked.
+// Green-screen demo: the original CC0 clip beside ñü.media's keyed composite, frame-locked.
 const DIR = '/khensu/codec/greenscreen/';
 const sides = [
   { file: 'original', name: 'Original', note: 'Green screen, 8K source shown at 2560 × 1440', ours: false },
-  { file: 'nu-greenscreen', name: 'ñü-media', note: 'Green keyed out, edges despilled, new background', ours: true },
+  { file: 'nu-greenscreen', name: 'ñü.media', note: 'Green keyed out, edges despilled, new background', ours: true },
 ];
 ---
 
 <figure class="card wide gs" data-scene="reveal">
-  <figcaption><b>Green screen, keyed</b><span>ñü-media carries transparency, so the receiver can put the subject over any background. Only the ñü-media side is keyed.</span></figcaption>
+  <figcaption><b>Green screen, keyed</b><span>ñü.media carries transparency, so the receiver can put the subject over any background. Only the ñü.media side is keyed.</span></figcaption>
   <div class="two">
     {sides.map((s) => (
       <div class:list={['side', { ours: s.ours }]}>

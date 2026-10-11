@@ -1,6 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
 import NuMedia from '../components/khensu/NuMedia.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
+import proReel from '../data/pro-reel.json';
+import i720 from '../data/iphone-720p.json';
+import ladReel from '../data/iphone-ladder-reel.json';
+
+const kbit = (s: string) => Number(s.match(/([\d.]+) kbit\/s with sound/)?.[1]);
+const low = proReel.tiles.find((t) => t.id === 'low')!;
+const ultra = proReel.tiles.find((t) => t.id === 'ultra')!;
+type Tile = { actual_kbps: number; vmaf: number };
+const r500 = (ladReel.tiles.rates as Record<string, Record<string, Tile>>)['500'];
+const srcKbps = Number(ladReel.source.match(/([\d.]+) Mbit\/s/)?.[1]) * 1000;
+const smaller = Math.round(srcKbps / r500['nu-media'].actual_kbps);
+const speed = i720.iphone_fps['nu-base'] / i720.iphone_fps['hevc-hw'];
+const fps = Number(ultra.note.match(/at (\d+) fps/)?.[1]);
 ---
 
 <Base
@@ -10,18 +24,34 @@ import NuMedia from '../components/khensu/NuMedia.astro';
   <section class="page-head">
     <div class="wrap">
       <p class="eyebrow">ñü-media · measurements</p>
-      <h1>Every number, and where it stands.</h1>
+      <h1>Less data.<br />The full picture.</h1>
+      <StatStrip
+        items={[
+          { n: smaller, unit: '×', label: `Less data than Instagram’s own file, at VMAF ${Math.round(r500['nu-media'].vmaf)} to HEVC’s ${Math.round(r500['hevc-hw'].vmaf)} at the same rate`, kind: 'benchmark' },
+          { n: kbit(low.note), unit: 'kbit/s', label: 'Full 720p video with sound, least-data mode', kind: 'benchmark' },
+          { n: speed, dec: 1, unit: '×', label: 'Faster to encode than full-size HEVC on iPhone', kind: 'benchmark' },
+          { n: fps, unit: 'fps', label: 'Ultra, rebuilt to 4K on the host’s own Mac', kind: 'benchmark' },
+        ]}
+      >
+        Benchmarks: the 720p reel encoded on iPhone Air with iOS {i720.os.match(/[\d.]+/)?.[0]}; least data and Ultra on a Mac
+        with M1 Pro, 11 October 2026. Raw results sit beside each chart below.
+      </StatStrip>
       <p class="lede">
-        ñü-media sends video in two layers. The base layer is the video at half size, encoded by your iPhone’s hardware
-        HEVC encoder; it is what crosses the network. The receiving iPhone’s Neural Engine then rebuilds the full picture.
-        The measurements here show the base layer alone, and the full picture rebuilt with Apple’s built-in super
-        resolution on the Neural Engine.
+        ñü-media sends a smaller picture, and the receiving iPhone’s Neural Engine rebuilds the full one.
       </p>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap prose">
+      <h2>How it works</h2>
+      <p class="body">
+        ñü-media sends video in two layers. The base layer is the video at half size, encoded by your iPhone’s hardware
+        HEVC encoder; it is what crosses the network. The receiving iPhone’s Neural Engine then rebuilds the full picture.
+        The measurements here show the base layer alone, and the full picture rebuilt with Apple’s built-in super
+        resolution on the Neural Engine.
+      </p>
+
       <h2>What the scores say</h2>
       <ul class="facts">
         <li><b>The base layer alone</b> scores below full-size HEVC, as expected: it is HEVC at a quarter of the pixels.</li>
@@ -42,6 +72,13 @@ import NuMedia from '../components/khensu/NuMedia.astro';
 </Base>
 
 <style>
+  .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
+  .body {
+    color: var(--text-dim);
+    margin: 0 0 2rem;
+  }
   .facts {
     display: grid;
     gap: 0.8rem;

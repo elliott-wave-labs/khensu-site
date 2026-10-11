@@ -1,15 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import RevealText from '../components/khensu/RevealText.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 
 const SPEC = 'https://dev.khensu.nu/specs/compliance';
-
-const stats = [
-  { n: '0', l: 'cookies, analytics or trackers on this site' },
-  { n: '0', l: 'names, phone numbers or emails in the app' },
-  { n: '0', l: 'servers that read or process your data' },
-  { n: '16', l: 'privacy law regimes met, on six continents' },
-];
 
 const inventory = [
   { data: 'Messages, calls, media, files, payments', where: 'Your devices; sealed packets in transit and in mailboxes', who: 'Only the people in the conversation', kept: 'On your devices until you delete them; mailbox copies expire after delivery or 30 days' },
@@ -40,6 +34,13 @@ const laws = [
   { law: 'DPDP Act 2023', where: 'India', how: 'Met the same way as GDPR' },
   { law: 'PDPA', where: 'Singapore', how: 'Met the same way as GDPR' },
   { law: 'POPIA', where: 'South Africa', how: 'Met the same way as GDPR' },
+];
+
+const stats = [
+  { n: 0, label: 'Cookies, analytics or trackers on this site' },
+  { n: 0, label: 'Names, phone numbers or emails in the app' },
+  { n: 0, label: 'Servers that read or process your data' },
+  { n: laws.length, label: 'Privacy laws met, on six continents' },
 ];
 
 const rights = [
@@ -82,22 +83,12 @@ const shield = [
       <div class="wrap">
         <p class="eyebrow">compliance</p>
         <h1>Compliant by having nothing to give.<br /><span class="dim">Your data never leaves your devices readable.</span></h1>
-        <p class="lede">
-          Messages, calls, payments, files, contacts and search stay on your devices, end-to-end encrypted with
-          post-quantum cryptography. Nothing is processed on a server. Here is every place personal data could exist,
-          every law that applies, and how each one is met.
-        </p>
+        <StatStrip items={stats} />
+        <p class="lede">Every place personal data could exist, every law that applies, and how each one is met.</p>
         <div class="btn-row">
           <a class="btn primary" href={SPEC}>Read the full document</a>
           <a class="btn" href="/privacy">Privacy at a glance</a>
         </div>
-      </div>
-      <div class="wrap">
-        <ul class="stats" role="list">
-          {stats.map((s, i) => (
-            <li style={`--i:${i}`}><b>{s.n}</b><span>{s.l}</span></li>
-          ))}
-        </ul>
       </div>
     </section>
 

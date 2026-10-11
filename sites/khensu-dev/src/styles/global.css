@@ -179,30 +179,91 @@ code,
 }
 
 .btn {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
   padding: 0.75em 1.25em;
   border-radius: 999px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 0.92rem;
   font-weight: 500;
+  color: var(--text);
   text-decoration: none;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.28);
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 .btn:hover {
-  border-color: var(--accent);
-  color: var(--text);
-  background: var(--accent-soft);
+  border-color: rgba(255, 255, 255, 0.36);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.09));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 30px rgba(0, 0, 0, 0.34);
 }
+
+/* Primary buttons carry the network aurora: each one drifts and shifts hue on its own clock,
+   set per button by aura-buttons.ts. */
 .btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
+  overflow: hidden;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.32);
+  background: #10121a;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+.btn.primary::before {
+  content: '';
+  position: absolute;
+  inset: -60% -35%;
+  z-index: -2;
+  background:
+    radial-gradient(42% 60% at 22% 70%, rgba(34, 245, 154, 0.95), transparent 70%),
+    radial-gradient(38% 55% at 50% 40%, rgba(24, 224, 200, 0.8), transparent 70%),
+    radial-gradient(42% 60% at 78% 30%, rgba(139, 92, 255, 0.95), transparent 70%),
+    radial-gradient(34% 50% at 60% 85%, rgba(255, 79, 216, 0.75), transparent 70%),
+    #1a1640;
+  filter: blur(10px) saturate(1.25) hue-rotate(var(--aura-hue, 0deg));
+  animation:
+    btn-aura var(--aura-dur, 14s) ease-in-out var(--aura-delay, 0s) infinite alternate,
+    btn-hue var(--hue-dur, 21s) ease-in-out var(--hue-delay, 0s) infinite alternate;
+}
+.btn.primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 48%, rgba(0, 0, 0, 0.12));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 .btn.primary:hover {
-  background: color-mix(in srgb, var(--accent) 85%, white);
-  color: var(--bg);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: #10121a;
+  filter: brightness(1.12) saturate(1.1);
+}
+@keyframes btn-aura {
+  0% { transform: translate3d(-12%, 6%, 0) rotate(0deg) scale(1); }
+  33% { transform: translate3d(10%, -8%, 0) rotate(40deg) scale(1.15); }
+  66% { transform: translate3d(-6%, -4%, 0) rotate(-25deg) scale(0.95); }
+  100% { transform: translate3d(12%, 8%, 0) rotate(70deg) scale(1.1); }
+}
+@keyframes btn-hue {
+  0% { filter: blur(10px) saturate(1.25) hue-rotate(var(--aura-hue, 0deg)); }
+  50% { filter: blur(12px) saturate(1.45) hue-rotate(calc(var(--aura-hue, 0deg) + 50deg)); }
+  100% { filter: blur(10px) saturate(1.2) hue-rotate(calc(var(--aura-hue, 0deg) - 40deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn.primary::before {
+    animation: none;
+  }
 }
 .btn-row {
   display: flex;

@@ -1,14 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base>
   <p class="eyebrow">Developer docs</p>
   <h1>Build on khensu.ñü</h1>
-  <p class="lede">
-    khensu.ñü is a post-quantum private messenger on a network run by people, and the first app on webË. These docs
-    are for people who want to run part of the network, review the design, or contribute.
-  </p>
+  <StatStrip
+    items={[
+      { n: 5, label: 'Mix network hops for every message' },
+      { n: 2, unit: 's', label: 'One steady burst from every phone while the app is open' },
+      { n: 8, label: 'Repositories, each opening when its design review finishes' },
+      { n: 0, label: 'Servers that read or process user data' },
+    ]}
+  />
+  <p class="lede">A post-quantum messenger on a network run by people, and the first app on webË.</p>
+  <p>These docs are for people who want to run part of the network, review the design, or contribute.</p>
 
   <h2>Principles</h2>
   <ul>

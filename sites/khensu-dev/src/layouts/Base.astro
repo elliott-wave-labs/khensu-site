@@ -6,6 +6,7 @@ import '@fontsource/inter/600.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '../styles/global.css';
 import Crescent from '../components/khensu/Crescent.astro';
+import { CARDS, cardFor } from '../../../khensu-nu/src/data/og';
 
 interface Props {
   title?: string;
@@ -20,6 +21,9 @@ const DEFAULT_DESC =
 const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const card = cardFor(Astro.url.pathname, 'dev-');
+const ogImage = `https://khensu.nu/og/${card}.jpg`;
+const ogAlt = CARDS[card].alt;
 
 const DOCS = [
   { href: '/', label: 'Overview' },
@@ -34,7 +38,7 @@ const DOCS = [
   { href: '/specs/threat-model', label: 'Threat model' },
   { href: '/specs/work', label: 'Network work' },
   { href: '/specs/app-commerce', label: 'App commerce' },
-  { href: '/specs/nu-media', label: 'ñü-media design' },
+  { href: '/specs/nu-media', label: 'ñü.media design' },
   { href: '/repositories', label: 'Repositories and licences' },
   { href: '/contribute', label: 'Contribute' },
   { href: '/security', label: 'Security' },
@@ -53,29 +57,36 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#0A0B0D" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0a0b0d" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content="https://khensu.nu/og.png" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="The khensu.ñü logo in front of its relay network" />
+    <meta property="og:image:alt" content={ogAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://khensu.nu/og.png" />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogAlt} />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="wrap bar">
         <a href="/" class="brand" aria-label="khensu.ñü developers, home">
-          <Crescent size={26} />
+          <img class="seal" src="/seal-128.webp" alt="" width="26" height="26" />
           <span>khensu.ñü <small>developers</small></span>
         </a>
         <nav aria-label="Primary">
@@ -111,6 +122,9 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
         </p>
       </div>
     </footer>
+    <script>
+      import '../../../_shared/aura-buttons.ts';
+    </script>
   </body>
 </html>
 

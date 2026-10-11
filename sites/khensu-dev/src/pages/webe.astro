@@ -1,14 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base title="webË" description="The webË specification, how to build apps and sites on webË, and how to extend khensu.ñü through code and consensus.">
   <p class="eyebrow">webË · specification</p>
   <h1>webË: a new network, alongside the internet</h1>
-  <p class="lede">
-    webË is an open protocol for names without DNS, content without CDNs, websites, feeds, forums and live media, all
-    delivered over a post-quantum stealth network. Nodes only relay, cache and count; encoding, encryption, ranking,
-    moderation and rendering happen on devices. khensu.ñü is the first webË app. Anyone can build another.
+  <StatStrip
+    items={[
+      { n: 6, label: 'Layers, from transport to clients' },
+      { n: 5, label: 'Mix network hops for every message' },
+      { n: 2, unit: 's', label: 'Stealth tick: one steady burst, sent or not' },
+      { n: 0, label: 'DNS lookups or certificate authorities for names' },
+    ]}
+  />
+  <p class="lede">An open protocol for names, sites, feeds, forums and live media over a post-quantum stealth network.</p>
+  <p>
+    Nodes only relay, cache and count; encoding, encryption, ranking, moderation and rendering happen on devices.
+    khensu.ñü is the first webË app. Anyone can build another.
   </p>
 
   <h2 id="spec">Specification</h2>
@@ -122,7 +131,7 @@ import Base from '../layouts/Base.astro';
   <ul>
     <li><strong>Proof aggregation:</strong> nodes with spare CPU fold each block’s spend and contract proofs into one recursive STARK, so phones verify one small proof instead of thousands.</li>
     <li><strong>Encrypted storage:</strong> erasure-coded shards of sites, media and backups, held as ciphertext and checked with storage proofs, paid per byte-day.</li>
-    <li><strong>Public media renditions:</strong> Macs and GPUs encode ñü-media versions of posts their owners published openly. Private media is always encoded on the sender’s device.</li>
+    <li><strong>Public media renditions:</strong> Macs and GPUs encode ñü.media versions of posts their owners published openly. Private media is always encoded on the sender’s device.</li>
     <li><strong>Private lookups:</strong> private information retrieval for names, keys and directories, so a node answers a query without learning what was asked.</li>
     <li><strong>Randomness and timestamps:</strong> a threshold randomness beacon for committee lotteries, raffles and fair ordering, and post-quantum timestamps that prove a hash existed at a given time.</li>
     <li><strong>Mesh and satellite bridging:</strong> nodes and suñůlink.shield units carry mixnet traffic between places with no internet and the rest of the network.</li>

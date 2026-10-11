@@ -1,14 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base title="Architecture" description="The parts of khensu.ñü and what each one does.">
   <p class="eyebrow">Architecture</p>
   <h1>How the pieces fit</h1>
-  <p class="lede">
-    khensu.ñü has no company servers in the middle. Your devices hold your data; a network of nodes run by people
-    carries it without being able to read it or see who it’s for.
-  </p>
+  <StatStrip
+    items={[
+      { n: 6, label: 'Parts, from the app to suñůlink.shield' },
+      { n: 0, label: 'Company servers in the middle' },
+      { n: 5, label: 'Mix network hops for every message' },
+      { n: 2, label: 'Relays per call, run by different operators' },
+    ]}
+  />
+  <p class="lede">Your devices hold your data; nodes run by people carry it without reading it or seeing who it’s for.</p>
 
   <table>
     <thead><tr><th>Part</th><th>What it does</th></tr></thead>

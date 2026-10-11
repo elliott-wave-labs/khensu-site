@@ -1,13 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base title="Security" description="Report a vulnerability in khensu.ñü, and how khensu.ñü meets GDPR, CCPA and every major privacy law.">
   <p class="eyebrow">security</p>
   <h1>Report a vulnerability</h1>
+  <StatStrip
+    items={[
+      { n: 3, label: 'Working days, at most, to acknowledge a report' },
+      { n: 24, unit: 'h', label: 'To report an exploited vulnerability to ENISA' },
+      { n: 72, unit: 'h', label: 'For regulators to hear of a breach of what we hold' },
+      { n: 16, label: 'Privacy laws met, from GDPR to POPIA' },
+    ]}
+  />
   <p class="lede">
-    If you find a security problem in khensu.ñü, its network or these sites, email
-    <a href="mailto:security@elliottwave.studio">security@elliottwave.studio</a>. Please don’t open a public issue.
+    Email <a href="mailto:security@elliottwave.studio">security@elliottwave.studio</a>. Please don’t open a public issue.
   </p>
   <ul>
     <li>Include what you found, how to reproduce it, and what an attacker could do with it.</li>

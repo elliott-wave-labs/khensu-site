@@ -4,12 +4,12 @@ type Row = { name: string; detail: string; seconds: number; label: string; ours?
 const rows: Row[] = [
   { name: 'Ray-traced film frames', detail: 'Toy Story 4: 60 to 160 render-farm hours per 4K frame (Pixar)', seconds: 300 * 60 * 3600, label: '18,000+ farm hours' },
   { name: 'Rotoscoping by hand', detail: 'About 15 frames a day for a skilled artist (Roto++, SIGGRAPH 2016)', seconds: 20 * 8 * 3600, label: '20 working days' },
-  { name: 'ñü-media Ultra rebuild, on the host', detail: 'Apple’s super resolution to 4K: 0.93 frames a second on an M1 Pro', seconds: 300 / 0.93, label: '5.4 min', ours: true, slow: true },
+  { name: 'ñü.media Ultra rebuild, on the host', detail: 'Apple’s super resolution to 4K: 0.93 frames a second on an M1 Pro', seconds: 300 / 0.93, label: '5.4 min', ours: true, slow: true },
   { name: 'Decoding the video itself', detail: 'Hardware HEVC, the 4K Ultra file, M1 Pro: 138 frames a second', seconds: 300 / 138, label: '2.2 s' },
   { name: 'AI cut-out, people only', detail: 'Robust Video Matting at 4K, 154 frames a second on a desktop RTX 3090, model time only', seconds: 300 / 154, label: '1.9 s' },
-  { name: 'Encoding ñü-media', detail: 'Hardware HEVC at 720 × 1280 on an iPhone Air: 203 frames a second', seconds: 300 / 203, label: '1.5 s', ours: true },
-  { name: 'ñü-media light key with glow and shadows', detail: '4K, in this browser’s GPU on an M1 Pro: 170+ frames a second', seconds: 300 / 170, label: '1.8 s', ours: true },
-  { name: 'ñü-media green-screen key', detail: '4K, in this browser’s GPU on an M1 Pro: 258+ frames a second', seconds: 300 / 258, label: '1.2 s', ours: true },
+  { name: 'Encoding ñü.media', detail: 'Hardware HEVC at 720 × 1280 on an iPhone Air: 203 frames a second', seconds: 300 / 203, label: '1.5 s', ours: true },
+  { name: 'ñü.media light key with glow and shadows', detail: '4K, in this browser’s GPU on an M1 Pro: 170+ frames a second', seconds: 300 / 170, label: '1.8 s', ours: true },
+  { name: 'ñü.media green-screen key', detail: '4K, in this browser’s GPU on an M1 Pro: 258+ frames a second', seconds: 300 / 258, label: '1.2 s', ours: true },
 ].sort((a, b) => b.seconds - a.seconds);
 const MAX = 8; // 10^8 seconds on the log axis
 const width = (s: number) => Math.max(2, (Math.log10(Math.max(s, 1)) + 0.3) / (MAX + 0.3)) * 100;
@@ -46,7 +46,7 @@ const ticks = [
       <li><b>The hard part happened when it was filmed.</b> A green screen or a black sky already separates the subject. A rotoscope artist or an AI model has to work out, frame by frame, where the person ends; a key only has to read the colour of each pixel.</li>
       <li><b>One pass, on the frame already decoded.</b> The key, glow and shadows are a single small program that runs on every pixel at once on the GPU, reading the frame the video decoder has just put there. Nothing is copied back, saved or sent anywhere.</li>
       <li><b>Light that looks right, not light that is simulated.</b> The glow and shadows blur the light a few dozen times per pixel. Ray tracing follows millions of light paths through a whole 3D scene to get every reflection physically right, which is why a film frame takes hours on a render farm.</li>
-      <li><b>Transparency travels with the video.</b> ñü-media carries the cut-out edge in the stream, so the receiver composites; it never recomputes it.</li>
+      <li><b>Transparency travels with the video.</b> ñü.media carries the cut-out edge in the stream, so the receiver composites; it never recomputes it.</li>
     </ul>
     <h3>Where it isn’t a replacement</h3>
     <p>A key needs a clean background. Footage with no green screen, hair against a busy wall or heavy motion blur still needs rotoscoping or an AI matte, and the effects here are a look, not physically accurate light. The slow step is ours too: rebuilding 4K for Ultra takes about 32 times longer than the video on an M1 Pro, which is why it runs once on the host, not on every viewer’s device.</p>

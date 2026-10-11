@@ -7,6 +7,8 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const KEEP = new Set(`
+Store Pay USDC Circle Wikimedia Archive Forbes WSJ Commons
+Store Pay USDC Circle Wikimedia Archive Forbes WSJ Commons
 Apple Google Epic Stripe Mac Siri Android Linux Windows Chromium Bluetooth Raspberry Pi Tor Signal Telegram Instagram
 Patreon Substack Spotify Twitch Kimberley Paraíba Earth Moon Mars Europe European America American California Texas
 Brazil Canada Québec Japan Korea Australia Zealand India Singapore Africa Switzerland Swiss Virginia Colorado Utah
@@ -16,13 +18,13 @@ Monday Tuesday Wednesday Thursday Friday Saturday Sunday January February March 
 October November December
 `.split(/\s+/).filter(Boolean));
 
-const WORD = /[\p{L}][\p{L}\p{M}'’-]*/gu;
+const WORD = /(?<![\p{L}\p{N}])[\p{L}][\p{L}\p{M}\p{N}'’-]*/gu;
 
 export function lowerWord(w) {
   if (w === 'I' || w.startsWith('I’') || w.startsWith("I'")) return w;
   const first = w[0];
   const rest = w.slice(1);
-  if (first === first.toLowerCase()) return w;
+  if (first === first.toLowerCase() || /\p{N}/u.test(w)) return w;
   if (rest !== rest.toLowerCase()) return w;
   if (KEEP.has(w.replace(/['’]s$/, ''))) return w;
   return w.toLowerCase();

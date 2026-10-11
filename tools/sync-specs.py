@@ -1,7 +1,7 @@
 """Copies the public specifications from khensu-specs into the developer site (sites/khensu-dev/src/specs).
 
 Links between the copied documents become /specs/<slug>; links to anything else in khensu-specs go to the file on
-GitHub. Display names follow AGENTS.md (khensu.ñü, ñü-media, webË) outside code.
+GitHub. Display names follow AGENTS.md (khensu.ñü, ñü.media, webË) outside code.
 
   python3 tools/sync-specs.py
 """
@@ -18,16 +18,13 @@ DOCS = {
     "WEBE.md": ("webe", "webË specification"),
     "PROTOCOL.md": ("protocol", "Protocol specification"),
     "THREAT-MODEL.md": ("threat-model", "Threat model"),
-    "WORK.md": ("work", "Network work"),
-    "COMPLIANCE.md": ("compliance", "Compliance"),
-    "design/app-commerce.md": ("app-commerce", "App commerce"),
-    "design/nu-media.md": ("nu-media", "ñü-media design"),
+    "design/nu-media.md": ("nu-media", "ñü.media design"),
 }
 
 
 def display(text: str) -> str:
     text = re.sub(r"(?<![/\w@.\-])khensu\.nu(?![/\w\-]|\.[a-z])", "khensu.ñü", text)
-    text = re.sub(r"(?<![/\w.\-`])nu-media(?![\w/\-.]|\.md)", "ñü-media", text)
+    text = re.sub(r"(?<![/\w.\-`])nu-media(?![\w/\-.]|\.md)", "ñü.media", text)
     return re.sub(r"(?<![/\w.\-`])webE(?!\w)", "webË", text)
 
 
@@ -55,14 +52,18 @@ def relink(src: str, text: str) -> str:
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    keep = {f"{slug}.md" for slug, _ in DOCS.values()}
     for old in OUT.glob("*.md"):
-        old.unlink()
+        if old.name not in keep:
+            old.unlink()
     for src, (slug, title) in DOCS.items():
         text = (SPECS / src).read_text()
         text = outside_code(relink(src, text), display)
         front = f"---\ntitle: {title!r}\nsource: {src!r}\n---\n\n"
-        (OUT / f"{slug}.md").write_text(front + text)
-        print(f"{src} -> src/specs/{slug}.md")
+        out = OUT / f"{slug}.md"
+        if not out.exists() or out.read_text() != front + text:
+            out.write_text(front + text)
+            print(f"{src} -> src/specs/{slug}.md")
 
 
 if __name__ == "__main__":

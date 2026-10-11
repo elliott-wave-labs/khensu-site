@@ -1,0 +1,242 @@
+---
+// Instant payouts: a 3D coin built from CSS transforms (two faces and a reeded edge of 60 slices) that turns as the
+// page scrolls, beside payments arriving. Amounts are examples.
+import Crescent from '../khensu/Crescent.astro';
+const EDGE = 60;
+const edge = Array.from({ length: EDGE }, (_, i) => (360 / EDGE) * i);
+const incoming = [
+  { k: 'Subscriptions', who: '120 fans at $4.99 a month', v: '+$598.80' },
+  { k: 'Tip', who: 'From a live room', v: '+$20.00' },
+  { k: 'Plays', who: '18,240 plays at 1¢, no cut', v: '+$182.40' },
+  { k: 'Live tickets', who: '10 for Friday’s premiere', v: '+$80.00' },
+  { k: 'Tip', who: 'From a chat', v: '+$7.22' },
+];
+---
+
+<section class="po" id="fans-pay-section" data-par data-scene="reveal" aria-labelledby="po-title">
+  <div class="wrap po-grid">
+    <div class="po-copy">
+      <p class="eyebrow">paid instantly</p>
+      <h2 id="po-title">Paid the moment they pay.<em>No payout dates. A 42¢ minimum.</em></h2>
+      <p class="po-lede">
+        <strong>Money goes from a fan’s wallet to yours as an encrypted message over the network.</strong>{" "}
+        There’s no public record of who paid whom, and no card processor, bank or platform account in the middle.
+        Nobody holds your money for you, so nobody can freeze it or make you wait.
+      </p>
+      <ul class="ways" role="list">
+        <li><b>Plays</b><span>1¢ a play, $10 per 1,000, no cut</span></li>
+        <li><b>Subscriptions</b><span>Fans who subscribe to you, monthly</span></li>
+        <li><b>Sales</b><span>Albums, downloads, films and in-app purchases</span></li>
+        <li><b>Tickets</b><span>A live room, a premiere, a concert or a show</span></li>
+        <li><b>Tips</b><span>100% to you, from anywhere in the app</span></li>
+        <li><b>Funding</b><span>ñüFi Back, all or nothing, for your next work</span></li>
+      </ul>
+    </div>
+
+    <div class="po-stage" aria-hidden="true">
+      <div class="coin-wrap">
+        <div class="coin">
+          <div class="face front"><Crescent size="44%" /><span>khensu.ñü</span></div>
+          <div class="face back"><Crescent size="44%" /><span>paid to you</span></div>
+          {edge.map((a) => <i style={`--a:${a}deg`} />)}
+        </div>
+        <span class="coin-shadow"></span>
+      </div>
+      <ul class="feed" role="list">
+        {incoming.map((p, i) => (
+          <li style={`--i:${i}`}><span><b>{p.k}</b><small>{p.who}</small></span><em>{p.v}</em></li>
+        ))}
+      </ul>
+      <p class="po-total"><small>In your wallet now</small><b data-count data-to="888.42" data-dec="2" data-pre="$">$888.42</b></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .po {
+    --v: 0;
+    position: relative;
+    overflow: hidden;
+    padding: clamp(5rem, 11vw, 9rem) 0;
+    background: radial-gradient(60% 50% at 75% 50%, rgba(139, 123, 255, 0.14), transparent 70%), #000;
+    border-top: 1px solid var(--line);
+  }
+  .po-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  h2 {
+    font-size: clamp(2.2rem, 3.8vw, 3.4rem);
+    font-weight: 600;
+  }
+  h2 em {
+    background: linear-gradient(100deg, #b9b0ff, #18e0c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .po-lede {
+    color: rgba(255, 255, 255, 0.56);
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  }
+  .po-lede strong {
+    color: #fff;
+    font-weight: 500;
+  }
+  .ways {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .ways li {
+    display: grid;
+    gap: 0.15rem;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .ways b {
+    font-weight: 500;
+  }
+  .ways span {
+    font-size: 0.86rem;
+    color: var(--text-dim);
+  }
+
+  .po-stage {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.6rem;
+  }
+  .coin-wrap {
+    --r: clamp(90px, 13vw, 140px);
+    --t: 18px;
+    position: relative;
+    width: calc(var(--r) * 2);
+    height: calc(var(--r) * 2);
+    perspective: 1100px;
+    translate: 0 calc(var(--v) * -50px);
+  }
+  .coin {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transform: rotateX(14deg) rotateY(calc(var(--v) * 420deg - 25deg));
+  }
+  .face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.4rem;
+    border-radius: 50%;
+    color: #2a2836;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.18) 59%, transparent 61%, transparent 86%, rgba(255, 255, 255, 0.5) 88%, rgba(0, 0, 0, 0.25) 92%),
+      conic-gradient(from 210deg, #f4f4f8, #b9bcc8, #ececf2, #9ea2b0, #f4f4f8, #c3c5d0, #f4f4f8),
+      #d9dae0;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.6), inset 0 0 30px rgba(80, 70, 140, 0.35);
+    backface-visibility: hidden;
+  }
+  .face :global(svg) {
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8));
+  }
+  .face span {
+    font-size: clamp(0.7rem, 1.2vw, 0.95rem);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .front {
+    transform: translateZ(calc(var(--t) / 2));
+  }
+  .back {
+    transform: rotateY(180deg) translateZ(calc(var(--t) / 2));
+  }
+  .coin i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(var(--r) * 6.2832 / 60 + 1px);
+    height: var(--t);
+    margin: calc(var(--t) / -2) 0 0 calc(var(--r) * -3.1416 / 60 - 0.5px);
+    background: repeating-linear-gradient(90deg, #8d90a0 0 1px, #c9cbd6 1px 3px);
+    transform: rotateZ(var(--a)) translateY(calc(var(--r) * -1)) rotateX(90deg);
+  }
+  .coin-shadow {
+    position: absolute;
+    left: 15%;
+    right: 15%;
+    bottom: -18%;
+    height: 14%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(139, 123, 255, 0.45), transparent);
+    filter: blur(8px);
+  }
+
+  .feed {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    width: min(100%, 360px);
+    display: grid;
+    gap: 0.5rem;
+  }
+  .feed li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: 16px;
+    background: rgba(28, 28, 34, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(18px) saturate(170%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    opacity: clamp(0, calc((var(--e, 1) - var(--i) * 0.12) / 0.25), 1);
+    translate: 0 calc((1 - clamp(0, calc((var(--e, 1) - var(--i) * 0.12) / 0.25), 1)) * 18px);
+  }
+  .feed span {
+    display: grid;
+  }
+  .feed b {
+    font-weight: 500;
+    font-size: 0.92rem;
+  }
+  .feed small {
+    font-size: 0.76rem;
+    color: var(--text-dim);
+  }
+  .feed em {
+    font-weight: 600;
+    background: none;
+    color: #18e0c8;
+    font-variant-numeric: tabular-nums;
+  }
+  .po-total {
+    margin: 0;
+    display: grid;
+    justify-items: center;
+  }
+  .po-total small {
+    font-size: 0.78rem;
+    color: var(--text-faint);
+  }
+  .po-total b {
+    font-size: clamp(2.6rem, 5vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 860px) {
+    .po-grid { grid-template-columns: 1fr; }
+    .ways { grid-template-columns: 1fr; }
+  }
+</style>

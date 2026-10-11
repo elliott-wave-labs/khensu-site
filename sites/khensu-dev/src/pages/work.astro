@@ -1,10 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 
 const jobs = [
   { id: 'aggregation', name: 'Proof aggregation', hw: 'Apple silicon Mac or recent desktop, 16 GB memory', text: 'Fold every spend and contract proof in an epoch into one recursive STARK, so phones verify one small proof instead of thousands.' },
   { id: 'storage', name: 'Encrypted storage', hw: 'A disk that stays online', text: 'Hold erasure-coded ciphertext shards of sites, media, backups and the network archive. Random challenges prove you still have them; you’re paid per byte-day.' },
-  { id: 'renditions', name: 'Public media renditions', hw: 'Apple silicon Mac or a hardware encoder', text: 'Encode ñü-media versions of posts their creators published openly and asked the network to render. Private media never leaves the sender’s device.' },
+  { id: 'renditions', name: 'Public media renditions', hw: 'Apple silicon Mac or a hardware encoder', text: 'Encode ñü.media versions of posts their creators published openly and asked the network to render. Private media never leaves the sender’s device.' },
   { id: 'lookups', name: 'Private lookups', hw: '8 GB memory per database shard', text: 'Answer name, key and directory lookups with private information retrieval, so you answer a query without learning what was asked.' },
   { id: 'beacon', name: 'Randomness and timestamps', hw: 'An always-on node', text: 'Sign the threshold randomness beacon for lotteries, ballots and fair ordering, and batch post-quantum timestamps that prove a hash existed at a given time.' },
   { id: 'mesh', name: 'Mesh and satellite bridging', hw: 'suñůlink.shield, a Raspberry Pi 5 with a HaLow radio, or a satellite link', text: 'Carry sealed mix packets between places with no internet and the rest of the network, over Wi-Fi HaLow, Bluetooth or satellite.' },
@@ -14,10 +15,15 @@ const jobs = [
 <Base title="Earn with your node" description="Six jobs your khensu.ñü node can do for the network and for contracts, all on ciphertext or published data, paid from work receipts.">
   <p class="eyebrow">network work</p>
   <h1>Your node can do more than relay</h1>
-  <p class="lede">
-    Turn on a job and the network pays you for it, every epoch.<br />
-    Every job touches only ciphertext or data its owner chose to publish.
-  </p>
+  <StatStrip
+    items={[
+      { n: jobs.length, label: 'Jobs a node can be paid for' },
+      { n: 1, label: 'Folded proof per epoch for phones to check, instead of thousands' },
+      { n: 50, label: 'Tokens, the lowest stake floor, for mesh bridging' },
+      { n: 99, unit: '%', label: 'Monthly uptime a storage disk needs' },
+    ]}
+  />
+  <p class="lede">Turn on a job and the network pays you for it, every epoch, on ciphertext or published data only.</p>
 
   {jobs.map((j) => (
     <section id={j.id}>

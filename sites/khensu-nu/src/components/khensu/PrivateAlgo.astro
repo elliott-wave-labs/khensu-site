@@ -1,10 +1,9 @@
 ---
-// Home-page teaser for /memory: the personal feed that learns and ranks only on the device.
-// Recommendation internals are a patent candidate (applications in preparation): keep to what /memory says.
+// Home-page teaser for /memory: the personal feed that learns and ranks only on the device. Keep to what /memory says.
 const points = [
-  { t: 'Learns from your habits', b: 'What you watch to the end, replay, save, share, skip and follow. On your device, and only if you switch it on.' },
-  { t: 'Finds things anonymously', b: 'Your device fetches public posts, streams, forums and places through two relays from different operators, then ranks them itself.' },
-  { t: 'Yours to see and reset', b: 'A “what it knows about me” screen lists what it learned and why. Remove anything, turn any signal off, or reset it all.' },
+  { t: 'Learns from your habits', b: 'What you watch to the end, replay, save, share, skip and follow. On your device, and only if you switch it on. Interests fade by half every 14 days unless you come back to them.' },
+  { t: 'Finds things anonymously', b: 'Your device prefetches public posts, live streams, forums and places inside its constant 2-second ticks, then scores them itself.' },
+  { t: 'Yours to see and reset', b: 'A “what it knows about me” screen lists what it learned and why, like the Naxos posts you saved. Remove anything, turn any signal off, or reset it all.' },
 ];
 ---
 
@@ -22,7 +21,7 @@ const points = [
         {points.map((p) => <li><b>{p.t}</b><span>{p.b}</span></li>)}
       </ul>
       <div class="btn-row">
-        <a class="btn primary" href="/memory">How memory and your feed work</a>
+        <a class="btn primary" href="/memory#memory-feed-section">How your feed is scored</a>
       </div>
     </div>
 

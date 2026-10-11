@@ -28,11 +28,14 @@ const ogAlt = CARDS[card].alt;
 
 const nav = [
   { href: '/webe', label: 'webË' },
-  { href: '/media', label: 'ñü-media' },
+  { href: '/media', label: 'ñü.media' },
   { href: '/memory', label: 'Memory' },
   { href: '/creators', label: 'Creators' },
+  { href: '/nufi', label: 'ñüFi' },
   { href: '/shield', label: 'suñůlink.shield' },
   { href: '/network', label: 'Network' },
+  { href: '/compliance', label: 'Compliance' },
+  { href: '/security', label: 'Security' },
   { href: '/webe#run-a-node-section', label: 'Run a node' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -48,8 +51,12 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#0A0B0D" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0a0b0d" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:type" content="website" />
@@ -88,7 +95,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <header class="site-header">
       <div class="wrap bar">
         <a href="/" class="brand" aria-label="khensu.ñü, home">
-          <Crescent size={26} />
+          <img class="seal" src="/seal-128.webp" alt="" width="26" height="26" />
           <span>khensu.ñü</span>
         </a>
         <nav aria-label="Primary">
@@ -115,9 +122,10 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
         </div>
         <ul class="foot-links">
           <li><a href="/webe">webË</a></li>
-          <li><a href="/media">ñü-media</a></li>
+          <li><a href="/media">ñü.media</a></li>
           <li><a href="/memory">Memory</a></li>
           <li><a href="/creators">Creators</a></li>
+          <li><a href="/nufi">ñüFi</a></li>
           <li><a href="/shield">suñůlink.shield</a></li>
           <li><a href="/transfer">Send big files</a></li>
           <li><a href="/quality">How we measure</a></li>
@@ -126,7 +134,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
           <li><a href="/compliance">Compliance</a></li>
           <li><a href="https://dev.khensu.nu">Developers</a></li>
           <li><a href="https://dev.khensu.nu/shell">suñůlink.shield specs</a></li>
-          <li><a href="https://dev.khensu.nu/security">Security</a></li>
+          <li><a href="/security">Security</a></li>
           <li><a href="https://elliottwave.studio">elliottwave.studio lab</a></li>
         </ul>
       </div>
@@ -140,6 +148,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     </footer>
     <script>
       import '../scripts/section-links.ts';
+      import '../../../_shared/aura-buttons.ts';
     </script>
   </body>
 </html>

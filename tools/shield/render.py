@@ -1,161 +1,256 @@
-"""Photoreal Cycles renders of suñůlink.shield for the site, from the GLBs that tools/shield/glb.py writes.
+"""Photoreal Cycles renders of suñůlink.shield for the site.
 
-  /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup -P tools/shield/render.py -- [stills|turntable|all]
+  /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup -P tools/shield/render.py -- [stills|turntable|og|all]
 
-Writes WebP with alpha to sites/khensu-nu/public/khensu/renders/: hero, macro, phone, lineup stills and a
-turntable sequence (turn/000.webp …) for the scroll-scrubbed hero. Lit with Blender's bundled studio HDRIs plus
-three area lights; the page background is black, so the alpha edges blend into it.
+Builds the scene directly (the CAD's wrap-xl housing and windows, its USB-C receptacle, the stone inlay and the
+procedural iPhone 18 Pro from khensu-specs/hardware/sunu/photoreal.py) rather than from the web GLBs, so the
+renders get the full-detail phone. Lit like apple.com's product shots: black, a big soft overhead key, thin strip
+rims along the edges, low fill, a soft contact shadow and no visible floor, AgX. Writes WebP with alpha (the
+macro flattened onto black) to sites/khensu-nu/public/khensu/renders/: hero, macro, phone, phone-front, ports, lineup,
+og-maroon/og-brass PNGs, and turn/000.webp … for the scroll-scrubbed turntable.
 """
 
 import math
+import os
 import sys
 from pathlib import Path
 
 import bpy
 from mathutils import Vector
 
-ROOT = Path(__file__).resolve().parents[2]
-GLB = ROOT / "sites/khensu-nu/public/khensu/shell/3d/glb"
-OUT = ROOT / "sites/khensu-nu/public/khensu/renders"
-WHAT = (sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv else "all")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import shield as S  # noqa: E402
+
+P = S.P
+OUT = Path(os.environ.get("RENDER_OUT", S.ROOT / "sites/khensu-nu/public/khensu/renders"))
+WHAT = (sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv[:-1] else "all")
 
 
 def reset(w, h, samples=128):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     s = bpy.context.scene
-    s.render.engine = "CYCLES"
-    prefs = bpy.context.preferences.addons["cycles"].preferences
-    for kind in ("METAL", "OPTIX", "CUDA"):
-        try:
-            prefs.compute_device_type = kind
-            prefs.get_devices()
-            for d in prefs.devices:
-                d.use = True
-            s.cycles.device = "GPU"
-            break
-        except TypeError:
-            continue
-    s.cycles.samples = samples
-    s.cycles.use_denoising = True
+    P._cycles(s, samples)
+    s.cycles.transparent_max_bounces = 16
     s.render.film_transparent = True
     s.render.resolution_x, s.render.resolution_y = w, h
     s.render.image_settings.file_format = "WEBP"
     s.render.image_settings.color_mode = "RGBA"
     s.render.image_settings.quality = 90
-    try:
-        s.view_settings.view_transform = "AgX"
-        s.view_settings.look = "AgX - Medium High Contrast"
-    except TypeError:
-        pass
-    world = bpy.data.worlds.new("studio")
-    s.world = world
-    world.use_nodes = True
-    nt = world.node_tree
-    env = nt.nodes.new("ShaderNodeTexEnvironment")
-    hdri = Path(bpy.utils.system_resource("DATAFILES", path="studiolights/world")) / "studio.exr"
-    env.image = bpy.data.images.load(str(hdri))
-    bg = next(n for n in nt.nodes if n.type == "BACKGROUND")
-    bg.inputs["Strength"].default_value = 0.35
-    nt.links.new(env.outputs["Color"], bg.inputs["Color"])
+    if os.environ.get("PREVIEW"):  # quick framing checks: 40% size, few samples
+        s.render.resolution_percentage = 40
+        s.cycles.samples = 16
     return s
 
 
-def light(name, loc, energy, size, color=(1, 1, 1)):
-    l = bpy.data.lights.new(name, "AREA")
-    l.energy, l.size, l.color = energy, size, color
-    o = bpy.data.objects.new(name, l)
-    bpy.context.scene.collection.objects.link(o)
-    o.location = loc
-    o.rotation_euler = (Vector((0, 0, 0)) - Vector(loc)).to_track_quat("-Z", "Y").to_euler()
-    return o
+def product(finish, tier="standard", phone=None, yaw=0.0, x=0.0, pitch=90.0):
+    """The shield (and optionally an iPhone 18 Pro in `phone` colour) upright, back towards -Y, turned by `yaw`
+    (`pitch` 0 lays it on its front, back up)."""
+    rig = bpy.data.objects.new("rig", None)
+    bpy.context.scene.collection.objects.link(rig)
+    root, parts = S.build_shield(finish, tier)
+    root.parent = rig
+    if phone:
+        P.build_phone(phone).parent = rig
+    rig.rotation_euler = (math.radians(pitch), 0, math.radians(yaw))
+    rig.location.x = x
+    bpy.context.view_layer.update()
+    return rig
 
 
-def rig():
-    light("key", (-0.35, -0.45, 0.4), 6, 0.5)
-    light("rim", (0.4, 0.3, 0.25), 9, 0.25, (0.85, 0.9, 1))
-    light("fill", (0.3, -0.5, -0.1), 1.2, 0.6)
+def world_point(rig, local):
+    bpy.context.view_layer.update()
+    return rig.matrix_world @ Vector(local)
 
 
-def camera(loc, target=(0, 0, 0), lens=85, fstop=None):
+def floor(z):
+    """A shadow catcher: the contact shadow survives in the alpha, the floor itself never shows."""
+    bpy.ops.mesh.primitive_plane_add(size=3000, location=(0, 0, z))
+    pl = bpy.context.active_object
+    pl.is_shadow_catcher = True
+    # A catcher still shades as a grey floor in reflections and bounce; on black there is no floor to see.
+    pl.visible_glossy = pl.visible_diffuse = pl.visible_transmission = False
+    return pl
+
+
+# Little light reflected straight back at the lens: AgX bleaches a brightly lit red to pink, so the faces stay
+# deep and the form comes from the overhead key, a soft side key and the strip rims.
+LIGHT = dict(front=0.3, sheen=0.35, side=1.0, world_strength=0.12, rim=1.4)
+
+
+# Bare brass has no diffuse to light: it shows only what it mirrors, so it gets the broad soft panel behind the
+# camera at full strength and no small side key to blow out across the face.
+BRASS_LIGHT = dict(sheen=1.6, front=0.8, side=0.0, world_strength=0.4)
+
+
+def camera(loc, target, lens=85, fstop=None, **light):
     c = bpy.data.cameras.new("cam")
     c.lens = lens
-    c.clip_start = 0.005
+    c.clip_start, c.clip_end = 1, 10000
     if fstop:
-        focus = bpy.data.objects.new("focus", None)
-        bpy.context.scene.collection.objects.link(focus)
-        focus.location = target
         c.dof.use_dof = True
-        c.dof.focus_object = focus
+        c.dof.focus_distance = (Vector(target) - Vector(loc)).length
         c.dof.aperture_fstop = fstop
     o = bpy.data.objects.new("cam", c)
     bpy.context.scene.collection.objects.link(o)
     o.location = loc
     o.rotation_euler = (Vector(target) - Vector(loc)).to_track_quat("-Z", "Y").to_euler()
     bpy.context.scene.camera = o
+    P.studio(bpy.context.scene, 1.0, camera=(Vector(loc) - Vector(target)).normalized(), target=target,
+             **{**LIGHT, **light})
     return o
-
-
-def load(name, x=0.0, turn=0.0):
-    before = set(bpy.data.objects)
-    bpy.ops.import_scene.gltf(filepath=str(GLB / f"{name}.glb"))
-    new = [o for o in bpy.data.objects if o not in before]
-    pivot = bpy.data.objects.new("pivot", None)
-    bpy.context.scene.collection.objects.link(pivot)
-    for o in new:
-        if o.parent is None:
-            o.parent = pivot
-    # glTF imports use quaternions, so turn an Euler pivot instead.
-    pivot.location.x = x
-    pivot.rotation_euler.z = math.radians(turn)
-    return pivot
 
 
 def still(path):
     OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / path).parent.mkdir(parents=True, exist_ok=True)
     bpy.context.scene.render.filepath = str(OUT / path)
     bpy.ops.render.render(write_still=True)
-    print("wrote", path)
+    print("wrote", path, flush=True)
+
+
+def flatten(path, size=None):
+    """Composite a render onto black (RGB), optionally cropped to the subject and scaled to a height."""
+    import numpy as np
+
+    img = bpy.data.images.load(str(OUT / path))
+    w, h = img.size
+    px = np.empty(w * h * 4, np.float32)
+    img.pixels.foreach_get(px)
+    px = px.reshape(h, w, 4)
+    px[..., :3] *= px[..., 3:4] if not img.alpha_mode == "PREMUL" else 1
+    px[..., 3] = 1
+    out = bpy.data.images.new("flat", w, h, alpha=False)
+    out.pixels.foreach_set(px.ravel())
+    sc = bpy.context.scene
+    sc.view_settings.view_transform = "Standard"
+    sc.view_settings.look = "None"
+    sc.render.image_settings.color_mode = "RGB"
+    out.save_render(str(OUT / path), scene=sc)
+
+
+def crop_png(src, dst, height):
+    """Crop a transparent render to its subject and save it as a PNG `height` px tall."""
+    import numpy as np
+
+    img = bpy.data.images.load(str(OUT / src))
+    w, h = img.size
+    px = np.empty(w * h * 4, np.float32)
+    img.pixels.foreach_get(px)
+    px = px.reshape(h, w, 4)
+    ys, xs = np.nonzero(px[..., 3] > 0.01)
+    pad = 8
+    x0, x1 = max(xs.min() - pad, 0), min(xs.max() + pad, w - 1)
+    y0, y1 = max(ys.min() - pad, 0), min(ys.max() + pad, h - 1)
+    sub = np.ascontiguousarray(px[y0:y1 + 1, x0:x1 + 1])
+    cw, ch = sub.shape[1], sub.shape[0]
+    out = bpy.data.images.new("crop", cw, ch, alpha=True)
+    out.pixels.foreach_set(sub.ravel())
+    out.scale(round(cw * height / ch), height)
+    sc = bpy.context.scene
+    sc.view_settings.view_transform = "Standard"
+    sc.view_settings.look = "None"
+    sc.render.image_settings.file_format = "PNG"
+    sc.render.image_settings.color_mode = "RGBA"
+    out.save_render(str(OUT / dst), scene=sc)
+    print("wrote", dst, flush=True)
+
+
+SHIELD_MID = (0.0, (31.28 - 74.58) / 2, S.T / 2)  # the shield's centre in the CAD frame
+
+
+def hero():
+    # The maroon shield alone, turned to catch the strip lights down its long edge.
+    reset(1600, 2000)
+    rig = product("maroon", yaw=-38)
+    t = world_point(rig, SHIELD_MID)
+    floor(world_point(rig, (0, S.YMIN, 0)).z)
+    camera(t + Vector((20, -290, 20)), t, 70)
+    still("hero.webp")
+
+
+def macro():
+    # The inlay in brass, shallow depth of field on the platinum line.
+    reset(1600, 1200, 160)
+    rig = product("brass", yaw=-24)
+    t = world_point(rig, (S.INLAY_C[0] + 6, S.INLAY_C[1], S.T))
+    camera(t + Vector((34, -108, 66)), t, 100, 4.0, **BRASS_LIGHT)
+    still("macro.webp")
+    flatten("macro.webp")
+
+
+def phone():
+    # On the phone: maroon on Burgundy, three-quarter back.
+    reset(1600, 2000)
+    rig = product("maroon", phone="burgundy", yaw=-35)
+    t = world_point(rig, (0, 0, 0))
+    floor(world_point(rig, (0, -P.H / 2, 0)).z)
+    camera(t + Vector((50, -470, 60)), t, 70)
+    still("phone.webp")
+
+
+def phone_front():
+    # The front: the khensu.nu wallpaper on the display, the shield's edge showing behind.
+    reset(1600, 2000)
+    rig = product("maroon", phone="burgundy", yaw=180 + 24)
+    t = world_point(rig, (0, 0, 0))
+    floor(world_point(rig, (0, -P.H / 2, 0)).z)
+    camera(t + Vector((-40, -470, 50)), t, 70)
+    still("phone-front.webp")
+
+
+def ports():
+    # Lying on its front, the bottom edges to camera: the shield's USB-C plug-through above the iPhone's own port.
+    reset(1600, 1200, 160)
+    rig = product("maroon", phone="burgundy", yaw=28, pitch=0)
+    t = world_point(rig, (-14, -P.H / 2 + 14, 3.0))
+    floor(world_point(rig, (0, 0, -P.D)).z)
+    camera(t + Vector((-80, -235, 72)), t, 85, 4.0, side=1.4, front=0.8, key=0.45)
+    still("ports.webp")
+
+
+def lineup():
+    reset(2400, 1200)
+    for i, f in enumerate(["maroon", "gold", "black", "brass"]):
+        rig = product(f, x=(i - 1.5) * 92, yaw=-20)
+    t = Vector((0, 0, world_point(rig, SHIELD_MID).z))
+    floor(world_point(rig, (0, S.YMIN, 0)).z)
+    camera(t + Vector((0, -700, 80)), t, 60, sheen=0.9, world_strength=0.24)
+    still("lineup.webp")
 
 
 def stills():
-    # The back faces -Y in Blender after glTF import, so cameras sit on the -Y side.
-    reset(1600, 2000)
-    rig()
-    load("maroon-standard-shield", turn=-28)
-    camera((0.06, -0.42, 0.05), lens=70)
-    still("hero.webp")
-
-    reset(1600, 1200, 160)
-    rig()
-    load("brass-standard-shield", turn=-18)
-    camera((0.03, -0.09, 0.025), target=(0, -0.0043, 0.0), lens=100, fstop=8)
-    still("macro.webp")
-
-    reset(1600, 2000)
-    rig()
-    load("maroon-standard-phone", turn=-35)
-    camera((0.05, -0.42, 0.06), lens=70)
-    still("phone.webp")
-
-    reset(2400, 1200)
-    rig()
-    for i, f in enumerate(["maroon", "gold", "black", "brass"]):
-        load(f"{f}-standard-shield", x=(i - 1.5) * 0.095, turn=-20)
-    camera((0.0, -0.62, 0.08), lens=60)
-    still("lineup.webp")
+    for f in (hero, macro, phone, phone_front, ports, lineup):
+        if not os.environ.get("SHOTS") or f.__name__ in os.environ["SHOTS"].split(","):
+            f()
 
 
 def turntable(frames=48):
     reset(1200, 1500, 64)
-    rig()
-    root = load("brass-standard-shield")
-    camera((0.0, -0.42, 0.03), lens=70)
+    rig = product("brass")
+    t = world_point(rig, SHIELD_MID)
+    floor(world_point(rig, (0, S.YMIN, 0)).z)
+    camera(t + Vector((0, -400, 25)), t, 70, **BRASS_LIGHT)
     for i in range(frames):
-        root.rotation_euler.z = math.radians(-70 + 140 * i / (frames - 1))
+        rig.rotation_euler.z = math.radians(-70 + 140 * i / (frames - 1))
         still(f"turn/{i:03d}.webp")
+
+
+def og():
+    # Link-preview cut-outs: the shield alone on transparency, cropped to it, 1100 px tall.
+    for finish, yaw in (("maroon", -22), ("brass", -22)):
+        reset(1000, 2000, 128)
+        bpy.context.scene.render.image_settings.file_format = "PNG"
+        rig = product(finish, yaw=yaw)
+        t = world_point(rig, SHIELD_MID)
+        camera(t + Vector((30, -330, 30)), t, 70, **(BRASS_LIGHT if finish == "brass" else {}))
+        still(f"og-{finish}-full.png")
+        crop_png(f"og-{finish}-full.png", f"og-{finish}.png", 1100)
+        (OUT / f"og-{finish}-full.png").unlink()
 
 
 if WHAT in ("stills", "all"):
     stills()
+if WHAT in ("og", "all"):
+    og()
 if WHAT in ("turntable", "all"):
     turntable()

@@ -58,7 +58,7 @@ export const RESULTS: Record<PhoneId, Record<Slim, Result>> = {
     card: { footprint: [56, 86], t: 5.2, wh: 4.1, cm3: 9.2, tiG: 50, proud: 0.52, draft: 0, usb: false, ring: 53 },
     fill: { footprint: [65.8, 143.0], t: 4.68, wh: 6.5, cm3: 14.43, tiG: 84, proud: 0, draft: 0, usb: true, ring: 56 },
     wrap: { footprint: [71.0, 149.2], t: 4.68, wh: 7.5, cm3: 16.6, tiG: 95, proud: 0, draft: 0, usb: true, ring: 56 },
-    'wrap-xl': { footprint: [71.0, 105.9], t: 7.68, wh: 14.0, cm3: 31.09, tiG: 121, proud: 3.0, draft: 3.69, usb: true, ring: 56 },
+    'wrap-xl': { footprint: [71.0, 105.9], t: 4.68, wh: 6.5, cm3: 14.48, tiG: 74, proud: 0, draft: 0, usb: true, ring: 56 },
   },
   island: {
     card: { footprint: [56, 86], t: 5.2, wh: 4.1, cm3: 9.17, tiG: 50, proud: 1.6, draft: 0, usb: false, ring: 53 },

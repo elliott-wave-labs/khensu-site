@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Sections from '../components/khensu/Sections.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/shield';
 ---
 
@@ -12,16 +13,17 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
     <div class="wrap">
       <p class="eyebrow">suñůlink.shield · to scale</p>
       <h1>One shield.<br />Drawn to scale.</h1>
-      <p class="lede">
-        A mesh node on the back of the phone: HaLow radio for the neighbourhood mesh, Wi-Fi and Bluetooth to the phone, its
-        own 6.2 Wh battery, charged over USB-C from a wall charger or power bank. Every drawing here is to scale and
-        comes from the same parametric CAD that exports STEP and STL for CNC and tooling.
-      </p>
-      <p class="fits">
-        Fits every iPhone back to iPhone X, and Google Pixel and Samsung Galaxy phones, flagship and everyday, with a case
-        made for each model. Drawn here on the two reference shapes: iPhone 18 Pro’s full-width camera plateau, and a camera
-        island like most other phones.
-      </p>
+      <StatStrip
+        items={[
+          { n: 0, unit: 'mm', label: 'Above the lenses: your iPhone gets no thicker' },
+          { n: 4.7, dec: 1, unit: 'mm', label: 'On the back, level with the lens tops' },
+          { n: 6.5, dec: 1, unit: 'Wh', label: 'Its own battery, about 5 hours relaying' },
+          { n: 600, unit: 'm', label: 'Shield to shield, or 2 km to a rooftop node' },
+        ]}
+      >
+        Figures for iPhone 18 Pro. Battery life varies with use and settings. Ranges are calculated from the HaLow link budget on open ground; see the <a href="https://dev.khensu.nu/shell">full specifications</a>.
+      </StatStrip>
+      <p class="lede">A mesh node on the back of your phone, drawn from the same CAD that machines it.</p>
     </div>
   </section>
 
@@ -31,6 +33,12 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
 
   <section class="section explorer">
     <div class="wrap">
+      <p class="fits">
+        Fits every iPhone back to iPhone X, and Google Pixel and Samsung Galaxy phones, flagship and everyday, with a case
+        made for each model. Drawn here on the two reference shapes: iPhone 18 Pro’s full-width camera plateau, and a camera
+        island like most other phones. HaLow radio for the neighbourhood mesh, Wi-Fi and Bluetooth to the phone, charged
+        over USB-C from a wall charger or power bank.
+      </p>
       <form class="pick" aria-label="Choose a phone and whether to show the internals">
         <fieldset>
           <legend>Phone</legend>
@@ -84,7 +92,7 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
       </div>
 
       <p class="small note">
-        From the CAD. Cells at 0.45 Wh/cm³ (thin pouch). Relay time at about 1 W for the board and radios; battery life and
+        From the parametric CAD that also exports STEP and STL for CNC and tooling. Cells at 0.45 Wh/cm³ (thin pouch). Relay time at about 1 W for the board and radios; battery life and
         charge time vary with use and settings. The build fails if the shield covers a lens, the flash, the depth sensor or the microphone, or
         clips a field of view. iPhone 18 Pro dimensions are measured from Apple’s published model; the makers’ accessory
         drawings take precedence when available.
@@ -105,8 +113,11 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
     max-width: 46rem;
     color: var(--text-dim);
   }
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
   .fits {
-    margin-top: 0.8rem;
+    margin: 0 0 1.6rem;
   }
   .pick {
     display: flex;

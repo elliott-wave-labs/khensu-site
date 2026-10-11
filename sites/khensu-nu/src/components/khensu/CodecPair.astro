@@ -1,5 +1,5 @@
 ---
-// Two encodes side by side, whole frames, frame-locked. One side is always the original or ñü-media.
+// Two encodes side by side, whole frames, frame-locked. One side is always the original or ñü.media.
 // `run` is khensu-specs bench/out/ladder*/results-ladder-*.json; files live in public/khensu/codec/<dir>/.
 type Tile = { file: string; actual_kbps: number; vmaf: number; dropped: number; base?: number[]; neural?: boolean };
 type Run = { size: string; seconds: number; tiles: { size: number[]; original: string; rates: Record<string, Record<string, Tile>> } };
@@ -24,7 +24,7 @@ const rate = (k: number) => (k < 1000 ? `${Math.round(k)} kbit/s` : `${(k / 1000
 const rateName = (k: number) => (k < 1000 ? `${k} kbit/s` : `${k / 1000} Mbit/s`);
 const [sw, sh] = run.size.split('x').map(Number);
 
-const NAMES: Record<string, string> = { original: 'Original', 'nu-media': 'ñü-media', 'h264-hw': 'H.264', 'hevc-hw': 'H.265 (HEVC)', 'av1-svt-rt': 'AV1' };
+const NAMES: Record<string, string> = { original: 'Original', 'nu-media': 'ñü.media', 'h264-hw': 'H.264', 'hevc-hw': 'H.265 (HEVC)', 'av1-svt-rt': 'AV1' };
 const PAIRS = [
   ['original', 'nu-media'],
   ['nu-media', 'h264-hw'],
@@ -35,7 +35,7 @@ const PAIRS = [
   ['original', 'av1-svt-rt'],
 ];
 
-NAMES['nu-media-4k'] = 'ñü-media in 4K';
+NAMES['nu-media-4k'] = 'ñü.media in 4K';
 const has4k = rates.some((r) => T.rates[String(r)]['nu-media-4k']);
 const how = (k: string, t: Tile) => {
   if (k === 'nu-media-4k') {
@@ -89,8 +89,8 @@ const portrait = th > tw;
       {PAIRS.map(([a, b], i) => <button type="button" data-a={a} data-b={b} aria-pressed={i === 0 ? 'true' : 'false'}>{NAMES[a]} <span>vs</span> {NAMES[b]}</button>)}
     </div>
     {has4k && (
-      <div class="seg" role="group" aria-label="ñü-media output">
-        <button type="button" data-out="native" aria-pressed="true">ñü-media at {sw} × {sh}</button>
+      <div class="seg" role="group" aria-label="ñü.media output">
+        <button type="button" data-out="native" aria-pressed="true">ñü.media at {sw} × {sh}</button>
         <button type="button" data-out="4k" aria-pressed="false">Rebuilt to 4K</button>
       </div>
     )}

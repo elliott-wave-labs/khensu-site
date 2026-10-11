@@ -3,6 +3,7 @@ import { APP_STORE_ID, APP_STORE_URL, GOOGLE_PLAY_ID, GOOGLE_PLAY_URL } from '..
 import Base from '../layouts/Base.astro';
 import Hero from '../components/khensu/Hero.astro';
 import Sections from '../components/khensu/Sections.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
 <Base>
@@ -18,7 +19,31 @@ import Sections from '../components/khensu/Sections.astro';
     ]}
   />
 
+  <section class="home-stats" aria-label="khensu.ñü in numbers">
+    <div class="wrap">
+      <StatStrip
+        items={[
+          { n: 5, label: 'Mix network hops for every message' },
+          { n: 0, label: 'Servers that read or process your data' },
+          { n: 10, unit: '%', label: 'Flat app fee, the lowest in the industry' },
+          { n: 100, unit: '%', label: 'Of every tip goes to the person' },
+        ]}
+      />
+    </div>
+  </section>
+
   <div class="khensu">
     <Sections show={['intro', 'highlights', 'creators', 'creatorpay', 'pay', 'economics', 'explore', 'numedia', 'perankh', 'cta', 'ringcode', 'design']} />
   </div>
 </Base>
+
+<style>
+  .home-stats {
+    position: relative;
+    z-index: 1;
+    padding: clamp(1rem, 3vw, 2rem) 0 clamp(3rem, 7vw, 5rem);
+  }
+  .home-stats :global(.stat-strip) {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,718 @@
+---
+// ñüFi: giving, crowdfunding, lending and investing on khensu.ñü. Sources: khensu-specs design/nufi.md (products,
+// network use, economics, regulation by product), design/app-commerce.md (flat 10% on in-app purchases, tips at 100%),
+// WEBE.md 14 (contracts: pledge, escrow, split, ticket, bounty; shielded settlement), PROTOCOL.md 13 and COMPLIANCE.md 9.
+// Lend and Invest are regulated: always "where licensed", never a promised return. Every amount is an example.
+import Base from '../layouts/Base.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import RevealText from '../components/khensu/RevealText.astro';
+import NufiHero from '../components/khensu/NufiHero.astro';
+import NufiPhone from '../components/khensu/NufiPhone.astro';
+import NufiPledgeGraph from '../components/khensu/NufiPledgeGraph.astro';
+import NufiBurst from '../components/khensu/NufiBurst.astro';
+import { BACKERS, DAILY_MET, total, usd } from '../data/nufi-campaign';
+
+const products = [
+  {
+    id: 'give',
+    name: 'Give',
+    line: 'Gifts to people, causes and communities, from a few cents up.',
+    body: 'No cut. A gift reaches the person whole; the only charge is the network fee, a fraction of a cent.',
+    licensed: false,
+  },
+  {
+    id: 'back',
+    name: 'Back',
+    line: 'Fund a film, an album, a tour or a product for a reward or a pre-order.',
+    body: 'Pledges pay out only if the goal is met by the deadline. Otherwise every backer is refunded, automatically.',
+    licensed: false,
+  },
+  {
+    id: 'lend',
+    name: 'Lend',
+    line: 'Small loans between people and to small businesses, repaid in instalments.',
+    body: 'Interest-free between people. Loans with interest come through licensed lending partners.',
+    licensed: true,
+  },
+  {
+    id: 'invest',
+    name: 'Invest',
+    line: 'Shares, revenue shares or notes in creators’ companies, startups and local businesses.',
+    body: 'Offered through a registered funding portal or its local equivalent, with the issuer’s disclosures up front.',
+    licensed: true,
+  },
+];
+
+const steps = [
+  { t: 'Publish the terms', b: 'Your goal, deadline and rewards are signed with your key and logged in public before anyone pays, so they can’t change afterwards. Updates are new signed versions, with the history in the open.' },
+  { t: 'Pledges wait in escrow', b: 'Each pledge is locked into a pledge contract on the network. No company holds it, khensu.ñü included.' },
+  { t: 'The deadline decides', b: 'Goal met: the escrow releases to your wallet. Goal missed: every pledge goes back to the backer who made it.' },
+];
+
+const privacy = [
+  { t: 'Shielded amounts and parties', b: 'Every payment moves through the network’s shielded pool. The chain records proofs and commitments, never amounts, senders or recipients.' },
+  { t: 'Anonymous backers', b: 'Creators see totals and which rewards were chosen. Who backed them stays private unless a backer chooses to share it.' },
+  { t: 'Nothing processed on servers', b: 'Campaigns, pledges and receipts are built on your device and travel as sealed messages over the mixnet. Nodes check proofs; they never see what’s inside.' },
+  { t: 'Self-custody', b: 'Money stays in your own wallet, under keys only your devices hold. Nobody can freeze it, and nobody makes you wait for a payout date.' },
+  { t: 'Repayments in the rhythm', b: 'Loan instalments and investor payouts are scheduled transfers sent on the network’s steady tick, so their timing doesn’t reveal who owes whom.' },
+  { t: 'Reputation without a bureau', b: 'Creators and borrowers can prove facts, such as campaigns delivered or loans repaid on time, as zero-knowledge credentials, without a public history of everyone they dealt with.' },
+];
+
+const contracts = [
+  { n: 'pledge', b: 'Pays only if a threshold of hidden pledges is met by a deadline; refunds otherwise.' },
+  { n: 'escrow', b: 'Releases milestone payments when both sides agree, or when an arbiter they chose does.' },
+  { n: 'split', b: 'Pays every collaborator their share of each payment a film, song or post earns, as it arrives.' },
+  { n: 'ticket', b: 'Anonymous, unlinkable tickets and memberships: premieres, live rooms, early access.' },
+  { n: 'bounty', b: 'Pays the first submission that passes the check.' },
+];
+
+const sum = total(DAILY_MET);
+const feeCap = Math.ceil(BACKERS / 100);
+---
+
+<Base
+  title="ñüFi"
+  description="ñüFi on khensu.ñü: give, back, lend and invest person to person. Pledges that refund if the goal isn’t met, shielded amounts and anonymous backers, contracts that enforce the terms, and no platform cut on giving and pledges."
+>
+  <meta slot="head" name="color-scheme" content="dark" />
+
+  <div class="khensu nufi">
+    <NufiHero />
+    <ProductBar name="ñüFi" action="Get the app" href="/app" explore="#nufi-products-section" />
+
+    <section class="nf-intro" id="nufi-intro-section" aria-label="What ñüFi is">
+      <div class="wrap">
+        <RevealText
+          parts={[
+            ['ñüFi lets people fund each other directly. '],
+            ['Fans fund a film, an album or a tour', true],
+            [' with pledges that pay out only if the goal is met. '],
+            ['Gifts reach the person whole.', true],
+            [' Lending and investing run through licensed partners, where the law allows. On giving and pledges, '],
+            ['nobody takes a cut, and nobody holds the money.', true],
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="section nf-band" id="nufi-products-section" aria-labelledby="nufi-products-title">
+      <div class="wrap">
+        <p class="eyebrow">four ways to fund</p>
+        <h2 id="nufi-products-title" class="big">Give. Back. Lend. Invest.<br /><em>One wallet, person to person.</em></h2>
+        <ul class="nf-products" role="list">
+          {products.map((p, i) => (
+            <li class:list={['nf-product', `p-${p.id}`]} data-reveal style={`--i:${i}`}>
+              <svg class="nf-glyph" viewBox="0 0 96 96" aria-hidden="true">
+                {p.id === 'give' && <path d="M48 78C30 64 16 53 16 37a15 15 0 0 1 32-7 15 15 0 0 1 32 7c0 16-14 27-32 41z" />}
+                {p.id === 'back' && (
+                  <>
+                    <circle class="dim" cx="48" cy="48" r="32" />
+                    <circle class="ring" cx="48" cy="48" r="32" pathLength="100" />
+                    <path d="M37 49l8 8 15-17" />
+                  </>
+                )}
+                {p.id === 'lend' && (
+                  <>
+                    <path d="M18 36h52l-10-10M78 60H26l10 10" />
+                    <circle class="fill" cx="30" cy="48" r="3" />
+                    <circle class="fill" cx="48" cy="48" r="3" />
+                    <circle class="fill" cx="66" cy="48" r="3" />
+                  </>
+                )}
+                {p.id === 'invest' && (
+                  <>
+                    <path d="M16 80h64" />
+                    <rect x="22" y="58" width="10" height="22" rx="2" />
+                    <rect x="43" y="44" width="10" height="36" rx="2" />
+                    <rect x="64" y="26" width="10" height="54" rx="2" />
+                  </>
+                )}
+              </svg>
+              <p class="nf-pname">
+                ñüFi {p.name}
+                {p.licensed && <a class="nf-tag" href="#nufi-notes">where licensed<sup>1</sup></a>}
+              </p>
+              <p class="nf-pline">{p.line}</p>
+              <p class="nf-pbody">{p.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section nf-back" id="nufi-back-section" aria-labelledby="nufi-back-title">
+      <div class="wrap nf-split">
+        <div data-reveal>
+          <p class="eyebrow"><span class="name-case">ñüFi</span> back</p>
+          <h2 id="nufi-back-title" class="big">Fund the film before it’s made.<br /><em>Backers pay only if the goal is met.</em></h2>
+          <p class="lede">
+            Ask the people who want the work, not a studio or a label. Set a goal, a deadline and the rewards. Backers
+            pledge from their own wallets, and every pledge waits in escrow on the network until the deadline.
+          </p>
+          <ol class="nf-steps" role="list">
+            {steps.map((s, i) => (
+              <li>
+                <span class="num">{String(i + 1).padStart(2, '0')}</span>
+                <b>{s.t}</b>
+                <span>{s.b}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div class="nf-phone-wrap" data-reveal>
+          <NufiPhone />
+        </div>
+      </div>
+    </section>
+
+    <section class="section nf-pledge" id="nufi-pledge-section" aria-labelledby="nufi-pledge-title">
+      <div class="wrap">
+        <div class="nf-head" data-reveal>
+          <p class="eyebrow">all or nothing</p>
+          <h2 id="nufi-pledge-title" class="big">The goal is the switch.<br /><em>Met, it pays. Missed, it refunds.</em></h2>
+          <p class="lede">
+            At the deadline the network checks one thing: whether the pledges reached the goal. Nobody can take the money
+            before then, keep it after a miss, or move the deadline.
+          </p>
+        </div>
+        <div data-reveal>
+          <NufiPledgeGraph />
+        </div>
+      </div>
+    </section>
+
+    <NufiBurst id="nufi-private-section" />
+
+    <section class="section nf-band" id="nufi-privacy-section" aria-labelledby="nufi-privacy-title">
+      <div class="wrap">
+        <p class="eyebrow">privacy</p>
+        <h2 id="nufi-privacy-title" class="big">Your money is your business.<br /><em>Shielded from end to end.</em></h2>
+        <ul class="nf-cards" role="list">
+          {privacy.map((c, i) => (
+            <li class="nf-glass" data-reveal style={`--i:${i % 3}`}>
+              <b>{c.t}</b>
+              <span>{c.b}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="nufi-contracts-section" aria-labelledby="nufi-contracts-title">
+      <div class="wrap">
+        <div class="nf-head" data-reveal>
+          <p class="eyebrow"><span class="name-case">webË</span> contracts</p>
+          <h2 id="nufi-contracts-title" class="big">Terms that enforce themselves.<br /><em>Code anyone can read.</em></h2>
+          <p class="lede">
+            Every campaign runs on a standard, audited webË contract. Its code is public and signed; its inputs stay
+            private to the people in it. Each step is proved on the device that takes it, and the chain keeps only the
+            proof.
+          </p>
+        </div>
+        <ul class="nf-contracts" role="list">
+          {contracts.map((c, i) => (
+            <li data-reveal style={`--i:${i}`}>
+              <code>{c.n}</code>
+              <span>{c.b}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="nf-fine">
+          Signed with ML-DSA-87 and proved with hash-based STARKs, so nothing in a contract is left for a quantum computer
+          to break later. Before you sign, your wallet shows the contract’s code, its author and any audit labels.
+        </p>
+      </div>
+    </section>
+
+    <section class="section nf-band" id="nufi-fees-section" aria-labelledby="nufi-fees-title">
+      <div class="wrap">
+        <div class="nf-head" data-reveal>
+          <p class="eyebrow">fees</p>
+          <h2 id="nufi-fees-title" class="big">No platform cut.<br /><em>The network fee is the only charge.</em></h2>
+        </div>
+        <ul class="nf-nums" role="list">
+          <li data-reveal style="--i:0"><b>0%</b><span>Platform cut on ñüFi Give and ñüFi Back.</span></li>
+          <li data-reveal style="--i:1"><b>100%</b><span>Of every tip reaches the person.</span></li>
+          <li data-reveal style="--i:2"><b>&lt;1¢</b><span>Network fee per transfer, paid to the people who run the nodes. Estimate.</span></li>
+          <li data-reveal style="--i:3"><b>0</b><span>Spread on loans or carry on investments for khensu.ñü. Licensed partners’ fees are shown before you commit.</span></li>
+        </ul>
+        <div class="nf-example nf-glass" data-reveal>
+          <p class="nf-ex-k">example</p>
+          <p>
+            A film raises <b>{usd(sum)}</b> from <b>{BACKERS.toLocaleString('en-US')} backers</b>. The filmmaker receives all
+            of it, less network fees that come to <b>under ${feeCap}</b> in total (estimate).
+          </p>
+        </div>
+        <p class="nf-fine">
+          Apps and sites that sell things on khensu.ñü pay a flat 10% of in-app purchases and subscriptions, never scaled up
+          or down. ñüFi isn’t a store: giving and pledging carry no cut.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="nufi-rights-section" aria-labelledby="nufi-rights-title">
+      <div class="wrap">
+        <div class="nf-head" data-reveal>
+          <p class="eyebrow">your rights</p>
+          <h2 id="nufi-rights-title" class="big">Backers fund the work.<br /><em>You keep the work.</em></h2>
+        </div>
+        <ul class="nf-cards three" role="list">
+          <li class="nf-glass" data-reveal style="--i:0">
+            <b>Rewards, not equity</b>
+            <span>A pledge buys a reward or a pre-order: a ticket, a download, a signed copy. Never a share, interest or a return.</span>
+          </li>
+          <li class="nf-glass" data-reveal style="--i:1">
+            <b>Your rights and IP stay yours</b>
+            <span>Backers don’t get your film, your masters or a share of your income, and neither does khensu.ñü.</span>
+          </li>
+          <li class="nf-glass" data-reveal style="--i:2">
+            <b>Investing, on your terms</b>
+            <span>If you choose to offer shares or a revenue share through ñüFi Invest, investors get exactly what the filed offering says, and nothing more.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section nf-band" id="nufi-licensed-section" aria-labelledby="nufi-licensed-title">
+      <div class="wrap">
+        <div class="nf-head" data-reveal>
+          <p class="eyebrow">lending and investing</p>
+          <h2 id="nufi-licensed-title" class="big">Regulated products.<br /><em>Offered where licensed.</em></h2>
+          <p class="lede">
+            Lending and investing are regulated activities, so ñüFi Lend and ñüFi Invest run through licensed partners,
+            and only in countries where those partners are licensed or the law permits them.
+          </p>
+        </div>
+        <dl class="nf-rules">
+          <div data-reveal>
+            <dt>Investing</dt>
+            <dd>
+              In the United States, offerings run under Regulation Crowdfunding through a registered funding portal or a
+              broker-dealer that is a FINRA member, with the issuer’s Form C disclosures, investor limits and annual reports.
+              In the European Union they run through crowdfunding service providers licensed under the ECSP Regulation, and
+              in the United Kingdom under FCA rules.
+            </dd>
+          </div>
+          <div data-reveal>
+            <dt>Lending</dt>
+            <dd>
+              Interest-free loans between people, and to borrowers abroad through local microfinance partners. Loans with
+              interest come through a licensed lending partner, with the disclosures local law requires.
+            </dd>
+          </div>
+          <div data-reveal>
+            <dt>Identity</dt>
+            <dd>
+              Where the law requires identity checks, the licensed partner does them and holds the records. khensu.ñü
+              doesn’t, and the network never links them to your messages.
+            </dd>
+          </div>
+          <div data-reveal>
+            <dt>No conflicts</dt>
+            <dd>
+              A funding portal can’t host offerings it has a financial interest in, so raises by khensu.ñü or Elliott Wave
+              never run on ñüFi Invest.
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section nf-close" id="nufi-start-section" aria-labelledby="nufi-start-title">
+      <div class="wrap">
+        <h2 id="nufi-start-title" class="big">Fund the next thing you love.<br /><em>Straight to the people making it.</em></h2>
+        <div class="btn-row nf-close-cta">
+          <a class="btn primary" href="/app">Get the app</a>
+          <a class="btn" href="/creators">For artists</a>
+          <a class="btn" href="https://dev.khensu.nu/webe">webË contracts</a>
+        </div>
+
+        <ol class="nf-notes" id="nufi-notes" role="list">
+          <li>
+            <sup>1</sup> ñüFi Lend and ñüFi Invest are offered only through licensed partners, in countries where they are
+            licensed or the law permits. Investing involves risk, including loss of principal. Not investment advice.
+            Availability varies by country. Loans can go unrepaid, and lenders can lose what they lend. khensu.ñü never
+            promises a return.
+          </li>
+          <li>ñüFi Back pledges aren’t investments: backers receive the rewards or pre-orders a campaign offers, not equity, interest or a return.</li>
+          <li>Gifts through ñüFi Give are tax-deductible only where the recipient is a registered charity or uses a fiscal sponsor, and only as local tax law allows.</li>
+          <li>Payments are self-custodied: khensu.ñü never holds your funds or keys. See <a href="/compliance">Compliance</a>.</li>
+          <li>Amounts on this page are examples. Network fees are estimates.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const items = document.querySelectorAll<HTMLElement>('.nufi [data-reveal]');
+    const io = new IntersectionObserver(
+      (es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }),
+      { rootMargin: '0px 0px -10% 0px' },
+    );
+    items.forEach((el) => { if (el.getBoundingClientRect().top > innerHeight) io.observe(el); else el.classList.add('in'); });
+    document.documentElement.classList.add('nf-reveal');
+  }
+</script>
+
+<style>
+  .nufi {
+    color-scheme: dark;
+    background: #000;
+    --mint: #bff5e4;
+    --mint-deep: #5ee6c0;
+  }
+  .nufi :global(h2[id]) {
+    scroll-margin-top: 6rem;
+  }
+  /* section-links.ts puts its button before the <em>; the <em> is a block, so the <br /> isn't needed then. */
+  .nufi :global(h2 > br:has(+ .sec-link)) {
+    display: none;
+  }
+  .big {
+    font-size: clamp(2.1rem, 4.8vw, 4rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.04;
+    max-width: none;
+  }
+  .nf-band {
+    background: #0b0b0d;
+  }
+  .nf-head {
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .nf-fine {
+    color: var(--text-faint);
+    font-size: 0.88rem;
+    max-width: 60ch;
+    margin-top: 1.6rem;
+  }
+
+  /* Entrances */
+  [data-reveal] {
+    transition:
+      opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--i, 0) * 90ms),
+      translate 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--i, 0) * 90ms);
+  }
+  :global(.nf-reveal) [data-reveal]:not(.in) {
+    opacity: 0;
+    translate: 0 36px;
+  }
+
+  /* Intro */
+  .nf-intro {
+    padding: clamp(5rem, 12vw, 9rem) 0;
+    background: #000;
+  }
+
+  /* Products */
+  .nf-products {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  }
+  .nf-product {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    min-height: 360px;
+    padding: 1.8rem 1.6rem;
+    border-radius: 28px;
+    background: radial-gradient(110% 70% at 50% 0%, rgba(94, 230, 192, 0.09), transparent 60%), #121214;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .nf-glyph {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1.4rem;
+    fill: none;
+    stroke: var(--mint);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 14px rgba(94, 230, 192, 0.45));
+  }
+  .nf-glyph .dim {
+    stroke: rgba(255, 255, 255, 0.14);
+  }
+  .nf-glyph .ring {
+    stroke-dasharray: 82 100;
+    transform: rotate(-90deg);
+    transform-origin: 48px 48px;
+  }
+  .nf-glyph .fill {
+    fill: var(--mint);
+    stroke: none;
+  }
+  .nf-pname {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #fff;
+  }
+  .nf-tag {
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    text-decoration: none;
+  }
+  .nf-tag sup {
+    margin-left: 0.15rem;
+  }
+  .nf-pline {
+    margin: 0;
+    font-size: clamp(1.2rem, 1.7vw, 1.45rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.22;
+    color: #fff;
+  }
+  .nf-pbody {
+    margin: 0.2rem 0 0;
+    color: var(--text-dim);
+    font-size: 0.98rem;
+  }
+
+  /* Back: copy and phone */
+  .nf-back {
+    background:
+      radial-gradient(50% 60% at 80% 50%, rgba(94, 230, 192, 0.08), transparent 70%),
+      #000;
+  }
+  .nf-split {
+    display: grid;
+    gap: clamp(3rem, 6vw, 5rem);
+    align-items: center;
+  }
+  @media (min-width: 880px) {
+    .nf-split {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    }
+  }
+  .nf-steps {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1.4rem;
+  }
+  .nf-steps li {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    column-gap: 0.4rem;
+    row-gap: 0.25rem;
+  }
+  .nf-steps .num {
+    grid-row: span 2;
+    padding-top: 0.25rem;
+  }
+  .nf-steps b {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .nf-steps span:not(.num) {
+    color: var(--text-dim);
+    font-size: 0.98rem;
+  }
+  .nf-phone-wrap {
+    display: grid;
+    justify-items: center;
+    --phone-w: min(300px, 76vw);
+  }
+
+  /* Pledge graph */
+  .nf-pledge {
+    background: #000;
+  }
+
+  /* Cards */
+  .nf-glass {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 22px;
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 24px 60px rgba(0, 0, 0, 0.28);
+  }
+  .nf-cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+  .nf-cards li {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 1.6rem 1.5rem;
+  }
+  .nf-cards b {
+    font-size: 1.12rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .nf-cards span {
+    color: var(--text-dim);
+    font-size: 0.97rem;
+    line-height: 1.5;
+  }
+
+  /* Contracts */
+  .nf-contracts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  .nf-contracts li {
+    display: grid;
+    grid-template-columns: minmax(7rem, 12rem) 1fr;
+    gap: 1rem 2rem;
+    align-items: baseline;
+    padding: 1.3rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .nf-contracts code {
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    color: var(--mint);
+  }
+  .nf-contracts span {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: clamp(1rem, 1.4vw, 1.12rem);
+  }
+  @media (max-width: 560px) {
+    .nf-contracts li {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+    }
+  }
+
+  /* Fees */
+  .nf-nums {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2rem 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  }
+  .nf-nums li {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .nf-nums b {
+    font-size: clamp(3rem, 6.4vw, 5rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    color: #fff;
+  }
+  .nf-nums span {
+    color: var(--text-dim);
+    font-size: 0.98rem;
+    max-width: 28ch;
+  }
+  .nf-example {
+    margin-top: 2.6rem;
+    padding: 1.5rem 1.6rem;
+  }
+  .nf-example p {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--text-dim);
+    font-size: 1.05rem;
+  }
+  .nf-example b {
+    color: #fff;
+    font-weight: 600;
+  }
+  .nf-ex-k {
+    font-family: var(--font-mono);
+    font-size: 0.72rem !important;
+    letter-spacing: 0.14em;
+    color: var(--text-faint) !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Regulated products */
+  .nf-rules {
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  }
+  .nf-rules > div {
+    padding: 1.5rem 1.6rem;
+    border-radius: 22px;
+    background: #121214;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .nf-rules dt {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .nf-rules dd {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.97rem;
+    line-height: 1.55;
+  }
+
+  /* Close */
+  .nf-close {
+    text-align: center;
+    background: radial-gradient(60% 50% at 50% 30%, rgba(94, 230, 192, 0.1), transparent 70%), #000;
+  }
+  .nf-close .big {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .nf-close-cta {
+    justify-content: center;
+    margin-bottom: clamp(3rem, 7vw, 5rem);
+  }
+  .nf-notes {
+    list-style: none;
+    margin: 0 auto;
+    padding: 1.6rem 0 0;
+    max-width: 62rem;
+    border-top: 1px solid var(--line);
+    text-align: left;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .nf-notes li {
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text-faint);
+  }
+  .nf-notes a {
+    color: var(--text-dim);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] {
+      transition: none;
+    }
+  }
+</style>

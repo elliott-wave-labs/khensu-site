@@ -14,6 +14,7 @@ import CreatorPay from './CreatorPay.astro';
 import RingCode from './RingCode.astro';
 import Economics from './Economics.astro';
 import PerAnkh from './PerAnkh.astro';
+import StatStrip from './StatStrip.astro';
 
 const highlights = [
   { icon: 'lock', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
@@ -21,7 +22,7 @@ const highlights = [
   { icon: 'feed', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
   { icon: 'wallet', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
   { icon: 'sparkle', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
-  { icon: 'live', title: 'Runs on any connection', body: 'Fibre, cable, 5G, satellite. And where there’s no internet at all, nearby nodes reach each other directly.' },
+  { icon: 'live', title: 'Runs on any connection', body: 'Fibre, cable, 5G, satellite. With no internet at all, phones reach each other at about 100 m, and suñůlink.shield stretches that to 600 m, or 2 km to a rooftop node.' },
 ] as const;
 
 const screens = [
@@ -36,10 +37,10 @@ const screens = [
 const statement = 'Every phone keeps the same quiet rhythm, all day. Typing, idle or asleep, it looks identical from outside. Even connecting looks like visiting an ordinary website.'.split(' ');
 
 const specs = [
-  { name: '5 hours', body: 'Relaying on a full charge of its own 6.2 Wh battery. When that runs out, it sips a little of your iPhone’s through its Qi2 coil where the phone supports it, or over the short cable in the box (iPhone 15 or later).' },
+  { name: '5 hours', body: 'Relaying on a full charge of its own 6.5 Wh battery. When that runs out, it sips a little of your iPhone’s through its Qi2 coil where the phone supports it, or over the short cable in the box (iPhone 15 or later).' },
   { name: '15 min', body: 'To 50% over its USB-C from a wall charger or power bank, full in about 45. Your iPhone’s port stays open.' },
   { name: '0 mm', body: 'Added above the camera: level with the lens tops, its opening angled so no lens ever sees it.' },
-  { name: '93 g', body: 'In titanium. Solid brass is about 136 g.' },
+  { name: '74 g', body: 'In titanium. Solid brass is about 93 g.' },
 ];
 
 const pages = [
@@ -146,9 +147,16 @@ const { show } = Astro.props as { show: Key[] };
         <p class="eyebrow">The new internet</p>
         <h2 id="webe-title" class="webe-name"><span class="name-case">webË</span></h2>
         <p class="webe-sub">A new internet, alongside the one you use.</p>
+        <StatStrip
+          items={[
+            { n: 5, label: 'Mix network hops for every message' },
+            { n: 2, unit: 's', label: 'One steady burst, so nobody sees when you’re active' },
+            { n: 2, label: 'Relays per call, run by different operators' },
+            { n: 0, label: 'Settings to switch stealth off' },
+          ]}
+        />
         <p class="lede webe-lede">
-          Same connection, same apps. Everything on it is post-quantum encrypted, hidden inside ordinary HTTPS and run
-          by the people who use it. Stealth is always on.
+          Same connection, same apps: post-quantum, hidden inside ordinary HTTPS and run by the people who use it.
         </p>
         <ul class="webe" role="list">
           <li><b>Alongside the internet</b><span>Works wherever the web does. Nothing to replace.</span></li>
@@ -319,16 +327,17 @@ const { show } = Astro.props as { show: Key[] };
           <p class="lede">
             A boat, a castle, a farm estate, the city or the slums, a private lab, a plane, a spaceship or an ET base.
             A node needs a connection and a power socket, nothing more. One on satellite internet, such as Starlink, is
-            a full node: it relays, stores and earns like any other. Where there is no internet at all, nodes and suñůlink.shields
-            within a kilometre or so reach each other directly and carry messages hop by hop.
+            a full node: it relays, stores and earns like any other. Where there is no internet at all, devices reach each other directly and carry messages hop by hop:<br />
+            phone to phone about 100 m outdoors; with suñůlink.shield about 600 m on open ground, and up to 2 km to a
+            rooftop node.
           </p>
           <ul class="links">
-            <li>Fibre and cable</li>
-            <li>5G home internet</li>
             <li>Satellite internet</li>
+            <li>5G Ultra Wideband</li>
+            <li>Fibre and cable</li>
             <li>Node-to-node mesh, no internet</li>
           </ul>
-          <p class="footnote">Starlink is a trademark of SpaceX. Named only as an example of satellite internet; no affiliation or endorsement.</p>
+          <p class="footnote">Mesh ranges are line of sight outdoors, calculated from each radio’s link budget: phones over Bluetooth and Wi-Fi peer-to-peer reach about 30 m indoors; suñůlink.shield’s Wi-Fi HaLow reaches about 100 m between shields in a city and 250–500 m to a rooftop node in towns and suburbs. Ranges in Europe are about a third shorter, under its lower power limit. Starlink is a trademark of SpaceX, and 5G Ultra Wideband of Verizon. Named only as examples; no affiliation or endorsement.</p>
         </div>
       </div>
     </section>
@@ -701,6 +710,7 @@ const { show } = Astro.props as { show: Key[] };
   }
   .webe-lede {
     max-width: 44rem;
+    margin-top: clamp(1.6rem, 4vw, 2.4rem);
   }
   .webe-sec .webe {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));

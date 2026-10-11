@@ -4,6 +4,13 @@ import BigFormats from '../components/khensu/BigFormats.astro';
 import CodecPair from '../components/khensu/CodecPair.astro';
 import formats from '../data/formats.json';
 import lad4k from '../data/iphone-ladder-nasa4k.json';
+import StatStrip from '../components/khensu/StatStrip.astro';
+
+type Pt = { actual_kbps: number; vmaf: number; dropped: number };
+const nu = [...(lad4k.codecs as Record<string, { points: Pt[] }>)['nu-media'].points].filter((p) => p.dropped === 0).sort((a, b) => b.vmaf - a.vmaf)[0];
+const hq = formats.formats['prores-hq'];
+const STREAM = 50; // Mbit/s, the same constant stream BigFormats assumes
+const nuMinutes = (nu.actual_kbps * 3600) / 1000 / STREAM / 60;
 ---
 
 <Base
@@ -13,12 +20,18 @@ import lad4k from '../data/iphone-ladder-nasa4k.json';
   <section class="page-head">
     <div class="wrap">
       <p class="eyebrow">Private transfer</p>
-      <h1>Send 4K video and big files privately.<br />No server. No fee per gigabyte.</h1>
-      <p class="lede">
-        khensu.ñü sends photos, video and files end to end through your own devices and the network’s nodes. No server holds them,
-        nobody sees who sent what to whom, and there is no fee per gigabyte. Video goes in ñü-media at the camera’s native resolution,
-        so a 4K master arrives at a fraction of the size of a ProRes or DNxHR file.
-      </p>
+      <h1>Send 4K privately.<br />No server. No fee per gigabyte.</h1>
+      <StatStrip
+        items={[
+          { n: Math.round(hq.kbps / nu.actual_kbps), unit: '×', label: 'Smaller than the ProRes 422 HQ master, as ñü.media', kind: 'benchmark' },
+          { n: Math.round(nuMinutes), unit: 'min', label: `To send an hour of 4K at ${STREAM} Mbit/s`, kind: 'projection' },
+          { n: 0, pre: '$', label: 'Per gigabyte, at any size' },
+          { n: 0, label: 'People who can see who sent what to whom' },
+        ]}
+      >
+        Benchmark on the same 4K NASA clip: ñü.media at its best measured point, VMAF {Math.round(nu.vmaf)} on iPhone Air, against ProRes 422 HQ at VMAF {Math.round(hq.vmaf)}. Transfer time is a projection from the stream speed shown.
+      </StatStrip>
+      <p class="lede">End to end through your own devices and the network’s nodes, at the camera’s native resolution.</p>
     </div>
   </section>
 
@@ -28,7 +41,7 @@ import lad4k from '../data/iphone-ladder-nasa4k.json';
         <BigFormats formats={formats as any} ladder={lad4k as any} />
         <CodecPair run={lad4k as any} dir="ladder-4k" origin="NASA · 3840 × 2160 · 16 Mbit/s"
           srcKbps={16197} srcName="YouTube’s 4K stream" start={4000} title="See it for yourself"
-          sub="Whole 4K frames, encoded on an iPhone Air. One side is always the original or ñü-media." />
+          sub="Whole 4K frames, encoded on an iPhone Air. One side is always the original or ñü.media." />
       </div>
 
       <div class="prose">
@@ -40,15 +53,15 @@ import lad4k from '../data/iphone-ladder-nasa4k.json';
             <tr><td>Who can open the file</td><td>Only the people you send it to</td><td>Dropbox holds the keys</td><td>The server operator, unless client-side encryption is set up</td></tr>
             <tr><td>Who sees sender and recipient</td><td>Nobody: it travels through the mix network</td><td>Dropbox</td><td>The server operator</td></tr>
             <tr><td>Where the file waits</td><td>Your own node, or encrypted chunks spread across nodes</td><td>Dropbox’s servers</td><td>Aspera or cloud storage servers</td></tr>
-            <tr><td>Video size</td><td>ñü-media at native resolution, or the exact original bytes</td><td>The original bytes</td><td>The original bytes</td></tr>
+            <tr><td>Video size</td><td>ñü.media at native resolution, or the exact original bytes</td><td>The original bytes</td><td>The original bytes</td></tr>
             <tr><td>Cost per gigabyte</td><td>Free</td><td>Plan limits</td><td>Paid</td></tr>
           </tbody>
         </table>
         </div>
         <p>
           Sending the exact same bytes is not faster than Aspera on a fast line; Aspera is built for line rate. khensu.ñü is faster
-          when the video goes as ñü-media instead of the editing master, because there is far less to send. Camera RAW isn’t supported:
-          video travels at native resolution in ñü-media, or bit-exact as the original file.
+          when the video goes as ñü.media instead of the editing master, because there is far less to send. Camera RAW isn’t supported:
+          video travels at native resolution in ñü.media, or bit-exact as the original file.
         </p>
         <p><a href="/media">Every measurement</a> · <a href="https://dev.khensu.nu/nu-media">Technical documentation</a></p>
       </div>
@@ -57,6 +70,9 @@ import lad4k from '../data/iphone-ladder-nasa4k.json';
 </Base>
 
 <style>
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
   .table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;

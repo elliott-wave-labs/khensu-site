@@ -502,7 +502,7 @@ The recipient keeps the per-hop payload keys indexed by `payload_key_ref`, valid
 
 ### 8.8 Ticks and cover
 
-- **Phones (app in foreground):** one burst every 2 s on every network and in every power state, with no exceptions. A burst is 4 small packets: one mailbox `fetch` plus 3 slots for outgoing fragments, receipts, typing events, PIR queries and ñü-media, filled with cover packets when empty. Tick times have a small uniform jitter (±100 ms) so bursts don't align across phones. The downstream carries 4 reply packets per tick, padded with cover replies. No cover in the background.
+- **Phones (app in foreground):** one burst every 2 s on every network and in every power state, with no exceptions. A burst is 4 small packets: one mailbox `fetch` plus 3 slots for outgoing fragments, receipts, typing events, PIR queries and ñü.media, filled with cover packets when empty. Tick times have a small uniform jitter (±100 ms) so bursts don't align across phones. The downstream carries 4 reply packets per tick, padded with cover replies. No cover in the background.
 - **Nodes:** constant node-to-node cover and loop packets around the clock, at a rate set per capacity class in the epoch header, independent of real load.
 - **Bulk packets** travel only inside constant streams: a user's own node, the Wi-Fi-and-charging window on phones, and call trunks. Phones send no bulk packets outside those.
 - Tick length, burst size and node cover rates are consensus parameters in the epoch header.
@@ -635,12 +635,21 @@ Storage receipts (`StorageReceipt { epoch, node, byte_hours, replicas_checked, s
 
 ### 12.5 Founder succession
 
-The network can't be stopped by anyone, including the founder. A dead-man's switch hands every founder power to consensus if the founder disappears or moves on.
+The founder holds some powers the committee doesn't: a co-signature on rule changes, a veto on new operators, and the key that signs releases. A dead-man's switch makes sure those powers can never be lost with the founder.
+
+In short:
+
+1. Every change is archived automatically. Every code push, private or public, every release and every network upgrade goes into the archive on the network within one epoch (12.6).
+2. Every week the founder checks in. The founder signs a `FounderCheckIn` on chain, confirming that the archive and the sealed private code escrow cover everything up to now.
+3. After 42 days without a check-in, the switch fires. Six missed weeks, or a signed handover, and it fires by itself.
+4. The trusted committee nodes get access. The 21 nodes of that epoch's committee jointly hold the keys to the sealed escrow and to release signing. Any 14 of them open it.
+5. Then everyone gets it. The full archive, private and patented code included, is sent to the press, to the founder's list of friends, to every node on the network, and posted publicly on Wikimedia and the Internet Archive (12.7).
 
 ```
 struct {
   uint64 network_epoch;
   opaque archive_root[64];       // the archive root the founder attests to
+  opaque escrow_root[64];        // Merkle root of the sealed private code escrow (12.7)
   opaque signature<V>;           // founder threshold key, label "founder check-in"
 } FounderCheckIn;
 
@@ -650,11 +659,12 @@ struct {
 } FounderHandover;
 ```
 
-- The founder posts a `FounderCheckIn` at least every 720 network epochs (30 days).
-- The switch fires at the first epoch where 2,160 network epochs (90 days) have passed since the last valid check-in, or at the epoch after a valid `FounderHandover`. Committee members record the firing in the epoch header's `rules_hash` transition; no signature is needed to fire it.
-- From that epoch: `founder_cosig` is always empty; rule changes need only 2/3 of the committee with the 30-day timelock and veto; admission veto ends; the founder key is removed from the pinned key set in the next app and node releases.
-- Release signing passes to a 14-of-21 threshold ML-DSA-87 key held by the epoch's committee and re-shared every epoch. A release is valid only if its reproducible build hash matches an entry under the archive root.
-- The switch is one-way. No rule change, including one signed by the founder key, can restore a founder role; such a change is invalid by definition and its signers produce `Evidence`.
+- **Weekly check-in.** The founder posts a `FounderCheckIn` at least every 168 network epochs (7 days). A check-in is valid only if `archive_root` and `escrow_root` cover every repository head and release archived up to the previous epoch.
+- **Firing.** The switch fires at the first epoch where 1,008 network epochs (42 days) have passed since the last valid check-in, or at the epoch after a valid `FounderHandover`. Committee members record the firing in the epoch header's `rules_hash` transition; no signature is needed to fire it.
+- **Founder powers end.** From that epoch `founder_cosig` is always empty; rule changes need only 2/3 of the committee with the 30-day timelock and veto; the admission veto ends; and the founder key is removed from the pinned key set in the next app and node releases.
+- **Committee takes over releases.** Release signing passes to a 14-of-21 threshold ML-DSA-87 key held by the epoch's committee and re-shared every epoch. A release is valid only if its reproducible build hash matches an entry under the archive root.
+- **Escrow opens.** At the same epoch the committee opens the private code escrow and releases everything to the recipients in 12.7.
+- **One way.** No rule change, including one signed by the founder key, can restore a founder role; such a change is invalid by definition and its signers produce `Evidence`.
 
 ### 12.6 Archive
 
@@ -662,13 +672,37 @@ Everything needed to rebuild and run the network lives on the network itself:
 
 | Archived | Contents |
 | --- | --- |
-| Code | Every repository: all branches, tags and history, as git packfiles |
+| Code | Every repository, public and private (private ones sealed, 12.7): all branches, tags and history, as git packfiles |
 | Specs | Every version of the specifications and design documents |
 | Releases | Every signed node, app and firmware release, with its reproducible build recipe and toolchain hashes |
+| Upgrades | Every rule set and network upgrade, with the votes that adopted it |
 | Chain | Every epoch header, rule set, lease, receipt root and evidence item since genesis |
 | Nodes | The node list and lease history for every epoch |
 
+**Archived automatically, on every change.** Nobody has to remember to archive. CI archives every push to every repository, every tag, every release build and every adopted upgrade within one epoch of it happening; private objects are sealed first (12.7). A release or upgrade whose objects aren't in the archive is invalid, so nodes and apps refuse to install it. The weekly check-in then attests to the archive as it stands.
+
 Archive objects are content-addressed and erasure-coded like webË objects (`WEBE.md` 4) and stored by storage nodes (`WORK.md` 4) at the highest replication class. The archive root is a Merkle root over the archive manifest, published under `archive.khensu.nu` and committed in every epoch header as part of `rules_hash`. Anyone can fetch the archive over the mixnet, rebuild every past release, check it against the logged hashes and replay the chain from genesis.
+
+### 12.7 Private code escrow and release
+
+Nothing stays private past the switch, patented code included. Every private repository, unreleased branch, patented algorithm and its reference implementation, model weights, build recipe and the patent filings themselves are archived now, sealed, and released to everyone when the switch fires.
+
+- **Sealed.** Each private object is encrypted with AES-256-GCM under a fresh key, and that key is encrypted with ML-KEM-1024 to the committee's escrow key: a 14-of-21 threshold key held by the trusted committee nodes and re-shared every epoch, like the release key. Sealed objects are stored and erasure-coded like any archive object.
+- **Kept current.** Every push to a private repository is sealed and archived within one epoch (12.6). Every `FounderCheckIn` carries `escrow_root`, a Merkle root over the sealed objects and the private repository heads they contain; a check-in whose `escrow_root` doesn't cover the current heads is invalid, so the founder can't keep checking in while holding code back.
+- **Opened by the committee.** At the epoch the switch fires, each committee node publishes its decryption share. Any 14 shares open every sealed object, and the plaintext joins the public archive under `archive.khensu.nu`.
+- **Released to everyone.** Within the same epoch the committee nodes send the opened archive, with a signed notice that the switch fired, to every recipient below. Each delivery is a `gateway` job (`WORK.md` 9a) whose TLS transcript proof goes on chain, so anyone can check it happened.
+
+| Recipient | How it arrives |
+| --- | --- |
+| Every node on the network | Already holds the archive; the opened objects replicate like any archive object |
+| The founder's list of friends | Each person on the list, sealed in the escrow with their khensu.ñü handle, gets the archive and the notice by message over the mixnet |
+| The press | The notice, the archive root and a download link go to The Wall Street Journal and Forbes, plus any outlet added to the list, through their published tip lines |
+| Wikimedia | The archive and notice are uploaded to Wikimedia Commons under the open licences below |
+| Internet Archive | The archive is uploaded to archive.org as a public item, with the notice and every release |
+
+  The recipient list is part of the escrow, so the founder can update it at any check-in but can't remove the release itself. Uploads that fail are retried every epoch until each recipient's proof is on chain.
+- **Licensed.** On opening, code that was private is licensed AGPL-3.0, or Apache-2.0 where it belongs to `khensu-core`, and Elliott Wave LLC grants everyone an irrevocable, worldwide, royalty-free licence under every patent and patent application it holds to make, use, sell and modify any implementation. The grant is signed now, sealed in the escrow, and takes effect at the switch.
+- **Never early.** Publishing a decryption share before the switch fires is `Evidence`, and a share alone opens nothing.
 
 ## 13. Shielded payments (outline, frozen in `PAYMENTS.md`)
 
