@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Repositories and licences" description="Where khensu.nu’s code lives, its licences, and when each repository opens.">
+  <p class="eyebrow">Repositories and licences</p>
+  <h1>Open source, component by component</h1>
+  <p class="lede">
+    Every part of khensu.nu will be open source. Each repository opens once its design review is finished; until
+    then they’re private.
+  </p>
+
+  <table>
+    <thead><tr><th>Repository</th><th>Contents</th><th>Licence</th></tr></thead>
+    <tbody>
+      <tr><td><code>khensu-core</code></td><td>Post-quantum MLS, credentials, mix network packets, on-device search, test vectors</td><td>Apache-2.0</td></tr>
+      <tr><td><code>khensu-apple</code></td><td>The app for iPhone, iPad and Mac</td><td>AGPL-3.0</td></tr>
+      <tr><td><code>khensu-tatenan</code></td><td>Node software for Mac and Raspberry Pi 5</td><td>AGPL-3.0</td></tr>
+      <tr><td><code>khensu-chain</code></td><td>Post-quantum chain, token and shielded payments</td><td>AGPL-3.0</td></tr>
+      <tr><td><code>khensu-services</code></td><td>Key transparency log, credential issuer, push gateway</td><td>AGPL-3.0</td></tr>
+      <tr><td><code>khensu-devnet</code></td><td>The whole network on one machine, for development</td><td>AGPL-3.0</td></tr>
+      <tr><td><code>khensu-specs</code></td><td>Plan, threat model and protocol specifications</td><td>CC BY 4.0</td></tr>
+      <tr><td><code>khensu-site</code></td><td>khensu.nu and these docs</td><td>AGPL-3.0</td></tr>
+    </tbody>
+  </table>
+  <p>All repositories live under <code>elliott-wave-labs</code> on GitHub.</p>
+</Base>

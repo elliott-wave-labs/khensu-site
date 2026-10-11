@@ -1,0 +1,231 @@
+---
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '../styles/global.css';
+import Crescent from '../components/khensu/Crescent.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const SITE_NAME = 'khensu.nu developers';
+const DEFAULT_DESC =
+  'Developer documentation for khensu.nu, the post-quantum private messenger on a network run by people: architecture, running a node, repositories, licences and security.';
+
+const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
+const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const DOCS = [
+  { href: '/', label: 'Overview' },
+  { href: '/architecture', label: 'Architecture' },
+  { href: '/node', label: 'Run a node' },
+  { href: '/repositories', label: 'Repositories and licences' },
+  { href: '/contribute', label: 'Contribute' },
+  { href: '/security', label: 'Security' },
+];
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#0A0B0D" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a href="/" class="brand" aria-label="khensu.nu developers, home">
+          <Crescent size={26} />
+          <span>khensu.nu <small>developers</small></span>
+        </a>
+        <nav aria-label="Primary">
+          <ul>
+            <li><a href="/node">Run a node</a></li>
+            <li><a href="/security">Security</a></li>
+            <li><a href="https://khensu.nu">khensu.nu</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="wrap docs">
+      <aside class="side" aria-label="Documentation">
+        <ul>
+          {DOCS.map((d) => (
+            <li>
+              <a href={d.href} aria-current={path === d.href ? 'page' : undefined}>{d.label}</a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+      <article class="doc prose">
+        <slot />
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap legal">
+        <p>
+          © 2026 Elliott Wave LLC. Docs licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+          khensu.nu™ is a trademark of Elliott Wave LLC. Patents pending.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: -9999px;
+  }
+  .skip:focus {
+    left: 1rem;
+    top: 1rem;
+    z-index: 10;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+  }
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 1rem;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+  }
+  .brand small {
+    color: var(--text-dim);
+    font-weight: 400;
+    font-size: 0.9em;
+  }
+  nav ul {
+    display: flex;
+    gap: clamp(0.9rem, 2.5vw, 2rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav a {
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: var(--text-dim);
+  }
+  .docs {
+    display: grid;
+    gap: 3rem;
+    padding-top: 3rem;
+    padding-bottom: 5rem;
+  }
+  @media (min-width: 860px) {
+    .docs {
+      grid-template-columns: 210px 1fr;
+    }
+    .side {
+      position: sticky;
+      top: 96px;
+      align-self: start;
+    }
+  }
+  .side ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.2rem;
+  }
+  .side a {
+    display: block;
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+  .side a[aria-current='page'] {
+    color: var(--text);
+    background: var(--accent-soft);
+  }
+  .doc :global(h1) {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-top: 0;
+  }
+  .doc :global(table) {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.92rem;
+    margin: 1.5rem 0;
+  }
+  .doc :global(th),
+  .doc :global(td) {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .doc :global(th) {
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .doc :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+  }
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding: 2rem 0;
+    background: var(--bg-sunk);
+  }
+  .legal p {
+    font-size: 0.8rem;
+    color: var(--text-faint);
+    max-width: none;
+    margin: 0;
+  }
+  @media (max-width: 560px) {
+    .brand small {
+      display: none;
+    }
+  }
+</style>

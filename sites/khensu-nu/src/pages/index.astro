@@ -1,0 +1,510 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/khensu/Hero.astro';
+import AppScreen from '../components/khensu/AppScreen.astro';
+import Exploded from '../components/khensu/Exploded.astro';
+import Finishes from '../components/khensu/Finishes.astro';
+import Net from '../components/khensu/Net.astro';
+import Orbit from '../components/khensu/Orbit.astro';
+import Icon from '../components/khensu/Icon.astro';
+
+const highlights = [
+  { icon: 'lock', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
+  { icon: 'shield', title: 'Nobody sees who talks to whom', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not.' },
+  { icon: 'feed', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
+  { icon: 'wallet', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
+  { icon: 'sparkle', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
+  { icon: 'live', title: 'Runs on any connection', body: 'Fibre, cable, 5G, satellite. And where there’s no internet at all, nearby nodes reach each other directly.' },
+] as const;
+
+const screens = [
+  { screen: 'chats', title: 'Chats', body: 'Liquid Glass, stock iOS 26 controls, folders and disappearing messages.' },
+  { screen: 'chat', title: 'Conversation', body: 'Messages, voice, files and shielded payments in one thread.' },
+  { screen: 'feed', title: 'Feed', body: 'People, forums, sites and live streams. Signed posts, anonymous readers.' },
+  { screen: 'call', title: 'Calls', body: 'Post-quantum voice and video. The route changes as you talk.' },
+  { screen: 'ask', title: 'Ask khensu', body: 'Local private AI for you alone: recall anything you’ve been told, with sources. No AI servers ever see it.' },
+  { screen: 'wallet', title: 'Wallet and node', body: 'A private balance, and the node that carries traffic for people nearby.' },
+] as const;
+
+const statement = 'Every phone keeps the same quiet rhythm, all day. Typing, idle or asleep, it looks identical from outside. Even connecting looks like visiting an ordinary website.'.split(' ');
+
+const styles = [
+  { name: 'Card', body: 'Pocket-size, on MagSafe.', spec: '5.2 mm · 4 Wh' },
+  { name: 'Fill', body: 'Inset from the edges. A flat back, only the lenses showing.', spec: '4.2 mm · 5 Wh' },
+  { name: 'Wrap', body: 'The whole back, flat. No camera bump, only the lenses showing.', spec: '4.2 mm · 6 Wh' },
+  { name: 'Wrap XL', body: 'About 11 hours as a node on its own cells.', spec: '7.2 mm · 13 Wh' },
+];
+
+---
+
+<Base>
+  <Hero
+    eyebrow="The first app on webE"
+    links={[
+      { href: '#run-a-node', label: 'Run a node' },
+      { href: 'https://dev.khensu.nu', label: 'Developer docs' },
+    ]}
+  />
+
+  <div class="khensu">
+    <section class="section intro">
+      <div class="wrap">
+        <p class="eyebrow">The first app on webE</p>
+        <h2 class="big">A messenger with no company in the middle. <em>Because there isn’t one.</em></h2>
+        <p class="lede">
+          khensu.nu runs on a network of small computers in people’s homes, not on a company’s servers. No one can read
+          what you send, see who you send it to, or switch it off. It is the first app on webE, a people-run internet
+          that sits on the one you already use.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href="#run-a-node">Run a node</a>
+          <a class="btn" href="https://dev.khensu.nu">Developer docs</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="highlights">
+      <div class="wrap">
+        <p class="eyebrow">Highlights</p>
+        <ul class="highlights">
+          {highlights.map((h) => (
+            <li class="hl">
+              <Icon name={h.icon} size="1.6rem" />
+              <h3>{h.title}</h3>
+              <p>{h.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section design" aria-labelledby="design-title">
+      <div class="wrap">
+        <p class="eyebrow">App design</p>
+        <h2 id="design-title" class="big">Feels like iOS. <em>Because it is.</em></h2>
+        <p class="lede">
+          Built only from Apple’s own Liquid Glass controls on iOS, iPadOS and macOS 26, so it looks like it shipped
+          with your iPhone. Scroll through the screens.
+        </p>
+      </div>
+      <ul class="gallery" tabindex="0" aria-label="App screens">
+        {screens.map((s) => (
+          <li>
+            <AppScreen screen={s.screen} label={`${s.title} screen`} />
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="statement" data-scene="reveal" aria-label="Stealth by default">
+      <div class="wrap">
+        <p class="eyebrow">Stealth by default</p>
+        <p class="words">
+          {statement.map((w, i) => (
+            <span style={`--i:${i};--n:${statement.length}`}>{w} </span>
+          ))}
+        </p>
+        <div class="pulse" aria-hidden="true">
+          {['Typing a message', 'Idle', 'Asleep in a pocket'].map((label) => (
+            <div class="pulse-row">
+              <span>{label}</span>
+              <span class="track"></span>
+            </div>
+          ))}
+        </div>
+        <p class="footnote">There is no setting to turn this off. Privacy you can switch off is privacy someone can make you switch off.</p>
+      </div>
+    </section>
+
+    <section class="section relays-sec" data-scene="reveal" aria-labelledby="relays-title">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">A few relays. Millions of people.</p>
+          <h2 id="relays-title" class="big">One small computer carries <em>a town.</em></h2>
+          <p class="lede">
+            A single <a href="https://www.raspberrypi.com/products/raspberry-pi-5/">Raspberry Pi 5</a> on a home fibre
+            line, sharing half its connection, carries everyone in a town of 1,700 for a day. The network needs no data
+            centres and no hyperscaler. Just a small share of the people who use it.
+          </p>
+          <p class="lede">
+            An old or unused phone runs a node even better, and more profitably: you already own it, so there’s nothing
+            to buy and what it earns is yours from day one. Your laptop or desktop can run one too, in the background
+            while you work.
+          </p>
+          <dl class="stats">
+            <div><dt>1,700</dt><dd>people a day, carried by one Raspberry Pi 5 on gigabit fibre</dd></div>
+            <div><dt>85 million</dt><dd>people a day, on 50,000 of them</dd></div>
+            <div><dt>2 in 100</dt><dd>people running a node on ordinary home broadband carry everyone</dd></div>
+          </dl>
+          <p class="footnote">
+            Engineering estimates from the protocol design: 1 hour of app use per person per day, each node sharing half its
+            upload. Real capacity depends on connections and use, and is measured as the network grows.
+          </p>
+        </div>
+        <Net contained closeup nodes={150} label="A web of relay nodes passing messages between them: a few nodes carry everyone." />
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="pay-title">
+      <div class="wrap">
+        <p class="eyebrow">How it’s paid for</p>
+        <h2 id="pay-title" class="big">No ads. No data sold. <em>No mining.</em></h2>
+        <p class="lede">
+          People who want more pay a small subscription, privately. That pays the people who run the network, in
+          proportion to the work they can prove they did. Nobody pays for your attention, because nobody gets it.
+        </p>
+        <ol class="flow">
+          <li>
+            <span class="num">01</span>
+            <h3>You pay for more, privately</h3>
+            <p>Messaging is free. Bigger files and more storage come with a small subscription, through the App Store, the web or the token. What you pay is never linked to what you do.</p>
+          </li>
+          <li>
+            <span class="num">02</span>
+            <h3>Subscriptions fund the network</h3>
+            <p>A fixed share of every subscription buys and burns the network’s token. The network pays out new tokens only for verified work, so more use means more income for operators.</p>
+          </li>
+          <li>
+            <span class="num">03</span>
+            <h3>Operators earn for real work</h3>
+            <p>Forwarding, storing and serving, proven by receipts that can’t be linked to anyone. A Pi uses about as much power as a light bulb.</p>
+          </li>
+        </ol>
+        <p class="footnote">Not an offer of securities or a promise of earnings. Pricing and token details are subject to legal review.</p>
+      </div>
+    </section>
+
+    <section class="section space" aria-labelledby="space-title">
+      <div class="wrap split rev">
+        <Orbit />
+        <div>
+          <p class="eyebrow">Runs on any link</p>
+          <h2 id="space-title" class="big">Works from a farmhouse. <em>Or a boat.</em></h2>
+          <p class="lede">
+            A node needs a connection and a power socket, nothing more. One on satellite internet, such as Starlink, is
+            a full node: it relays, stores and earns like any other. Where there is no internet at all, nodes and shells
+            within a kilometre or so reach each other directly and carry messages hop by hop.
+          </p>
+          <ul class="links">
+            <li>Fibre and cable</li>
+            <li>5G home internet</li>
+            <li>Satellite internet</li>
+            <li>Node-to-node mesh, no internet</li>
+          </ul>
+          <p class="footnote">Starlink is a trademark of SpaceX. Named only as an example of satellite internet; no affiliation or endorsement.</p>
+        </div>
+      </div>
+    </section>
+
+    <Exploded />
+
+    <Finishes />
+
+    <section class="section">
+      <div class="wrap">
+        <p class="eyebrow">Four ways to wear it</p>
+        <ul class="styles">
+          {styles.map((s) => (
+            <li class="card">
+              <h3>{s.name}</h3>
+              <p>{s.body}</p>
+              <span class="mono">{s.spec}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="footnote">Figures for iPhone 18 Pro from the current CAD model; production figures may change. Every style comes in matte titanium matched to your iPhone or in bare brass, and clears every lens, flash and sensor.</p>
+      </div>
+    </section>
+
+    <section class="section net-host" aria-labelledby="webe-title">
+      <Net />
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">webE</p>
+          <h2 id="webe-title" class="big">An internet run by the people who use it.</h2>
+          <p class="lede">
+            The same network that carries your messages carries feeds, forums, websites and live streams. It speaks HTTPS,
+            so it works wherever the web does, and everything on it is post-quantum. Public posts carry their author’s
+            signature, so you know who said it. Reading leaves no trace, so nobody knows who read it.
+          </p>
+        </div>
+        <ul class="webe">
+          <li><b>Messages and calls</b><span>Private by default, one to one and in large groups.</span></li>
+          <li><b>Feeds and forums</b><span>Follow people and communities without an algorithm owning you.</span></li>
+          <li><b>Sites</b><span>Publish at your-name.khensu.nu, hosted by the network.</span></li>
+          <li><b>Live</b><span>Stream to a room or a crowd, with the route changing as you go.</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <section class="section net-host" id="run-a-node">
+      <Net />
+      <div class="wrap cta">
+        <h2>Run a node. <em>Be part of the network.</em></h2>
+        <p class="lede">A Raspberry Pi 5, a Mac, or an old iPhone on Wi-Fi. Tell us you’re in and we’ll get you set up.</p>
+        <div class="btn-row">
+          <a class="btn primary" href="mailto:hello@elliottwave.studio?subject=khensu.nu%20node">hello@elliottwave.studio</a>
+          <a class="btn" href="https://dev.khensu.nu/node">Node guide</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  import '../scripts/scenes.ts';
+</script>
+
+<style>
+  .big {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    max-width: 20ch;
+  }
+  .intro .big {
+    max-width: 22ch;
+  }
+  .highlights {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    overflow: hidden;
+  }
+  .hl {
+    background: var(--bg-raised);
+    padding: 2rem;
+  }
+  .hl h3 {
+    margin: 1rem 0 0.5rem;
+    font-weight: 500;
+  }
+  .hl p {
+    color: var(--text-dim);
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .gallery {
+    list-style: none;
+    margin: 3rem 0 0;
+    padding: 1rem max(var(--gutter), calc((100vw - var(--wrap)) / 2 + var(--gutter))) 2rem;
+    display: flex;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: max(var(--gutter), calc((100vw - var(--wrap)) / 2 + var(--gutter)));
+    scrollbar-width: thin;
+    --phone-w: clamp(220px, 24vw, 280px);
+  }
+  .gallery li {
+    scroll-snap-align: start;
+    width: var(--phone-w);
+    flex: none;
+  }
+  .gallery h3 {
+    margin: 1.5rem 0 0.3rem;
+    font-weight: 500;
+  }
+  .gallery p {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+  .statement {
+    --p: 1;
+    padding: clamp(6rem, 16vw, 12rem) 0;
+    border-top: 1px solid var(--line);
+  }
+  .words {
+    font-size: clamp(1.9rem, 4.6vw, 3.6rem);
+    line-height: 1.15;
+    letter-spacing: -0.035em;
+    font-weight: 500;
+    max-width: 24ch;
+    margin: 0 0 3rem;
+  }
+  .words span {
+    opacity: clamp(0.14, calc(var(--p) * var(--n) * 1.25 - var(--i)), 1);
+  }
+  .pulse {
+    display: grid;
+    gap: 0.9rem;
+    max-width: 760px;
+    margin-bottom: 2rem;
+  }
+  .pulse-row {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    align-items: center;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-faint);
+  }
+  .track {
+    height: 28px;
+    border-radius: 6px;
+    background-color: var(--bg-raised);
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent 0 52px,
+      rgba(242, 241, 236, 0.85) 52px 55px,
+      transparent 55px 58px,
+      rgba(242, 241, 236, 0.85) 58px 61px,
+      transparent 61px 64px,
+      rgba(242, 241, 236, 0.85) 64px 67px,
+      transparent 67px 70px,
+      rgba(242, 241, 236, 0.85) 70px 73px,
+      transparent 73px 120px
+    );
+    background-size: 120px 100%;
+    animation: beat 2s linear infinite;
+    border: 1px solid var(--line);
+  }
+  @keyframes beat {
+    to { background-position: -120px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .track { animation: none; }
+  }
+  @media (max-width: 560px) {
+    .pulse-row { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+
+  .split {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+  @media (min-width: 960px) {
+    .split {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .stats {
+    display: grid;
+    gap: 1.4rem;
+    margin: 2rem 0;
+  }
+  .stats dt {
+    font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(100deg, #9aa0a9, #ffffff 55%, #c9ccd2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .stats dd {
+    margin: 0.3rem 0 0;
+    color: var(--text-dim);
+  }
+
+  .flow {
+    list-style: none;
+    margin: 3rem 0 2rem;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    counter-reset: f;
+  }
+  .flow li {
+    position: relative;
+    padding: 1.75rem;
+    border-radius: var(--radius);
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+  }
+  .flow h3 {
+    margin: 1rem 0 0.5rem;
+    font-weight: 500;
+  }
+  .flow p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  .space {
+    background: radial-gradient(80% 60% at 30% 100%, rgba(40, 60, 95, 0.25), transparent 70%);
+  }
+  @media (min-width: 960px) {
+    .rev {
+      grid-template-columns: 1.1fr 1fr;
+    }
+  }
+  .links {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .links li {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .styles {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  }
+  .styles h3 {
+    margin: 0 0 0.4rem;
+    font-weight: 500;
+  }
+  .styles p {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+
+  .webe {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .webe li {
+    background: var(--bg-raised);
+    padding: 1.3rem 1.5rem;
+    display: grid;
+    gap: 0.2rem;
+  }
+  .webe b {
+    font-weight: 500;
+  }
+  .webe span {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+
+  .cta h2 {
+    max-width: 18ch;
+  }
+</style>

@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Architecture" description="The parts of khensu.nu and what each one does.">
+  <p class="eyebrow">Architecture</p>
+  <h1>How the pieces fit</h1>
+  <p class="lede">
+    khensu.nu has no company servers in the middle. Your devices hold your data; a network of nodes run by people
+    carries it without being able to read it or see who it’s for.
+  </p>
+
+  <table>
+    <thead><tr><th>Part</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>App (<code>nu.khensu.ptah</code>)</td><td>SwiftUI app for iPhone, iPad and Mac on iOS, iPadOS and macOS 26, built only from Apple’s stock Liquid Glass controls. Holds your keys, messages and private on-device AI.</td></tr>
+      <tr><td>Core library</td><td>Rust: the post-quantum MLS suite, credentials, mix network packets and the on-device search index, shared with the app as a Swift framework.</td></tr>
+      <tr><td>Node (<code>nu.khensu.tatenan</code>)</td><td>Runs on a Raspberry Pi 5, a Mac, a laptop or desktop in the background, or an old iPhone. Mixes and forwards traffic, keeps encrypted mailboxes, relays calls and earns for the work.</td></tr>
+      <tr><td>Chain</td><td>A post-quantum ledger for the network’s token and shielded payments, where amounts are hidden and leave no lasting record.</td></tr>
+      <tr><td>Services</td><td>A public key transparency log so anyone can check that a handle’s keys haven’t been swapped, a credential issuer, and a push gateway that wakes phones without learning anything.</td></tr>
+      <tr><td>Shell</td><td>An optional titanium or brass case with a node board inside, which turns your iPhone into part of the network.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Handles</h2>
+  <p>Everyone gets a permanent handle at <code>name.khensu.nu</code>, resolved from the key transparency log over the mix network, so looking someone up reveals nothing.</p>
+
+  <h2>Calls</h2>
+  <p>Messages go through the mix network. Live calls can’t take a mixer’s delays, so they use two relays run by different operators, and the route changes as you talk.</p>
+
+  <h2>Full specifications</h2>
+  <p>The protocol and threat model specifications are published alongside the code, once each component’s design review is finished.</p>
+</Base>

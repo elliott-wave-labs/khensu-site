@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base>
+  <p class="eyebrow">Developer docs</p>
+  <h1>Build on khensu.nu</h1>
+  <p class="lede">
+    khensu.nu is a post-quantum private messenger on a network run by people, and the first app on webE. These docs
+    are for people who want to run part of the network, review the design, or contribute.
+  </p>
+
+  <h2>Principles</h2>
+  <ul>
+    <li><b>Post-quantum everywhere.</b> Every message, call, payment and signature uses NIST’s post-quantum standards, ML-KEM-1024 and ML-DSA-87, inside the IETF’s Messaging Layer Security (MLS).</li>
+    <li><b>Stealth is not optional.</b> Every message travels through a mix network, and every phone sends the same constant rhythm whether or not you’re using it. There is no setting to turn it off.</li>
+    <li><b>Nothing is processed on servers.</b> Search, summaries and answers come from private AI on your own device. There are no AI nodes or servers for your data to leak to, and no iCloud or Siri.</li>
+    <li><b>Run by people.</b> Nodes run on Raspberry Pi 5 boards, Macs, laptops and old phones in people’s homes, paid for the work they can prove they did.</li>
+  </ul>
+
+  <h2>Start here</h2>
+  <ul>
+    <li><a href="/architecture">Architecture</a>: the parts of the system and what each one does.</li>
+    <li><a href="/node">Run a node</a>: hardware, connection and how to join.</li>
+    <li><a href="/repositories">Repositories and licences</a>: where the code lives and when it opens.</li>
+    <li><a href="/security">Security</a>: how to report a vulnerability.</li>
+  </ul>
+</Base>

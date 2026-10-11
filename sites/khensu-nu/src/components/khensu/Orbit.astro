@@ -1,0 +1,88 @@
+---
+// A home node on satellite internet: the Earth's limb, a low-orbit shell of satellites drifting
+// past, and a dish on a house beaming up. Pure SVG with CSS motion.
+const sats = Array.from({ length: 14 }, (_, i) => i);
+---
+
+<svg class="orbit" viewBox="0 0 800 460" role="img" aria-label="A home node with a satellite dish, linked to a satellite passing overhead in low Earth orbit.">
+  <defs>
+    <radialGradient id="earth" cx="50%" cy="0%" r="75%">
+      <stop offset="0" stop-color="#1b2433"></stop>
+      <stop offset="0.6" stop-color="#0d1118"></stop>
+      <stop offset="1" stop-color="#0a0b0d"></stop>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#f2f1ec" stop-opacity="0.9"></stop>
+      <stop offset="1" stop-color="#f2f1ec" stop-opacity="0.05"></stop>
+    </linearGradient>
+  </defs>
+
+  <circle cx="400" cy="1380" r="1000" fill="url(#earth)" stroke="#2b3a52" stroke-width="1.5"></circle>
+  <circle cx="400" cy="1380" r="1006" fill="none" stroke="#5b7aa8" stroke-opacity="0.35" stroke-width="6"></circle>
+  <circle cx="400" cy="1380" r="1140" fill="none" stroke="var(--line-strong)" stroke-dasharray="3 7"></circle>
+
+  <g class="sats">
+    {sats.map((i) => (
+      <g transform={`rotate(${-34 + i * 5.2} 400 1380)`}>
+        <g transform="translate(400 240)">
+          <rect x="-3" y="-3" width="6" height="6" fill="#c9ccd2"></rect>
+          <rect x="-16" y="-1.2" width="10" height="2.4" fill="#6b7079"></rect>
+          <rect x="6" y="-1.2" width="10" height="2.4" fill="#6b7079"></rect>
+        </g>
+      </g>
+    ))}
+  </g>
+
+  <path class="beam" d="M402 368 L404 252" stroke="url(#beam)" stroke-width="2" fill="none"></path>
+  <circle class="ping" cx="404" cy="252" r="8" fill="none" stroke="#f2f1ec"></circle>
+
+  <g transform="translate(372 368)">
+    <path d="M0 22 L28 2 L56 22 V44 H0 Z" fill="#15171b" stroke="#3a3e46"></path>
+    <rect x="22" y="28" width="12" height="16" fill="#0a0b0d" stroke="#3a3e46"></rect>
+    <path d="M24 2 q8 -12 22 -6" fill="none" stroke="#c9ccd2" stroke-width="2"></path>
+    <ellipse cx="32" cy="-2" rx="9" ry="4" transform="rotate(-20 32 -2)" fill="#c9ccd2"></ellipse>
+    <circle class="node" cx="44" cy="36" r="3.2" fill="#f2f1ec"></circle>
+  </g>
+</svg>
+
+<style>
+  .orbit {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .sats {
+    transform-origin: 400px 1380px;
+    animation: drift 60s linear infinite;
+  }
+  @keyframes drift {
+    from { rotate: -6deg; }
+    to { rotate: 6deg; }
+  }
+  .beam {
+    stroke-dasharray: 6 6;
+    animation: flow 1.2s linear infinite;
+  }
+  @keyframes flow {
+    to { stroke-dashoffset: -24; }
+  }
+  .ping {
+    transform-origin: 404px 252px;
+    animation: ping 2s ease-out infinite;
+  }
+  @keyframes ping {
+    from { scale: 0.4; opacity: 0.9; }
+    to { scale: 2.4; opacity: 0; }
+  }
+  .node {
+    animation: blink 2s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% { opacity: 0.25; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sats, .beam, .ping, .node {
+      animation: none;
+    }
+  }
+</style>

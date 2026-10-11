@@ -1,0 +1,156 @@
+---
+// khensu.nu hero: three app screens fan out from one phone as the page scrolls (--e from scenes.ts).
+import AppScreen from './AppScreen.astro';
+import Crescent from './Crescent.astro';
+import Net from './Net.astro';
+
+interface Props {
+  eyebrow?: string;
+  heading?: 'h1' | 'h2';
+  cta?: boolean;
+  links?: { href: string; label: string }[];
+}
+const {
+  eyebrow = 'Flagship 01',
+  heading = 'h1',
+  cta = true,
+  links = [
+    { href: '/khensu', label: 'Explore khensu.nu' },
+    { href: 'https://khensu.nu', label: 'Visit khensu.nu' },
+  ],
+} = Astro.props;
+const H = heading;
+---
+
+<section class="k-hero khensu" data-scene="fan" aria-labelledby="k-hero-title">
+  <div class="sticky">
+    <Net class="hero-net" />
+    <div class="wrap head">
+      <p class="eyebrow">{eyebrow}</p>
+      <div class="mark"><Crescent size="100%" /></div>
+      <H id="k-hero-title" class="title">khensu<span>.nu</span></H>
+      <p class="tag">Private by design. <em>Post-quantum. Run by people.</em></p>
+      {cta && (
+        <div class="btn-row">
+          {links.map((l, i) => <a class:list={['btn', i === 0 && 'primary']} href={l.href}>{l.label}</a>)}
+        </div>
+      )}
+    </div>
+    <div class="fan" aria-hidden="true">
+      <AppScreen screen="chats" class="ph left" />
+      <AppScreen screen="feed" class="ph right" />
+      <AppScreen screen="chat" class="ph mid" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .k-hero {
+    --e: 1;
+    position: relative;
+    height: 210vh;
+    background:
+      radial-gradient(60% 50% at 50% 70%, rgba(242, 241, 236, 0.08), transparent 70%),
+      var(--bg);
+  }
+  .sticky {
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    padding-top: clamp(1.5rem, 5vh, 3.5rem);
+  }
+  .sticky :global(.hero-net) {
+    --net-at: 50% 38%;
+    opacity: calc(1 - var(--e) * 0.45);
+  }
+  .head {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: calc(1 - var(--e) * 0.35);
+    translate: 0 calc(var(--e) * -2vh);
+  }
+  .head .eyebrow {
+    margin-bottom: 1rem;
+  }
+  .mark {
+    width: clamp(2.6rem, 5vw, 3.6rem);
+    aspect-ratio: 1;
+    color: var(--khensu);
+    margin-bottom: 0.6rem;
+  }
+  .title {
+    font-size: clamp(3.4rem, 10vw, 8rem);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+    line-height: 0.95;
+    margin: 0;
+    background: linear-gradient(180deg, #ffffff, #9aa0a9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .title span {
+    font-weight: 300;
+  }
+  .tag {
+    font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+    color: var(--text-dim);
+    margin: 0.8rem 0 0;
+    max-width: none;
+  }
+  .head .btn-row {
+    justify-content: center;
+    margin-top: 1.4rem;
+  }
+  .fan {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: clamp(1.5rem, 4vh, 3rem);
+    --phone-w: clamp(190px, min(21vw, 30vh), 290px);
+  }
+  .fan :global(.ph) {
+    position: absolute;
+    top: 0;
+    transition: none;
+  }
+  .fan :global(.mid) {
+    z-index: 2;
+    translate: 0 calc((1 - var(--e)) * 6vh);
+  }
+  .fan :global(.left),
+  .fan :global(.right) {
+    --spread: calc(0.18 + var(--e) * 0.82);
+    opacity: calc(0.35 + var(--e) * 0.65);
+  }
+  .fan :global(.left) {
+    translate: calc(var(--spread) * -78%) calc(4vh + (1 - var(--e)) * 6vh);
+    rotate: calc(var(--spread) * -7deg);
+    scale: 0.92;
+  }
+  .fan :global(.right) {
+    translate: calc(var(--spread) * 78%) calc(4vh + (1 - var(--e)) * 6vh);
+    rotate: calc(var(--spread) * 7deg);
+    scale: 0.92;
+  }
+  @media (max-width: 640px) {
+    .k-hero {
+      height: 170vh;
+    }
+    .fan {
+      --phone-w: min(52vw, 30vh);
+    }
+  }
+</style>
