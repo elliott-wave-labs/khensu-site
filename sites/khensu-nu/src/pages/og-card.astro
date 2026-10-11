@@ -1,0 +1,76 @@
+---
+// The 1200 x 630 link-preview card. `tools/og.sh` screenshots it to public/og.png.
+import Crescent from '../components/khensu/Crescent.astro';
+import Net from '../components/khensu/Net.astro';
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>khensu.nu</title>
+  </head>
+  <body>
+    <main class="card">
+      <Net class="card-net" nodes={120} />
+      <div class="front">
+        <div class="mark"><Crescent size="100%" /></div>
+        <p class="title">khensu<span>.nu</span></p>
+        <p class="tag">webE, private by design. Post-quantum.</p>
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    background: var(--bg);
+  }
+  .card {
+    position: relative;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(55% 60% at 50% 50%, rgba(242, 241, 236, 0.07), transparent 70%), var(--bg);
+  }
+  .card :global(.card-net) {
+    --net-at: 50% 50%;
+  }
+  .front {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: var(--fg, #f2f1ec);
+  }
+  .mark {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 18px;
+    filter: drop-shadow(0 0 28px rgba(0, 0, 0, 0.9));
+  }
+  .title {
+    margin: 0;
+    font: 600 132px/1 Inter, sans-serif;
+    letter-spacing: -0.045em;
+    text-shadow: 0 0 40px rgba(0, 0, 0, 0.85);
+  }
+  .title span {
+    font-weight: 300;
+    opacity: 0.75;
+  }
+  .tag {
+    margin: 22px 0 0;
+    font: 300 34px/1.2 Inter, sans-serif;
+    opacity: 0.85;
+    text-shadow: 0 0 24px rgba(0, 0, 0, 0.9);
+  }
+</style>
