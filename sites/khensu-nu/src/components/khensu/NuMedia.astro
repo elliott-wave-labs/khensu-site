@@ -15,7 +15,6 @@ const pts = (run: Run, key: string, scale = 1): P[] =>
   run.codecs[key].points.map((p) => ({ k: p.actual_kbps * scale, v: p.vmaf })).sort((a, b) => a.k - b.k);
 
 // Targets and estimates, all scaled from measured curves (see the footnote).
-const NU_TARGET = 0.6; // nu-media design target: 40% fewer bits than hardware HEVC
 const AV2 = 0.7; // AOMedia: about 30% fewer bits than AV1
 const LEARNED = 0.65; // DCVC-RT, from its published gain over H.266
 
@@ -24,7 +23,7 @@ const series = (run: Run) => [
   { name: 'HEVC, iPhone hardware', cls: 'c265', ps: pts(run, 'hevc-hw') },
   { name: 'AV1 software, real time', cls: 'cav1rt', ps: pts(run, 'av1-svt-rt') },
   { name: 'nu-media base layer only', cls: 'cnub', ps: pts(run, 'nu-base') },
-  { name: 'nu-media target', cls: 'cnu', ps: pts(run, 'hevc-hw', NU_TARGET), est: true },
+  ...(run.codecs['nu-sr'] ? [{ name: 'nu-media with Apple super resolution, all on iPhone', cls: 'cnu', ps: pts(run, 'nu-sr') }] : []),
   { name: 'AV2, published estimate', cls: 'cav2', ps: pts(run, 'av1-svt-rt', AV2), est: true },
   { name: 'Learned codec (DCVC-RT), estimate', cls: 'cml', ps: pts(run, 'av1-svt-rt', LEARNED), est: true },
 ];
@@ -67,7 +66,7 @@ const need = [
   { name: 'HEVC', note: 'iPhone hardware', kbps: at(pts(r, 'hevc-hw'), 80), rt: 'Yes, hardware' },
   { name: 'AV2', note: 'Published estimate', kbps: at(pts(r, 'av1-svt-rt', AV2), 80), rt: 'No: no hardware yet', est: true },
   { name: 'Learned codec', note: 'DCVC-RT, estimate', kbps: at(pts(r, 'av1-svt-rt', LEARNED), 80), rt: 'No: datacenter GPU', est: true },
-  { name: 'nu-media target', note: 'With Neural Engine enhancement', kbps: at(pts(r, 'hevc-hw', NU_TARGET), 80), rt: 'Yes, Neural Engine', ours: true, est: true },
+  { name: 'nu-media + super resolution', note: 'Apple’s model on the Neural Engine, measured', kbps: at(pts(r, 'nu-sr'), 80), rt: 'Yes, all on iPhone', ours: true, over: pts(r, 'nu-sr').every((p) => p.v < 80) },
 ].sort((a, b) => b.kbps - a.kbps);
 const needMax = Math.max(...need.map((n) => n.kbps));
 
@@ -326,12 +325,12 @@ const chips = [
             <li class:list={[{ ours: r.ours, est: r.est }]} style={`--w:${(r.kbps / needMax) * 100};--i:${i}`}>
               <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
               <span class="track"><span class="fill" /></span>
-              <span class="value"><b>{r.kbps.toLocaleString('en-US')}</b> <small>kbit/s</small></span>
+              <span class="value">{r.over ? <b>Not reached</b> : <><b>{r.kbps.toLocaleString('en-US')}</b> <small>kbit/s</small></>}</span>
               <span class="rt">{r.rt}</span>
             </li>
           ))}
         </ul>
-        <p class="note">On iPhone Air, Apple’s hardware HEVC matches real-time AV1 software at a fraction of the power, so it carries nu-media’s base layer. The Neural Engine has to beat it by 40% to meet our target.</p>
+        <p class="note">Measured on iPhone Air. Apple’s hardware HEVC matches real-time AV1 software at a fraction of the power, so it carries nu-media’s base layer. Apple’s super resolution runs at 459 fps on the Neural Engine, but adds texture the original doesn’t have, so it scores below a plain upscale and never reaches VMAF 80 up to 1.4 Mbit/s. nu-media’s own trained network replaces it.</p>
       </figure>
 
       <figure class="card wide" data-scene="reveal">
@@ -355,7 +354,7 @@ const chips = [
       typical estimate for 3 s of motion with sound, and the nu-media Live Photo is a design target. Video is measured with VMAF (4K model for 4K) on 6-second clips:
       H.264 and HEVC encoded by the hardware encoder of an iPhone Air (iOS 26.6.1) at live-call settings; AV1 with
       SVT-AV1 at real-time settings on an Apple M1 Pro, because iPhone has no AV1 encoder; nu-media as its half-size base
-      layer without the Neural Engine. The nu-media target (40% fewer bits than hardware HEVC), AV2 (about 30% fewer than
+      layer, and end to end on the iPhone with Apple’s low-latency super resolution on the Neural Engine. AV2 (about 30% fewer than
       AV1, per AOMedia) and DCVC-RT (from its authors’ published gain over H.266; real time only on an NVIDIA A100) are
       scaled from the measured curves, not measured. Neural Engine core counts from Apple.
       <a href="/khensu/codec/results-reel.json">720p results</a> · <a href="/khensu/codec/results-aurora.json">4K results</a>.

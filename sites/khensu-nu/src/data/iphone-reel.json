@@ -142,6 +142,48 @@
           "vmaf": 86.42
         }
       ]
+    },
+    "nu-sr": {
+      "label": "nu-media: HEVC iPhone hardware at half size + Apple low-latency super resolution (Neural Engine), all on iPhone",
+      "device": "iPhone18,4",
+      "os": "Version 26.6.1 (Build 23G83)",
+      "points": [
+        {
+          "target_kbps": 150,
+          "actual_kbps": 107.3,
+          "vmaf": 29.53,
+          "encode_fps_iphone": 386,
+          "sr_fps_iphone": 457
+        },
+        {
+          "target_kbps": 250,
+          "actual_kbps": 177.2,
+          "vmaf": 43.07,
+          "encode_fps_iphone": 384,
+          "sr_fps_iphone": 443
+        },
+        {
+          "target_kbps": 500,
+          "actual_kbps": 352.4,
+          "vmaf": 56.91,
+          "encode_fps_iphone": 384,
+          "sr_fps_iphone": 471
+        },
+        {
+          "target_kbps": 1000,
+          "actual_kbps": 702.5,
+          "vmaf": 66.94,
+          "encode_fps_iphone": 377,
+          "sr_fps_iphone": 456
+        },
+        {
+          "target_kbps": 2000,
+          "actual_kbps": 1401.2,
+          "vmaf": 72.94,
+          "encode_fps_iphone": 368,
+          "sr_fps_iphone": 459
+        }
+      ]
     }
   },
   "device": "iPhone18,4",
