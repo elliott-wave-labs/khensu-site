@@ -704,9 +704,9 @@ Nothing stays private past the switch, patented code included. Every private rep
 - **Licensed.** On opening, code that was private is licensed AGPL-3.0, or Apache-2.0 where it belongs to `khensu-core`, and Elliott Wave LLC grants everyone an irrevocable, worldwide, royalty-free licence under every patent and patent application it holds to make, use, sell and modify any implementation. The grant is signed now, sealed in the escrow, and takes effect at the switch.
 - **Never early.** Publishing a decryption share before the switch fires is `Evidence`, and a share alone opens nothing.
 
-## 13. Shielded payments (outline, frozen in `PAYMENTS.md`)
+## 13. Shielded payments (specified in full in `PAYMENTS.md`, ñü.wallet)
 
-- Notes in fixed denominations (1, 10, 100, 1,000 units); note commitment `Poseidon2(value, owner_pk_hash, rho, era)`.
+- Notes in fixed denominations (1-2-5 series); note commitment `Poseidon2(asset_id, value, owner_pk_hash, rho, era)`.
 - Spend: nullifier `Poseidon2(nk, rho, era)`, new commitments, STARK proof of membership in the era tree and value conservation.
 - Note secrets travel to the recipient as an MLS `payment` content message; spends go to committee ingress through the mixnet (kind 5).
 - Era refresh within the grace period moves notes to the next era; after the era closes its tree and nullifiers are deleted.

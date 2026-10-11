@@ -58,6 +58,26 @@ const privacy = [
   { t: 'Reputation without a bureau', b: 'Creators and borrowers can prove facts, such as campaigns delivered or loans repaid on time, as zero-knowledge credentials, without a public history of everyone they dealt with.' },
 ];
 
+const walletSpec = [
+  { n: 'keys', b: '24-word recovery phrase, Argon2id seed, spend and viewing keys wrapped by the Secure Enclave. Face ID for every spend.' },
+  { n: 'notes', b: 'USDC and the khensu token in 1-2-5 denominations, committed with Poseidon2. Nullifiers only your key can make.' },
+  { n: 'spends', b: 'Always 4 notes in, 4 out, padded to the same size, so 1¢ and $10,000 look identical. Sent through the mixnet.' },
+  { n: 'proof', b: 'A hash-based STARK proves ownership, membership and that value balances. It is also the spend authorisation.' },
+  { n: 'delivery', b: 'Each new note is sealed to the recipient with ML-KEM-1024 and AES-256-GCM, and arrives in your chat.' },
+  { n: 'eras', b: '30-day eras. Old trees and nullifier lists are deleted after a 14-day grace; your wallet refreshes notes on its own.' },
+  { n: 'receipts', b: 'The committee signs each spend within seconds, so tap to pay works at the till.' },
+  { n: 'fees', b: 'Under 1¢ to send or withdraw, nothing to receive, with a protocol ceiling of 1¢. ñü takes no commission.' },
+];
+
+const walletTests = [
+  { t: 'Test vectors', b: 'Keys, notes, trees, ciphertexts and 250 full spends that must pass or fail, each with every intermediate value.' },
+  { t: 'Open reference code', b: 'khensu-wallet in khensu-core, Apache-2.0: prover, verifier and a CLI that checks spends and vectors.' },
+  { t: 'Formal models', b: 'Tamarin for delivery and replay, and a second, independent verifier in Lean 4 that must agree with the first.' },
+  { t: 'Fuzzing and mutation', b: 'Every constraint in the proof is removed in turn, and a search tries to inflate value or steal a note.' },
+  { t: 'A public test network', b: 'Valueless test USDC, so anyone can make, intercept and replay real spends from TestFlight builds.' },
+  { t: 'Bounties and audits', b: 'Safe harbour for good-faith research, bounties highest for soundness and privacy breaks, two audits published in full.' },
+];
+
 const contracts = [
   { n: 'pledge', b: 'Pays only if a threshold of hidden pledges is met by a deadline; refunds otherwise.' },
   { n: 'escrow', b: 'Releases milestone payments when both sides agree, or when an arbiter they chose does.' },
@@ -195,6 +215,57 @@ const feeCap = Math.ceil(BACKERS / 100);
             </li>
           ))}
         </ul>
+      </div>
+    </section>
+
+    <section class="section" id="nufi-wallet-section" aria-labelledby="nufi-wallet-title">
+      <div class="wrap">
+        <div class="nf-head" data-reveal>
+          <p class="eyebrow"><span class="name-case">ñü.wallet</span></p>
+          <h2 id="nufi-wallet-title" class="big">Money that stays private.<br /><em>Post-quantum from the key up.</em></h2>
+          <p class="lede">
+            ñü.wallet holds USDC and the khensu token in a shielded pool. It never touches elliptic curves or RSA:
+            notes are hash commitments, spends are STARK proofs and every secret is sealed with ML-KEM-1024. Only you hold
+            the keys, and nobody can freeze a note.
+          </p>
+        </div>
+        <ul class="nf-contracts" role="list">
+          {walletSpec.map((c, i) => (
+            <li data-reveal style={`--i:${i}`}>
+              <code>{c.n}</code>
+              <span>{c.b}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="nf-fine">
+          Public at the edges only: deposits and withdrawals show an amount and a public account, as the law requires of
+          the bridge and the card partner. Inside the pool, amounts, senders and recipients are hidden.
+        </p>
+      </div>
+    </section>
+
+    <section class="section nf-band" id="nufi-verify-section" aria-labelledby="nufi-verify-title">
+      <div class="wrap">
+        <div class="nf-head" data-reveal>
+          <p class="eyebrow">verification</p>
+          <h2 id="nufi-verify-title" class="big">Check every byte.<br /><em>Then try to break it.</em></h2>
+          <p class="lede">
+            The full specification is public, like the ñü.media codecs: wire formats, the exact proof statement, error
+            codes and registries, so anyone can build a wallet that interoperates or attack the one we ship.
+          </p>
+        </div>
+        <ul class="nf-cards" role="list">
+          {walletTests.map((c, i) => (
+            <li class="nf-glass" data-reveal style={`--i:${i % 3}`}>
+              <b>{c.t}</b>
+              <span>{c.b}</span>
+            </li>
+          ))}
+        </ul>
+        <div class="btn-row nf-close-cta">
+          <a class="btn primary" href="https://dev.khensu.nu/specs/payments">Read the ñü.wallet spec</a>
+          <a class="btn" href="https://dev.khensu.nu/specs/payments#18-verification-and-penetration-testing">Pen-testing programme</a>
+        </div>
       </div>
     </section>
 

@@ -18,6 +18,7 @@ DOCS = {
     "WEBE.md": ("webe", "webË specification"),
     "PROTOCOL.md": ("protocol", "Protocol specification"),
     "THREAT-MODEL.md": ("threat-model", "Threat model"),
+    "PAYMENTS.md": ("payments", "ñü.wallet specification"),
     "design/nu-media.md": ("nu-media", "ñü.media design"),
 }
 
