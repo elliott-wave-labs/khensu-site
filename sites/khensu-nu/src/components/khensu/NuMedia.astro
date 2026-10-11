@@ -170,6 +170,8 @@ const chips = [
 
       <figure class="card">
         <figcaption><b>Progressive</b><span>Preview first, full detail in seconds</span></figcaption>
+        <div class="prog">
+        <span class="timer" aria-hidden="true"></span>
         <svg class="scene" viewBox="0 0 320 180" role="img" aria-label="A photo of the Portara on Naxos at dawn, sharpening as it arrives">
           <defs>
             <linearGradient id="nm-sky" x1="0" y1="0" x2="0" y2="1">
@@ -191,7 +193,8 @@ const chips = [
             <path d="M206 136 h70 M190 146 h40 M240 152 h56" stroke="#ffd9a0" stroke-opacity="0.5" stroke-width="2" />
           </g>
         </svg>
-        <p class="note">1 slot: preview. 20 slots: full screen, in HDR.</p>
+        </div>
+        <p class="note">1 slot: preview. 20 slots, 7 ticks, 14 s: full screen, in HDR.</p>
       </figure>
 
       <figure class="card" data-scene="reveal">
@@ -458,15 +461,39 @@ const chips = [
     border-radius: 14px;
     overflow: hidden;
   }
-  .sharpen {
-    animation: sharpen 6s steps(5, end) infinite;
+  /* One clock drives both: --tick counts 2-second ticks 0 to 7, then holds the sharp photo for a tick. */
+  @property --tick {
+    syntax: '<integer>';
+    inherits: true;
+    initial-value: 7;
   }
-  @keyframes sharpen {
-    0% { filter: blur(9px); }
-    20% { filter: blur(6px); }
-    40% { filter: blur(3.5px); }
-    60% { filter: blur(1.5px); }
-    80%, 100% { filter: blur(0); }
+  .prog {
+    position: relative;
+    animation: tick 16s infinite;
+  }
+  @keyframes tick {
+    0% { --tick: 0; animation-timing-function: steps(7, end); }
+    87.5%, 100% { --tick: 7; }
+  }
+  .sharpen {
+    filter: blur(calc((7 - var(--tick)) * 1.3px));
+    transition: filter 0.4s ease-out;
+  }
+  .timer {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    z-index: 1;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    counter-reset: secs calc(var(--tick) * 2) slot calc(min(20, 1 + var(--tick) * 3));
+  }
+  .timer::after {
+    content: counter(secs) ' s · slot ' counter(slot) ' of 20';
   }
 
   /* Rate-quality chart: lines draw left to right as the card scrolls in. */
@@ -677,7 +704,7 @@ const chips = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sharpen {
+    .prog {
       animation: none;
     }
   }
