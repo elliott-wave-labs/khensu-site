@@ -26,7 +26,14 @@ const H = heading;
   <div class="sticky">
     <Net class="hero-net" />
     <div class="wrap head">
-      <p class="eyebrow">{eyebrow}</p>
+      <p class="eyebrow">
+        {eyebrow.split('webE').map((part, i) => (
+          <>
+            {i > 0 && <span class="name-case">webE</span>}
+            {part}
+          </>
+        ))}
+      </p>
       <div class="mark"><Crescent size="100%" /></div>
       <H id="k-hero-title" class="title">khensu<span>.nu</span></H>
       <p class="tag">webE, private by design. <em>Post-quantum. Run profitably by the people.</em></p>

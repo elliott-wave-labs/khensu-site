@@ -136,6 +136,10 @@ code,
   align-items: center;
   gap: 0.6em;
 }
+/* Names keep their own casing inside uppercase labels: webE, never WEBE. */
+.name-case {
+  text-transform: none;
+}
 .eyebrow::before {
   content: '';
   width: 1.75rem;
