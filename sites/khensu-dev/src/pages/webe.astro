@@ -25,18 +25,18 @@ import Base from '../layouts/Base.astro';
   </table>
   <p>The full documents, in <code>khensu-specs</code>:</p>
   <table>
-    <thead><tr><th>Document</th><th>Covers</th></tr></thead>
+    <thead><tr><th>Document</th><th>Covers</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td><a href="/specs/webe"><code>WEBE.md</code></a></td><td>Names, objects, fetch, publish, sites, feeds, forums, labels, clients</td></tr>
-      <tr><td><a href="/specs/protocol"><code>PROTOCOL.md</code></a></td><td>Wire formats, MLS suite, mix packets, stealth ticks, calls</td></tr>
-      <tr><td><a href="/specs/threat-model"><code>THREAT-MODEL.md</code></a></td><td>Who we defend against and what remains</td></tr>
-      <tr><td><a href="/specs/nu-media"><code>design/nu-media.md</code></a></td><td>Images, video and HDR in minimal wire bits</td></tr>
+      <tr><td><a href="/specs/webe"><code>WEBE.md</code></a></td><td>Names, objects, fetch, publish, sites, feeds, forums, labels, clients</td><td>Draft 0.1</td></tr>
+      <tr><td><a href="/specs/protocol"><code>PROTOCOL.md</code></a></td><td>Wire formats, MLS suite, mix packets, stealth ticks, calls</td><td>Draft</td></tr>
+      <tr><td><a href="/specs/threat-model"><code>THREAT-MODEL.md</code></a></td><td>Who we defend against and what remains</td><td>Draft</td></tr>
+      <tr><td><a href="/specs/nu-media"><code>design/nu-media.md</code></a></td><td>Images, video and HDR in minimal wire bits</td><td>Design</td></tr>
     </tbody>
   </table>
   <p>
-    Every document is public: select its name to read it here.<br />
-    They cover Outfox with ML-KEM-1024, a stealth profile for MOQ, naming from a transparency log, signed
-    content-addressed sites and feeds over MOQ, and two-relay stealth fetch.
+    Five Internet-Drafts are planned from these: Outfox with ML-KEM-1024, a stealth profile for MOQ, naming from a
+    transparency log, signed content-addressed sites and feeds over MOQ, and two-relay stealth fetch. Each document
+    above is public; select its name to read it here.
   </p>
 
   <h2 id="vpn">How webË replaces a VPN</h2>
@@ -57,16 +57,16 @@ import Base from '../layouts/Base.astro';
       <tr><td>Who runs it</td><td>One company, one subscription</td><td>Independent operators paid by the protocol for proven work</td></tr>
     </tbody>
   </table>
-  <h3>Everything on webË</h3>
+  <h3>Today: everything on webË</h3>
   <p>
     Messages, calls, payments, feeds, forums, sites and live streams all travel this way, in the khensu.ñü app and in
     any webË app built on <code>khensu-core</code>. No VPN is needed for any of them, and a VPN would add nothing.
   </p>
-  <h3>webË exit, for the rest of the internet</h3>
+  <h3>Planned: webË exit, for the rest of the internet</h3>
   <ul>
     <li><strong>On the device:</strong> a Network Extension packet tunnel on iPhone, iPad and Mac sends all the device’s traffic into webË, so ordinary apps and websites are covered too. It is part of the khensu.ñü app, with no separate VPN account.</li>
     <li><strong>Two relays:</strong> each connection goes through an entry relay and an exit relay from different operators, the same split as webË fetches. The exit relay opens the connection to the website; HTTPS to the website stays end to end, so the exit sees only the site’s name and traffic size.</li>
-    <li><strong>Stealth stays on:</strong> the tunnel looks like ordinary HTTPS and uses padded trunks and size buckets. Bulk browsing can’t fit inside the 2-second ticks, so timing cover for the open web is weaker than for messages, and the app says so.</li>
+    <li><strong>Stealth stays on:</strong> the tunnel looks like ordinary HTTPS and uses padded trunks and size buckets. Bulk browsing can’t fit inside the 2-second ticks, so timing cover for the open web is weaker than for messages; we will say so in the app.</li>
     <li><strong>Exit operators:</strong> exit duty is opt-in, needs extra stake, and runs only where the operator chooses, because exit relays receive abuse complaints for other people’s traffic, as Tor exits do.</li>
     <li><strong>DNS:</strong> resolved at the exit relay inside the tunnel, never by your internet provider.</li>
     <li><strong>Nothing processed on servers:</strong> relays only forward. There is no filtering, ad blocking or inspection at the exit.</li>
@@ -88,31 +88,20 @@ import Base from '../layouts/Base.astro';
     <li>Sites can’t reach the ordinary web or other names unless their policy lists them, which blocks third-party tracking by construction.</li>
   </ul>
 
-  <h2 id="contracts">Post-quantum web contracts</h2>
+  <h2 id="contracts">Post-quantum web contracts (proposed)</h2>
   <p>
     A webË contract is an agreement between people that enforces itself, without a server and without a public record of
-    who agreed to what. The full design is in <a href="/specs/webe#14-contracts"><code>WEBE.md</code> section 14</a>.
+    who agreed to what. It is a design proposal, open for review in <code>WEBE.md</code> section 14.
   </p>
   <ul>
-    <li><strong>The code:</strong> a small, deterministic WebAssembly program, signed by its author with ML-DSA-87 and addressed by its hash, published like a site. Anyone can read what it does before agreeing.</li>
+    <li><strong>The code:</strong> a small, deterministic WebAssembly program, signed by its author with ML-DSA-87 and addressed by its hash, published like a site. Anyone can read what it will do before agreeing.</li>
     <li><strong>Runs on the parties’ devices:</strong> each step runs on the phones and Macs of the people in the contract, never on nodes. Inputs such as amounts, delivery proofs and messages stay private to the parties.</li>
     <li><strong>Proved, not replayed:</strong> each step produces a STARK proof (hash-based, so post-quantum) that the program ran correctly on the committed state. The chain stores only the proof, a commitment to the new state and any shielded-pool notes, never the inputs.</li>
     <li><strong>Settled privately:</strong> money moves through the shielded pool with ML-KEM-1024 note encryption, and every message between parties goes over the mixnet, so not even the operators can see who has a contract with whom.</li>
     <li><strong>Expires with the era:</strong> contract state follows the pool’s eras, so nothing sits on the chain forever.</li>
   </ul>
-  <h3>Contracts for any work</h3>
-  <p>
-    A contract is general WebAssembly, so it can describe any agreement whose steps can be checked.<br />
-    It can commission work from people or from nodes, and release the reward when the result passes its check.
-  </p>
-  <ul>
-    <li><strong>Work by people:</strong> a translation, a design, a code review or a field report, accepted by the requester, by a reviewer both sides chose, or by an automatic test written into the contract.</li>
-    <li><strong>Work by nodes:</strong> any job in <a href="#network-work">work for the network</a>, such as storing a site, encoding public media or aggregating proofs, with the node’s signed work receipt as the evidence.</li>
-    <li><strong>Any reward:</strong> tokens from the shielded pool, an anonymous credential, a reputation point, access to a group, or nothing at all.</li>
-  </ul>
   <h3>What you can build with contracts</h3>
   <ul>
-    <li><strong>Anonymous ballots:</strong> a club, a co-op or a neighbourhood votes with one credential per member. The contract checks each ballot, counts them and publishes only the result; nobody, including the organiser, can see who voted or how.</li>
     <li><strong>Escrow and milestones:</strong> a client locks payment; each milestone releases when both sides sign, or when an arbiter they chose decides.</li>
     <li><strong>Threshold pledges:</strong> “I’ll pay if 1,000 others do.” Pledges stay hidden and unlinkable until the threshold is met, then settle together, or refund on the deadline.</li>
     <li><strong>Revenue splits:</strong> collaborators on a post, song or film are paid their shares automatically from every payment it earns.</li>
@@ -125,10 +114,10 @@ import Base from '../layouts/Base.astro';
     and nothing for a quantum computer to break later. Contracts that need public state use a forum or feed as their record.
   </p>
 
-  <h2 id="network-work">Work for the network</h2>
+  <h2 id="network-work">Deeper work for the network (proposed)</h2>
   <p>
-    Nodes earn work receipts for more than relaying, and any contract can commission these jobs.<br />
-    Every job touches only ciphertext or data its owner chose to publish. User data is never processed on a server.
+    Nodes earn work receipts for more than relaying. Every job below touches only ciphertext or data its owner chose to
+    publish. User data is still never processed on a server.
   </p>
   <ul>
     <li><strong>Proof aggregation:</strong> nodes with spare CPU fold each block’s spend and contract proofs into one recursive STARK, so phones verify one small proof instead of thousands.</li>
@@ -143,30 +132,20 @@ import Base from '../layouts/Base.astro';
   <p>There are two ways to change khensu.ñü: pull requests for code, and consensus for the network’s rules.</p>
   <h3>Code: pull requests</h3>
   <ul>
-    <li>Send pull requests to any repository. Outside contributors sign a contributor licence agreement once, through a bot on the first pull request.</li>
+    <li>Send pull requests to any repository once it opens. Outside contributors sign a contributor licence agreement once, through a bot on the first pull request.</li>
     <li><code>khensu-core</code> is Apache-2.0; the apps, node, chain, services and sites are AGPL-3.0, so modified versions that others use must publish their changes.</li>
     <li>Cryptography and protocol changes start with a written design, as a pull request to <code>khensu-specs</code>, and need review before any code.</li>
     <li>Node and app builds are reproducible, and every release hash is published to the transparency log, so anyone can check that what runs is what was merged.</li>
   </ul>
   <h3>Network rules: consensus</h3>
   <ul>
-    <li>Rules that every node enforces (fees, eligibility, penalties, cipher suites) change only through the chain’s governance: a change needs 2/3 of the epoch’s 21-member committee and the founder’s signature, until the succession switch below hands the founder’s part to consensus.</li>
+    <li>Rules that every node enforces (fees, eligibility, penalties, cipher suites) change only through the chain’s governance: a proposal needs 2/3 of the epoch’s 21-member committee and the founder’s signature.</li>
     <li>Every rule change waits a 30-day timelock, during which the committee can veto it. Emergency fixes take 48 hours and may only tighten rules, such as disabling a cipher.</li>
     <li>Nobody, including the founder, can use governance to read content, unmask users or make stealth optional.</li>
     <li>Committee seats go by lottery, weighted by node reputation and stake, so running a reliable node is how you get a vote.</li>
   </ul>
-  <h3>No one can stop it</h3>
   <p>
-    khensu.ñü is a gift to Earth and every being.<br />
-    It keeps running if the founder disappears or moves on.
-  </p>
-  <ul>
-    <li><strong>Dead-man’s switch:</strong> the founder signs a check-in on chain every 30 days. After 90 days without one, or the moment the founder signs a handover, the switch fires on its own and every founder power passes to consensus. It is one-way: nothing, including the founder’s own key, can bring a founder role back.</li>
-    <li><strong>Releases by consensus:</strong> from then on, node and app releases are signed by a 14-of-21 threshold key held by each epoch’s committee, and only from reproducible builds that match the archive.</li>
-    <li><strong>The full archive lives on the network:</strong> every repository with its whole history, every spec, every signed release and build recipe, the chain since genesis and the history of every node are stored as erasure-coded objects at <code>archive.khensu.nu</code>. Every epoch header commits to the archive, so anyone can rebuild any release and replay the network from genesis without GitHub, Apple or the founder.</li>
-  </ul>
-  <p>The rules are in <a href="/specs/protocol#125-founder-succession">the protocol, section 12.5</a>.</p>
-  <p>
-    See <a href="/contribute">Contribute</a> and <a href="/repositories">Repositories and licences</a>, or write to <a href="mailto:hello@elliottwave.studio?subject=Building%20on%20web%C3%8B">hello@elliottwave.studio</a>.
+    See <a href="/contribute">Contribute</a> and <a href="/repositories">Repositories and licences</a>, or write to
+    <a href="mailto:hello@elliottwave.studio?subject=Building%20on%20web%C3%8B">hello@elliottwave.studio</a>.
   </p>
 </Base>

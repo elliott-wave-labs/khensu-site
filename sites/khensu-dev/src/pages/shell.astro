@@ -36,11 +36,12 @@ const fmt = (n: number, digits = 0) => n.toLocaleString('en-US', { maximumFracti
       <tr><td>USB-C</td><td>The shell has its own USB-C port in its bottom edge, above the iPhone’s. The iPhone’s port stays open: charge both at once, from two cables or one dual USB-C cable, and keep using the iPhone’s port for drives, displays, audio and CarPlay.</td></tr>
       <tr><td>Attachment</td><td>MagSafe-compatible magnet ring and a 0.5 mm micro-suction urethane layer that is also the shock isolator</td></tr>
       <tr><td>Antennas</td><td>A band in the bottom edge, so nearby nodes reach each other directly where there’s no internet</td></tr>
+      <tr><td>Mesh range</td><td>Without the shield, phones reach each other over Bluetooth and Wi-Fi peer-to-peer: about 30 m indoors, 100 m outdoors. With it, over Wi-Fi HaLow: about 600 m shield to shield on open ground (100 m in a city), and 2 km to a rooftop node in the open (250 m in a city, 500 m in suburbs). Every hop adds the same again.</td></tr>
       <tr><td>Camera</td><td>Clears every lens, flash and sensor, outside each one’s field of view</td></tr>
     </tbody>
   </table>
   <p class="footnote">
-    Figures for iPhone 18 Pro. Battery life and charge time vary with use and settings. iPhone, MagSafe and CarPlay are trademarks of Apple Inc.
+    Figures for iPhone 18 Pro. Mesh ranges are calculated from the link budget: HaLow at +21 dBm and −105 dBm sensitivity (1 MHz, MCS10), a −3 dBi antenna in the shell, a +3 dBi antenna 10 m up on the rooftop node and a 15 dB margin for the body and fading, with the two-ray ground model in the open and Okumura–Hata in towns, in the US 902–928 MHz band. Europe’s lower power limit makes them about a third shorter. Battery life and charge time vary with use and settings. iPhone, MagSafe and CarPlay are trademarks of Apple Inc.
   </p>
 
   <h2>Inside</h2>
