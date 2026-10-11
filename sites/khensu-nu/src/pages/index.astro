@@ -239,10 +239,10 @@ const specs = [
 
     <section class="section net-host" aria-labelledby="webe-title">
       <Net />
-      <div class="wrap split">
-        <div>
-          <p class="eyebrow"><span class="name-case">webE</span></p>
-          <h2 id="webe-title" class="big">A new network, alongside the internet.</h2>
+      <div class="wrap">
+        <p class="eyebrow"><span class="name-case">webE</span></p>
+        <h2 id="webe-title" class="big webe-title">A new network, alongside the internet.</h2>
+        <div class="webe-intro">
           <p class="lede">
             webE runs next to the internet you already use, not instead of it. Its traffic travels as ordinary HTTPS, so
             it works wherever the web does and looks like any website to anyone watching. Inside, every connection is
@@ -259,17 +259,21 @@ const specs = [
             design.
           </p>
         </div>
-        <ul class="webe">
+        <ul class="webe" role="list">
           <li><b>Alongside the internet</b><span>Same connection, same apps. A second network that rides the first.</span></li>
           <li><b>HTTPS outside, post-quantum inside</b><span>Looks like a normal website; sealed with ML-KEM-1024 and ML-DSA-87.</span></li>
           <li><b>Stealth can’t be turned off</b><span>No setting, no faster visible mode. Every message, call and page is hidden.</span></li>
           <li><b>Messages and calls</b><span>Private by default, one to one and in large groups.</span></li>
           <li><b>Feeds and forums</b><span>Follow people and communities without an algorithm owning you.</span></li>
           <li><b>Content</b><span>Videos, photos, reels and music to watch and follow, like YouTube or Instagram, served by the network.</span></li>
-          <li><b>Content</b><span>Videos, photos, reels and music to watch and follow, like YouTube or Instagram, served by the network.</span></li>
           <li><b>Sites</b><span>Publish at your-name.khensu.nu, hosted by the network.</span></li>
           <li><b>Live</b><span>Stream to a room or a crowd, with the route changing as you go.</span></li>
         </ul>
+        <div class="actions webe-links">
+          <a class="btn primary" href="https://dev.khensu.nu/webe">webE specification</a>
+          <a class="btn" href="https://dev.khensu.nu/webe#build">Build an app on webE</a>
+          <a class="btn" href="https://dev.khensu.nu/webe#extend">Extend khensu.nu</a>
+        </div>
       </div>
     </section>
 
@@ -523,35 +527,50 @@ const specs = [
   }
 
   /* Frosted glass: the relay network behind shows through, blurred. */
+  .webe-title {
+    max-width: 22ch;
+  }
+  .webe-intro {
+    display: grid;
+    gap: 0 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    margin-top: 1.25rem;
+  }
   .webe {
     list-style: none;
-    margin: 0;
+    margin: 2.5rem 0 0;
     padding: 0;
     display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  }
+  .webe li {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    min-height: 11rem;
+    padding: 1.75rem 1.6rem;
     background: rgba(255, 255, 255, 0.045);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 22px;
-    overflow: hidden;
     backdrop-filter: blur(22px) saturate(1.6);
     -webkit-backdrop-filter: blur(22px) saturate(1.6);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.12),
-      0 24px 60px rgba(0, 0, 0, 0.35);
-  }
-  .webe li {
-    padding: 1.3rem 1.5rem;
-    display: grid;
-    gap: 0.2rem;
-  }
-  .webe li + li {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+      0 24px 60px rgba(0, 0, 0, 0.3);
   }
   .webe b {
+    font-size: 1.2rem;
     font-weight: 500;
+    line-height: 1.25;
   }
   .webe span {
     color: var(--text-dim);
-    font-size: 0.92rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .webe-links {
+    margin-top: 2rem;
   }
 
   .cta h2 {
