@@ -122,9 +122,10 @@ const styles = [
       </div>
     </section>
 
-    <section class="section relays-sec" data-scene="reveal" aria-labelledby="relays-title">
-      <div class="wrap split">
-        <div>
+    <section class="section relays-sec net-host" data-scene="reveal" aria-labelledby="relays-title">
+      <Net closeup nodes={170} class="behind" label="A close-up of the relay network: messages move along links, vanish and reappear on other links as relays switch." />
+      <div class="wrap">
+        <div class="relays-copy">
           <p class="eyebrow">Built for 10 billion</p>
           <h2 id="relays-title" class="big">Ten billion people a day. <em>And beyond.</em></h2>
           <p class="lede">
@@ -148,7 +149,6 @@ const styles = [
             connections and use, and is measured as the network grows. iPhone is a trademark of Apple Inc.
           </p>
         </div>
-        <Net contained closeup nodes={150} label="A close-up of the relay network: messages move along links, vanish and reappear on other links as relays switch." />
       </div>
     </section>
 
@@ -186,8 +186,9 @@ const styles = [
         <Orbit />
         <div>
           <p class="eyebrow">Runs on any link</p>
-          <h2 id="space-title" class="big">Works from a farmhouse. <em>Or a boat.</em></h2>
+          <h2 id="space-title" class="big">Works from anywhere. <em>Even an ET base.</em></h2>
           <p class="lede">
+            A boat, a castle, a farm estate, the city or the slums, a private lab, a plane, a spaceship or an ET base.
             A node needs a connection and a power socket, nothing more. One on satellite internet, such as Starlink, is
             a full node: it relays, stores and earns like any other. Where there is no internet at all, nodes and shells
             within a kilometre or so reach each other directly and carry messages hop by hop.
@@ -519,5 +520,8 @@ const styles = [
 
   .cta h2 {
     max-width: none;
+  }
+  .relays-copy {
+    max-width: 52rem;
   }
 </style>

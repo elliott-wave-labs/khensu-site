@@ -21,7 +21,12 @@ function update() {
     else p = clamp(-r.top / Math.max(1, r.height - vh));
 
     let e = smooth(p);
-    if (kind === 'explode') e = reduce.matches ? 1 : smooth((p - 0.08) / 0.3) - smooth((p - 0.74) / 0.2);
+    if (kind === 'explode') {
+      // The bare iPhone first, then the layers arrive above it (--a), then they clip on once (--e falls to 0).
+      const a = reduce.matches ? 1 : smooth((p - 0.04) / 0.34);
+      e = reduce.matches ? 1 : 1 - smooth((p - 0.46) / 0.28);
+      el.style.setProperty('--a', a.toFixed(4));
+    }
     el.style.setProperty('--p', p.toFixed(4));
     el.style.setProperty('--e', e.toFixed(4));
   }
