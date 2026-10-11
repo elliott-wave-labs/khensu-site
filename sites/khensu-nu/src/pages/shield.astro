@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Sections from '../components/khensu/Sections.astro';
 import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/shield';
 ---
 
@@ -13,7 +14,7 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
       <h1>One shield.<br />Drawn to scale.</h1>
       <p class="lede">
         A mesh node on the back of the phone: HaLow radio for the neighbourhood mesh, Wi-Fi and Bluetooth to the phone, its
-        own 14 Wh battery, charged over USB-C from a wall charger or power bank. Every drawing here is to scale and
+        own 6.2 Wh battery, charged over USB-C from a wall charger or power bank. Every drawing here is to scale and
         comes from the same parametric CAD that exports STEP and STL for CNC and tooling.
       </p>
       <p class="fits">
@@ -23,6 +24,10 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
       </p>
     </div>
   </section>
+
+  <div class="khensu">
+    <Sections show={['exploded', 'sideview', 'finishes', 'specs']} />
+  </div>
 
   <section class="section explorer">
     <div class="wrap">
@@ -51,14 +56,14 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
                 <h2>suñůlink.shield <small>on the {p.short}</small></h2>
                 <p class="line">
                   {p.id === 'iphone-18-pro'
-                    ? 'The back below the camera plateau, 3 mm above the lens tops, its top edge angled so no camera ever sees it.'
-                    : 'The whole back around the camera island, 3 mm above the lens tops, the camera in a well angled clear of every field of view.'}
+                    ? 'The back below the camera plateau, level with the lens tops, its top edge angled so no camera ever sees it.'
+                    : 'The whole back around the camera island, level with the lens tops, the camera in a well angled clear of every field of view.'}
                 </p>
                 <dl class="stats">
                   <div><dt>{r.wh} Wh</dt><dd>battery, {r.cm3} cm³ of cells</dd></div>
                   <div><dt>{r.t} mm</dt><dd>thick, {r.proud} mm above the lens tops</dd></div>
                   <div><dt>{r.tiG} g</dt><dd>in titanium</dd></div>
-                  <div><dt>about {r.wh.toFixed(0)} h</dt><dd>relaying on its own cells (estimate)</dd></div>
+                  <div><dt>about {r.wh.toFixed(0)} h</dt><dd>relaying on its own cells</dd></div>
                 </dl>
                 <p class="small">
                   Footprint {r.footprint[0]} × {r.footprint[1]} mm. Magnet ring {r.ring} mm. Charges over its USB-C from a wall
@@ -79,8 +84,8 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
       </div>
 
       <p class="small note">
-        From the CAD. Cells at 0.45 Wh/cm³ (thin pouch). Relay time assumes about 1 W for the board and radios, an estimate
-        until the board exists. The build fails if the shield covers a lens, the flash, the depth sensor or the microphone, or
+        From the CAD. Cells at 0.45 Wh/cm³ (thin pouch). Relay time at about 1 W for the board and radios; battery life and
+        charge time vary with use and settings. The build fails if the shield covers a lens, the flash, the depth sensor or the microphone, or
         clips a field of view. iPhone 18 Pro dimensions are measured from Apple’s published model; the makers’ accessory
         drawings take precedence when available.
       </p>
@@ -88,7 +93,7 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
       <div class="btn-row">
         <a class="btn primary" href="/buy">Buy one</a>
         <a class="btn" href="https://dev.khensu.nu/shell">Full specifications</a>
-        <a class="btn" href="/#shell-title">Back to the overview</a>
+        <a class="btn" href="#shell-title">Back to the top</a>
       </div>
     </div>
   </section>
@@ -123,7 +128,7 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
     margin-right: 0.4rem;
     font-size: 0.8rem;
     color: var(--text-faint);
-    text-transform: uppercase;
+    text-transform: lowercase;
     letter-spacing: 0.08em;
   }
   label {

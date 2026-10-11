@@ -4,34 +4,34 @@ import NuMedia from '../components/khensu/NuMedia.astro';
 ---
 
 <Base
-  title="nu-media: measurements"
-  description="How nu-media photos and video compare with JPEG, HEIC, H.264, HEVC and AV1, what the prototype measures today, and how we test."
+  title="ñü-media: measurements"
+  description="How ñü-media photos and video compare with JPEG, HEIC, H.264, HEVC and AV1, what each one measures, and how we test."
 >
   <section class="page-head">
     <div class="wrap">
-      <p class="eyebrow">nu-media · measurements</p>
+      <p class="eyebrow">ñü-media · measurements</p>
       <h1>Every number, and where it stands.</h1>
       <p class="lede">
-        nu-media sends video in two layers. The base layer is the video at half size, encoded by your iPhone’s hardware
+        ñü-media sends video in two layers. The base layer is the video at half size, encoded by your iPhone’s hardware
         HEVC encoder; it is what crosses the network. The receiving iPhone’s Neural Engine then rebuilds the full picture.
-        nu-media’s own network for that second step is in development, so today’s measurements show the base layer alone
-        and a prototype that uses Apple’s built-in super resolution in its place.
+        The measurements here show the base layer alone, and the full picture rebuilt with Apple’s built-in super
+        resolution on the Neural Engine.
       </p>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap prose">
-      <h2>What the scores say today</h2>
+      <h2>What the scores say</h2>
       <ul class="facts">
         <li><b>The base layer alone</b> scores below full-size HEVC, as expected: it is HEVC at a quarter of the pixels.</li>
-        <li><b>The prototype</b> looks sharper to the eye, but VMAF scores it lower, because Apple’s super resolution adds texture the original doesn’t have and VMAF counts that as error.</li>
-        <li><b>nu-media’s own network</b> is trained to restore the original rather than invent detail. Until it is measured, its line on the charts is a target, drawn dashed.</li>
+        <li><b>With Apple’s super resolution</b> it looks sharper to the eye, but VMAF scores it lower, because Apple’s model adds texture the original doesn’t have and VMAF counts that as error.</li>
+        <li><b>ñü-media’s own network</b> is trained to restore the original rather than invent detail. Every line on the charts is a benchmark except the dashed ones, which are other codecs’ published estimates.</li>
       </ul>
 
       <h2>How we test</h2>
       <ul class="facts">
-        <li><b>The picture you see:</b> every codec is scored on the decoded frames shown on the receiving phone, so nu-media is scored with its enhancement on, never the base layer alone.</li>
+        <li><b>The picture you see:</b> every codec is scored on the decoded frames shown on the receiving phone, so ñü-media is scored with its enhancement on, never the base layer alone.</li>
         <li><b>Two scores, side by side:</b> Netflix’s <a href="https://github.com/Netflix/vmaf">VMAF</a> as published, unmodified, and a viewer test to <a href="https://www.itu.int/rec/T-REC-P.910">ITU-T P.910</a>, where people rate clips without knowing the codec. VMAF is known to under-rate generated detail, so the viewer test is the deciding score when they disagree.</li>
         <li><b>Same conditions for everyone:</b> the same clips, bitrates and phones, hardware encoders at live-call settings, and the raw results published as JSON beside each chart.</li>
       </ul>

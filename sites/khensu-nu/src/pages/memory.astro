@@ -1,0 +1,1049 @@
+---
+// Memory (Per-Ankh) and the on-device recommendation design. Sources: khensu-specs PLAN.md (Local search and memory,
+// Public square, webË), WEBE.md 5 and 8, design/stealth-relay.md rule 8, THREAT-MODEL.md L1-L3 and 5.2.
+// Both are patent candidates with applications in preparation (PATENTS.md): this page says what happens and why it is
+// private, never how the engines work inside. Keep it at the level of the existing public wording.
+import Base from '../layouts/Base.astro';
+
+const remembers = [
+  { t: 'Your conversations', b: 'Messages, voice notes, photos and the links people send you, so you can search them and ask about them.' },
+  { t: 'What matters in them', b: 'Plans, dates, decisions, places and the things people asked you, each linked to the message it came from.' },
+  { t: 'Who you talk to', b: 'The people, groups and places that come up, so “what did Ana say about May?” just works.' },
+  { t: 'What you watch and read', b: 'Posts, videos, live streams, forums and places you spend time with, if you switch on your personal feed.' },
+];
+
+const memoryRules = [
+  { t: 'Encrypted on your device', b: 'Kept under AES-256 with a key the Secure Enclave never releases. Unreadable while your phone is locked, and the app opens it only after Face ID.' },
+  { t: 'Never backed up or synced', b: 'Your messages sync between your own devices, end to end. Each device builds its own memory from them, and the memory itself is never backed up, synced or sent anywhere.' },
+  { t: 'Deleted with its source', b: 'Delete a message, or let it disappear, and everything learned from it goes too.' },
+  { t: 'Leave any chat out', b: 'One switch keeps a chat out of your memory. It only controls your own device: anyone who can read a chat can remember it on theirs.' },
+];
+
+const signals = [
+  'Time spent on a post or video',
+  'Replays',
+  'Saves',
+  'Shares into chats',
+  'Skips and “not interested”',
+  'Who you follow',
+  'Live streams you join',
+  'Forums you read and post in',
+  'Places you open on the map',
+];
+
+const knows = [
+  { name: 'Sailing', why: 'You watch most sailing videos to the end' },
+  { name: 'Live jazz', why: 'You joined 4 jazz streams this month' },
+  { name: 'Lisbon', why: 'You saved 6 posts about Lisbon' },
+  { name: 'Climate organising', why: 'You follow 3 climate forums' },
+];
+
+const toggles = [
+  { name: 'Time spent', on: true },
+  { name: 'Replays and saves', on: true },
+  { name: 'Live streams', on: true },
+  { name: 'Places', on: false },
+];
+
+const sees = [
+  { who: 'The first relay', what: 'Knows it’s you connecting. Can’t read what you asked for: the request is sealed for the second relay.' },
+  { who: 'The second relay or cache', what: 'Knows which public post or stream was asked for. Has no idea who asked.' },
+  { who: 'Someone watching your connection', what: 'Sees ordinary-looking HTTPS at a steady rhythm. Replies are padded to standard sizes, so their size gives nothing away.' },
+  { who: 'Us', what: 'Nothing. There is no khensu.ñü server in the path, no account history and no profile to look at.' },
+];
+
+const found = [
+  { t: 'Signed posts', b: 'Every post is signed by the person or persona who made it, so it can be shared, quoted and checked anywhere on the network.' },
+  { t: 'Follows and reposts', b: 'People find creators the way word of mouth always worked: through the people they already follow.' },
+  { t: 'Public counts', b: 'Likes, reposts and views are counted without recording who gave them. Creators see how a post is doing, never who looked.' },
+  { t: 'Topics, forums and live', b: 'Posts tagged to a topic or a forum, and streams going live now, are public, so any device can pick them up and decide if they fit.' },
+  { t: 'Open labels', b: 'Anyone can propose a label, such as opinion, misleading or scam, and the community rates them in the open. Labels inform. They don’t delete.' },
+  { t: 'Search', b: 'Search goes through the same private paths, so looking someone up never tells anyone who was looking.' },
+];
+
+const wellbeing = [
+  { t: 'Chronological, by default', b: 'Newest first from the people and forums you follow. The personal feed is something you choose, not something done to you.' },
+  { t: 'An end to the feed', b: 'Turn off endless scrolling and the feed stops when you’ve caught up, with a clear “you’re all caught up”.' },
+  { t: 'Time limits', b: 'Set a daily limit for the Feed and live streams. When it’s reached, the Feed rests until tomorrow. Chats keep working.' },
+  { t: 'Why am I seeing this', b: 'Every recommended post can show, in plain words, which of your own habits led to it, and you can remove that reason.' },
+];
+---
+
+<Base
+  title="Memory and your private algorithm"
+  description="How khensu.ñü’s memory and your personal feed work entirely on your device: what they learn, how you control them, and how recommendations stay anonymous."
+>
+  <meta slot="head" name="color-scheme" content="dark" />
+
+  <div class="khensu mem">
+    <section class="page-head">
+      <div class="wrap">
+        <p class="eyebrow">memory and your algorithm</p>
+        <h1>Your memory. Your feed.<br /><em>Both live only on your device.</em></h1>
+        <p class="lede">
+          khensu.ñü remembers your conversations so you can search them and ask about them, and it can learn what you
+          like so the Feed shows you the right people, posts, live streams, forums and places. All of it happens on your
+          iPhone, iPad or Mac. Nothing about what you say, watch or care about is ever sent to a server, because there
+          isn’t one to send it to.
+        </p>
+      </div>
+    </section>
+
+    <section class="section diag-sec" aria-labelledby="map-title">
+      <div class="wrap">
+        <p class="eyebrow">the whole picture</p>
+        <h2 id="map-title" class="big">The smart part is on your device.<br /><em>The network only carries sealed, same-size packages.</em></h2>
+
+        <figure class="diag" aria-labelledby="diag-cap">
+          <div class="d-device" role="group" aria-label="Your device: memory, what you like, ranking and Ask khensu, all encrypted and opened only after Face ID">
+            <p class="d-label">your device</p>
+            <ul class="d-tiles" role="list">
+              <li><b>Memory</b><span>Messages, voice notes, photos, plans</span></li>
+              <li><b>What you like</b><span>Watched, saved, followed, joined</span></li>
+              <li><b>Ranking</b><span>Your rules, on-device models</span></li>
+              <li><b>Ask khensu</b><span>Answers with sources</span></li>
+            </ul>
+            <p class="d-lock">
+              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M5 11h14v9H5zM8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+              Encrypted. Opens only after Face ID.
+            </p>
+          </div>
+
+          <div class="d-link" role="group" aria-label="Between your device and the network: same-size sealed requests go out, padded public content comes back, and your memory and taste never leave">
+            <div class="d-lane out">
+              <span class="d-lane-label">Sealed requests, all the same size</span>
+              <span class="d-track" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            </div>
+            <div class="d-lane in">
+              <span class="d-lane-label">Public posts, streams, forums, places, padded to standard sizes</span>
+              <span class="d-track" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            </div>
+            <p class="d-never">
+              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M6 18 18 6" stroke="currentColor" stroke-width="1.6" /></svg>
+              Never sent: your messages, your memory, what you like, your history
+            </p>
+          </div>
+
+          <div class="d-net" role="group" aria-label="The network: two relays from different operators. The first knows who but not what; the second knows what but not who">
+            <p class="d-label">the network</p>
+            <div class="d-relay">
+              <b>First relay</b>
+              <span>Knows who, not what</span>
+            </div>
+            <div class="d-trunk" aria-hidden="true"><span></span></div>
+            <div class="d-relay">
+              <b>Second relay or cache</b>
+              <span>Knows what, not who</span>
+            </div>
+            <p class="d-note">Run by different operators, in different countries.</p>
+          </div>
+
+          <figcaption id="diag-cap">
+            Your memory, what you like and the ranking all stay on your device. To find new things, it asks the network for
+            public content through two relays run by different operators, so neither one learns both who asked and what
+            was asked for.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="memory-title">
+      <div class="wrap">
+        <p class="eyebrow">the memory layer</p>
+        <h2 id="memory-title" class="big">Per-Ankh remembers for you.<br /><em>And for no one else.</em></h2>
+        <p class="lede">
+          In ancient Egypt the Per-Ankh, the House of Life, was where scribes kept the records. khensu.ñü’s memory layer
+          keeps yours on your phone: what you’ve said, heard and shared, searchable and askable, and readable by no one
+          else.
+        </p>
+
+        <h3 class="sub">What it remembers</h3>
+        <ul class="cards" role="list">
+          {remembers.map((r) => (
+            <li class="glass">
+              <b>{r.t}</b>
+              <span>{r.b}</span>
+            </li>
+          ))}
+        </ul>
+
+        <h3 class="sub">Where it lives</h3>
+        <ul class="cards" role="list">
+          {memoryRules.map((r) => (
+            <li class="glass">
+              <b>{r.t}</b>
+              <span>{r.b}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="ask-title">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">ask khensu</p>
+          <h2 id="ask-title" class="big">Ask anything you’ve been told.<br /><em>Every answer shows its sources.</em></h2>
+          <p class="lede">
+            Ask khensu searches your memory by words, by meaning, by the people and places involved, and by time, then
+            answers in a sentence or two with links to the exact messages, voice notes and photos it read. Tap a source to
+            jump to it.
+          </p>
+          <p class="lede">
+            Commands start with a tilde. Type <code>~catch-up</code> in a busy group to get what you
+            missed, or <code>~summarize</code> on a long thread. A slash is always just a slash.
+          </p>
+          <p class="fine">
+            Runs on Apple’s on-device model with the Neural Engine. No Siri, no Private Cloud Compute, no iCloud, no AI
+            servers. Search works on every iPhone with iOS 26; answers and summaries need Apple Intelligence (iPhone 15
+            Pro or later, and iPads and Macs with Apple silicon).
+          </p>
+        </div>
+
+        <figure class="phone-card" aria-label="Illustration: in a group chat, typing ~catch-up gives a short summary of what you missed, with three sources linked to the original messages.">
+          <div class="pc-head" aria-hidden="true"><span class="pc-dot"></span>Lisbon weekend <small>48 unread</small></div>
+          <div class="pc-ask" aria-hidden="true"><code>~catch-up</code></div>
+          <div class="pc-answer" aria-hidden="true">
+            <p><b>Moved to 12–14 June.</b> Ana found a flat in Alfama; Sam wants a vote on the Saturday dinner. You were asked to bring the speaker.</p>
+            <p class="pc-cites"><span>Ana · Tue 14:02</span><span>Sam · poll</span><span>Ana · voice note</span></p>
+          </div>
+          <figcaption>Illustrative.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="algo-title">
+      <div class="wrap">
+        <p class="eyebrow">your algorithm</p>
+        <h2 id="algo-title" class="big">An algorithm that works for you.<br /><em>Because it only ever answers to you.</em></h2>
+        <p class="lede">
+          The Feed starts chronological: newest first, from the people and forums you follow. If you want help finding
+          more, switch on your personal feed. It learns from your own habits, on your device, and ranks what the network
+          has to offer by what you actually care about.
+        </p>
+
+        <div class="split algo-split">
+          <div>
+            <h3 class="sub">What it can learn from</h3>
+            <ul class="chips" role="list">
+              {signals.map((s) => <li>{s}</li>)}
+            </ul>
+            <p class="body">
+              From those habits it works out the kinds of things you like (short clips or long reads, live music or
+              debates), the people and creators you come back to, and the forums, streams and places that hold your
+              attention. Ranking uses on-device models you choose and rules you can write yourself, such as “newest
+              first from close friends” or “no politics on weekdays”.
+            </p>
+            <p class="body">
+              Nobody else’s interests shape your feed, and no advertiser pays to get into it. There are no ads to target,
+              because there is nothing about you to target with.
+            </p>
+          </div>
+
+          <figure class="knows" aria-label="Illustration of the What it knows about me screen: four learned interests, each with the reason it was learned and a remove button; switches for which habits it learns from; and buttons to pause learning or reset everything.">
+            <div class="kn-head" aria-hidden="true">
+              <b>What it knows about me</b>
+              <small>Only on this iPhone</small>
+            </div>
+            <ul class="kn-list" role="list" aria-hidden="true">
+              {knows.map((k) => (
+                <li><span><b>{k.name}</b><small>{k.why}</small></span><i class="kn-x">Remove</i></li>
+              ))}
+            </ul>
+            <p class="kn-sub" aria-hidden="true">Learn from</p>
+            <ul class="kn-toggles" role="list" aria-hidden="true">
+              {toggles.map((t) => (
+                <li><span>{t.name}</span><i class:list={['kn-sw', { on: t.on }]}></i></li>
+              ))}
+            </ul>
+            <div class="kn-btns" aria-hidden="true"><span>Pause learning</span><span class="danger">Reset everything</span></div>
+            <figcaption>Illustrative.</figcaption>
+          </figure>
+        </div>
+
+        <h3 class="sub">You can see it, edit it, and switch it off</h3>
+        <ul class="cards" role="list">
+          <li class="glass"><b>See what it knows</b><span>One screen lists what it has learned about you, each with the plain reason it learned it.</span></li>
+          <li class="glass"><b>Edit it</b><span>Remove an interest, or add one it missed. It changes your feed straight away.</span></li>
+          <li class="glass"><b>Turn signals off</b><span>Stop it learning from any habit, such as how long you watch, or which places you open.</span></li>
+          <li class="glass"><b>Reset or pause</b><span>Wipe everything it learned in one tap, or pause learning and keep the feed as it is.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="anon-title">
+      <div class="wrap">
+        <p class="eyebrow">anonymous discovery</p>
+        <h2 id="anon-title" class="big">Recommendations without a profile.<br /><em>Your taste never leaves your device.</em></h2>
+        <p class="lede">
+          To recommend something, an app needs two things: what’s out there, and what you like. Most apps send what you
+          like to their servers. khensu.ñü does the opposite: your device brings what’s out there home, anonymously, and
+          decides on its own what fits.
+        </p>
+
+        <ol class="steps">
+          <li class="glass">
+            <span class="num">01</span>
+            <h3>Fetch, anonymously</h3>
+            <p>
+              Your device asks the network for public content: new posts from people and topics you follow, what’s
+              trending, streams going live, forums and places. Larger items come through two relays run by different
+              operators. Small ones ride the same steady 2-second rhythm as your messages, through the mix network.
+              Lookups in public directories are private lookups, so the node answering doesn’t learn what was asked.
+            </p>
+          </li>
+          <li class="glass">
+            <span class="num">02</span>
+            <h3>Rank, on your device</h3>
+            <p>
+              Your device scores what came back against what it has learned about you, and against your own rules and
+              filters. This happens offline, in the app, after Face ID.
+            </p>
+          </li>
+          <li class="glass">
+            <span class="num">03</span>
+            <h3>Show, and keep it to yourself</h3>
+            <p>
+              You see your feed. What you then watch, skip or save teaches your device, and only your device. Your
+              watch time, skips and saves are never reported. Likes, reposts and views are counted anonymously, with
+              no link to you.
+            </p>
+          </li>
+        </ol>
+
+        <h3 class="sub">Who sees what</h3>
+        <ul class="sees" role="list">
+          {sees.map((s) => (
+            <li><b>{s.who}</b><span>{s.what}</span></li>
+          ))}
+        </ul>
+        <p class="footnote">
+          An honest limit: someone able to watch a large part of the internet for a long time could still estimate roughly
+          how much you use the network. They can’t see what you read, watch or like.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="creators-title">
+      <div class="wrap">
+        <p class="eyebrow">how creators get found</p>
+        <h2 id="creators-title" class="big">Creators still get found.<br /><em>Nobody gets watched.</em></h2>
+        <p class="lede">
+          Discovery runs on what creators make public, not on what readers do in private. Everything a device needs to
+          find good work is out in the open, signed and checkable.
+        </p>
+        <ul class="cards three" role="list">
+          {found.map((f) => (
+            <li class="glass"><b>{f.t}</b><span>{f.b}</span></li>
+          ))}
+        </ul>
+        <p class="body wide">
+          Moderation works the same way. Each person chooses what they see: their own filters, on-device models, and label
+          lists published by communities, newsrooms or fact-checkers that they subscribe to. Forums can set their own
+          rules, and any reader can switch to the unfiltered view. Nothing is removed from the network for being unpopular
+          or controversial; content that is illegal everywhere, such as child sexual abuse material, is refused by node
+          caches and blocked by the app.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="vs-title">
+      <div class="wrap">
+        <p class="eyebrow">compared with server-side feeds</p>
+        <h2 id="vs-title" class="big">Same goal: show you what you’ll love.<br /><em>Opposite place to do it.</em></h2>
+
+        <figure class="vs" aria-labelledby="vs-cap">
+          <div class="vs-col them" role="group" aria-label="A typical server-side feed, in four steps">
+            <p class="vs-label">A typical server-side feed</p>
+            <ol role="list">
+              <li>What you watch, like and skip is sent to the company</li>
+              <li>A profile of you is built and kept on its servers</li>
+              <li>Your feed is ranked there, for time spent and for ads</li>
+              <li>The profile stays with the company</li>
+            </ol>
+          </div>
+          <div class="vs-col us" role="group" aria-label="khensu.ñü, in four steps">
+            <p class="vs-label">khensu.ñü</p>
+            <ol role="list">
+              <li>Public content is fetched anonymously, through two relays</li>
+              <li>What you like is learned and kept on your device</li>
+              <li>Your feed is ranked there, by your rules</li>
+              <li>You can see it, edit it, or reset it</li>
+            </ol>
+          </div>
+          <figcaption id="vs-cap">
+            Platforms such as TikTok, Instagram and YouTube rank feeds on their own servers using activity they collect.
+            khensu.ñü keeps the learning and the ranking on your device.
+          </figcaption>
+        </figure>
+        <p class="footnote">TikTok, Instagram and YouTube are trademarks of their respective owners. Named only for comparison; no affiliation.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="well-title">
+      <div class="wrap">
+        <p class="eyebrow">wellbeing</p>
+        <h2 id="well-title" class="big">Built to be put down.<br /><em>Nobody earns from your attention.</em></h2>
+        <p class="lede">
+          khensu.ñü is paid for by subscriptions, not ads, so there’s no reason to keep you scrolling. The controls are
+          there to help you stop.
+        </p>
+        <ul class="cards" role="list">
+          {wellbeing.map((w) => (
+            <li class="glass">
+              <b>{w.t}</b>
+              <span>{w.b}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="private-title">
+      <div class="wrap">
+        <p class="eyebrow">what we don’t publish</p>
+        <h2 id="private-title" class="big">What it does is public.<br /><em>How it works inside stays with us.</em></h2>
+        <p class="lede">
+          The memory engine and the private recommendation engine are our own work. This page explains what they do and
+          why it’s private, not how they work inside. The privacy rules themselves are public, and every repository and
+          its licence is listed on <a href="https://dev.khensu.nu/repositories">dev.khensu.nu</a>.
+        </p>
+        <div class="btn-row">
+          <a class="btn" href="/privacy">Privacy</a>
+          <a class="btn" href="https://dev.khensu.nu/webe">webË specification</a>
+          <a class="btn" href="https://dev.khensu.nu/security">Security</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .mem {
+    color-scheme: dark;
+    --violet: #8b7bff;
+    --teal: #4fd1c5;
+    --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02));
+    --glass-line: rgba(255, 255, 255, 0.12);
+  }
+  .mem h1 {
+    font-size: clamp(2.4rem, 5.6vw, 4.6rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    max-width: none;
+  }
+  .big {
+    font-size: clamp(1.8rem, 3.5vw, 3.1rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    max-width: none;
+  }
+  h2[id] {
+    scroll-margin-top: 6rem;
+  }
+  /* section-links.ts puts its button before the <em>; the <em> is a block, so the <br /> isn't needed then. */
+  h2 > br:has(+ :global(.sec-link)) {
+    display: none;
+  }
+  .sub {
+    margin: 3rem 0 1.1rem;
+    font-weight: 500;
+    font-size: 1.25rem;
+  }
+  .body {
+    color: var(--text-dim);
+    font-size: 1.02rem;
+  }
+  .body.wide {
+    max-width: 60rem;
+    margin-top: 2rem;
+  }
+  .fine {
+    color: var(--text-faint);
+    font-size: 0.85rem;
+  }
+  code {
+    padding: 0.1em 0.4em;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  /* Liquid Glass cards */
+  .glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-line);
+    border-radius: 22px;
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 24px 60px rgba(0, 0, 0, 0.28);
+  }
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  }
+  .cards.three {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    margin-top: 2.5rem;
+  }
+  .cards li {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 1.5rem 1.4rem;
+  }
+  .cards b {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .cards span:not(.tag) {
+    color: var(--text-dim);
+    font-size: 0.96rem;
+    line-height: 1.5;
+  }
+
+  .split {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  @media (min-width: 960px) {
+    .split {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    }
+  }
+  .algo-split {
+    align-items: start;
+    margin-top: 1rem;
+  }
+
+  /* Diagram: your device, the link, the network */
+  .diag-sec {
+    background: radial-gradient(70% 60% at 20% 40%, rgba(139, 123, 255, 0.12), transparent 70%);
+  }
+  .diag {
+    margin: 3rem 0 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 0.95fr);
+    gap: 0;
+    align-items: stretch;
+  }
+  .d-label {
+    margin: 0 0 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+  }
+  .d-device {
+    position: relative;
+    padding: 1.6rem;
+    border-radius: 30px;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(160deg, rgba(139, 123, 255, 0.16), rgba(79, 209, 197, 0.05)) padding-box,
+      linear-gradient(#0d0e13, #0d0e13) padding-box,
+      linear-gradient(135deg, rgba(185, 173, 255, 0.7), rgba(79, 209, 197, 0.5)) border-box;
+    box-shadow: 0 0 60px rgba(139, 123, 255, 0.18);
+  }
+  .d-device .d-label {
+    color: #c9c0ff;
+  }
+  .d-tiles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+  }
+  .d-tiles li {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.9rem 1rem;
+    border-radius: 18px;
+    background: rgba(10, 11, 16, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .d-tiles b {
+    font-weight: 500;
+  }
+  .d-tiles span {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+  .d-lock {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 1rem 0 0;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+  .d-link {
+    display: grid;
+    align-content: center;
+    gap: 1.2rem;
+    padding: 1rem clamp(0.8rem, 2vw, 1.6rem);
+  }
+  .d-lane {
+    display: grid;
+    gap: 0.45rem;
+  }
+  .d-lane-label {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.35;
+  }
+  .d-track {
+    position: relative;
+    height: 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .d-track i {
+    position: absolute;
+    top: 2px;
+    left: -24px;
+    width: 18px;
+    height: 6px;
+    border-radius: 2px;
+    background: rgba(242, 241, 236, 0.85);
+    animation: d-move 4s linear infinite;
+    animation-delay: calc(var(--k) * -1s);
+  }
+  .d-track i:nth-child(1) { --k: 0; }
+  .d-track i:nth-child(2) { --k: 1; }
+  .d-track i:nth-child(3) { --k: 2; }
+  .d-track i:nth-child(4) { --k: 3; }
+  .in .d-track i {
+    animation-name: d-back;
+    background: rgba(79, 209, 197, 0.85);
+  }
+  @keyframes d-move {
+    from { left: -24px; }
+    to { left: 100%; }
+  }
+  @keyframes d-back {
+    from { left: 100%; }
+    to { left: -24px; }
+  }
+  .d-never {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    margin: 0.3rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: #c9c0ff;
+  }
+  .d-never svg {
+    flex: none;
+    margin-top: 0.1rem;
+  }
+  .d-net {
+    display: grid;
+    align-content: center;
+    padding: 1.6rem;
+    border-radius: 30px;
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .d-relay {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.85rem 1rem;
+    border-radius: 18px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-line);
+  }
+  .d-relay b {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .d-relay span {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+  }
+  .d-trunk {
+    display: flex;
+    justify-content: center;
+    height: 28px;
+  }
+  .d-trunk span {
+    width: 2px;
+    background: repeating-linear-gradient(180deg, rgba(242, 241, 236, 0.7) 0 4px, transparent 4px 8px);
+    animation: d-trunk 1s linear infinite;
+    background-size: 2px 8px;
+  }
+  @keyframes d-trunk {
+    to { background-position: 0 8px; }
+  }
+  .d-note {
+    margin: 1rem 0 0;
+    font-size: 0.78rem;
+    color: var(--text-faint);
+  }
+  .diag figcaption {
+    grid-column: 1 / -1;
+    margin-top: 1.4rem;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    max-width: 62ch;
+  }
+  @media (max-width: 900px) {
+    .diag {
+      grid-template-columns: 1fr;
+    }
+    .d-link {
+      padding: 1.4rem 0.4rem;
+    }
+  }
+  @media (max-width: 360px) {
+    .d-tiles {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Ask khensu card */
+  .phone-card {
+    margin: 0;
+    display: grid;
+    gap: 0.8rem;
+    padding: 1.3rem;
+    border-radius: 34px;
+    background: radial-gradient(120% 70% at 85% 0%, rgba(139, 123, 255, 0.22), transparent 60%), #000;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 8px #1b1e25, 0 30px 70px rgba(0, 0, 0, 0.55);
+    max-width: 420px;
+    justify-self: center;
+    width: 100%;
+  }
+  .pc-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+  .pc-head small {
+    margin-left: auto;
+    color: var(--text-faint);
+    font-weight: 400;
+    font-size: 0.8rem;
+  }
+  .pc-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--teal));
+  }
+  .pc-ask {
+    justify-self: end;
+    padding: 0.5rem 0.9rem;
+    border-radius: 18px 18px 4px 18px;
+    background: rgba(10, 132, 255, 0.85);
+  }
+  .pc-ask code {
+    background: none;
+    padding: 0;
+  }
+  .pc-answer {
+    padding: 0.9rem 1rem;
+    border-radius: 20px;
+    background: var(--glass-bg);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  .pc-answer p {
+    margin: 0;
+  }
+  .pc-cites {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.7rem !important;
+  }
+  .pc-cites span {
+    padding: 0.1rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .phone-card figcaption,
+  .knows figcaption {
+    font-size: 0.72rem;
+    color: var(--text-faint);
+  }
+
+  /* Signals and the "what it knows" screen */
+  .chips {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .chips li {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.86rem;
+    color: var(--text);
+  }
+  .knows {
+    margin: 0;
+    display: grid;
+    gap: 0.7rem;
+    padding: 1.4rem;
+    border-radius: 30px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-line);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 30px 70px rgba(0, 0, 0, 0.4);
+  }
+  .kn-head {
+    display: grid;
+    gap: 0.1rem;
+  }
+  .kn-head b {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .kn-head small,
+  .kn-sub {
+    color: var(--text-faint);
+    font-size: 0.8rem;
+    margin: 0;
+  }
+  .kn-sub {
+    margin-top: 0.4rem;
+  }
+  .kn-list,
+  .kn-toggles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 18px;
+    background: rgba(10, 11, 16, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .kn-list li,
+  .kn-toggles li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0.95rem;
+  }
+  .kn-list li + li,
+  .kn-toggles li + li {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .kn-list span {
+    display: grid;
+  }
+  .kn-list b {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .kn-list small {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+  }
+  .kn-x {
+    font-style: normal;
+    font-size: 0.78rem;
+    color: #ff6b6b;
+    white-space: nowrap;
+  }
+  .kn-toggles span {
+    font-size: 0.92rem;
+  }
+  .kn-sw {
+    position: relative;
+    flex: none;
+    width: 46px;
+    height: 28px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+  }
+  .kn-sw::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  }
+  .kn-sw.on {
+    background: #30d158;
+  }
+  .kn-sw.on::after {
+    left: 21px;
+  }
+  .kn-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-top: 0.2rem;
+  }
+  .kn-btns span {
+    text-align: center;
+    padding: 0.6rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+  }
+  .kn-btns .danger {
+    color: #ff6b6b;
+  }
+
+  /* Steps and who-sees-what */
+  .steps {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  }
+  .steps li {
+    padding: 1.7rem 1.6rem;
+  }
+  .steps h3 {
+    margin: 0.9rem 0 0.5rem;
+    font-weight: 500;
+  }
+  .steps p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.96rem;
+  }
+  .sees {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    overflow: hidden;
+  }
+  .sees li {
+    display: grid;
+    align-content: start;
+    gap: 0.45rem;
+    padding: 1.5rem;
+    background: var(--bg-raised);
+  }
+  .sees b {
+    font-weight: 500;
+  }
+  .sees span {
+    color: var(--text-dim);
+    font-size: 0.94rem;
+  }
+
+  /* Comparison */
+  .vs {
+    margin: 2.5rem 0 1rem;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  }
+  .vs-col {
+    padding: 1.6rem;
+    border-radius: 26px;
+  }
+  .vs-col.them {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid var(--line-strong);
+  }
+  .vs-col.us {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(160deg, rgba(139, 123, 255, 0.16), rgba(79, 209, 197, 0.05)) padding-box,
+      linear-gradient(#0d0e13, #0d0e13) padding-box,
+      linear-gradient(135deg, rgba(185, 173, 255, 0.7), rgba(79, 209, 197, 0.5)) border-box;
+  }
+  .vs-label {
+    margin: 0 0 1.1rem;
+    font-weight: 600;
+  }
+  .them .vs-label {
+    color: var(--text-dim);
+  }
+  .vs ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+  }
+  .vs li {
+    position: relative;
+    padding: 0.75rem 0 0.75rem 2rem;
+    font-size: 0.96rem;
+    color: var(--text-dim);
+  }
+  .us li {
+    color: var(--text);
+  }
+  .vs li::before {
+    content: '';
+    position: absolute;
+    left: 0.35rem;
+    top: 1.05rem;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+  }
+  .vs li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: calc(0.35rem + 4px);
+    top: calc(1.05rem + 12px);
+    bottom: -0.9rem;
+    width: 1px;
+    background: currentColor;
+    opacity: 0.35;
+  }
+  .vs figcaption {
+    grid-column: 1 / -1;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    max-width: 62ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d-track i,
+    .d-trunk span {
+      animation: none;
+    }
+    .d-track i:nth-child(1) { left: 8%; }
+    .d-track i:nth-child(2) { left: 32%; }
+    .d-track i:nth-child(3) { left: 56%; }
+    .d-track i:nth-child(4) { left: 80%; }
+  }
+</style>

@@ -71,7 +71,7 @@ export const RESULTS: Record<PhoneId, Record<Slim, Result>> = {
 // One product. The other CAD styles stay in hardware/sunu as engineering references only.
 export const SHIELD = 'wrap-xl' as const;
 export const STYLES: { id: StyleId; name: string; line: string }[] = [
-  { id: SHIELD, name: 'suñůlink.shield', line: 'The back of the phone below the camera, 3 mm above the lens tops, its top edge angled clear of every field of view' },
+  { id: SHIELD, name: 'suñůlink.shield', line: 'The back of the phone around the camera, level with the lens tops, its top edge angled clear of every field of view' },
 ];
 
 const C = {

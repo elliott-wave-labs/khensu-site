@@ -1,0 +1,169 @@
+---
+import Base from '../layouts/Base.astro';
+import files from '../data/verify.json';
+
+type File = { file: string; what: string; bytes: number; sha256: string; url?: string };
+const list = files as File[];
+const mb = (b: number) => (b >= 1e6 ? `${(b / 1e6).toFixed(1)} MB` : `${Math.round(b / 1e3)} kB`);
+---
+
+<Base title="How we measure video" description="Why VMAF alone can’t judge ñü-media, the tests we use instead, and how to check every number yourself with public tools.">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow">ñü-media · Measuring quality</p>
+      <h1>VMAF can’t see what ñü-media does.<br /><span class="dim">So every number gets more than one test, and you can rerun them all.</span></h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap prose">
+      <h2>What VMAF is good at</h2>
+      <p>
+        <a href="https://github.com/Netflix/vmaf">VMAF</a> is Netflix’s open quality score. It compares every frame of a
+        video with the original and predicts, from 0 to 100, how viewers would rate it. For ordinary codecs it works
+        well, and we keep publishing it, unmodified, next to everything else. When ñü-media sends less detail than the
+        original, as in its low-data mode, a low VMAF score is real lost detail, not a flaw in the test.
+      </p>
+
+      <h2>Why it isn’t enough for ñü-media</h2>
+      <ul>
+        <li>
+          <b>It only measures sameness.</b> VMAF rewards pixels that match the original. When a host or viewer device
+          rebuilds a picture at 4K, or adds frames to reach 240 fps, the new pixels can’t match a source that never had
+          them, so VMAF counts them as error even when people prefer them.
+        </li>
+        <li>
+          <b>It has nothing to compare against above the source.</b> A 720p, 30 fps original has no 4K or 240 fps
+          version to score against. VMAF can only score the output shrunk back down, which hides exactly what changed.
+        </li>
+        <li>
+          <b>It was trained for television.</b> Its models assume 8-bit SDR, ordinary frame rates and a living-room
+          viewing distance (the 4K model, a large TV up close). It wasn’t trained on neural reconstruction, HDR, frame
+          rates above 60 or a phone held at arm’s length.
+        </li>
+        <li>
+          <b>It averages away failures.</b> A few broken frames disappear into the mean, and dropped frames don’t
+          count at all unless the frames are aligned first.
+        </li>
+        <li>
+          <b>It can be gamed.</b> Sharpening raises VMAF without making video better, which is why Netflix also
+          publishes VMAF NEG, a version that ignores enhancement.
+        </li>
+      </ul>
+
+      <h2>What we use instead</h2>
+      <p>Every clip is scored in five layers. A result counts as “looks the same as the original” only when every gate passes, never on one average.</p>
+      <ol>
+        <li>
+          <b>Fidelity, at the source’s own size and frame rate:</b> VMAF and VMAF NEG, PSNR-Y, MS-SSIM and Netflix’s
+          CAMBI banding score, with the mean, the worst 1% of frames and the worst tile. Large frames are scored in
+          4K tiles, so 8K and larger sources work.
+        </li>
+        <li>
+          <b>Perception across screens and frame rates:</b>
+          <a href="https://github.com/gfxdisp/ColorVideoVDP">ColorVideoVDP</a> from the University of Cambridge, which
+          models the display’s size, distance and brightness, HDR, and frame rate. Its JOD scale reads 10 for
+          identical.
+        </li>
+        <li>
+          <b>Timing:</b> dropped and repeated frames, the longest stall, the frame rate actually shown, and the peak
+          bitrate in any one-second window, not just the average.
+        </li>
+        <li>
+          <b>Enhancement checks</b> for pictures rebuilt on a host or viewer device. The enhanced output, shrunk back
+          to the source’s size and frame rate, must still match the source, so enhancement can add detail but can’t
+          change what was there. Generated detail and frames are marked as generated in the stream’s provenance
+          record.
+        </li>
+        <li>
+          <b>People.</b> Blind viewer tests to <a href="https://www.itu.int/rec/T-REC-P.910">ITU-T P.910</a> (each clip
+          rated alone, with a hidden original) and <a href="https://www.itu.int/rec/R-REC-BT.500">ITU-R BT.500</a>
+          pairwise comparisons, on real iPhones at arm’s length. We publish mean scores with 95% confidence intervals
+          and every raw vote. When people and the metrics disagree, people decide. The charts on this site show the
+          metrics.
+        </li>
+      </ol>
+
+      <h2>Check it yourself</h2>
+      <p>
+        You don’t need any of our code. Every published result lists the device, operating system and date it was
+        measured on. For each clip we publish the exact bits that crossed the network, the decoded or enhanced output,
+        and a SHA-256 hash of each, so you can confirm you have the same files and score them with public tools:
+      </p>
+      <pre><code>shasum -a 256 original.mp4 sent.mp4 shown.mp4
+
+# Fidelity at the source's size: VMAF, VMAF NEG, PSNR, MS-SSIM and banding (ffmpeg built with libvmaf)
+ffmpeg -i shown.mp4 -i original.mp4 -lavfi \
+  "[0:v]scale=720:1280:flags=lanczos,setpts=PTS-STARTPTS[d];[1:v]setpts=PTS-STARTPTS[r];\
+   [d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg':\
+feature=name=psnr|name=float_ms_ssim|name=cambi:log_fmt=json:log_path=scores.json" -f null -
+
+# Perception, including display and frame rate (pip install cvvdp)
+cvvdp --test shown.mp4 --ref original.mp4 --display standard_phone
+
+# Bits on the wire: average and peak bitrate come from the packet sizes
+ffprobe -v error -select_streams v:0 -show_entries packet=pts_time,size -of csv=p=0 sent.mp4</code></pre>
+
+      {list.length > 0 && (
+        <>
+          <h2>Files</h2>
+          <div class="files">
+            <table>
+              <thead><tr><th>File</th><th>What it is</th><th>Size</th><th>SHA-256</th></tr></thead>
+              <tbody>
+                {list.map((f) => (
+                  <tr>
+                    <td>{f.url ? <a href={f.url} download>{f.file}</a> : f.file}</td>
+                    <td>{f.what}</td>
+                    <td>{mb(f.bytes)}</td>
+                    <td><code class="hash">{f.sha256}</code></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      <h2>What stays private</h2>
+      <p>
+        ñü-media’s encoder and enhancement code aren’t published. The tests, the files and the numbers are public, so
+        you can verify every claim without trusting us or seeing the code.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .dim {
+    color: rgba(255, 255, 255, 0.55);
+  }
+  pre {
+    overflow-x: auto;
+    padding: 1rem 1.1rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+  .files {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: 0.55rem 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    vertical-align: top;
+  }
+  .hash {
+    font-size: 0.72rem;
+    word-break: break-all;
+  }
+</style>

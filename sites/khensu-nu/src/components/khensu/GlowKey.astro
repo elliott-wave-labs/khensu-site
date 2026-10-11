@@ -6,7 +6,7 @@ const DIR = '/khensu/codec/glowkey/';
 ---
 
 <figure class="card wide gk" data-scene="reveal">
-  <figcaption><b>Light on black, keyed</b> <span>The black is punched out on the viewer’s device, so only the light lands on the new background. The second version adds glow, soft shadows and moving aurora gradients.</span></figcaption>
+  <figcaption><b>Light on black, keyed</b> <span>The black is punched out on the viewer’s device, so only the light lands on the new background. The second version adds AI effects: glow, soft shadows, moving aurora gradients and lyrics that write themselves in light.</span></figcaption>
   <video class="src fg" muted loop playsinline preload="auto" crossorigin="anonymous" src={`${DIR}iss-aurora.mp4`} aria-hidden="true"></video>
   <video class="src bg" muted loop playsinline preload="auto" crossorigin="anonymous" src={`${DIR}rick.mp4`} aria-hidden="true"></video>
   <div class="grid">
@@ -17,17 +17,38 @@ const DIR = '/khensu/codec/glowkey/';
     </div>
     <div class="side ours">
       <img src={`${DIR}rick.jpg`} alt="" class="poster" />
-      <canvas data-mode="key" aria-label="nu-media: the black keyed out, the aurora over a new background"></canvas>
-      <p class="tag"><b>nu-media</b> <small>Black keyed out, light laid over a new background</small></p>
+      <canvas data-mode="key" aria-label="ñü-media: the black keyed out, the aurora over a new background"></canvas>
+      <p class="tag"><b>ñü-media</b> <small>Black keyed out, light laid over a new background</small></p>
     </div>
     <div class="side ours fx">
       <img src={`${DIR}rick.jpg`} alt="" class="poster" />
-      <canvas data-mode="fx" aria-label="nu-media with effects: glow, soft shadows and moving aurora gradients"></canvas>
+      <canvas data-mode="fx" aria-label="ñü-media with AI effects: glow, soft shadows, moving aurora gradients and the words Never gonna give you up written in light"></canvas>
       <Net closeup nodes={70} class="over" />
-      <p class="tag"><b>nu-media, with effects</b> <small>Glow, soft shadows under the light, aurora gradients and the relay web, all drawn live on this device</small></p>
+      <svg class="lyrics" viewBox="0 0 1600 900" aria-hidden="true">
+        <defs>
+          <linearGradient id="gk-aurora" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1600" y2="0">
+            <stop offset="0" stop-color="#22f59a" />
+            <stop offset="0.3" stop-color="#18e0c8" />
+            <stop offset="0.55" stop-color="#3b9dff" />
+            <stop offset="0.8" stop-color="#8b5cff" />
+            <stop offset="1" stop-color="#ff4fd8" />
+            <animateTransform attributeName="gradientTransform" type="translate" values="-500 0; 500 0; -500 0" dur="9s" repeatCount="indefinite" />
+          </linearGradient>
+          <filter id="gk-glow" x="-20%" y="-60%" width="140%" height="220%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b1" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b2" />
+            <feMerge><feMergeNode in="b1" /><feMergeNode in="b2" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#gk-glow)">
+          <text class="line l1" x="800" y="250">Never gonna give you up</text>
+          <text class="line l2" x="800" y="250">Never gonna let you down</text>
+        </g>
+      </svg>
+      <p class="tag"><b>ñü-media, with AI effects</b> <small>Glow, soft shadows, aurora gradients and lyrics written in light, all drawn live on this device</small></p>
     </div>
   </div>
-  <p class="note">Composited live in your browser with WebGL; nothing is rendered on a server. Light: NASA, ISS Expedition 29 aurora time-lapse, 17 September 2011, public domain. Background: Rick Astley, “Never Gonna Give You Up” (1987), © Sony Music Entertainment, a short silent excerpt used as a meme.</p>
+  <p class="note">Composited live in your browser with WebGL; nothing is rendered on a server. Both clips were filmed at 30 fps and raised to 120 fps with Apple’s on-device frame-rate conversion on a Mac, so they move smoothly on 120 Hz screens. Light: NASA, ISS Expedition 29 aurora time-lapse, 17 September 2011, public domain. Background: Rick Astley, “Never Gonna Give You Up” (1987), © Sony Music Entertainment, a short silent excerpt used as a meme.</p>
 </figure>
 
 <script>
@@ -231,6 +252,52 @@ const DIR = '/khensu/codec/glowkey/';
     opacity: 0.4;
     z-index: 1;
     mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, transparent 25%, #000 90%);
+  }
+  .lyrics {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  .line {
+    font-family: ui-rounded, 'SF Pro Rounded', 'Nunito', system-ui, sans-serif;
+    font-size: 132px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-anchor: middle;
+    fill: url(#gk-aurora);
+    fill-opacity: 0;
+    stroke: url(#gk-aurora);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 2600;
+    stroke-dashoffset: 2600;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: write 9s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  }
+  .l2 {
+    animation-delay: 4.5s;
+  }
+  /* Each line is traced in light, fills like a balloon, holds, then drifts up and fades. */
+  @keyframes write {
+    0% { opacity: 0; stroke-dashoffset: 2600; fill-opacity: 0; transform: translateY(0) scale(0.96); }
+    2% { opacity: 1; }
+    24% { stroke-dashoffset: 0; fill-opacity: 0; transform: scale(0.98); }
+    31% { fill-opacity: 0.85; transform: scale(1.04); }
+    35% { transform: scale(1); }
+    44% { opacity: 1; fill-opacity: 0.85; transform: translateY(0) scale(1); }
+    50% { opacity: 0; fill-opacity: 0.4; transform: translateY(-40px) scale(1.02); stroke-dashoffset: 0; }
+    100% { opacity: 0; stroke-dashoffset: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line { animation: none; }
+    .l1 { opacity: 1; stroke-dashoffset: 0; fill-opacity: 0.85; }
   }
   .tag {
     position: absolute;

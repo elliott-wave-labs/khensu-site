@@ -4,7 +4,7 @@
 // finish, inlay tier and mode (shield alone or on the iPhone). The page picks one with a `shield:finish`
 // event { finish, tier }; see pages/buy.astro.
 const GLB = '/khensu/shell/3d/glb';
-const first = `${GLB}/maroon-standard-shield.glb`;
+const first = `${GLB}/maroon-moldavite-shield.glb`;
 // iPhone 18 Pro colours for the "On iPhone" mode. "Match" follows the shield's finish.
 const phones = [
   { id: 'match', name: 'Match the shield' },
@@ -18,7 +18,7 @@ const phones = [
 <div class="viewer" data-glb={GLB}>
   <ew-viewer
     src={first}
-    alt="suñůlink.shield, a maroon titanium shield for iPhone with the khensu.nu mark inlaid in stone and platinum on the back"
+    alt="suñůlink.shield, a maroon titanium shield for iPhone with the khensu.ñü mark inlaid in stone and platinum on the back"
     ar
     ar-label="View in your space"
     camera-controls
@@ -49,13 +49,13 @@ const phones = [
   type Finish = { finish: string; tier: 'standard' | 'moldavite' };
   const host = document.querySelector<HTMLElement>('.viewer')!;
   const viewer = host.querySelector('ew-viewer')!;
-  const state = { finish: 'maroon', tier: 'standard', mode: 'shield', phone: 'match' };
+  const state = { finish: 'maroon', tier: 'moldavite', mode: 'shield', phone: 'match' };
   const colours = host.querySelector<HTMLElement>('.phone-colours')!;
 
-  // The shield finishes as iPhone colours, for "Match": [hex, metalness, roughness].
+  // The iPhone colour each shield finish ships on, for "Match" (gold goes on Silver): [hex, metalness, roughness].
   const MATCH: Record<string, [string, number, number]> = {
     maroon: ['#5e1a24', 0.6, 0.34],
-    gold: ['#c9a564', 0.85, 0.3],
+    gold: ['#d4d5d7', 0.6, 0.34],
     black: ['#232427', 0.6, 0.34],
     brass: ['#ecd59c', 1, 0.26],
   };

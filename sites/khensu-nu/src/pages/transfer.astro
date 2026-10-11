@@ -7,17 +7,17 @@ import lad4k from '../data/iphone-ladder-nasa4k.json';
 ---
 
 <Base
-  title="Send 4K privately, free — khensu.nu"
+  title="Send 4K privately, free"
   description="Send film and video at native resolution, end to end, without a server holding your files. Compared with Dropbox, IBM Aspera, ProRes and DNxHR."
 >
   <section class="page-head">
     <div class="wrap">
       <p class="eyebrow">Private transfer</p>
-      <h1>Send the picture.<br />Not the bytes.</h1>
+      <h1>Send 4K video and big files privately.<br />No server. No fee per gigabyte.</h1>
       <p class="lede">
-        khensu.nu sends photos, video and files end to end through your own devices and the network’s nodes. No server holds them,
-        nobody sees who sent what to whom, and there is no fee per gigabyte. Video goes in nu-media at the camera’s native resolution,
-        so a 4K master arrives in a fraction of the data.
+        khensu.ñü sends photos, video and files end to end through your own devices and the network’s nodes. No server holds them,
+        nobody sees who sent what to whom, and there is no fee per gigabyte. Video goes in ñü-media at the camera’s native resolution,
+        so a 4K master arrives at a fraction of the size of a ProRes or DNxHR file.
       </p>
     </div>
   </section>
@@ -26,26 +26,29 @@ import lad4k from '../data/iphone-ladder-nasa4k.json';
     <div class="wrap">
       <div class="cards">
         <BigFormats formats={formats as any} ladder={lad4k as any} />
-        <CodecPair run={lad4k as any} dir="ladder-4k" origin="NASA · 3840 × 2160 · 16 Mbit/s" title="See it for yourself"
-          sub="Whole 4K frames, encoded on an iPhone Air. One side is always the original or nu-media." />
+        <CodecPair run={lad4k as any} dir="ladder-4k" origin="NASA · 3840 × 2160 · 16 Mbit/s"
+          srcKbps={16197} srcName="YouTube’s 4K stream" start={4000} title="See it for yourself"
+          sub="Whole 4K frames, encoded on an iPhone Air. One side is always the original or ñü-media." />
       </div>
 
       <div class="prose">
         <h2>How it compares</h2>
+        <div class="table-scroll">
         <table>
-          <thead><tr><th></th><th>khensu.nu</th><th>Dropbox</th><th>IBM Aspera</th></tr></thead>
+          <thead><tr><th></th><th>khensu.ñü</th><th>Dropbox</th><th>IBM Aspera</th></tr></thead>
           <tbody>
             <tr><td>Who can open the file</td><td>Only the people you send it to</td><td>Dropbox holds the keys</td><td>The server operator, unless client-side encryption is set up</td></tr>
             <tr><td>Who sees sender and recipient</td><td>Nobody: it travels through the mix network</td><td>Dropbox</td><td>The server operator</td></tr>
             <tr><td>Where the file waits</td><td>Your own node, or encrypted chunks spread across nodes</td><td>Dropbox’s servers</td><td>Aspera or cloud storage servers</td></tr>
-            <tr><td>Video size</td><td>nu-media at native resolution, or the exact original bytes</td><td>The original bytes</td><td>The original bytes</td></tr>
+            <tr><td>Video size</td><td>ñü-media at native resolution, or the exact original bytes</td><td>The original bytes</td><td>The original bytes</td></tr>
             <tr><td>Cost per gigabyte</td><td>Free</td><td>Plan limits</td><td>Paid</td></tr>
           </tbody>
         </table>
+        </div>
         <p>
-          Sending the exact same bytes is not faster than Aspera on a fast line; Aspera is built for line rate. khensu.nu is faster
-          when the video goes as nu-media instead of the editing master, because there is far less to send. Camera RAW isn’t supported:
-          video travels at native resolution in nu-media, or bit-exact as the original file.
+          Sending the exact same bytes is not faster than Aspera on a fast line; Aspera is built for line rate. khensu.ñü is faster
+          when the video goes as ñü-media instead of the editing master, because there is far less to send. Camera RAW isn’t supported:
+          video travels at native resolution in ñü-media, or bit-exact as the original file.
         </p>
         <p><a href="/media">Every measurement</a> · <a href="https://dev.khensu.nu/nu-media">Technical documentation</a></p>
       </div>
@@ -54,6 +57,10 @@ import lad4k from '../data/iphone-ladder-nasa4k.json';
 </Base>
 
 <style>
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   .cards {
     display: grid;
     gap: 1rem;

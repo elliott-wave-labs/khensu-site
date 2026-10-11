@@ -1,6 +1,5 @@
 ---
-// nu-media charts. Photo figures from khensu-specs design/nu-media.md (nu-media values are design
-// targets). Video figures are measured: data/iphone-*.json is khensu-specs bench/iphone-*.json, with
+// ñü-media charts. Video figures are measured: data/iphone-*.json is khensu-specs bench/iphone-*.json, with
 // H.264 and HEVC encoded on an iPhone Air and AV1 on a Mac (the iPhone has no AV1 encoder).
 // Each card draws from its own --e (scripts/scenes.ts, reveal); without the script they show complete.
 import reel from '../../data/iphone-reel.json';
@@ -13,6 +12,8 @@ import LadderChart from './LadderChart.astro';
 import BigFormats from './BigFormats.astro';
 import GreenScreen from './GreenScreen.astro';
 import GlowKey from './GlowKey.astro';
+import KeySpeed from './KeySpeed.astro';
+import ProReel from './ProReel.astro';
 
 type Point = { actual_kbps: number; vmaf: number };
 type Run = { codecs: Record<string, { points: Point[] }>; grid: { want_kbps: number; codecs: Record<string, Point> } };
@@ -21,7 +22,7 @@ type P = { k: number; v: number };
 const pts = (run: Run, key: string, scale = 1): P[] =>
   run.codecs[key].points.map((p) => ({ k: p.actual_kbps * scale, v: p.vmaf })).sort((a, b) => a.k - b.k);
 
-// Targets and estimates, all scaled from measured curves (see the footnote).
+// Published estimates, scaled from the measured AV1 curve (see the footnote).
 const AV2 = 0.7; // AOMedia: about 30% fewer bits than AV1
 const LEARNED = 0.65; // DCVC-RT, from its published gain over H.266
 
@@ -29,8 +30,8 @@ const series = (run: Run) => [
   { name: 'H.264, iPhone hardware', cls: 'c264', ps: pts(run, 'h264-hw') },
   { name: 'HEVC, iPhone hardware', cls: 'c265', ps: pts(run, 'hevc-hw') },
   { name: 'AV1 software, real time', cls: 'cav1rt', ps: pts(run, 'av1-svt-rt') },
-  { name: 'nu-media base layer only', cls: 'cnub', ps: pts(run, 'nu-base') },
-  ...(run.codecs['nu-sr'] ? [{ name: 'nu-media with Apple super resolution, all on iPhone', cls: 'cnu', ps: pts(run, 'nu-sr') }] : []),
+  { name: 'ñü-media base layer only', cls: 'cnub', ps: pts(run, 'nu-base') },
+  ...(run.codecs['nu-sr'] ? [{ name: 'ñü-media with Apple super resolution, all on iPhone', cls: 'cnu', ps: pts(run, 'nu-sr') }] : []),
   { name: 'AV2, published estimate', cls: 'cav2', ps: pts(run, 'av1-svt-rt', AV2), est: true },
   { name: 'Learned codec (DCVC-RT), estimate', cls: 'cml', ps: pts(run, 'av1-svt-rt', LEARNED), est: true },
 ];
@@ -68,37 +69,24 @@ const at = (ps: P[], target: number) => {
 const r = reel as Run;
 const need = [
   { name: 'H.264', note: 'iPhone hardware', kbps: at(pts(r, 'h264-hw'), 80), rt: 'Yes, hardware' },
-  { name: 'nu-media base layer', note: 'HEVC at half size, no enhancement', kbps: at(pts(r, 'nu-base'), 80), rt: 'Yes, hardware', ours: true },
+  { name: 'ñü-media base layer', note: 'HEVC at half size, no enhancement', kbps: at(pts(r, 'nu-base'), 80), rt: 'Yes, hardware', ours: true },
   { name: 'AV1, real time', note: 'SVT-AV1 on a Mac', kbps: at(pts(r, 'av1-svt-rt'), 80), rt: 'No AV1 encoder on iPhone' },
   { name: 'HEVC', note: 'iPhone hardware', kbps: at(pts(r, 'hevc-hw'), 80), rt: 'Yes, hardware' },
   { name: 'AV2', note: 'Published estimate', kbps: at(pts(r, 'av1-svt-rt', AV2), 80), rt: 'No: no hardware yet', est: true },
   { name: 'Learned codec', note: 'DCVC-RT, estimate', kbps: at(pts(r, 'av1-svt-rt', LEARNED), 80), rt: 'No: datacenter GPU', est: true },
-  { name: 'nu-media + super resolution', note: 'Apple’s model on the Neural Engine, measured', kbps: at(pts(r, 'nu-sr'), 80), rt: 'Yes, all on iPhone', ours: true, over: pts(r, 'nu-sr').every((p) => p.v < 80) },
+  { name: 'ñü-media + super resolution', note: 'Apple’s model on the Neural Engine, measured', kbps: at(pts(r, 'nu-sr'), 80), rt: 'Yes, all on iPhone', ours: true, over: pts(r, 'nu-sr').every((p) => p.v < 80) },
 ].sort((a, b) => b.kbps - a.kbps);
 const needMax = Math.max(...need.map((n) => n.kbps));
 
 const rg = r.grid.codecs;
 const at500 = [
-  { name: 'nu-media', note: 'Base layer only, before the Neural Engine', vmaf: rg['nu-base'].vmaf, ours: true },
+  { name: 'ñü-media', note: 'Base layer only, before the Neural Engine', vmaf: rg['nu-base'].vmaf, ours: true },
   { name: 'H.264', note: 'iPhone hardware', vmaf: rg['h264-hw'].vmaf },
   { name: 'H.265 (HEVC)', note: 'iPhone hardware', vmaf: rg['hevc-hw'].vmaf },
   { name: 'AV1', note: 'Software, on a Mac', vmaf: rg['av1-svt-rt'].vmaf },
 ];
 
 const rate = (k: number) => (k < 1000 ? `${Math.round(k)} kbit/s` : `${(k / 1000).toFixed(1)} Mbit/s`);
-const photo = [
-  { name: 'JPEG', note: 'ImageIO', bits: '5.06 Mbit', size: '618 KB', w: 100 },
-  { name: 'HEIC', note: 'ImageIO, hardware HEVC', bits: '2.53 Mbit', size: '309 KB', w: 50 },
-  { name: 'nu-media', note: 'Neural Engine', bits: '0.33 Mbit', size: '40 KB', w: 6.5, ours: true },
-];
-
-const live = [
-  { name: 'HEIC + HEVC', note: 'Apple’s Live Photo pair', bits: '11.2 Mbit', size: '1.4 MB', w: 100 },
-  { name: 'nu-media Live', note: 'Neural Engine, motion from the still', bits: '1.6 Mbit', size: '200 KB', w: 14, ours: true },
-];
-
-const heicTicks = 52;
-const nuTicks = 7;
 
 const chips = [
   { name: 'A13', cores: 8 },
@@ -116,7 +104,7 @@ const { full = false } = Astro.props as { full?: boolean };
 
 <section class="section numedia" aria-labelledby="numedia-title">
   <div class="wrap">
-    <p class="eyebrow">nu-media</p>
+    <p class="eyebrow">ñü-media</p>
     <h2 id="numedia-title" class="big">Less data. Same picture.</h2>
     <p class="lede">
       Our own image and video codec runs on your iPhone’s Neural Engine. Photos and video take a fraction of the data,
@@ -124,49 +112,6 @@ const { full = false } = Astro.props as { full?: boolean };
     </p>
 
     <div class="charts">
-      <figure class="card wide" data-scene="reveal">
-        <figcaption><b>One full-screen photo</b><span>Size on the wire</span></figcaption>
-        <ul class="bars" role="list">
-          {photo.map((r, i) => (
-            <li class:list={[{ ours: r.ours }]} style={`--w:${r.w};--i:${i}`}>
-              <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
-              <span class="track"><span class="fill" /></span>
-              <span class="value"><b>{r.size}</b> <small>{r.bits}</small></span>
-            </li>
-          ))}
-        </ul>
-        <div class="saves" data-parallax><p class="target">Design targets</p><div class="sv" data-speed="-0.05"><b>15×</b><span>smaller than JPEG</span></div><div class="sv" data-speed="0.04"><b>94%</b><span>less data</span></div><div class="sv" data-speed="0.12"><b>$49</b><span>saved per million views</span></div></div>
-        <figcaption class="sub-cap"><b>One Live Photo</b><span>The still plus 3 seconds of motion and sound</span></figcaption>
-        <ul class="bars" role="list">
-          {live.map((r, i) => (
-            <li class:list={[{ ours: r.ours }]} style={`--w:${r.w};--i:${i + 3}`}>
-              <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
-              <span class="track"><span class="fill" /></span>
-              <span class="value"><b>{r.size}</b> <small>{r.bits}</small></span>
-            </li>
-          ))}
-        </ul>
-        <div class="saves" data-parallax><p class="target">Design targets</p><div class="sv" data-speed="-0.05"><b>7×</b><span>smaller than Apple’s Live Photo pair</span></div><div class="sv" data-speed="0.04"><b>86%</b><span>less data</span></div><div class="sv" data-speed="0.12"><b>$102</b><span>saved per million views</span></div></div>
-        <p class="saves-note">Bandwidth priced at $0.085 per GB, Amazon CloudFront’s US list price for the first 10 TB a month. Against HEIC, a nu-media photo is 7.7× smaller, 87% less, $23 saved per million views.</p>
-      </figure>
-
-      <figure class="card" data-scene="reveal">
-        <figcaption><b>Time to arrive</b><span>Each square is one 2-second stealth tick</span></figcaption>
-        <div class="ticks-row">
-          <span class="label"><b>HEIC</b> <small>309 KB · 104 s</small></span>
-          <div class="ticks" aria-hidden="true">
-            {Array.from({ length: heicTicks }, (_, i) => <i style={`--i:${i}`} />)}
-          </div>
-        </div>
-        <div class="ticks-row ours">
-          <span class="label"><b>nu-media</b> <small>40 KB · 14 s</small></span>
-          <div class="ticks" aria-hidden="true">
-            {Array.from({ length: nuTicks }, (_, i) => <i style={`--i:${i}`} />)}
-          </div>
-        </div>
-        <p class="note">A preview lands in the first tick and sharpens as the rest arrive. A nu-media Live Photo (200 KB) shows its still in 14 s and starts moving at about 70 s, all inside the ticks.</p>
-      </figure>
-
       <figure class="card">
         <figcaption><b>Progressive</b><span>Preview first, full detail in seconds</span></figcaption>
         <div class="prog">
@@ -193,7 +138,7 @@ const { full = false } = Astro.props as { full?: boolean };
           </g>
         </svg>
         </div>
-        <p class="note">1 slot: preview. 20 slots, 7 ticks, 14 s: full screen, in HDR.</p>
+        <p class="note">A preview lands in the first slot and sharpens as the rest arrive.</p>
       </figure>
 
       {full && (<>
@@ -208,11 +153,11 @@ const { full = false } = Astro.props as { full?: boolean };
             </li>
           ))}
         </ul>
-        <p class="note"><a href="https://github.com/Netflix/vmaf">VMAF</a> is Netflix’s open video quality score: it compares each video with the original and predicts how people would rate it, 0 to 100. Above 70 looks good on a phone. nu-media sends a half-size base layer; the receiving iPhone’s Neural Engine restores the rest.</p>
+        <p class="note"><a href="https://github.com/Netflix/vmaf">VMAF</a> is Netflix’s open video quality score: it compares each video with the original and predicts how people would rate it, 0 to 100. Above 70 looks good on a phone. <a href="/quality">Why VMAF alone isn’t enough, and how to check our numbers.</a> ñü-media sends a half-size base layer; the receiving iPhone’s Neural Engine restores the rest.</p>
       </figure>
 
       <figure class="card wide" data-scene="reveal">
-        <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. nu-media in colour, everything else in grey. Solid lines measured, dashed lines are targets and estimates.</span></figcaption>
+        <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. ñü-media in colour, everything else in grey. Solid lines are benchmarks; dashed lines are published estimates, not measured.</span></figcaption>
         <div class="rds">
           {charts.map((c, ci) => (
             <div class="rdw">
@@ -260,28 +205,33 @@ const { full = false } = Astro.props as { full?: boolean };
 
       </>)}
 
+      {full && (<>
+      <ProReel />
+
       <CodecPair run={ladReel as any} dir="ladder-reel" origin="Instagram · 720 × 1280 · 2.44 Mbit/s"
         srcKbps={2437.958} srcName="Instagram’s own file" start={500}
         title="The whole reel, two at a time"
-        sub={`All ${Math.round((ladReel as any).seconds)} seconds, whole frames, encoded on an iPhone Air over USB. Pick a bitrate and a pair; one side is always the original or nu-media.`}>
-        <p class="note">Source: @deemsterhotline on Instagram, used with thanks: H.264, 720 × 1280 at 30 fps, 2.44 Mbit/s. A dropped frame shows as the previous frame held, and is counted in the label. Rebuilt to 4K (2160 × 3840) from the same bits, the reel scores the same as at 720p: VMAF 87 at 1.4 Mbit/s and 59 at 351 kbit/s, no dropped frames. Apple’s scaler doesn’t accept 720 × 1280 frames, so that step is a plain upscale until nu-media’s own network does it. VMAF is Netflix’s 0 to 100 quality score; 93 and up looks the same as the original to most viewers.</p>
+        sub={`All ${Math.round((ladReel as any).seconds)} seconds, whole frames, encoded on an iPhone Air over USB. ñü-media here is its low-data mode, which sends a smaller picture and rebuilds it on the receiving iPhone. Pick a bitrate and a pair; one side is always the original or ñü-media.`}>
+        <p class="note">Source: @deemsterhotline on Instagram, used with thanks: H.264, 720 × 1280 at 30 fps, 2.44 Mbit/s. A dropped frame shows as the previous frame held, and is counted in the label. Rebuilt to 4K (2160 × 3840) from the same bits, the reel scores the same as at 720p: VMAF 87 at 1.4 Mbit/s and 59 at 351 kbit/s, no dropped frames. The iPhone’s low-latency scaler doesn’t accept 720 × 1280 frames, so on the phone that step is a plain upscale; ñü-media Ultra, above, rebuilds 4K on the host’s Mac instead. VMAF is Netflix’s 0 to 100 quality score; 93 and up looks the same as the original to most viewers.</p>
       </CodecPair>
 
       <CodecPair run={lad4k as any} dir="ladder-4k" origin="NASA · 3840 × 2160 · 16 Mbit/s"
         srcKbps={16197} srcName="YouTube’s 4K stream" start={4000}
-        title="4K, two at a time: nu-media rebuilt to 4K"
-        sub="nu-media sends a smaller picture and the receiving iPhone rebuilds it to the full 3840 × 2160. Whole frames, shown at 2560 × 1440; use Zoom 3× to see the detail. Encoded on an iPhone Air over USB; AV1 in software on a Mac, because iPhone has no AV1 encoder.">
-        <p class="note">Stunning Aurora Borealis from Space in Ultra-High Definition (4K), NASA, filmed from the International Space Station; public domain. The source is YouTube’s best stream, VP9 at about 16 Mbit/s. nu-media picks the base size that scores best at each bitrate and rebuilds it on the receiving iPhone’s Neural Engine; Apple’s scaler, which the prototype uses, stops at 1920 × 1080, so the last step to 4K is a plain upscale until nu-media’s own network replaces it.</p>
+        title="4K, two at a time: ñü-media rebuilt to 4K"
+        sub="ñü-media sends a smaller picture and the receiving iPhone rebuilds it to the full 3840 × 2160. Whole frames, shown at 2560 × 1440; use Zoom 3× to see the detail. Encoded on an iPhone Air over USB; AV1 in software on a Mac, because iPhone has no AV1 encoder.">
+        <p class="note">Stunning Aurora Borealis from Space in Ultra-High Definition (4K), NASA, filmed from the International Space Station; public domain. The source is YouTube’s best stream, VP9 at about 16 Mbit/s. ñü-media picks the base size that scores best at each bitrate and rebuilds it on the receiving iPhone’s Neural Engine; Apple’s scaler, measured here, stops at 1920 × 1080, so in these runs the last step to 4K is a plain upscale.</p>
       </CodecPair>
 
       <GreenScreen />
       <GlowKey />
+      <KeySpeed />
+      </>)}
 
       {full && (<>
         <LadderChart run={lad4k as any} title="How low 4K can go, measured" refName="H.265 at 4 Mbit/s"
-          sub="Quality against bitrate on iPhone Air, 32 kbit/s to 4 Mbit/s. nu-media in colour." />
+          sub="Quality against bitrate on iPhone Air, 32 kbit/s to 4 Mbit/s. ñü-media in colour." />
         <LadderChart run={ladReel as any} title="How low 720p can go, measured" refName="H.265 at 2 Mbit/s"
-          sub="The whole Instagram reel on iPhone Air, 64 kbit/s to 2 Mbit/s. nu-media in colour." />
+          sub="The whole Instagram reel on iPhone Air, 64 kbit/s to 2 Mbit/s. ñü-media in colour." />
         <BigFormats formats={formats as any} ladder={lad4k as any} />
       </>)}
 
@@ -298,12 +248,12 @@ const { full = false } = Astro.props as { full?: boolean };
             </li>
           ))}
         </ul>
-        <p class="note">Measured on iPhone Air. Apple’s hardware HEVC matches real-time AV1 software at a fraction of the power, so it carries nu-media’s base layer. Apple’s super resolution runs at 459 fps on the Neural Engine, but adds texture the original doesn’t have, so it scores below a plain upscale and never reaches VMAF 80 up to 1.4 Mbit/s. nu-media’s own trained network replaces it.</p>
+        <p class="note">Measured on iPhone Air. Apple’s hardware HEVC matches real-time AV1 software at a fraction of the power, so it carries ñü-media’s base layer. Apple’s super resolution runs at 459 fps on the Neural Engine, but adds texture the original doesn’t have, so it scores below a plain upscale and never reaches VMAF 80 up to 1.4 Mbit/s. ñü-media’s own network is trained to restore the original instead.</p>
       </figure>
       ) : (
         <a class="card wide more" href="/media">
-          <b>How nu-media video measures today</b>
-          <span>Quality scores against H.264, HEVC and AV1, what the prototype does and doesn’t do yet, and how we test.</span>
+          <b>How ñü-media video measures</b>
+          <span>Quality scores against H.264, HEVC and AV1, what each layer does, and how we test.</span>
           <span class="go">See the measurements →</span>
         </a>
       )}
@@ -324,15 +274,15 @@ const { full = false } = Astro.props as { full?: boolean };
     </div>
 
     <p class="footnote">
-      Photo sizes for one full-screen iPhone 18 Pro image (2622 × 1206). JPEG and HEIC are typical ImageIO results;
-      nu-media photo figures are design targets. Live Photo sizes are at the same screen size: the HEIC + HEVC pair is a
-      typical estimate for 3 s of motion with sound, and the nu-media Live Photo is a design target. Video is measured with VMAF (4K model for 4K) on 6-second clips:
-      H.264 and HEVC encoded by the hardware encoder of an iPhone Air (iOS 26.6.1) at live-call settings; AV1 with
-      SVT-AV1 at real-time settings on an Apple M1 Pro, because iPhone has no AV1 encoder; nu-media as its half-size base
-      layer, and end to end on the iPhone with Apple’s low-latency super resolution on the Neural Engine. AV2 (about 30% fewer than
-      AV1, per AOMedia) and DCVC-RT (from its authors’ published gain over H.266; real time only on an NVIDIA A100) are
-      scaled from the measured curves, not measured. Neural Engine core counts from Apple.
-      <a href="/khensu/codec/results-reel.json">720p results</a> · <a href="/khensu/codec/results-nasa4k.json">4K results</a>.
+      All video figures are benchmarks: <a href="https://github.com/Netflix/vmaf">VMAF</a> (4K model for 4K) on 6-second clips.
+      <a href="https://www.itu.int/rec/T-REC-H.264">H.264</a> and <a href="https://www.itu.int/rec/T-REC-H.265">HEVC</a> from an
+      iPhone Air’s hardware encoder (iOS 26.6.1) at live-call settings; AV1 from <a href="https://gitlab.com/AOMediaCodec/SVT-AV1">SVT-AV1</a>
+      real time on an M1 Pro, as iPhone has no AV1 encoder; ñü-media as its half-size base layer, and end to end on iPhone with Apple’s
+      <a href="https://developer.apple.com/documentation/videotoolbox/vtsuperresolutionscaler">super resolution</a>. Only the dashed
+      lines aren’t measured: <a href="https://aomedia.org/">AV2</a> (about 30% under AV1, per AOMedia) and
+      <a href="https://github.com/microsoft/DCVC">DCVC-RT</a> (its authors’ gain over H.266) are scaled from our AV1 curve.
+      Photo results aren’t shown here. Results: <a href="/khensu/codec/results-reel.json">720p</a>,
+      <a href="/khensu/codec/results-nasa4k.json">4K</a>.
     </p>
   </div>
 </section>
@@ -411,7 +361,7 @@ const { full = false } = Astro.props as { full?: boolean };
     color: transparent;
   }
   .sv span { font-size: 1.05rem; color: rgba(255, 255, 255, 0.72); }
-  .saves .target { grid-column: 1 / -1; margin: 0 0 -0.4rem; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+  .saves .target { grid-column: 1 / -1; margin: 0 0 -0.4rem; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: lowercase; color: rgba(255, 255, 255, 0.5); }
   .more { display: grid; gap: 0.4rem; text-decoration: none; color: inherit; }
   .more b { font-size: 1.2rem; font-weight: 500; }
   .more span { color: var(--text-dim); }

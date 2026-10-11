@@ -1,5 +1,5 @@
 ---
-// A ring code (khensu-specs design/ring-code.md): 408 points on six rings, each point's angular offset and
+// A ñüCode, the ring code of khensu-specs design/ring-code.md: 408 points on six rings, each point's angular offset and
 // brightness set by the bytes it carries, joined to its nearest inner neighbours, with decorative pulses.
 // The bytes here come from a sample address, so the ring is illustrative.
 const RINGS = [48, 56, 64, 72, 80, 88];
@@ -28,6 +28,7 @@ RINGS.forEach((n, ring) => {
 });
 
 const lines: string[] = [];
+const ringLines: string[][] = RINGS.map(() => []);
 const byRing = RINGS.map((_, i) => pts.filter((p) => p.ring === i));
 for (let ring = 1; ring < RINGS.length; ring++) {
   for (const p of byRing[ring]) {
@@ -35,39 +36,58 @@ for (let ring = 1; ring < RINGS.length; ring++) {
       .map((q) => ({ q, d: Math.abs(Math.atan2(Math.sin(q.a - p.a), Math.cos(q.a - p.a))) }))
       .sort((m, n) => m.d - n.d)
       .slice(0, 2);
-    for (const { q } of near) lines.push(`M${p.x.toFixed(1)} ${p.y.toFixed(1)}L${q.x.toFixed(1)} ${q.y.toFixed(1)}`);
+    for (const { q } of near) {
+      const d = `M${p.x.toFixed(1)} ${p.y.toFixed(1)}L${q.x.toFixed(1)} ${q.y.toFixed(1)}`;
+      lines.push(d);
+      ringLines[ring].push(d);
+    }
   }
 }
-const pulses = lines.filter(() => rand() < 0.08).map((d) => ({ d, delay: (rand() * 6).toFixed(2), dur: (1.6 + rand() * 1.6).toFixed(2) }));
+const pulses = ringLines.map((ls) => ls.filter(() => rand() < 0.08).map((d) => ({ d, delay: (rand() * 6).toFixed(2), dur: (1.6 + rand() * 1.6).toFixed(2) })));
+const flecks = Array.from({ length: 22 }, () => ({ x: 8 + rand() * 84, y: 8 + rand() * 84, r: 0.6 + rand() * 1.6, o: 0.25 + rand() * 0.5 }));
+import Crescent from './Crescent.astro';
 const anchors = [-Math.PI / 2 - 0.09, -Math.PI / 2 + 0.09, Math.PI / 2].map((a) => ({ x: C + 205 * Math.cos(a), y: C + 205 * Math.sin(a) }));
 ---
 
-<section class="section ring-sec" aria-labelledby="ring-title">
+<section class="section ring-sec" id="nucode-section" aria-labelledby="nucode-title">
   <div class="wrap ring-grid">
     <figure class="ring-fig">
-      <svg class="ring" viewBox="-20 -20 440 440" role="img" aria-label="A ring code: a circle of 408 points joined by lines, with light pulsing along them.">
-        <path class="ring-lines" d={lines.join('')} />
-        {pulses.map((p) => <path class="ring-pulse" d={p.d} pathLength="1" style={`animation-delay:${p.delay}s;animation-duration:${p.dur}s`} />)}
-        {pts.map((p) => (
-          <circle cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r={p.r} style={`--o:${p.o};animation-delay:-${p.d.toFixed(2)}s`} />
-        ))}
-        {anchors.map((a) => <circle class="ring-anchor" cx={a.x.toFixed(1)} cy={a.y.toFixed(1)} r="5" />)}
-        <circle class="ring-core" cx={C} cy={C} r="34" />
-        <path class="ring-moon" d="M206 184a17 17 0 1 0 0 32a13 13 0 1 1 0-32z" />
-      </svg>
-      <figcaption>Illustrative ring from a sample address.</figcaption>
+      <div class="ring-view" role="img" aria-label="A ñüCode: six rings of 408 points joined by lines, stacked in depth around a lapis seal with the khensu.ñü mark.">
+        <div class="ring-stage">
+          <div class="ring-shadow"></div>
+          {RINGS.map((_, ring) => (
+            <svg class="ring-layer" viewBox="-20 -20 440 440" style={`--z:${ring}`} aria-hidden="true">
+              <path class="ring-lines" d={ringLines[ring].join('')} />
+              {pulses[ring].map((p) => <path class="ring-pulse" d={p.d} pathLength="1" style={`animation-delay:${p.delay}s;animation-duration:${p.dur}s`} />)}
+              {byRing[ring].map((p) => (
+                <circle cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r={p.r} style={`--o:${p.o};animation-delay:-${p.d.toFixed(2)}s`} />
+              ))}
+              {ring === RINGS.length - 1 && anchors.map((a) => <circle class="ring-anchor" cx={a.x.toFixed(1)} cy={a.y.toFixed(1)} r="5" />)}
+            </svg>
+          ))}
+          <div class="ring-seal">
+            <div class="seal-face">
+              <svg class="seal-stone" viewBox="0 0 100 100" aria-hidden="true">
+                {flecks.map((f) => <circle cx={f.x.toFixed(1)} cy={f.y.toFixed(1)} r={f.r.toFixed(2)} style={`opacity:${f.o.toFixed(2)}`} />)}
+              </svg>
+              <Crescent class="seal-mark" size="58%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>Illustrative ñüCode from a sample address.</figcaption>
     </figure>
     <div>
-      <p class="eyebrow">Share your profile</p>
-      <h2 id="ring-title" class="big">No QR codes. <em>A ring that’s only yours.</em></h2>
+      <p class="eyebrow">ñüCode</p>
+      <h2 id="nucode-title" class="big">No QR codes. <em>A ñüCode that’s only yours.</em></h2>
       <p class="lede">
-        Show your ring and a friend’s camera reads it in about two seconds. 408 points, placed by the data they carry,
-        so no two rings are alike.
+        Show your ñüCode and a friend’s camera reads it in about two seconds. 408 points, placed by the data they carry,
+        so no two nuCodes are alike.
       </p>
       <ul class="ring-list" role="list">
-        <li><b>New every time</b><span>Each live ring carries a fresh one-time ML-KEM-1024 key, so a photo of it is useless once it’s used or after five minutes.</span></li>
-        <li><b>In your contact card</b><span>Add your khensu.nu profile to your own card in Contacts, so it travels with NameDrop and contact sharing. Only your public handle, never keys.</span></li>
-        <li><b>In Apple Wallet</b><span>Your ring as a Wallet pass, with no barcode and no web service behind it, so it never phones home.</span></li>
+        <li><b>New every time</b><span>Each live ñüCode carries a fresh one-time ML-KEM-1024 key, so a photo of it is useless once it’s used or after five minutes.</span></li>
+        <li><b>In your contact card</b><span>Add your khensu.ñü profile to your own card in Contacts, so it travels with NameDrop and contact sharing. Only your public handle, never keys.</span></li>
+        <li><b>In Apple Wallet</b><span>Your ñüCode as a Wallet pass, with no barcode and no web service behind it, so it never phones home.</span></li>
       </ul>
     </div>
   </div>
@@ -82,13 +102,107 @@ const anchors = [-Math.PI / 2 - 0.09, -Math.PI / 2 + 0.09, Math.PI / 2].map((a) 
   }
   .ring-fig { margin: 0; }
   .ring-fig figcaption { margin-top: 0.6rem; text-align: center; font-size: 0.75rem; color: var(--muted, rgba(255, 255, 255, 0.5)); }
-  .ring {
-    display: block;
+  .ring-view {
+    position: relative;
     width: 100%;
     max-width: 30rem;
+    aspect-ratio: 1;
     margin: 0 auto;
+    perspective: 1100px;
+    perspective-origin: 50% 30%;
+  }
+  .ring-stage {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--tilt, 54deg)) rotateZ(var(--spin, 0deg));
+    animation: nucode-spin 60s linear infinite;
+    transition: --tilt 0.6s;
+  }
+  .ring-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform: translateZ(calc(var(--z) * 9px));
+  }
+  .ring-layer circle {
+    filter: drop-shadow(0 0 2px rgba(185, 173, 255, 0.8));
+  }
+  .ring-shadow {
+    position: absolute;
+    inset: 12%;
     border-radius: 50%;
-    background: radial-gradient(closest-side, rgba(139, 123, 255, 0.12), transparent 75%);
+    background: radial-gradient(closest-side, rgba(139, 123, 255, 0.28), rgba(139, 123, 255, 0.06) 60%, transparent);
+    transform: translateZ(-18px);
+    filter: blur(6px);
+  }
+  .ring-seal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 21%;
+    aspect-ratio: 1;
+    transform-style: preserve-3d;
+    transform: translate(-50%, -50%) translateZ(70px) rotateZ(calc(var(--spin, 0deg) * -1)) rotateX(calc(var(--tilt, 54deg) * -1));
+    animation: nucode-seal 60s linear infinite;
+  }
+  .seal-face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    overflow: hidden;
+    color: #e9ecf1;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.35), transparent 34%),
+      radial-gradient(circle at 70% 78%, rgba(10, 18, 70, 0.9), transparent 55%),
+      radial-gradient(circle at 40% 45%, #2e57c9, #1a3394 55%, #0d1a5a);
+    box-shadow:
+      inset 0 2px 3px rgba(255, 255, 255, 0.45),
+      inset 0 -6px 12px rgba(0, 0, 0, 0.55),
+      0 0 0 2px #cfd3da,
+      0 0 0 3.5px rgba(40, 44, 54, 0.9),
+      0 18px 40px rgba(0, 0, 0, 0.6),
+      0 0 50px rgba(80, 110, 255, 0.35);
+  }
+  .seal-stone {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .seal-stone circle {
+    fill: #eef2ff;
+  }
+  .seal-face :global(.seal-mark) {
+    position: relative;
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5)) drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.4));
+  }
+  @property --spin {
+    syntax: '<angle>';
+    inherits: true;
+    initial-value: 0deg;
+  }
+  @property --tilt {
+    syntax: '<angle>';
+    inherits: true;
+    initial-value: 54deg;
+  }
+  @keyframes nucode-spin {
+    to { --spin: 360deg; }
+  }
+  @keyframes nucode-seal {
+    to { --spin: 360deg; }
+  }
+  .ring-view:hover {
+    --tilt: 38deg;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ring-stage,
+    .ring-seal { animation: none; }
   }
   .ring-lines { fill: none; stroke: rgba(255, 255, 255, 0.11); stroke-width: 0.6; }
   .ring-pulse {
@@ -101,10 +215,8 @@ const anchors = [-Math.PI / 2 - 0.09, -Math.PI / 2 + 0.09, Math.PI / 2].map((a) 
     opacity: 0;
     animation: ring-pulse 2.4s linear infinite;
   }
-  .ring circle { fill: #fff; opacity: var(--o); animation: ring-twinkle 4s ease-in-out infinite; }
-  .ring .ring-anchor { fill: #fff; opacity: 1; animation: none; }
-  .ring .ring-core { fill: rgba(255, 255, 255, 0.06); stroke: rgba(255, 255, 255, 0.25); opacity: 1; animation: none; }
-  .ring-moon { fill: #fff; }
+  .ring-layer circle { fill: #fff; opacity: var(--o); animation: ring-twinkle 4s ease-in-out infinite; }
+  .ring-layer .ring-anchor { fill: #fff; opacity: 1; animation: none; }
   .ring-list { display: grid; gap: 1rem; margin: 1.6rem 0 0; padding: 0; list-style: none; }
   .ring-list li { display: grid; gap: 0.2rem; }
   .ring-list span { color: var(--muted, rgba(255, 255, 255, 0.65)); }

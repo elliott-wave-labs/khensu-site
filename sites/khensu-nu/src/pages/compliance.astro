@@ -1,0 +1,563 @@
+---
+import Base from '../layouts/Base.astro';
+import RevealText from '../components/khensu/RevealText.astro';
+
+const SPEC = 'https://dev.khensu.nu/specs/compliance';
+
+const stats = [
+  { n: '0', l: 'cookies, analytics or trackers on this site' },
+  { n: '0', l: 'names, phone numbers or emails in the app' },
+  { n: '0', l: 'servers that read or process your data' },
+  { n: '16', l: 'privacy law regimes met, on six continents' },
+];
+
+const inventory = [
+  { data: 'Messages, calls, media, files, payments', where: 'Your devices; sealed packets in transit and in mailboxes', who: 'Only the people in the conversation', kept: 'On your devices until you delete them; mailbox copies expire after delivery or 30 days' },
+  { data: 'Contacts, groups, search index, AI memory', where: 'Your devices only', who: 'You', kept: 'Until you delete them' },
+  { data: 'Handle (name.khensu.nu) and public keys', where: 'Key transparency log', who: 'Anyone, because you chose to publish a handle', kept: 'Until you release the handle' },
+  { data: 'IP address', where: 'The entry node your device connects to, while connected', who: 'That node’s software, in memory only', kept: 'Never logged; gone when the connection closes' },
+  { data: 'Push token', where: 'Sealed inside your wake capability; opened by the push gateway to send a wake', who: 'The gateway, in memory, for up to 20 seconds', kept: 'Never stored' },
+  { data: 'App Attest check', where: 'Sent once to the credential issuer when you join', who: 'The issuer, to check the app is genuine', kept: 'Discarded after the check; only a commitment the issuer can’t link to you remains' },
+  { data: 'Payment amounts and parties', where: 'Shielded notes', who: 'Only sender and recipient', kept: 'Era trees and nullifiers are deleted 30 days after each era closes' },
+  { data: 'Email you send us', where: 'Our mailbox', who: 'Elliott Wave LLC', kept: 'Until your request is handled, or for reservations until your shield ships; deleted sooner on request' },
+  { data: 'Website visits', where: 'Google Cloud’s content delivery network, to serve the page', who: 'Google Cloud, as our processor', kept: 'We keep no logs' },
+];
+
+const laws = [
+  { law: 'GDPR', where: 'European Union and EEA', how: 'Minimisation by design, fixed retention, every right honoured on your device' },
+  { law: 'UK GDPR and Data Protection Act 2018', where: 'United Kingdom', how: 'Met the same way as GDPR' },
+  { law: 'ePrivacy Directive', where: 'European Union', how: 'No cookies or device storage on the sites; the app stores only what you create' },
+  { law: 'Revised Federal Act on Data Protection (nFADP)', where: 'Switzerland', how: 'Met the same way as GDPR' },
+  { law: 'CCPA as amended by CPRA', where: 'California', how: 'No sale or sharing, no cross-context behavioural advertising, no sensitive inferences' },
+  { law: 'Every US state privacy law', where: 'Virginia, Colorado, Connecticut, Utah, Texas, Oregon, Montana, Iowa, Delaware, New Hampshire, New Jersey, Tennessee, Minnesota, Maryland, Indiana, Kentucky, Nebraska, Rhode Island and more', how: 'No targeted advertising, sale or profiling; opt-out signals are moot because nothing is collected' },
+  { law: 'COPPA', where: 'United States', how: 'No personal information collected from anyone, children included' },
+  { law: 'LGPD', where: 'Brazil', how: 'Met the same way as GDPR' },
+  { law: 'PIPEDA and Québec Law 25', where: 'Canada', how: 'Met the same way as GDPR, with no cross-border transfer of personal information' },
+  { law: 'APPI', where: 'Japan', how: 'Met the same way as GDPR' },
+  { law: 'PIPA', where: 'South Korea', how: 'Met the same way as GDPR' },
+  { law: 'Privacy Act 1988 and the Australian Privacy Principles', where: 'Australia', how: 'Met the same way as GDPR' },
+  { law: 'Privacy Act 2020', where: 'New Zealand', how: 'Met the same way as GDPR' },
+  { law: 'DPDP Act 2023', where: 'India', how: 'Met the same way as GDPR' },
+  { law: 'PDPA', where: 'Singapore', how: 'Met the same way as GDPR' },
+  { law: 'POPIA', where: 'South Africa', how: 'Met the same way as GDPR' },
+];
+
+const rights = [
+  { right: 'Access and portability', how: 'Everything is already on your device. Export it from the app in an open format, any time.' },
+  { right: 'Erasure', how: 'Delete a message, a conversation or the whole app; your devices hold the only readable copies. Releasing a handle publishes a revocation, private lookup mirrors drop it within one epoch, and the log keeps only a hash that can’t be read back to the name.' },
+  { right: 'Rectification', how: 'Edit your profile and handle record in the app.' },
+  { right: 'Restriction and objection', how: 'There is no processing to restrict or object to beyond delivering what you send.' },
+  { right: 'Email we hold', how: 'Write to hello@elliottwave.studio. We answer within 30 days, free of charge.' },
+];
+
+const standards = [
+  { std: 'FIPS 203', use: 'ML-KEM-1024 for every key exchange' },
+  { std: 'FIPS 204', use: 'ML-DSA-87 for every signature' },
+  { std: 'FIPS 197 and SP 800-38D', use: 'AES-256-GCM' },
+  { std: 'FIPS 180-4', use: 'SHA-512' },
+  { std: 'NSA CNSA 2.0', use: 'The khensu.ñü suite is the CNSA 2.0 suite, exactly: ML-KEM-1024, ML-DSA-87, AES-256, SHA-384/512' },
+  { std: 'RFC 9420 (MLS)', use: 'Group messaging with MLS_256_MLKEM1024_AES256GCM_SHA512_MLDSA87' },
+  { std: 'EU Cyber Resilience Act', use: 'Coordinated vulnerability disclosure with a 3-day acknowledgement, security updates for each product’s supported life, a software bill of materials for every release, exploited vulnerabilities reported to ENISA within 24 hours' },
+  { std: 'Reproducible builds', use: 'Node, firmware and Raspberry Pi image builds are reproducible; every release hash is in the transparency log and the network archive' },
+];
+
+const shield = [
+  { area: 'Radio, US and Canada', std: 'FCC Part 15 (15.247 for Wi-Fi HaLow at 902–928 MHz; 15.247 and 15.407 for Wi-Fi and Bluetooth), ISED RSS-247' },
+  { area: 'Radio, EU and UK', std: 'Radio Equipment Directive 2014/53/EU (CE) and Radio Equipment Regulations 2017 (UKCA), with the RED cybersecurity requirements (EN 18031-1)' },
+  { area: 'Product safety', std: 'IEC 62368-1' },
+  { area: 'Battery', std: 'IEC 62133-2, UN 38.3, EU Battery Regulation 2023/1542' },
+  { area: 'Wireless charging', std: 'Qi2 certification (Wireless Power Consortium)' },
+  { area: 'Materials', std: 'RoHS, REACH, California Proposition 65' },
+  { area: 'Recycling', std: 'WEEE take-back' },
+  { area: 'Security', std: 'EU Cyber Resilience Act requirements; open firmware with post-quantum secure boot' },
+];
+---
+
+<Base
+  title="Compliance"
+  description="khensu.ñü meets GDPR, CCPA and every major privacy law the strongest way there is: by not having your data. Data inventory, your rights, CNSA 2.0, accessibility, export and suñůlink.shield certifications."
+>
+  <div class="khensu">
+    <section class="page-head">
+      <div class="wrap">
+        <p class="eyebrow">compliance</p>
+        <h1>Compliant by having nothing to give.<br /><span class="dim">Your data never leaves your devices readable.</span></h1>
+        <p class="lede">
+          Messages, calls, payments, files, contacts and search stay on your devices, end-to-end encrypted with
+          post-quantum cryptography. Nothing is processed on a server. Here is every place personal data could exist,
+          every law that applies, and how each one is met.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href={SPEC}>Read the full document</a>
+          <a class="btn" href="/privacy">Privacy at a glance</a>
+        </div>
+      </div>
+      <div class="wrap">
+        <ul class="stats" role="list">
+          {stats.map((s, i) => (
+            <li style={`--i:${i}`}><b>{s.n}</b><span>{s.l}</span></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section band">
+      <div class="wrap">
+        <RevealText
+          parts={[
+            ['Most companies comply by promising to protect what they collect. '],
+            ['khensu.ñü collects nothing to protect.', true],
+            [' There is no field in the protocol for a name, a phone number, an email address, a location or a contact list. '],
+            ['Data that doesn’t exist can’t be breached, sold, subpoenaed or misused.', true],
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="section" id="compliance-inventory">
+      <div class="wrap">
+        <p class="eyebrow">data inventory</p>
+        <h2>Everything we could touch.<br /><span class="dim">And what happens to it.</span></h2>
+        <p class="intro">
+          The complete list, for the app, the network and the sites. There is no advertising, no profiling, no data sale
+          or sharing, and no data broker relationship of any kind.
+        </p>
+        <div class="table" tabindex="0">
+          <table>
+            <thead><tr><th scope="col">Data</th><th scope="col">Where it exists</th><th scope="col">Who can read it</th><th scope="col">Kept</th></tr></thead>
+            <tbody>
+              {inventory.map((r) => (
+                <tr><th scope="row">{r.data}</th><td>{r.where}</td><td>{r.who}</td><td>{r.kept}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-privacy">
+      <div class="wrap">
+        <p class="eyebrow">privacy laws</p>
+        <h2>Every major privacy law.<br /><span class="dim">Met by design, not by policy.</span></h2>
+        <p class="intro">
+          Data minimisation, purpose limitation and storage limitation are the architecture. Every server-side item is
+          transient or deleted on a fixed schedule. No processing relies on consent, none involves special category data,
+          and there is no automated decision-making or profiling.
+        </p>
+        <ul class="laws" role="list">
+          {laws.map((l) => (
+            <li class="glass"><b>{l.law}</b><span class="where">{l.where}</span><span class="how">{l.how}</span></li>
+          ))}
+        </ul>
+        <p class="footnote">
+          Data protection by design and by default is the architecture: stealth and end-to-end encryption can’t be turned
+          off. A data protection impact assessment covers the app, the network, the credential issuer and the push gateway,
+          and is published with the specifications. Breaches of the little we hold are reported to the supervisory authority
+          within 72 hours, and to the people affected without undue delay.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-rights">
+      <div class="wrap">
+        <p class="eyebrow">your rights</p>
+        <h2>Your rights, in your hands.<br /><span class="dim">Literally: the data is on your phone.</span></h2>
+        <dl class="rights">
+          {rights.map((r) => (
+            <div class="glass"><dt>{r.right}</dt><dd>{r.how}</dd></div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-no-sale">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">no sale, no sharing, no profiling</p>
+          <h2>Nothing to sell.<br /><span class="dim">Nobody to sell it to.</span></h2>
+        </div>
+        <ul class="checks" role="list">
+          <li><b>No accounts with names, numbers or emails.</b> You are a key on your device, not a row in a database.</li>
+          <li><b>No advertising and no profiling.</b> No cross-context behavioural advertising, no inferences, no data brokers.</li>
+          <li><b>No readable transfers.</b> Content never leaves your devices readable, so nothing readable crosses a border. Packets cross the internet sealed.</li>
+          <li><b>Children.</b> khensu.ñü is for people 13 and older, or the age of digital consent where it’s higher. It collects no personal information from anyone, so it collects none from children.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-lawful-access">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">lawful access</p>
+          <h2>We can’t decrypt.<br /><span class="dim">There is no key, mode or update that could.</span></h2>
+        </div>
+        <div class="prose">
+          <p>
+            We answer valid legal process with what we hold, which is the inventory above. A breach of any node, mailbox,
+            the credential issuer or the push gateway exposes sealed packets and nothing readable. Every request we receive
+            is counted in our transparency report.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-safety">
+      <div class="wrap">
+        <p class="eyebrow">digital services act · online safety act</p>
+        <h2>Public spaces, moderated.<br /><span class="dim">Private messages, never scanned.</span></h2>
+        <div class="grid">
+          <article class="glass">
+            <h3>EU Digital Services Act</h3>
+            <p>Public feeds, forums and sites have notice and action through signed label lists and an illegal-content hash list. Private messages are interpersonal communications, outside content moderation duties. Points of contact and transparency reports are published.</p>
+          </article>
+          <article class="glass">
+            <h3>UK Online Safety Act 2023</h3>
+            <p>Public content is handled the same way. Private messages stay end-to-end encrypted. We never scan private content.</p>
+          </article>
+          <article class="glass">
+            <h3>Child abuse material</h3>
+            <p>Known material is blocked from public content by hash list. Reports go to NCMEC in the US and to the relevant national hotline.</p>
+          </article>
+          <article class="glass">
+            <h3>App Store</h3>
+            <p>Apple privacy label: Data Not Collected. Required-reason APIs are declared in the privacy manifest.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-standards">
+      <div class="wrap">
+        <p class="eyebrow">standards</p>
+        <h2>The CNSA 2.0 suite.<br /><span class="dim">Exactly, with no classical fallback.</span></h2>
+        <p class="intro">
+          Every key exchange is ML-KEM-1024 and every signature is ML-DSA-87, the algorithms the US National Security
+          Agency requires for national security systems. Anyone can rebuild every release and check it against the logged hash.
+        </p>
+        <div class="table" tabindex="0">
+          <table>
+            <thead><tr><th scope="col">Standard</th><th scope="col">How khensu.ñü uses it</th></tr></thead>
+            <tbody>
+              {standards.map((r) => (
+                <tr><th scope="row">{r.std}</th><td>{r.use}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="footnote">
+          Security reports: <a href="mailto:security@elliottwave.studio?subject=khensu.nu%20security">security@elliottwave.studio</a> and <a href="/.well-known/security.txt">/.well-known/security.txt</a>.
+          Details on <a href="https://dev.khensu.nu/security#privacy-law">dev.khensu.nu/security</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-developers">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">for developers on <span class="name-case">webË</span></p>
+          <h2>Build on it.<br /><span class="dim">Inherit all of it.</span></h2>
+        </div>
+        <ul class="checks" role="list">
+          <li><b>No server-side API for user data.</b> Content is end-to-end encrypted on the device.</li>
+          <li><b>Stealth can’t be turned off.</b> A webË app can’t leak who talks to whom.</li>
+          <li><b>No third-party tracking.</b> Sites reach the ordinary web or third parties only if their policy lists them.</li>
+          <li><b>Data Not Collected.</b> The App Store label for an app built only on <code>khensu-core</code>, and buyers stay anonymous to sellers.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-accessibility">
+      <div class="wrap">
+        <p class="eyebrow">accessibility</p>
+        <h2>For everyone.<br /><span class="dim">WCAG 2.2 AA, in the app and on the sites.</span></h2>
+        <div class="grid">
+          <article class="glass"><h3>WCAG 2.2 Level AA</h3><p>The app and every site.</p></article>
+          <article class="glass"><h3>European Accessibility Act</h3><p>Messaging and commerce meet EN 301 549.</p></article>
+          <article class="glass"><h3>ADA and Section 508</h3><p>Met through WCAG 2.2 AA.</p></article>
+          <article class="glass"><h3>Apple accessibility</h3><p>VoiceOver, Dynamic Type, Voice Control, Switch Control, Reduce Motion and Increase Contrast throughout, with Apple’s standard controls.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-export">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">export</p>
+          <h2>Mass-market encryption.<br /><span class="dim">Classified and filed.</span></h2>
+        </div>
+        <div class="prose">
+          <p>
+            khensu.ñü’s encryption is mass-market software under the US Export Administration Regulations: ECCN 5D992.c
+            under License Exception ENC, section 740.17(b)(1), with the annual self-classification report filed with BIS
+            and the NSA. Open-source repositories are published under section 734.3(b)(3) with notice to BIS, and App Store
+            export documentation is filed with Apple. The app isn’t offered in countries under comprehensive US embargo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-payments">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">payments</p>
+          <h2>Your money, your keys.<br /><span class="dim">No card data, anywhere.</span></h2>
+        </div>
+        <ul class="checks" role="list">
+          <li><b>Self-custody.</b> khensu.ñü never holds your funds or your keys.</li>
+          <li><b>PCI DSS scope: nil.</b> No card data touches khensu.ñü, its nodes or its sites.</li>
+          <li><b>Licensed partners.</b> Where a licensed third party provides card payments or on-ramps, it meets its own licensing, anti-money-laundering and sanctions obligations.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-shield">
+      <div class="wrap">
+        <p class="eyebrow">suñůlink.shield</p>
+        <h2>suñůlink.shield ships certified.<br /><span class="dim">Radio, safety, battery, materials and recycling.</span></h2>
+        <div class="table" tabindex="0">
+          <table>
+            <thead><tr><th scope="col">Area</th><th scope="col">Ships with</th></tr></thead>
+            <tbody>
+              {shield.map((r) => (
+                <tr><th scope="row">{r.area}</th><td>{r.std}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <a class="btn" href="/shield">suñůlink.shield</a>
+          <a class="btn" href="https://dev.khensu.nu/shell">Full specifications</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compliance-contact">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">contact</p>
+          <h2>Ask us anything.<br /><span class="dim">A person answers.</span></h2>
+        </div>
+        <div class="prose">
+          <p>
+            Privacy, data protection and legal process:
+            <a href="mailto:hello@elliottwave.studio?subject=khensu.nu%20compliance">hello@elliottwave.studio</a>.
+            Security: <a href="mailto:security@elliottwave.studio?subject=khensu.nu%20security">security@elliottwave.studio</a>.
+            Elliott Wave LLC is established in the United States and is the controller for the website, the email you send
+            us, the credential issuer and the push gateway.
+          </p>
+          <div class="btn-row">
+            <a class="btn primary" href={SPEC}>The full compliance document</a>
+            <a class="btn" href="https://dev.khensu.nu/security#privacy-law">Security and privacy law</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .dim {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .stats {
+    list-style: none;
+    margin: clamp(2.5rem, 6vw, 4.5rem) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 1rem;
+  }
+  .stats li {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.4rem 1.5rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--i) * 90ms);
+  }
+  .stats b {
+    font-size: clamp(2.6rem, 5vw, 3.6rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .stats span {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stats li {
+      animation: none;
+    }
+  }
+  .band {
+    background: #000;
+  }
+  h2 {
+    margin-bottom: 1.2rem;
+  }
+  .intro {
+    color: var(--text-dim);
+    max-width: 52rem;
+    margin-bottom: 2rem;
+  }
+  .glass {
+    padding: 1.3rem 1.4rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .glass h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  .glass p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .grid {
+    margin-top: 1.5rem;
+  }
+
+  .table {
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  table {
+    width: 100%;
+    min-width: 44rem;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.8rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  thead th {
+    border-top: 0;
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    color: var(--text-faint);
+  }
+  tbody th {
+    font-weight: 500;
+    color: var(--text);
+  }
+  td {
+    color: var(--text-dim);
+  }
+
+  .laws {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 0.8rem;
+  }
+  .laws li {
+    display: grid;
+    align-content: start;
+    gap: 0.25rem;
+  }
+  .laws b {
+    font-weight: 500;
+  }
+  .laws .where {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+  }
+  .laws .how {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  .footnote {
+    max-width: 60rem;
+    line-height: 1.6;
+  }
+  .footnote a {
+    color: var(--text-dim);
+  }
+
+  .rights {
+    margin: 1.5rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 0.8rem;
+  }
+  .rights dt {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+  .rights dd {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .split .prose p {
+    color: var(--text-dim);
+  }
+  .checks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    color: var(--text-dim);
+  }
+  .checks li {
+    padding-left: 1.6rem;
+    position: relative;
+  }
+  .checks li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+  }
+  .checks b {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  @media (max-width: 820px) {
+    .split {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

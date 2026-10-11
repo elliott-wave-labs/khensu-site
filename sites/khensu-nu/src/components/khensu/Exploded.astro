@@ -10,9 +10,10 @@ const layers = [
   { file: 'base', label: 'Base plate', short: 'Base' },
   { file: 'magnet_ring', label: 'MagSafe-compatible magnets', short: 'Magnets' },
   { file: 'pcb', label: 'Node board, i.MX 93', short: 'Node board' },
-  { file: 'battery', label: '14 Wh battery', short: 'Battery' },
+  { file: 'battery', label: '6.2 Wh battery', short: 'Battery' },
+  { file: 'coil', label: 'Qi2 charging coil', short: 'Qi2 coil' },
   { file: 'window_inserts', label: 'Antenna band: HaLow, Wi-Fi', short: 'Antennas' },
-  { file: 'housing', label: 'Ceramic-coated titanium', short: 'Titanium' },
+  { file: 'housing', label: 'Ceramic powder-coated titanium', short: 'Titanium' },
 ];
 ---
 
@@ -28,16 +29,16 @@ const layers = [
           Apple’s push service can’t be trusted, and earns while it works.
         </p>
         <dl class="facts">
-          <div><dt>14 hours</dt><dd>relaying on a full charge (estimate), then a sip of your iPhone’s battery</dd></div>
-          <div><dt>25 min</dt><dd>to 50% over USB-C from a wall charger or power bank, full in about 75 (design targets)</dd></div>
+          <div><dt>5 hours</dt><dd>relaying on a full charge, then a sip of your iPhone’s battery</dd></div>
+          <div><dt>15 min</dt><dd>to 50% over USB-C from a wall charger or power bank, full in about 45</dd></div>
           <div><dt>Clear</dt><dd>below the camera, its edge angled out of every lens’s view</dd></div>
         </dl>
         <p class="fits">
           <span><b>Fits</b> iPhone X and later · Google Pixel · Samsung Galaxy S and A</span>
-          <small>The khensu.nu app needs iPhone 11 or later. On older iPhones and on Android, the shield runs as a node today; khensu.nu for Android is coming.</small>
+          <small>The khensu.ñü app needs iPhone 11 or later. On older iPhones and on Android, the shield runs as a node. Battery life and charge time vary with use and settings.</small>
         </p>
       </div>
-      <div class="stage" role="img" aria-label="suñůlink.shield, shown on iPhone 18 Pro, arriving in layers and clipping onto the phone: battleproof titanium shell, antenna band, battery, node board, magnets, base plate and shock layer above an iPhone.">
+      <div class="stage" role="img" aria-label="suñůlink.shield, shown on iPhone 18 Pro, arriving in layers and clipping onto the phone: battleproof titanium shell, antenna band, battery, node board, Qi2 charging coil, magnets, base plate and shock layer above an iPhone.">
         <img class="shadow" src="/khensu/shell/shadow.png" alt="" width="1600" height="1600" loading="lazy" decoding="async" />
         {layers.map((l, i) => (
           <img class:list={['layer', { phone: i === 0 }]} src={`/khensu/shell/${l.file}.png`} alt="" width="1600" height="1600" style={`--i:${i}`} loading="lazy" decoding="async" />

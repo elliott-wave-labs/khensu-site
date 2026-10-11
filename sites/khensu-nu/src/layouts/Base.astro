@@ -15,9 +15,9 @@ interface Props {
   noindex?: boolean;
 }
 
-const SITE_NAME = 'khensu.nu';
+const SITE_NAME = 'khensu.ñü';
 const DEFAULT_DESC =
-  'khensu.nu is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device.';
+  'khensu.ñü is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device.';
 
 const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — webË, private by design. Post-quantum. Run profitably by the people.`;
@@ -27,11 +27,13 @@ const ogImage = new URL(`/og/${card}.jpg`, Astro.site);
 const ogAlt = CARDS[card].alt;
 
 const nav = [
-  { href: '/#highlights', label: 'Features' },
+  { href: '/webe', label: 'webË' },
+  { href: '/media', label: 'ñü-media' },
+  { href: '/memory', label: 'Memory' },
+  { href: '/creators', label: 'Creators' },
   { href: '/shield', label: 'suñůlink.shield' },
-  { href: '/#webe-title', label: 'webË' },
-  { href: 'https://dev.khensu.nu', label: 'Developers' },
-  { href: '/#run-a-node', label: 'Run a node' },
+  { href: '/network', label: 'Network' },
+  { href: '/webe#run-a-node-section', label: 'Run a node' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
@@ -85,9 +87,9 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="wrap bar">
-        <a href="/" class="brand" aria-label="khensu.nu, home">
+        <a href="/" class="brand" aria-label="khensu.ñü, home">
           <Crescent size={26} />
-          <span>khensu.nu</span>
+          <span>khensu.ñü</span>
         </a>
         <nav aria-label="Primary">
           <ul>
@@ -108,13 +110,20 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <footer class="site-footer">
       <div class="wrap foot">
         <div>
-          <p class="foot-brand">khensu.nu</p>
+          <p class="foot-brand">khensu.ñü</p>
           <p class="foot-tag">The first app on webË. From <a href="https://elliottwave.studio">elliottwave.studio lab</a>.</p>
         </div>
         <ul class="foot-links">
-          <li><a href="/#highlights">Features</a></li>
-          <li><a href="/#shell-title">suñůlink.shield</a></li>
+          <li><a href="/webe">webË</a></li>
+          <li><a href="/media">ñü-media</a></li>
+          <li><a href="/memory">Memory</a></li>
+          <li><a href="/creators">Creators</a></li>
+          <li><a href="/shield">suñůlink.shield</a></li>
+          <li><a href="/transfer">Send big files</a></li>
+          <li><a href="/quality">How we measure</a></li>
+          <li><a href="/network">Network</a></li>
           <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/compliance">Compliance</a></li>
           <li><a href="https://dev.khensu.nu">Developers</a></li>
           <li><a href="https://dev.khensu.nu/shell">suñůlink.shield specs</a></li>
           <li><a href="https://dev.khensu.nu/security">Security</a></li>
@@ -123,12 +132,15 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       </div>
       <div class="wrap legal">
         <p>
-          © 2026 Elliott Wave LLC. All rights reserved. khensu.nu™ and elliottwave.studio lab™ are trademarks of Elliott Wave LLC.
-          Patent applications in preparation. Apple, the Apple logo, iPhone, iPad, Mac and Liquid Glass are trademarks of Apple Inc., registered in the U.S. and other countries. App Store is a service mark of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC. khensu.nu is not affiliated with or endorsed by Apple or Google.
+          © 2026 Elliott Wave LLC. All rights reserved. khensu.ñü™ and elliottwave.studio lab™ are trademarks of Elliott Wave LLC.
+          Apple, the Apple logo, iPhone, iPad, Mac and Liquid Glass are trademarks of Apple Inc., registered in the U.S. and other countries. App Store is a service mark of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC. khensu.nu is not affiliated with or endorsed by Apple or Google.
         </p>
         <p>Elliott Wave LLC, founded and solely owned by Elliott, owns all intellectual property in its projects, the open-source projects included.</p>
       </div>
     </footer>
+    <script>
+      import '../scripts/section-links.ts';
+    </script>
   </body>
 </html>
 

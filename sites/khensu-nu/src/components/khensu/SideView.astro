@@ -1,28 +1,20 @@
 ---
-// Side view at the long edge, path-traced from the CAD (khensu-specs/hardware/shell/render_layers.py, iPhone 18 Pro
-// measured geometry): the iPhone alone, then with the shield below the camera, 3 mm above the lens tops.
-// The camera is orthographic, so dropping the shell layer by a fixed amount is a true vertical move in millimetres.
-// It drops on with --e from the reveal scene in scripts/scenes.ts.
-import side from '../../../public/khensu/shell/side.json';
+// Edge-on side views, path-traced from the CAD (khensu-site/tools/shield/sideview.py, iPhone 18 Pro measured
+// geometry): the phone standing upright seen exactly from the side, alone and with the shield, in the same
+// orthographic frame, so the two images are at the same scale and the added thickness reads directly.
+import sidev from '../../../public/khensu/shell/sidev.json';
 
-const [W, H] = side.res;
-const [[x0, y0], [x1, y1]] = side.guide;
-const TOP = side.top_mm.toFixed(2);
-const drop = ((9 * side.px_per_mm_z) / H) * 100;
-const views = [
-  { id: 'alone', title: 'iPhone 18 Pro', note: `${TOP} mm at the camera` },
-  { id: 'with-shell', title: 'With suñůlink.shield', note: 'Below the camera, 3 mm above the lens tops' },
-];
+const { width: W, height: H } = sidev;
 ---
 
-<section class="section side" data-scene="reveal" aria-labelledby="side-title" style={`--drop:${drop.toFixed(2)}%`}>
+<section class="section side" aria-labelledby="side-title">
   <div class="wrap">
     <p class="eyebrow">Side view</p>
-    <h2 id="side-title" class="big">Three millimetres. <em>Fourteen hours of node.</em></h2>
+    <h2 id="side-title" class="big">Zero millimetres. <em>No new bump.</em></h2>
     <p class="lede">
-      The shield sits below the camera and rises 3 mm past the lens tops. Its top edge is angled so no lens, flash or
-      sensor ever sees it, even the ultra wide at 120°. That 3 mm holds a 14 Wh battery: about fourteen hours of
-      relaying on its own cells.
+      The shield covers the back and stops level with the lens tops, so it adds nothing above the camera. Its camera
+      opening is angled so no lens, flash or sensor ever sees it, even the ultra wide at 120°. Inside that depth: a
+      6.2 Wh battery, about five hours of relaying on its own cells.
     </p>
     <p class="lede">
       Each shield is CNC-machined from titanium for a precise fit, following the iPhone 18 Pro’s own edge curve, so
@@ -30,94 +22,50 @@ const views = [
     </p>
 
     <div class="views">
-      {views.map((v) => (
+      {sidev.views.map((v) => (
         <figure class="view">
-          <div class="render" role="img" aria-label={`${v.title}, side view: ${v.note}`} style={`aspect-ratio:${W}/${H}`}>
-            <img src="/khensu/shell/side_phone_burgundy.png" alt="" width={W} height={H} loading="lazy" decoding="async" />
-            {v.id === 'with-shell' && (
-              <>
-                <img class="shell" src="/khensu/shell/side_shell_burgundy.png" alt="" width={W} height={H} loading="lazy" decoding="async" />
-                <img class="lenses" src="/khensu/shell/side_camera.png" alt="" width={W} height={H} loading="lazy" decoding="async" />
-              </>
-            )}
-            <svg viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
-              <line x1={x0} y1={y0} x2={x1} y2={y1} />
-            </svg>
-            <span class="dim" aria-hidden="true">{TOP} mm</span>
-          </div>
-          <figcaption><span>{v.title}</span>{v.note}</figcaption>
+          <img src={v.src} alt={v.alt} width={W} height={H} loading="lazy" decoding="async" />
+          <figcaption>{v.label}</figcaption>
         </figure>
       ))}
     </div>
 
     <dl class="stats">
-      <div><dt>+3 mm</dt><dd>above the lens tops, clear of every camera’s field of view.</dd></div>
+      <div><dt>0 mm</dt><dd>added above the lens tops, clear of every camera’s field of view.</dd></div>
     </dl>
     <p class="footnote">
       Path-traced to scale from the CAD model, on iPhone 18 Pro geometry measured from Apple’s published model; Apple’s
-      accessory drawings take precedence when available. Relay time is an estimate at about 1 W. iPhone is a trademark of Apple Inc.
+      accessory drawings take precedence when available. Relay time at about 1 W; battery life varies with use and settings. iPhone is a trademark of Apple Inc.
     </p>
   </div>
 </section>
 
 <style>
-  .side {
-    --e: 1;
-  }
   .views {
-    display: grid;
-    gap: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: clamp(1.5rem, 6vw, 5rem);
     margin-top: 3rem;
+    padding: 2.5rem 1rem 2rem;
+    border-radius: 22px;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(255, 255, 255, 0.05), transparent 70%);
   }
   .view {
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-  .render {
-    position: relative;
-    width: 100%;
-    border-radius: 22px;
-    overflow: hidden;
-    background: radial-gradient(ellipse 70% 90% at 50% 60%, rgba(255, 255, 255, 0.06), transparent 70%);
-  }
-  .render img,
-  .render svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-  .shell {
-    translate: 0 calc((var(--e) - 1) * var(--drop));
-    opacity: clamp(0, calc(var(--e) * 3), 1);
-  }
-  /* The lenses show through the shell's openings only once it's seated. */
-  .lenses {
-    opacity: clamp(0, calc(var(--e) * 40 - 39), 1);
-  }
-  line {
-    stroke: var(--accent);
-    stroke-width: 2;
-    stroke-dasharray: 9 6;
-    opacity: 0.85;
-  }
-  .dim {
-    position: absolute;
-    right: 1.2rem;
-    top: 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--accent);
+  .view img {
+    display: block;
+    height: clamp(380px, 72vh, 760px);
+    width: auto;
   }
   figcaption {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1rem;
-    margin-top: 0.9rem;
-    font-size: 0.85rem;
-    color: var(--text-dim);
-  }
-  figcaption span {
+    margin-top: 1rem;
+    font-size: 0.9rem;
     color: var(--text);
+    text-transform: lowercase;
   }
   .stats {
     display: grid;
