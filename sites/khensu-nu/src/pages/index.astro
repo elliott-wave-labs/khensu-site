@@ -527,14 +527,20 @@ const specs = [
   }
 
   /* Frosted glass: the relay network behind shows through, blurred. */
+  h2[id] {
+    scroll-margin-top: 6rem;
+  }
   .webe-title {
     max-width: 22ch;
   }
   .webe-intro {
-    display: grid;
-    gap: 0 2.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    columns: 2 340px;
+    column-gap: 2.5rem;
     margin-top: 1.25rem;
+  }
+  .webe-intro .lede {
+    break-inside: avoid;
+    margin-top: 0;
   }
   .webe {
     list-style: none;
