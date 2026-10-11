@@ -36,6 +36,32 @@ const steps = [
       ))}
     </ol>
 
+    <figure class="card pay" data-scene="reveal">
+      <div class="pay-scene" aria-hidden="true">
+        <div class="phone">
+          <div class="screen">
+            <span class="ptitle">Wallet</span>
+            <div class="state s1"><small>khensu.nu coin</small><b>1,240.00</b><span class="tag">Coffee · $4.50</span></div>
+            <div class="state s2"><small>Converting</small><b>4.50 USDC</b><span class="tag">from khensu.nu coin</span></div>
+            <div class="state s3"><small>Apple Pay</small><b class="hold">Hold near reader</b><span class="tag">Face ID ✓</span></div>
+            <div class="state s4"><small>Paid</small><b class="ok">✓ $4.50</b><span class="tag">Café du Port</span></div>
+          </div>
+        </div>
+        <div class="waves"><i></i><i></i><i></i></div>
+        <div class="reader"><span class="rscreen"><span class="r1">$4.50</span><span class="r2">✓ Approved</span></span></div>
+      </div>
+      <figcaption>
+        <b>Pay with khensu.nu coin anywhere Apple Pay works</b>
+        <span>Tap your iPhone or Apple Watch at any contactless terminal. Your coin converts to USDC, then to the shop’s currency, in the moment you pay. The shop just sees a card payment.</span>
+        <ol class="pay-steps" role="list">
+          <li><b>1</b> Pick khensu.nu coin in your wallet</li>
+          <li><b>2</b> It converts to USDC automatically</li>
+          <li><b>3</b> Tap to pay with Apple Pay</li>
+        </ol>
+        <span class="soon">Android and Google Pay are coming.</span>
+      </figcaption>
+    </figure>
+
     <div class="grid">
       <figure class="card keep-card" data-scene="reveal">
         <figcaption><b>What you keep from a $10 tip</b><span>Before tax</span></figcaption>
@@ -66,7 +92,7 @@ const steps = [
       wallet stay private. Paid digital content inside the iPhone app follows Apple’s purchase rules; tips go 100% to the
       creator. The network fee is a design target. Shield and node rewards are paid by the protocol for verified work and
       vary; this is not a promise of earnings. Other platforms’ shares are their published standard terms and differ by
-      programme and region. Apple Pay is a trademark of Apple Inc.; USDC is issued by Circle. No affiliation or endorsement.
+      programme and region. Apple Pay and Apple Watch are trademarks of Apple Inc.; Android and Google Pay are trademarks of Google LLC; USDC is issued by Circle. No affiliation or endorsement.
     </p>
   </div>
 </section>
@@ -212,7 +238,116 @@ const steps = [
     color: #b9b0ff;
   }
 
+  .pay {
+    margin-top: 2.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: 2rem;
+  }
+  .pay figcaption { gap: 0.7rem; }
+  .pay figcaption b { font-size: 1.4rem; }
+  .pay-steps { list-style: none; margin: 0.4rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+  .pay-steps li { display: flex; gap: 0.7rem; align-items: center; color: var(--text); }
+  .pay-steps li b {
+    font-size: 0.85rem; width: 1.6rem; height: 1.6rem; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(139, 123, 255, 0.18); color: #b9b0ff;
+  }
+  .soon { color: #4fd1c5 !important; font-weight: 500; }
+  .pay-scene {
+    position: relative;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+  .phone {
+    position: relative;
+    width: 132px;
+    height: 268px;
+    border-radius: 30px;
+    background: #050506;
+    border: 2px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 4px #111;
+    padding: 10px;
+    animation: pay-phone 10s infinite ease-in-out;
+    z-index: 2;
+  }
+  .screen {
+    position: relative;
+    height: 100%;
+    border-radius: 22px;
+    background: linear-gradient(160deg, #1c1830, #0b0b10);
+    overflow: hidden;
+  }
+  .ptitle { position: absolute; top: 16px; left: 12px; font-size: 0.7rem; color: var(--text-dim); }
+  .state {
+    position: absolute;
+    inset: 44px 10px auto;
+    display: grid;
+    gap: 0.35rem;
+    opacity: 0;
+  }
+  .state small { font-size: 0.65rem; color: var(--text-dim); }
+  .state b { font-size: 1.15rem; font-weight: 600; }
+  .state .tag {
+    margin-top: 0.4rem; font-size: 0.62rem; padding: 0.3rem 0.45rem; border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08); color: var(--text-dim);
+  }
+  .state .hold { font-size: 0.85rem; }
+  .state .ok { color: #4fd1c5; }
+  .s1 { animation: pay-s1 10s infinite; }
+  .s2 { animation: pay-s2 10s infinite; }
+  .s3 { animation: pay-s3 10s infinite; }
+  .s4 { animation: pay-s4 10s infinite; }
+  @keyframes pay-s1 { 0%, 22% { opacity: 1; } 26%, 100% { opacity: 0; } }
+  @keyframes pay-s2 { 0%, 24% { opacity: 0; } 28%, 46% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  @keyframes pay-s3 { 0%, 48% { opacity: 0; } 52%, 72% { opacity: 1; } 76%, 100% { opacity: 0; } }
+  @keyframes pay-s4 { 0%, 74% { opacity: 0; } 78%, 96% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes pay-phone {
+    0%, 48% { transform: translateX(-40px) rotate(0); }
+    56%, 92% { transform: translateX(18px) rotate(-8deg); }
+    100% { transform: translateX(-40px) rotate(0); }
+  }
+  .waves { position: relative; width: 0; height: 60px; z-index: 3; }
+  .waves i {
+    position: absolute; left: 4px; top: 50%; width: 22px; height: 22px; margin-top: -11px;
+    border: 2px solid #8b7bff; border-left-color: transparent; border-top-color: transparent; border-bottom-color: transparent;
+    border-radius: 50%; opacity: 0; animation: pay-wave 10s infinite;
+  }
+  .waves i:nth-child(2) { width: 36px; height: 36px; margin-top: -18px; animation-delay: 0.15s; }
+  .waves i:nth-child(3) { width: 50px; height: 50px; margin-top: -25px; animation-delay: 0.3s; }
+  @keyframes pay-wave { 0%, 56% { opacity: 0; } 60%, 74% { opacity: 1; } 78%, 100% { opacity: 0; } }
+  .reader {
+    position: relative;
+    width: 112px;
+    height: 170px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #2a2a31, #17171c);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    margin-left: 46px;
+    display: grid;
+    justify-items: center;
+    padding-top: 16px;
+  }
+  .rscreen {
+    position: relative; width: 84px; height: 54px; border-radius: 8px; background: #0b0f12;
+    display: grid; place-items: center; font-size: 0.85rem; font-weight: 600;
+  }
+  .rscreen span { position: absolute; }
+  .r1 { animation: pay-r1 10s infinite; }
+  .r2 { animation: pay-r2 10s infinite; color: #4fd1c5; font-size: 0.72rem; }
+  @keyframes pay-r1 { 0%, 74% { opacity: 1; } 78%, 100% { opacity: 0; } }
+  @keyframes pay-r2 { 0%, 74% { opacity: 0; } 78%, 96% { opacity: 1; } 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .phone, .state, .waves i, .rscreen span, .s1, .s2, .s3, .s4, .r1, .r2 { animation: none; }
+    .phone { transform: translateX(18px) rotate(-8deg); }
+    .s4, .r2 { opacity: 1; }
+    .r1 { opacity: 0; }
+  }
+
   @media (max-width: 960px) {
+    .pay { grid-template-columns: 1fr; }
     .grid {
       grid-template-columns: 1fr;
     }
