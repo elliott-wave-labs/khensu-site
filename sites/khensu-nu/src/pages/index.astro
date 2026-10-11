@@ -12,6 +12,11 @@ import Orbit from '../components/khensu/Orbit.astro';
 import Icon from '../components/khensu/Icon.astro';
 import NuMedia from '../components/khensu/NuMedia.astro';
 import Creators from '../components/khensu/Creators.astro';
+import RingCode from '../components/khensu/RingCode.astro';
+import Economics from '../components/khensu/Economics.astro';
+import PerAnkh from '../components/khensu/PerAnkh.astro';
+import RingCode from '../components/khensu/RingCode.astro';
+import Economics from '../components/khensu/Economics.astro';
 
 const highlights = [
   { icon: 'lock', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
@@ -44,7 +49,7 @@ const specs = [
 
 <Base>
   <Hero
-    eyebrow="The first app on webE"
+    eyebrow="The first app on webË"
     links={[
       { href: APP_STORE_URL, label: 'App Store · Coming soon' },
       { href: '#run-a-node', label: 'Run a node' },
@@ -55,11 +60,11 @@ const specs = [
   <div class="khensu">
     <section class="section intro">
       <div class="wrap">
-        <p class="eyebrow">The first app on <span class="name-case">webE</span></p>
+        <p class="eyebrow">The first app on <span class="name-case">webË</span></p>
         <h2 class="big">A messenger with no company in the middle. <em>Because there isn’t one.</em></h2>
         <p class="lede">
           khensu.nu runs on a network of small computers in people’s homes, not on a company’s servers. No one can read
-          what you send, see who you send it to, or switch it off. It is the first app on webE, a people-run internet
+          what you send, see who you send it to, or switch it off. It is the first app on webË, a people-run internet
           that sits on the one you already use.
         </p>
         <div class="btn-row">
@@ -88,7 +93,7 @@ const specs = [
       <Net />
       <div class="wrap">
         <p class="eyebrow">The new internet</p>
-        <h2 id="webe-title" class="webe-name"><span class="name-case">webE</span></h2>
+        <h2 id="webe-title" class="webe-name"><span class="name-case">webË</span></h2>
         <p class="webe-sub">A new internet, alongside the one you use.</p>
         <p class="lede webe-lede">
           Same connection, same apps. Everything on it is post-quantum encrypted, hidden inside ordinary HTTPS and run
@@ -101,10 +106,12 @@ const specs = [
           <li><b>Messages and calls</b><span>One to one and in large groups.</span></li>
           <li><b>Feeds and content</b><span>Posts, forums, videos, photos, reels and music.</span></li>
           <li><b>Sites and live</b><span>Publish at your-name.khensu.nu. Stream to a room or a crowd.</span></li>
+          <li><b>Global social</b><span>Follow anyone in any country, translated on your phone. Posts keep spreading phone to phone when the internet is cut.</span></li>
+          <li><b>Private AI and feeds</b><span>Summaries, search and your recommendations run only on your device. What you read and watch never leaves it.</span></li>
         </ul>
         <div class="btn-row webe-links">
-          <a class="btn primary" href="https://dev.khensu.nu/webe">webE specification</a>
-          <a class="btn" href="https://dev.khensu.nu/webe#build">Build an app on webE</a>
+          <a class="btn primary" href="https://dev.khensu.nu/webe">webË specification</a>
+          <a class="btn" href="https://dev.khensu.nu/webe#build">Build an app on webË</a>
           <a class="btn" href="https://dev.khensu.nu/webe#extend">Extend khensu.nu</a>
         </div>
       </div>
@@ -118,19 +125,19 @@ const specs = [
         <h2 id="vpn-title" class="big webe-title">Better than a VPN. Nothing to switch on.</h2>
         <p class="lede">
           A VPN moves your trust from your internet provider to one VPN company, which then sees your address and
-          everything you open. On webE, nobody holds both.
+          everything you open. On webË, nobody holds both.
         </p>
         <ul class="webe" role="list">
           <li><b>No one sees both ends</b><span>The first relay knows who you are but not what you open. The last knows what, not who. They’re run by different operators in different countries.</span></li>
-          <li><b>Looks like a normal website</b><span>VPN protocols are easy to recognise and block. webE traffic is ordinary HTTPS.</span></li>
+          <li><b>Looks like a normal website</b><span>VPN protocols are easy to recognise and block. webË traffic is ordinary HTTPS.</span></li>
           <li><b>Hides when, not just where</b><span>A VPN still shows when and how much you use it. khensu.nu keeps the same rhythm all day.</span></li>
           <li><b>Nothing to log</b><span>“No logs” is a VPN’s promise. Relays never see your content or both ends, so there’s nothing to hand over.</span></li>
           <li><b>Post-quantum only</b><span>ML-KEM-1024 and ML-DSA-87, so traffic recorded today can’t be decrypted later.</span></li>
           <li><b>No off switch, no leaks</b><span>No kill switch needed: there is no unprotected mode to fall back to.</span></li>
         </ul>
         <p class="footnote">
-          This covers everything on webE today: messages, calls, payments, feeds, forums, sites and live streams. For the
-          rest of the internet, webE exit is planned: a VPN profile for iPhone, iPad and Mac that sends all your traffic
+          This covers everything on webË today: messages, calls, payments, feeds, forums, sites and live streams. For the
+          rest of the internet, webË exit is planned: a VPN profile for iPhone, iPad and Mac that sends all your traffic
           through two relays from different operators, under the same rules.
         </p>
         <div class="btn-row webe-links">
@@ -158,6 +165,10 @@ const specs = [
         ))}
       </ul>
     </section>
+
+    <RingCode />
+
+    <PerAnkh />
 
     <section class="statement" data-scene="reveal" aria-label="Stealth by default">
       <div class="wrap">
@@ -248,6 +259,8 @@ const specs = [
     </section>
 
     <Creators />
+
+    <Economics />
 
     <section class="section space" aria-labelledby="space-title">
       <div class="wrap split rev">

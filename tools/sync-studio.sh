@@ -20,7 +20,7 @@ s = open(sys.argv[1]).read()
 swaps = [
     ("""<Base>
   <Hero
-    eyebrow="The first app on webE"
+    eyebrow="The first app on webË"
     links={[
       { href: APP_STORE_URL, label: 'App Store · Coming soon' },
       { href: '#run-a-node', label: 'Run a node' },

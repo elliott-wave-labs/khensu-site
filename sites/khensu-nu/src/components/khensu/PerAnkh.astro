@@ -1,0 +1,123 @@
+---
+// Per-Ankh, the on-device memory layer (khensu-specs PLAN.md, Local search and memory; code name KhensuMemory).
+const lanes = [
+  { name: 'Words', note: 'Full-text search' },
+  { name: 'Meaning', note: 'On-device embeddings' },
+  { name: 'Connections', note: 'People, places, plans' },
+  { name: 'Time', note: '“Last spring”' },
+];
+const points = [
+  { t: 'Remembers what matters', b: 'Plans, dates, decisions, addresses and the things people asked you, each linked to the message it came from.' },
+  { t: 'Answers with sources', b: 'Ask anything and get an answer that cites the exact messages, voice notes and photos it read.' },
+  { t: 'Forgets when you do', b: 'Delete a message or let it disappear, and everything learned from it goes too. Never backed up, never synced.' },
+  { t: 'Only after Face ID', b: 'Nothing is indexed or readable while your phone is locked. Apple’s on-device model only; no cloud, ever.' },
+];
+---
+
+<section class="section ankh-sec" aria-labelledby="ankh-title">
+  <div class="wrap ankh-grid">
+    <div>
+      <p class="eyebrow">Memory</p>
+      <h2 id="ankh-title" class="big">Per-Ankh. <em>Your records, kept only by you.</em></h2>
+      <p class="lede">
+        In ancient Egypt, the Per-Ankh, the House of Life, was where scribes kept the records. Ours lives on your
+        phone: everything you’ve said, heard and shared, searchable and askable, and readable by no one else.
+      </p>
+      <ul class="ankh-points" role="list">
+        {points.map((p) => <li><b>{p.t}</b><span>{p.b}</span></li>)}
+      </ul>
+    </div>
+
+    <figure class="ankh-fig" aria-label="Four searches run on the device and merge into one answer with citations.">
+      <div class="ankh-ask">When is the Lisbon trip now?</div>
+      <ul class="ankh-lanes" role="list">
+        {lanes.map((l, i) => (
+          <li style={`--i:${i}`}><b>{l.name}</b><small>{l.note}</small><span class="ankh-beam" /></li>
+        ))}
+      </ul>
+      <div class="ankh-answer">
+        <p><b>12–19 May.</b> Ana moved it from April last Tuesday, and Sam booked the flat in Alfama.</p>
+        <p class="ankh-cites"><span>Ana · Tue 14:02</span><span>Sam · voice note</span><span>Booking photo</span></p>
+      </div>
+      <figcaption>Illustrative. Search works on every iPhone with iOS 26; answers need iPhone 15 Pro or later.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .ankh-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .ankh-points { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.4rem; margin: 1.6rem 0 0; padding: 0; list-style: none; }
+  .ankh-points li { display: grid; gap: 0.2rem; align-content: start; }
+  .ankh-points span { color: var(--muted, rgba(255, 255, 255, 0.65)); }
+  .ankh-fig {
+    margin: 0;
+    display: grid;
+    gap: 0.9rem;
+    padding: 1.4rem;
+    border-radius: 24px;
+    background: radial-gradient(120% 80% at 80% 0%, rgba(139, 123, 255, 0.16), transparent 60%), rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .ankh-ask, .ankh-answer {
+    border-radius: 18px;
+    padding: 0.9rem 1.1rem;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(18px) saturate(160%);
+  }
+  .ankh-ask { justify-self: end; border-radius: 18px 18px 4px 18px; background: rgba(10, 132, 255, 0.85); border-color: transparent; }
+  .ankh-lanes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+  .ankh-lanes li {
+    position: relative;
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.6rem 0.6rem 1.2rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    font-size: 0.8rem;
+  }
+  .ankh-lanes small { color: var(--muted, rgba(255, 255, 255, 0.55)); font-size: 0.7rem; }
+  .ankh-beam {
+    position: absolute;
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: 0.45rem;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, #b9adff, transparent) no-repeat;
+    background-size: 50% 100%;
+    animation: ankh-scan 2.6s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.25s);
+  }
+  .ankh-answer p { margin: 0; }
+  .ankh-cites { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem !important; }
+  .ankh-cites span {
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .ankh-fig figcaption { font-size: 0.72rem; color: var(--muted, rgba(255, 255, 255, 0.5)); }
+  @keyframes ankh-scan {
+    0% { background-position: -100% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @media (max-width: 900px) {
+    .ankh-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .ankh-points, .ankh-lanes { grid-template-columns: 1fr 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ankh-beam { animation: none; background-position: 50% 0; }
+  }
+</style>

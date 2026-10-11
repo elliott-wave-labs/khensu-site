@@ -19,14 +19,14 @@ const DEFAULT_DESC =
   'khensu.nu is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device.';
 
 const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
-const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — webE, private by design. Post-quantum. Run profitably by the people.`;
+const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — webË, private by design. Post-quantum. Run profitably by the people.`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL('/og.png', Astro.site);
 
 const nav = [
   { href: '/#highlights', label: 'Features' },
-  { href: '/#shell-title', label: 'suñůlink.shield' },
-  { href: '/#webe-title', label: 'webE' },
+  { href: '/shield', label: 'suñůlink.shield' },
+  { href: '/#webe-title', label: 'webË' },
   { href: 'https://dev.khensu.nu', label: 'Developers' },
   { href: '/#run-a-node', label: 'Run a node' },
 ];
@@ -103,7 +103,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       <div class="wrap foot">
         <div>
           <p class="foot-brand">khensu.nu</p>
-          <p class="foot-tag">The first app on webE. From <a href="https://elliottwave.studio">elliottwave.studio lab</a>.</p>
+          <p class="foot-tag">The first app on webË. From <a href="https://elliottwave.studio">elliottwave.studio lab</a>.</p>
         </div>
         <ul class="foot-links">
           <li><a href="/#highlights">Features</a></li>

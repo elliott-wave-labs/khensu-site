@@ -136,7 +136,7 @@ code,
   align-items: center;
   gap: 0.6em;
 }
-/* Names keep their own casing inside uppercase labels: webE, never WEBE. */
+/* Names keep their own casing inside uppercase labels: webË, never WEBE. */
 .name-case {
   text-transform: none;
 }

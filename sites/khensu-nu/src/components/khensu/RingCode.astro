@@ -1,0 +1,129 @@
+---
+// A ring code (khensu-specs design/ring-code.md): 408 points on six rings, each point's angular offset and
+// brightness set by the bytes it carries, joined to its nearest inner neighbours, with decorative pulses.
+// The bytes here come from a sample address, so the ring is illustrative.
+const RINGS = [48, 56, 64, 72, 80, 88];
+const C = 200;
+let seed = 0x6b68656e;
+const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+
+type P = { x: number; y: number; r: number; o: number; d: number; ring: number; a: number };
+const pts: P[] = [];
+RINGS.forEach((n, ring) => {
+  const rad = 62 + ring * 25;
+  for (let i = 0; i < n; i++) {
+    if (ring === RINGS.length - 1 && (i < 3 || i > n - 4)) continue;
+    const bits = Math.floor(rand() * 8);
+    const a = ((i + (bits & 3) * 0.22) / n) * Math.PI * 2 - Math.PI / 2;
+    pts.push({
+      x: C + rad * Math.cos(a),
+      y: C + rad * Math.sin(a),
+      r: bits & 4 ? 2.6 : 1.7,
+      o: bits & 4 ? 1 : 0.55,
+      d: rand() * 4,
+      ring,
+      a,
+    });
+  }
+});
+
+const lines: string[] = [];
+const byRing = RINGS.map((_, i) => pts.filter((p) => p.ring === i));
+for (let ring = 1; ring < RINGS.length; ring++) {
+  for (const p of byRing[ring]) {
+    const near = byRing[ring - 1]
+      .map((q) => ({ q, d: Math.abs(Math.atan2(Math.sin(q.a - p.a), Math.cos(q.a - p.a))) }))
+      .sort((m, n) => m.d - n.d)
+      .slice(0, 2);
+    for (const { q } of near) lines.push(`M${p.x.toFixed(1)} ${p.y.toFixed(1)}L${q.x.toFixed(1)} ${q.y.toFixed(1)}`);
+  }
+}
+const pulses = lines.filter(() => rand() < 0.08).map((d) => ({ d, delay: (rand() * 6).toFixed(2), dur: (1.6 + rand() * 1.6).toFixed(2) }));
+const anchors = [-Math.PI / 2 - 0.09, -Math.PI / 2 + 0.09, Math.PI / 2].map((a) => ({ x: C + 205 * Math.cos(a), y: C + 205 * Math.sin(a) }));
+---
+
+<section class="section ring-sec" aria-labelledby="ring-title">
+  <div class="wrap ring-grid">
+    <figure class="ring-fig">
+      <svg class="ring" viewBox="-20 -20 440 440" role="img" aria-label="A ring code: a circle of 408 points joined by lines, with light pulsing along them.">
+        <path class="ring-lines" d={lines.join('')} />
+        {pulses.map((p) => <path class="ring-pulse" d={p.d} pathLength="1" style={`animation-delay:${p.delay}s;animation-duration:${p.dur}s`} />)}
+        {pts.map((p) => (
+          <circle cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r={p.r} style={`--o:${p.o};animation-delay:-${p.d.toFixed(2)}s`} />
+        ))}
+        {anchors.map((a) => <circle class="ring-anchor" cx={a.x.toFixed(1)} cy={a.y.toFixed(1)} r="5" />)}
+        <circle class="ring-core" cx={C} cy={C} r="34" />
+        <path class="ring-moon" d="M206 184a17 17 0 1 0 0 32a13 13 0 1 1 0-32z" />
+      </svg>
+      <figcaption>Illustrative ring from a sample address.</figcaption>
+    </figure>
+    <div>
+      <p class="eyebrow">Share your profile</p>
+      <h2 id="ring-title" class="big">No QR codes. <em>A ring that’s only yours.</em></h2>
+      <p class="lede">
+        Show your ring and a friend’s camera reads it in about two seconds. 408 points, placed by the data they carry,
+        so no two rings are alike.
+      </p>
+      <ul class="ring-list" role="list">
+        <li><b>New every time</b><span>Each live ring carries a fresh one-time ML-KEM-1024 key, so a photo of it is useless once it’s used or after five minutes.</span></li>
+        <li><b>In your contact card</b><span>Add your khensu.nu profile to your own card in Contacts, so it travels with NameDrop and contact sharing. Only your public handle, never keys.</span></li>
+        <li><b>In Apple Wallet</b><span>Your ring as a Wallet pass, with no barcode and no web service behind it, so it never phones home.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ring-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .ring-fig { margin: 0; }
+  .ring-fig figcaption { margin-top: 0.6rem; text-align: center; font-size: 0.75rem; color: var(--muted, rgba(255, 255, 255, 0.5)); }
+  .ring {
+    display: block;
+    width: 100%;
+    max-width: 30rem;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(139, 123, 255, 0.12), transparent 75%);
+  }
+  .ring-lines { fill: none; stroke: rgba(255, 255, 255, 0.11); stroke-width: 0.6; }
+  .ring-pulse {
+    fill: none;
+    stroke: #b9adff;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-dasharray: 0.18 1;
+    stroke-dashoffset: 1.18;
+    opacity: 0;
+    animation: ring-pulse 2.4s linear infinite;
+  }
+  .ring circle { fill: #fff; opacity: var(--o); animation: ring-twinkle 4s ease-in-out infinite; }
+  .ring .ring-anchor { fill: #fff; opacity: 1; animation: none; }
+  .ring .ring-core { fill: rgba(255, 255, 255, 0.06); stroke: rgba(255, 255, 255, 0.25); opacity: 1; animation: none; }
+  .ring-moon { fill: #fff; }
+  .ring-list { display: grid; gap: 1rem; margin: 1.6rem 0 0; padding: 0; list-style: none; }
+  .ring-list li { display: grid; gap: 0.2rem; }
+  .ring-list span { color: var(--muted, rgba(255, 255, 255, 0.65)); }
+  @keyframes ring-pulse {
+    0% { stroke-dashoffset: 1.18; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  @keyframes ring-twinkle {
+    0%, 100% { opacity: var(--o); }
+    50% { opacity: calc(var(--o) * 0.35); }
+  }
+  @media (max-width: 860px) {
+    .ring-grid { grid-template-columns: 1fr; }
+    .ring { max-width: 22rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ring-pulse { display: none; }
+    .ring circle { animation: none; }
+  }
+</style>

@@ -172,6 +172,7 @@ const chips = [
             </li>
           ))}
         </ul>
+        <p class="saves"><span><b>15×</b> smaller than JPEG</span><span><b>94%</b> less data</span><span><b>$49</b> saved per million views</span></p>
         <figcaption class="sub-cap"><b>One Live Photo</b><span>The still plus 3 seconds of motion and sound</span></figcaption>
         <ul class="bars" role="list">
           {live.map((r, i) => (
@@ -182,6 +183,8 @@ const chips = [
             </li>
           ))}
         </ul>
+        <p class="saves"><span><b>7×</b> smaller than Apple’s pair</span><span><b>86%</b> less data</span><span><b>$102</b> saved per million views</span></p>
+        <p class="saves-note">Bandwidth priced at $0.085 per GB, Amazon CloudFront’s US list price for the first 10 TB a month. Against HEIC, a nu-media photo is 7.7× smaller, 87% less, $23 saved per million views.</p>
       </figure>
 
       <figure class="card" data-scene="reveal">
@@ -241,7 +244,7 @@ const chips = [
             </li>
           ))}
         </ul>
-        <p class="note">VMAF, 0 to 100. Above 70 looks good on a phone. nu-media sends a half-size base layer; the receiving iPhone’s Neural Engine restores the rest.</p>
+        <p class="note"><a href="https://github.com/Netflix/vmaf">VMAF</a> is Netflix’s open video quality score: it compares each video with the original and predicts how people would rate it, 0 to 100. Above 70 looks good on a phone. nu-media sends a half-size base layer; the receiving iPhone’s Neural Engine restores the rest.</p>
       </figure>
 
       <figure class="card wide" data-scene="reveal">
@@ -379,6 +382,10 @@ const chips = [
   .card.wide {
     grid-column: 1 / -1;
   }
+  .saves { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; }
+  .saves span { padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; background: rgba(139, 123, 255, 0.14); color: rgba(255, 255, 255, 0.75); }
+  .saves b { color: #c9c0ff; }
+  .saves-note { margin: 0.8rem 0 0; font-size: 0.72rem; color: var(--muted, rgba(255, 255, 255, 0.5)); }
   .sub-cap {
     margin-top: 0.6rem;
   }
