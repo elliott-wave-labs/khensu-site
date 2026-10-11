@@ -172,7 +172,7 @@ const chips = [
             </li>
           ))}
         </ul>
-        <p class="saves"><span><b>15×</b> smaller than JPEG</span><span><b>94%</b> less data</span><span><b>$49</b> saved per million views</span></p>
+        <div class="saves" data-parallax><div class="sv" data-speed="-0.05"><b>15×</b><span>smaller than JPEG</span></div><div class="sv" data-speed="0.04"><b>94%</b><span>less data</span></div><div class="sv" data-speed="0.12"><b>$49</b><span>saved per million views</span></div></div>
         <figcaption class="sub-cap"><b>One Live Photo</b><span>The still plus 3 seconds of motion and sound</span></figcaption>
         <ul class="bars" role="list">
           {live.map((r, i) => (
@@ -183,7 +183,7 @@ const chips = [
             </li>
           ))}
         </ul>
-        <p class="saves"><span><b>7×</b> smaller than Apple’s pair</span><span><b>86%</b> less data</span><span><b>$102</b> saved per million views</span></p>
+        <div class="saves" data-parallax><div class="sv" data-speed="-0.05"><b>7×</b><span>smaller than Apple’s Live Photo pair</span></div><div class="sv" data-speed="0.04"><b>86%</b><span>less data</span></div><div class="sv" data-speed="0.12"><b>$102</b><span>saved per million views</span></div></div>
         <p class="saves-note">Bandwidth priced at $0.085 per GB, Amazon CloudFront’s US list price for the first 10 TB a month. Against HEIC, a nu-media photo is 7.7× smaller, 87% less, $23 saved per million views.</p>
       </figure>
 
@@ -362,6 +362,28 @@ const chips = [
   </div>
 </section>
 
+<script>
+  const groups = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
+  if (groups.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const tiles = groups.flatMap((g) => [...g.querySelectorAll<HTMLElement>('[data-speed]')]);
+    let queued = false;
+    const frame = () => {
+      queued = false;
+      const mid = innerHeight / 2;
+      for (const t of tiles) {
+        const r = t.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > innerHeight + 200) continue;
+        const d = r.top + r.height / 2 - mid;
+        t.style.transform = `translate3d(0, ${(d * Number(t.dataset.speed)).toFixed(1)}px, 0)`;
+      }
+    };
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(frame); } };
+    addEventListener('scroll', queue, { passive: true });
+    addEventListener('resize', queue);
+    frame();
+  }
+</script>
+
 <style>
   .charts {
     display: grid;
@@ -387,9 +409,32 @@ const chips = [
   .card.wide {
     grid-column: 1 / -1;
   }
-  .saves { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; }
-  .saves span { padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; background: rgba(139, 123, 255, 0.14); color: rgba(255, 255, 255, 0.75); }
-  .saves b { color: #c9c0ff; }
+  .saves { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 1rem; margin: 2.2rem 0 2.6rem; }
+  .sv {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    min-height: 13rem;
+    padding: 2rem 1.6rem;
+    border-radius: 24px;
+    background:
+      radial-gradient(120% 90% at 20% 0%, rgba(139, 123, 255, 0.28), rgba(139, 123, 255, 0) 60%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 20px 50px rgba(0, 0, 0, 0.35);
+    will-change: transform;
+  }
+  .sv b {
+    font-size: clamp(3.2rem, 6.5vw, 5.6rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    background: linear-gradient(120deg, #ffffff, #c9c0ff 45%, #7fd3ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sv span { font-size: 1.05rem; color: rgba(255, 255, 255, 0.72); }
   .saves-note { margin: 0.8rem 0 0; font-size: 0.72rem; color: var(--muted, rgba(255, 255, 255, 0.5)); }
   .sub-cap {
     margin-top: 0.6rem;
@@ -548,6 +593,30 @@ const chips = [
   }
   .timer::after {
     content: counter(secs) ' s · slot ' counter(slot) ' of 20';
+  }
+  /* The outline empties clockwise once per 2-second tick, in step with --tick. */
+  @property --gone {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+  .timer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(transparent var(--gone), #c9c0ff 0);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: clock 2s linear infinite;
+  }
+  @keyframes clock {
+    to { --gone: 360deg; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .timer::before { animation: none; }
   }
 
   /* Rate-quality chart: lines draw left to right as the card scrolls in. */

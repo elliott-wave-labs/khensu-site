@@ -17,54 +17,53 @@ const editions = [
     id: 'titanium',
     name: 'Titanium',
     price: 399,
-    body: 'Ceramic-coated titanium in your iPhone’s colour. The stone inlay with gold or platinum.',
+    body: 'Ceramic-coated titanium in your iPhone’s colour. The stone inlay, with a platinum line.',
     finishes: [
       { name: 'Burgundy', hex: '#5e1a24' },
       { name: 'Glacier', hex: '#b9c8d4' },
       { name: 'Silver', hex: '#cfd0cf' },
       { name: 'Black', hex: '#232427' },
     ],
-    accents: ['gold', 'platinum'],
   },
   {
     id: 'brass',
     name: 'Solid brass',
     price: 349,
-    body: 'Solid brass that darkens to a patina as you carry it. The same stone inlay and metal line.',
+    body: 'Solid brass that darkens to a patina as you carry it. The same stone inlay and platinum line.',
     finishes: [{ name: 'Brass', hex: '#b8914a' }],
-    accents: ['gold', 'platinum'],
   },
   {
     id: 'limited',
     name: 'Limited edition',
     price: 999,
-    body: 'Adds moldavite to the inlay, with a platinum bezel and a gold crescent. 500 made, each numbered.',
+    body: 'Adds moldavite and Paraíba tourmaline to the inlay. 500 made, each numbered.',
     finishes: [
       { name: 'Black titanium', hex: '#232427' },
       { name: 'Burgundy titanium', hex: '#5e1a24' },
       { name: 'Brass', hex: '#b8914a' },
     ],
-    accents: ['both'],
   },
 ];
 
 const stones = [
-  { name: 'Lapis lazuli', where: 'The crescent', note: 'Deep blue with flecks of pyrite. From Chile.', color: '#1f3a93' },
-  { name: 'Labradorite', where: 'The disc', note: 'Grey that flashes blue and gold as it turns. From Madagascar.', color: '#4b6a80' },
-  { name: 'Black onyx', where: 'The surround', note: 'A ring of black around the mark.', color: '#121214' },
-  { name: 'Bloodstone', where: 'The ring', note: 'Green with red flecks, in every edition. From India.', color: '#1f3d2b' },
-  { name: 'Moldavite', where: 'A node point in the disc', note: 'Green glass from a meteorite strike, found only in Czechia. Limited edition.', color: '#4a7a2a' },
+  { name: 'Lapis lazuli', img: 'lapis', where: 'The crescent', note: 'Deep blue with flecks of pyrite. From Chile.', chakra: 'Third eye and throat', meaning: 'Wisdom and truth. Worn by Egyptian royalty, and inlaid in Tutankhamun’s golden mask.' },
+  { name: 'Labradorite', img: 'labradorite', where: 'The disc', note: 'Grey that flashes blue and gold as it turns. From Madagascar.', chakra: 'Third eye and crown', meaning: 'Intuition and protection. Called a stone of transformation, for the light hidden inside it.' },
+  { name: 'Black onyx', img: 'onyx', where: 'A node point in the disc', note: 'Deep, polished black. From Brazil.', chakra: 'Root', meaning: 'Strength and grounding. A shield that keeps what is yours, yours.' },
+  { name: 'Bloodstone', img: 'bloodstone', where: 'The ring', note: 'Green with red flecks, in every edition. From India.', chakra: 'Root and heart', meaning: 'Courage and vitality. Carried by warriors for endurance.' },
+  { name: 'Blue kyanite', img: 'kyanite', where: 'A node point in the disc', note: 'Bladed blue that shifts with the light, in every edition. From Brazil.', chakra: 'Throat', meaning: 'Clear communication and alignment. Said never to hold on to negative energy.' },
+  { name: 'Tourmaline', img: 'tourmaline', where: 'Twelve markers in the ring', note: 'Pink, green, blue, canary and watermelon, with neon Paraíba in the limited edition. From Brazil and Mozambique.', chakra: 'All seven, by colour; Paraíba for throat and heart', meaning: 'Balance and protection. Watermelon tourmaline joins the heart’s pink and green.' },
+  { name: 'Moldavite', img: 'moldavite', where: 'A second node point in the disc', note: 'Green glass from a meteorite strike, found only in Czechia. Limited edition.', chakra: 'Heart and crown', meaning: 'Rapid change and awakening. Born of a meteorite strike 15 million years ago.' },
 ];
 ---
 
-<Base title="Pre-order suñůlink.shield" description="Pre-order suñůlink.shield: a post-quantum node in titanium or brass, made in Morocco, with the khensu.nu mark inlaid flush in lapis, labradorite, onyx and bloodstone.">
+<Base title="Pre-order suñůlink.shield" description="Pre-order suñůlink.shield: a post-quantum node in titanium or brass, made in Morocco, with the khensu.nu mark inlaid flush in bloodstone, lapis, labradorite, onyx, kyanite and tourmaline, with platinum.">
   <section class="page-head">
     <div class="wrap">
       <p class="eyebrow">suñůlink.shield · pre-order</p>
       <h1>Made in Morocco. <em>Inlaid with stone.</em></h1>
       <p class="lede">
         A post-quantum node for your iPhone, machined from titanium or brass, with the khensu.nu mark set flush into
-        the back in natural stone and a line of gold or platinum. Every inlay is cut from its own stones, so no two are
+        the back in natural stone with a line of platinum. Every inlay is cut from its own stones, so no two are
         the same.
       </p>
     </div>
@@ -96,18 +95,7 @@ const stones = [
                 </button>
               ))}
             </div>
-            {e.accents.length > 1 ? (
-              <>
-                <p class="opt-label">Crescent and bezel</p>
-                <div class="accents">
-                  {e.accents.map((a, j) => (
-                    <button class:list={['accent', { on: j === 0 }]} data-accent={a}>{a === 'gold' ? '18k gold' : 'Platinum'}</button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <p class="opt-note">Platinum bezel, 18k gold crescent</p>
-            )}
+            <p class="opt-note">Platinum crescent line</p>
             <a class="btn primary reserve" href={links[e.id as keyof typeof links] || mail(e.name)}>
               {links[e.id as keyof typeof links] ? `Reserve with a $${DEPOSIT} deposit` : 'Reserve by email'}
             </a>
@@ -130,19 +118,22 @@ const stones = [
       <h2 class="big">The mark, in stone. <em>Flush to the metal.</em></h2>
       <p class="lede narrow">
         Each stone is cut by machine to the shape of its part of the mark, set into a pocket milled in the back and
-        lapped down with the metal until the surface is one smooth plane you can’t feel with a fingernail. The gold or
-        platinum line is laid in by hand, in the way Meknes craftspeople have inlaid silver into steel for centuries.
+        lapped down with the metal until the surface is one smooth plane you can’t feel with a fingernail. The platinum
+        line is laid in by hand, in the way Meknes craftspeople have inlaid silver into steel for centuries.
       </p>
         </div>
-        <canvas class="inlay-closeup" width="1024" height="1024" role="img" aria-label="Close-up of the inlay: the khensu.nu mark with a bloodstone ring, a lapis crescent and a labradorite disc, in a black onyx surround with a metal bezel."></canvas>
+        <canvas class="inlay-closeup" width="1024" height="1024" role="img" aria-label="Close-up of the inlay: the khensu.nu mark with a bloodstone ring, a lapis crescent and a labradorite disc, in tourmaline markers in the ring and kyanite and onyx points in the disc."></canvas>
       </div>
       <ul class="stones" role="list">
         {stones.map((s) => (
           <li>
-            <span class="dot" style={`background:${s.color}`}></span>
-            <b>{s.name}</b>
-            <small>{s.where}</small>
-            <span>{s.note}</span>
+            <div class="stone-head">
+              <img src={`/khensu/stones/${s.img}.jpg`} alt="" width="120" height="120" loading="lazy" decoding="async" />
+              <div><b>{s.name}</b><small>{s.where}</small></div>
+            </div>
+            <span class="note">{s.note}</span>
+            <span class="chakra"><em>Chakra</em> {s.chakra}</span>
+            <span class="meaning">{s.meaning}</span>
           </li>
         ))}
       </ul>
@@ -174,7 +165,7 @@ const stones = [
       <p class="footnote">
         For iPhone 18 Pro and Pro Max first, then more models. Stones are natural, so colour and pattern vary, and
         they are softer than the metal around them: sealed, but they may show fine wear over years, like a watch dial.
-        Moldavite is certified genuine. Sources are traceable, and our lapis does not come from Afghanistan. Battery
+        Stone photographs are illustrative; every inlay is cut from its own stones. Chakras and meanings are traditional beliefs, shared for their history, not as claims. Moldavite is certified genuine. Sources are traceable, and our lapis does not come from Afghanistan. Battery
         and charge times are targets; production figures may change. The 3D view uses the current CAD model, and the
         inlay is drawn to show the design, not a specific shield. iPhone is a trademark of Apple Inc. Payments are
         handled by Stripe.
@@ -185,12 +176,11 @@ const stones = [
 </Base>
 
 <script>
-  type Accent = 'gold' | 'platinum' | 'both';
-  const state = { edition: 'titanium', hex: '#5e1a24', brass: false, accent: 'gold' as Accent };
+  const state = { edition: 'titanium', hex: '#5e1a24', brass: false };
   const send = () =>
     dispatchEvent(
       new CustomEvent('shield:finish', {
-        detail: { housing: state.hex, brass: state.brass, accents: state.accent, moldavite: state.edition === 'limited' },
+        detail: { housing: state.hex, brass: state.brass, moldavite: state.edition === 'limited' },
       }),
     );
   const pick = (group: Element, el: Element) => {
@@ -201,8 +191,6 @@ const stones = [
     const sw = opts.querySelector<HTMLElement>('.swatch.on')!;
     state.hex = sw.dataset.hex!;
     state.brass = !!sw.dataset.brass;
-    const ac = opts.querySelector<HTMLElement>('.accent.on');
-    state.accent = (ac?.dataset.accent as Accent) ?? 'both';
     send();
   };
   for (const b of document.querySelectorAll<HTMLElement>('.edition')) {
@@ -221,14 +209,13 @@ const stones = [
   }
   for (const o of document.querySelectorAll<HTMLElement>('.options')) {
     o.querySelectorAll('.swatch').forEach((s) => s.addEventListener('click', () => { pick(o.querySelector('.swatches')!, s); sync(o); }));
-    o.querySelectorAll('.accent').forEach((a) => a.addEventListener('click', () => { pick(o.querySelector('.accents')!, a); sync(o); }));
   }
 </script>
 
 <style>
   .narrow { max-width: 46rem; }
   .inlay-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
-  .inlay-closeup { width: min(360px, 80vw); height: auto; aspect-ratio: 1; border-radius: 50%; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08); }
+  .inlay-closeup { width: min(420px, 80vw); height: auto; aspect-ratio: 1; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.6)); }
   @media (max-width: 900px) { .inlay-head { grid-template-columns: 1fr; justify-items: center; } }
   .buy-grid {
     display: grid;
@@ -293,7 +280,7 @@ const stones = [
     margin: 2rem 0 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
     gap: 1rem;
   }
   .stones li {
@@ -304,9 +291,16 @@ const stones = [
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
-  .stones .dot { width: 1.6rem; height: 1.6rem; border-radius: 50%; margin-bottom: 0.4rem; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), inset 0 6px 10px rgba(255, 255, 255, 0.15); }
+  .stones li { gap: 0.55rem; }
+  .stone-head { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.2rem; }
+  .stone-head img { width: 3.6rem; height: 3.6rem; flex: none; border-radius: 50%; object-fit: cover; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08); }
+  .stone-head div { display: grid; gap: 0.15rem; }
+  .stone-head b { font-size: 1.05rem; }
   .stones small { color: #b9adff; font-size: 0.78rem; }
-  .stones span:last-child { color: var(--text-dim); font-size: 0.9rem; }
+  .stones .note { color: var(--text-dim); font-size: 0.9rem; }
+  .stones .chakra { font-size: 0.82rem; color: rgba(255, 255, 255, 0.82); }
+  .stones .chakra em { font-style: normal; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: #b9adff; margin-right: 0.35rem; }
+  .stones .meaning { font-size: 0.85rem; color: var(--text-dim); font-style: italic; }
   .two { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
   .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin: 0; }
   .specs dt { font-size: 1.7rem; font-weight: 500; letter-spacing: -0.02em; }

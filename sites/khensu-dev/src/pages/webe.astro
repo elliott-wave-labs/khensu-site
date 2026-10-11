@@ -2,13 +2,13 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="webE" description="The webE specification, how to build apps and sites on webE, and how to extend khensu.nu through code and consensus.">
-  <p class="eyebrow">webE · specification</p>
-  <h1>webE: a new network, alongside the internet</h1>
+<Base title="webË" description="The webË specification, how to build apps and sites on webË, and how to extend khensu.nu through code and consensus.">
+  <p class="eyebrow">webË · specification</p>
+  <h1>webË: a new network, alongside the internet</h1>
   <p class="lede">
-    webE is an open protocol for names without DNS, content without CDNs, websites, feeds, forums and live media, all
+    webË is an open protocol for names without DNS, content without CDNs, websites, feeds, forums and live media, all
     delivered over a post-quantum stealth network. Nodes only relay, cache and count; encoding, encryption, ranking,
-    moderation and rendering happen on devices. khensu.nu is the first webE app. Anyone can build another.
+    moderation and rendering happen on devices. khensu.nu is the first webË app. Anyone can build another.
   </p>
 
   <h2 id="spec">Specification</h2>
@@ -36,16 +36,16 @@ import Base from '../layouts/Base.astro';
   <p>
     Five Internet-Drafts are planned from these: Outfox with ML-KEM-1024, a stealth profile for MOQ, naming from a
     transparency log, signed content-addressed sites and feeds over MOQ, and two-relay stealth fetch. The specification
-    repository opens with its design review; until then, <a href="mailto:hello@elliottwave.studio?subject=webE%20specification">ask for access</a>.
+    repository opens with its design review; until then, <a href="mailto:hello@elliottwave.studio?subject=web%C3%8B%20specification">ask for access</a>.
   </p>
 
-  <h2 id="vpn">How webE replaces a VPN</h2>
+  <h2 id="vpn">How webË replaces a VPN</h2>
   <p>
-    A VPN hides your traffic from your internet provider by handing all of it to one company instead. webE splits that
+    A VPN hides your traffic from your internet provider by handing all of it to one company instead. webË splits that
     trust so no single party ever holds it.
   </p>
   <table>
-    <thead><tr><th></th><th>Typical VPN</th><th>webE</th></tr></thead>
+    <thead><tr><th></th><th>Typical VPN</th><th>webË</th></tr></thead>
     <tbody>
       <tr><td>Who sees your IP and what you open</td><td>The VPN company sees both</td><td>Nobody: the entry relay knows who, the exit relay or cache knows what, run by different operators, networks and jurisdictions</td></tr>
       <tr><td>Messages</td><td>One tunnel; the VPN sees when you talk to which service</td><td>Mix network: five hops with cover traffic, so no relay or outside observer can link sender and receiver</td></tr>
@@ -57,35 +57,75 @@ import Base from '../layouts/Base.astro';
       <tr><td>Who runs it</td><td>One company, one subscription</td><td>Independent operators paid by the protocol for proven work</td></tr>
     </tbody>
   </table>
-  <h3>Today: everything on webE</h3>
+  <h3>Today: everything on webË</h3>
   <p>
     Messages, calls, payments, feeds, forums, sites and live streams all travel this way, in the khensu.nu app and in
-    any webE app built on <code>khensu-core</code>. No VPN is needed for any of them, and a VPN would add nothing.
+    any webË app built on <code>khensu-core</code>. No VPN is needed for any of them, and a VPN would add nothing.
   </p>
-  <h3>Planned: webE exit, for the rest of the internet</h3>
+  <h3>Planned: webË exit, for the rest of the internet</h3>
   <ul>
-    <li><strong>On the device:</strong> a Network Extension packet tunnel on iPhone, iPad and Mac sends all the device’s traffic into webE, so ordinary apps and websites are covered too. It is part of the khensu.nu app, with no separate VPN account.</li>
-    <li><strong>Two relays:</strong> each connection goes through an entry relay and an exit relay from different operators, the same split as webE fetches. The exit relay opens the connection to the website; HTTPS to the website stays end to end, so the exit sees only the site’s name and traffic size.</li>
+    <li><strong>On the device:</strong> a Network Extension packet tunnel on iPhone, iPad and Mac sends all the device’s traffic into webË, so ordinary apps and websites are covered too. It is part of the khensu.nu app, with no separate VPN account.</li>
+    <li><strong>Two relays:</strong> each connection goes through an entry relay and an exit relay from different operators, the same split as webË fetches. The exit relay opens the connection to the website; HTTPS to the website stays end to end, so the exit sees only the site’s name and traffic size.</li>
     <li><strong>Stealth stays on:</strong> the tunnel looks like ordinary HTTPS and uses padded trunks and size buckets. Bulk browsing can’t fit inside the 2-second ticks, so timing cover for the open web is weaker than for messages; we will say so in the app.</li>
     <li><strong>Exit operators:</strong> exit duty is opt-in, needs extra stake, and runs only where the operator chooses, because exit relays receive abuse complaints for other people’s traffic, as Tor exits do.</li>
     <li><strong>DNS:</strong> resolved at the exit relay inside the tunnel, never by your internet provider.</li>
     <li><strong>Nothing processed on servers:</strong> relays only forward. There is no filtering, ad blocking or inspection at the exit.</li>
   </ul>
 
-  <h2 id="build">Build an app on webE</h2>
+  <h2 id="build">Build an app on webË</h2>
   <ul>
     <li><strong>Sites:</strong> a site is a signed manifest plus static files and optional WebAssembly, published at <code>your-name.khensu.nu</code> and hosted by the network. There is no server-side code. A site can embed feeds, forums and live tracks by reference.</li>
     <li><strong>Apps:</strong> <code>khensu-core</code> (Apache-2.0, Rust) gives you the transport, MLS groups, names and objects, with Swift bindings as an XCFramework for iPhone, iPad and Mac. Your app gets the same stealth and post-quantum encryption as khensu.nu, with no extra work.</li>
-    <li><strong>Browsers:</strong> the Chromium extension resolves <code>webe://</code> and <code>https://*.khensu.nu</code> through a local daemon, so webE pages open in an ordinary browser.</li>
+    <li><strong>Browsers:</strong> the Chromium extension resolves <code>webe://</code> and <code>https://*.khensu.nu</code> through a local daemon, so webË pages open in an ordinary browser.</li>
     <li><strong>Develop locally:</strong> <code>khensu-devnet</code> runs a node, the mix network, the chain and the push gateway on one machine.</li>
   </ul>
-  <p>Every webE app keeps the same rules, enforced by the protocol and by review:</p>
+  <p>Every webË app keeps the same rules, enforced by the protocol and by review:</p>
   <ul>
     <li>Stealth can’t be turned off, and there is no faster visible mode.</li>
     <li>Nothing processes user data on a server; nodes only relay, cache and count.</li>
     <li>ML-KEM-1024 and ML-DSA-87 only, with no classical fallback.</li>
     <li>Content is signed by its publisher and addressed by its hash, so no node can alter it.</li>
     <li>Sites can’t reach the ordinary web or other names unless their policy lists them, which blocks third-party tracking by construction.</li>
+  </ul>
+
+  <h2 id="contracts">Post-quantum web contracts (proposed)</h2>
+  <p>
+    A webË contract is an agreement between people that enforces itself, without a server and without a public record of
+    who agreed to what. It is a design proposal, open for review in <code>WEBE.md</code> section 14.
+  </p>
+  <ul>
+    <li><strong>The code:</strong> a small, deterministic WebAssembly program, signed by its author with ML-DSA-87 and addressed by its hash, published like a site. Anyone can read what it will do before agreeing.</li>
+    <li><strong>Runs on the parties’ devices:</strong> each step runs on the phones and Macs of the people in the contract, never on nodes. Inputs such as amounts, delivery proofs and messages stay private to the parties.</li>
+    <li><strong>Proved, not replayed:</strong> each step produces a STARK proof (hash-based, so post-quantum) that the program ran correctly on the committed state. The chain stores only the proof, a commitment to the new state and any shielded-pool notes, never the inputs.</li>
+    <li><strong>Settled privately:</strong> money moves through the shielded pool with ML-KEM-1024 note encryption, and every message between parties goes over the mixnet, so not even the operators can see who has a contract with whom.</li>
+    <li><strong>Expires with the era:</strong> contract state follows the pool’s eras, so nothing sits on the chain forever.</li>
+  </ul>
+  <h3>What you can build with contracts</h3>
+  <ul>
+    <li><strong>Escrow and milestones:</strong> a client locks payment; each milestone releases when both sides sign, or when an arbiter they chose decides.</li>
+    <li><strong>Threshold pledges:</strong> “I’ll pay if 1,000 others do.” Pledges stay hidden and unlinkable until the threshold is met, then settle together, or refund on the deadline.</li>
+    <li><strong>Revenue splits:</strong> collaborators on a post, song or film are paid their shares automatically from every payment it earns.</li>
+    <li><strong>Tickets and memberships:</strong> anonymous credentials that prove you paid, without showing who you are or linking one visit to the next.</li>
+    <li><strong>Bounties:</strong> a reward paid to whoever first submits something that passes the contract’s check, such as a bug proof or a translation.</li>
+    <li><strong>Time-locked releases:</strong> a file, key or message that opens on a date, or if you stop checking in.</li>
+  </ul>
+  <p>
+    By design there is no global shared state that any contract can read, so there is no public order book, no front-running
+    and nothing for a quantum computer to break later. Contracts that need public state use a forum or feed as their record.
+  </p>
+
+  <h2 id="network-work">Deeper work for the network (proposed)</h2>
+  <p>
+    Nodes earn work receipts for more than relaying. Every job below touches only ciphertext or data its owner chose to
+    publish. User data is still never processed on a server.
+  </p>
+  <ul>
+    <li><strong>Proof aggregation:</strong> nodes with spare CPU fold each block’s spend and contract proofs into one recursive STARK, so phones verify one small proof instead of thousands.</li>
+    <li><strong>Encrypted storage:</strong> erasure-coded shards of sites, media and backups, held as ciphertext and checked with storage proofs, paid per byte-day.</li>
+    <li><strong>Public media renditions:</strong> Macs and GPUs encode nu-media versions of posts their owners published openly. Private media is always encoded on the sender’s device.</li>
+    <li><strong>Private lookups:</strong> private information retrieval for names, keys and directories, so a node answers a query without learning what was asked.</li>
+    <li><strong>Randomness and timestamps:</strong> a threshold randomness beacon for committee lotteries, raffles and fair ordering, and post-quantum timestamps that prove a hash existed at a given time.</li>
+    <li><strong>Mesh and satellite bridging:</strong> nodes and suñůlink.shield units carry mixnet traffic between places with no internet and the rest of the network.</li>
   </ul>
 
   <h2 id="extend">Extend khensu.nu</h2>
@@ -106,6 +146,6 @@ import Base from '../layouts/Base.astro';
   </ul>
   <p>
     See <a href="/contribute">Contribute</a> and <a href="/repositories">Repositories and licences</a>, or write to
-    <a href="mailto:hello@elliottwave.studio?subject=Building%20on%20webE">hello@elliottwave.studio</a>.
+    <a href="mailto:hello@elliottwave.studio?subject=Building%20on%20web%C3%8B">hello@elliottwave.studio</a>.
   </p>
 </Base>

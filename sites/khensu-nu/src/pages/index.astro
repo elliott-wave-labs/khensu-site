@@ -18,7 +18,7 @@ import PerAnkh from '../components/khensu/PerAnkh.astro';
 
 const highlights = [
   { icon: 'lock', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
-  { icon: 'shield', title: 'Nobody sees who talks to whom', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not, and the relays carrying you keep switching, so none of them sees a whole conversation.' },
+  { icon: 'shield', title: 'Full stealth mode, beyond a VPN', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not, and the relays carrying you keep switching, so none of them sees a whole conversation.' },
   { icon: 'feed', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
   { icon: 'wallet', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
   { icon: 'sparkle', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
@@ -396,6 +396,8 @@ const specs = [
     gap: 0.6rem;
     margin: 0 0 0.6rem;
     font-weight: 500;
+    white-space: nowrap;
+    font-size: clamp(1.05rem, 1.45vw, 1.3rem);
   }
   .hl h3 :global(svg) {
     flex: none;
