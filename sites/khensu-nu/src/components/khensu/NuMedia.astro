@@ -96,25 +96,21 @@ const v720 = (k: string) => `${rate(t720[k].actual_kbps)} · VMAF ${t720[k].vmaf
 const videos = [
   {
     title: '5× smaller than Instagram’s own file',
-    sub: 'Every codec at 500 kbit/s, 720p. Top row encoded on an iPhone Air, bottom row on a Mac, since iPhone has no encoder for them. 1:1 crops of 720 × 1280 frames.',
+    sub: 'The original against the iPhone’s hardware encoders and nu-media, all at 500 kbit/s. 1:1 crops of 720 × 1280 frames, encoded on an iPhone Air.',
     stats: [
       { big: `${(2437.958 / 500).toFixed(1)}×`, small: 'fewer bytes than Instagram serves' },
       { big: `${(2437.958 / 500).toFixed(1)}×`, small: 'faster to arrive on the same connection' },
       { big: 'Same look', small: 'nu-media’s quality target at this size' },
     ],
-    src: '/khensu/codec/compare-720p.mp4', poster: '/khensu/codec/compare-720p.jpg', w: 1440, h: 1280, cols: 4, rows: 2, maxw: '46rem',
-    mobile: '/khensu/codec/compare-720p-m.mp4',
+    src: '/khensu/codec/compare-720p-4.mp4', poster: '/khensu/codec/compare-720p-4.jpg', w: 1440, h: 640, cols: 4, rows: 1, maxw: '60rem',
+    mobile: '/khensu/codec/compare-720p-4m.mp4',
     tiles: [
       { name: 'Original', note: 'Instagram · 720 × 1280 · 2.44 Mbit/s · 30 fps' },
-      { name: 'nu-media', note: `Neural Engine · ${v720('nu-media')}`, ours: true },
-      { name: 'HEVC (H.265)', note: `iPhone hardware · ${v720('hevc-hw')}` },
-      { name: 'HEVC (x265)', note: `Software, slow · ${v720('hevc-x265')}` },
-      { name: 'AV1', note: `Real time · ${v720('av1-rt')}` },
-      { name: 'AV1', note: `Best, not live · ${v720('av1-best')}` },
       { name: 'H.264', note: `iPhone hardware · ${v720('h264-hw')}` },
-      { name: 'VP9', note: `Real time · ${v720('vp9-rt')}` },
+      { name: 'HEVC (H.265)', note: `iPhone hardware · ${v720('hevc-hw')}` },
+      { name: 'nu-media', note: `Neural Engine · ${v720('nu-media')}`, ours: true },
     ],
-    credit: `Source: @deemsterhotline on Instagram, used with thanks: H.264 High profile, 720 × 1280 at 30 fps, 2.44 Mbit/s video (2.51 Mbit/s with audio), so every tile here uses about a fifth of the bits Instagram serves. nu-media is the iPhone’s hardware HEVC at 360 × 640 plus Apple’s low-latency super resolution on the Neural Engine, our first prototype of the enhancement layer. It looks sharper but scores VMAF ${t720['nu-media'].vmaf.toFixed(0)}, below a plain upscale (${(g720.tiles as any)['nu-base-lanczos'].vmaf.toFixed(0)}), because it adds texture the original doesn’t have; nu-media’s own trained network replaces it.`,
+    credit: `Source: @deemsterhotline on Instagram, used with thanks: H.264 High profile, 720 × 1280 at 30 fps, 2.44 Mbit/s video (2.51 Mbit/s with audio), so every tile here uses about a fifth of the bits Instagram serves. nu-media works at any resolution; in this test its base layer was sent at 360 × 640, the size that fits 500 kbit/s best, and rebuilt to 720 × 1280 on the receiving iPhone with Apple’s low-latency super resolution, our first prototype of the enhancement layer. It looks sharper but scores VMAF ${t720['nu-media'].vmaf.toFixed(0)}, below a plain upscale (${(g720.tiles as any)['nu-base-lanczos'].vmaf.toFixed(0)}), because it adds texture the original doesn’t have; nu-media’s own trained network replaces it. Full results for every codec are on <a href="/media">the measurements page</a>.`,
   },
   {
     title: '4K at 4 Mbit/s, encoded on iPhone Air',
@@ -319,7 +315,7 @@ const { full = false } = Astro.props as { full?: boolean };
               ))}
             </ol>
           </div>
-          <p class="note">{v.credit}</p>
+          <p class="note" set:html={v.credit} />
         </figure>
       ))}
 
@@ -846,12 +842,12 @@ const { full = false } = Astro.props as { full?: boolean };
 
   @media (max-width: 640px) {
     .cmp.has-m video {
-      aspect-ratio: 720 / 1800;
+      aspect-ratio: 720 / 900;
       object-fit: cover;
     }
     .cmp.has-m .tiles {
       --cols: 2 !important;
-      --rows: 4 !important;
+      --rows: 2 !important;
     }
     .cmp.has-m .tiles li {
       font-size: 0.72rem;
