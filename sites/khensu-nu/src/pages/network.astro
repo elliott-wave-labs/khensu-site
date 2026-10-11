@@ -38,56 +38,22 @@ const fees = [
   { name: 'Apple App Store, Google Play', fee: 30, from: 15, label: '15–30%', keeps: '$70–85' },
 ];
 
-const usd = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })}`;
-const tiers = [
-  { name: 'Pro', price: 4.99 },
-  { name: 'Ultra', price: 200 },
-  { name: 'Akashic', price: 1000 },
-].map((t) => {
-  const net = Math.round(t.price * 0.85 * 100) / 100;
-  const half = Math.floor((net / 2) * 100) / 100;
-  return { ...t, apple: Math.round((t.price - net) * 100) / 100, net, network: Math.round((net - half) * 100) / 100, founder: half };
-});
-const perPayer = 0.989 * tiers[0].network + 0.01 * tiers[1].network + 0.001 * tiers[2].network;
-const scale = [
-  { users: 1e6, nodes: 5000 },
-  { users: 10e6, nodes: 20000 },
-  { users: 100e6, nodes: 60000 },
-  { users: 250e6, nodes: 90000 },
-  { users: 1e9, nodes: 150000 },
-].map((r) => {
-  const pool = r.users * 0.05 * perPayer;
-  const avg = pool / r.nodes;
-  return { ...r, pool, avg, big: avg * 10, bigWeek: (avg * 10 * 12) / 52 };
-});
-const people = (n: number) => (n >= 1e9 ? `${n / 1e9} billion` : `${n / 1e6} million`);
-const whole = (n: number) => `$${Math.round(n).toLocaleString('en-US')}`;
-const money = (n: number) => (n >= 1e6 ? `$${(n / 1e6).toFixed(n >= 1e8 ? 0 : 1)} million` : whole(n));
-const pipeline = [
-  { t: 'You subscribe in the App Store', text: 'Pro, Ultra or Akashic, paid with Apple Pay. Apple keeps its 15% and pays the rest to Elliott Wave LLC each month.' },
-  { t: 'Half goes to the network as USDC', text: 'The network’s 50% is converted 1:1 to USDC, a fully reserved dollar stablecoin, and paid into the shielded pool as that epoch’s pay pool.' },
-  { t: 'Nodes are paid for proved work', text: 'Each node draws from the pool in shielded USDC for its verified work receipts, at one worldwide rate. Nobody sees who was paid or how much.' },
-  { t: 'Operators spend it with Apple Pay', text: 'Keep it, send it, or spend it anywhere with a USDC debit card in Apple Pay, or withdraw to a bank.' },
-  { t: 'The other half is the founder’s', text: 'Elliott Wave LLC’s 50% pays for building and running khensu.ñü. It is the only cut, and it comes only from these subscriptions.' },
-];
 const succession = [
-  { t: 'On every change', text: 'Every code push, private or public, every release and every network upgrade is archived on the network automatically, within one epoch. A release that isn’t archived won’t install.' },
-  { t: 'Every week', text: 'The founder signs a check-in on chain, confirming the archive and the sealed escrow of private code cover everything up to now.' },
-  { t: '42 days without a check-in', text: 'Six missed weeks, or a signed handover, and the switch fires by itself. No signature, vote or server is needed to fire it.' },
-  { t: 'The trusted committee opens it', text: 'The 21 committee nodes of that epoch jointly hold the keys. Any 14 open every sealed repository, patented code included, and take over signing releases.' },
-  { t: 'Then everyone gets it', text: 'The full archive goes to every node, the founder’s list of friends, The Wall Street Journal and Forbes, Wikimedia Commons and the Internet Archive, with a royalty-free licence to every patent. Founder powers pass to consensus for good.' },
+  { t: 'Every 30 days', text: 'The founder signs a check-in on chain, attesting to the archive and to the sealed escrow of every line of private code.' },
+  { t: '42 days of silence, or a signed handover', text: 'The switch fires by itself. No signature, vote or server is needed to fire it.' },
+  { t: 'From then on, forever', text: 'Every founder power passes to consensus: two-thirds of the committee, with a 30-day timelock and veto. All private code opens, patented code included. No rule change can bring a founder back.' },
 ];
 ---
 
 <Base
-  title="The network: contracts, paid node work and a gift to everyone"
-  description="webË contracts for any work, from escrow to anonymous ballots. Six jobs node operators are paid for. A flat 10% app fee, the lowest in the industry. And a network that belongs to everyone, the founder’s powers included."
+  title="The network: contracts, work and no off switch"
+  description="webË contracts for any work, from escrow to anonymous ballots. Six jobs node operators are paid for. A flat 10% app fee, the lowest in the industry. And a network no one can stop, the founder included."
 >
   <div class="khensu">
     <section class="page-head">
       <div class="wrap">
         <p class="eyebrow"><span class="name-case">webË</span> · the network</p>
-        <h1>Private contracts.<br /><span class="dim">Owned by everyone.</span></h1>
+        <h1>Private contracts.<br /><span class="dim">No off switch.</span></h1>
         <StatStrip
           items={[
             { n: 10, unit: '%', label: 'Flat app fee, on the first dollar and the billionth' },
@@ -96,16 +62,14 @@ const succession = [
             { n: 42, unit: 'days', label: 'Of founder silence, then every power and every line of code passes to the network' },
           ]}
         />
-        <p class="lede">Agreements that keep themselves, node work that pays, and a network that belongs to all of us, so people everywhere can create, earn and live securely.</p>
+        <p class="lede">Agreements that keep themselves, node work that pays, and a network no one can stop, the founder included.</p>
         <nav class="chips" aria-label="On this page">
           <a href="#network-contracts">Contracts</a>
           <a href="#network-ballots">Ballots</a>
           <a href="#network-standard">Standard contracts</a>
           <a href="#network-work">Node work</a>
-          <a href="#network-economics">Economics</a>
-          <a href="#network-earnings">Node earnings</a>
           <a href="#network-commerce">10% app fee</a>
-          <a href="#network-gift">A gift to everyone</a>
+          <a href="#network-unstoppable">No one can stop it</a>
         </nav>
       </div>
     </section>
@@ -247,99 +211,6 @@ const succession = [
       </div>
     </section>
 
-    <section class="section" id="network-economics">
-      <div class="wrap">
-        <p class="eyebrow">network economics</p>
-        <h2>Half to the network.<br /><span class="dim">Half to the founder. Nothing from you.</span></h2>
-        <p class="intro">
-          khensu.ñü earns only from its own subscriptions. After Apple’s cut, every dollar splits evenly: half pays the
-          people who run the network, half goes to the founder’s company.
-        </p>
-        <figure class="glass econ">
-          <figcaption>A month of each subscription, in US dollars</figcaption>
-          <div class="econ-scroll" tabindex="0">
-            <table>
-              <thead>
-                <tr><th scope="col">Plan</th><th scope="col">You pay</th><th scope="col">Apple’s 15%</th><th scope="col">After Apple</th><th scope="col">To the network, 50%</th><th scope="col">To the founder, 50%</th></tr>
-              </thead>
-              <tbody>
-                {tiers.map((t) => (
-                  <tr>
-                    <th scope="row">{t.name}</th>
-                    <td>{usd(t.price)}</td>
-                    <td class="dim">−{usd(t.apple)}</td>
-                    <td>{usd(t.net)}</td>
-                    <td class="ours">{usd(t.network)}</td>
-                    <td>{usd(t.founder)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </figure>
-        <ol class="steps" role="list">
-          {pipeline.map((p, i) => (
-            <li class="glass" style={`--i:${i}`}><span class="num">{String(i + 1).padStart(2, '0')}</span><h3>{p.t}</h3><p>{p.text}</p></li>
-          ))}
-        </ol>
-        <div class="grid three">
-          <article class="glass"><h3>No cut on views or engagement</h3><p>Every play pays the creator 1¢, $10 per 1,000, all of it to them.</p></article>
-          <article class="glass"><h3>No cut on gifts, sales or subscriptions</h3><p>Tips, a creator’s own purchases and fan subscriptions reach them in full.</p></article>
-          <article class="glass"><h3>No cut on hosting or network work</h3><p>Storage, delivery, relays and every job a node does are paid to the node in full.</p></article>
-        </div>
-        <p class="footnote">
-          Apple keeps 15% under its Small Business Program and on subscriptions after their first year; 30% applies in a
-          subscription’s first year once a developer earns over $1 million a year, which makes Pro $3.49 after Apple
-          ($1.75 to the network, $1.74 to the founder), Ultra $140 ($70 each) and Akashic $700 ($350 each). USDC is issued by
-          Circle and redeemable 1:1 for US dollars. Apple and Apple Pay are trademarks of Apple Inc.
-        </p>
-      </div>
-    </section>
-
-    <section class="section" id="network-earnings">
-      <div class="wrap">
-        <p class="eyebrow">node earnings</p>
-        <h2>Over $1,000 a week.<br /><span class="dim">Once the audience is there.</span></h2>
-        <p class="intro">
-          What a node earns depends on how many people use khensu.ñü and how much work the node does. Here is a month at each
-          audience size, paid from the network’s half of subscriptions alone.
-        </p>
-        <figure class="glass econ">
-          <figcaption>Estimated monthly earnings per node, in US dollars</figcaption>
-          <div class="econ-scroll" tabindex="0">
-            <table>
-              <thead>
-                <tr><th scope="col">People on khensu.ñü</th><th scope="col">Network pool a month</th><th scope="col">Nodes</th><th scope="col">Average node</th><th scope="col">High-capacity node</th><th scope="col">Per week</th></tr>
-              </thead>
-              <tbody>
-                {scale.map((r) => (
-                  <tr class={r.bigWeek >= 1000 ? 'over' : undefined}>
-                    <th scope="row">{people(r.users)}</th>
-                    <td>{money(r.pool)}</td>
-                    <td class="dim">{r.nodes.toLocaleString('en-US')}</td>
-                    <td>{whole(r.avg)}</td>
-                    <td class="ours">{whole(r.big)}</td>
-                    <td class="ours">{whole(r.bigWeek)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </figure>
-        <div class="grid three">
-          <article class="glass"><h3>Average node</h3><p>A Mac or Raspberry Pi 5 on home broadband, online all day, doing its share of mixing, mail and relays.</p></article>
-          <article class="glass"><h3>High-capacity node</h3><p>Fast fibre, plenty of storage and a Mac with a Neural Engine. It proves ten times the work of an average node, so it earns ten times as much.</p></article>
-          <article class="glass"><h3>Paid for proof, not hype</h3><p>Every dollar comes from a verified work receipt, paid in shielded USDC at one worldwide rate. No token sale, and no pay for doing nothing.</p></article>
-        </div>
-        <p class="footnote">
-          Estimates. They assume 5% of people subscribe (98.9% Pro, 1% Ultra, 0.1% Akashic, about $3.37 a month to the network
-          per subscriber after Apple’s 15%), node counts growing more slowly than the audience, and a high-capacity node
-          proving ten times the average work. Before electricity and bandwidth costs, and before tax. Earnings from webË apps,
-          contracts, media delivery and the basic income are not included. Real earnings depend on usage and are not guaranteed.
-        </p>
-      </div>
-    </section>
-
     <section class="section" id="network-commerce">
       <div class="wrap">
         <p class="eyebrow">app commerce</p>
@@ -381,11 +252,11 @@ const succession = [
       </div>
     </section>
 
-    <section class="section earth" id="network-gift">
+    <section class="section earth" id="network-unstoppable">
       <img class="globe" src="/khensu/hero/earth.jpg" alt="" width="1920" height="1080" loading="lazy" decoding="async" />
       <div class="wrap">
         <p class="eyebrow">succession</p>
-        <h2>It belongs to everyone.<br /><span class="dim">Even after its founder.</span></h2>
+        <h2>No one can stop it.<br /><span class="dim">Not even its founder.</span></h2>
         <p class="intro">
           A dead-man’s switch is written into the protocol. If the founder disappears, or chooses to step away, every founder
           power passes to the network’s consensus, permanently. There is no path back to a founder key.
@@ -406,15 +277,14 @@ const succession = [
           </article>
           <article class="glass">
             <h3>Private code opens too, patents included</h3>
-            <p>Every private repository, patented algorithm, model and patent filing is sealed on the network to a 14-of-21 key held by the trusted committee nodes, updated on every push. When the switch fires the committee opens it, and everyone gets a royalty-free licence to every patent.</p>
+            <p>Every private repository, patented algorithm, model and patent filing is already sealed on the network to a 14-of-21 committee key, kept current at every check-in. When the switch fires it opens, and everyone gets a royalty-free licence to every patent.</p>
           </article>
           <article class="glass">
             <h3>Everything, archived on the network</h3>
             <p>Every repository with all its history, every spec, every signed release and build recipe, the whole chain and every node’s history live on the network itself at <code>archive.khensu.nu</code>. Anyone can rebuild every release and replay the network from genesis, without GitHub, Apple or the founder.</p>
           </article>
         </div>
-        <p class="gift">A gift to humanity and all beings.<br />Freedom and privacy, plus a universal basic income.</p>
-        <p class="gift-sub">Made so everyone, everywhere, can create, build and live securely.</p>
+        <p class="gift">This can’t be stopped.<br />It is a gift to Earth and every being.</p>
         <div class="btn-row center">
           <a class="btn" href={`${DEV}/specs/protocol#125-founder-succession`}>Founder succession specification</a>
           <a class="btn" href="/compliance">Compliance</a>
@@ -708,59 +578,6 @@ const succession = [
     margin: 0;
     color: var(--text-dim);
     font-size: 0.95rem;
-  }
-  .econ {
-    margin: 0 0 2rem;
-    padding: 1.4rem;
-  }
-  .econ figcaption {
-    color: var(--text-dim);
-    font-size: 0.92rem;
-    margin-bottom: 0.8rem;
-  }
-  .econ-scroll {
-    overflow-x: auto;
-  }
-  .econ table {
-    width: 100%;
-    border-collapse: collapse;
-    font-variant-numeric: tabular-nums;
-    min-width: 640px;
-  }
-  .econ th,
-  .econ td {
-    text-align: right;
-    padding: 0.75rem 0.6rem;
-    border-bottom: 1px solid var(--line);
-    white-space: nowrap;
-  }
-  .econ th:first-child {
-    text-align: left;
-  }
-  .econ thead th {
-    font-weight: 400;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-  }
-  .econ tbody th {
-    font-weight: 600;
-  }
-  .econ td.dim {
-    color: var(--text-dim);
-  }
-  .econ td.ours {
-    color: #b9b0ff;
-    font-weight: 600;
-  }
-  .econ tr.over td.ours {
-    color: #2ee59d;
-  }
-  .gift-sub {
-    margin: 1.2rem auto 0;
-    max-width: 36rem;
-    text-align: center;
-    color: var(--text-dim);
-    font-size: clamp(1rem, 1.6vw, 1.2rem);
   }
   .gift {
     margin: clamp(3.5rem, 8vw, 6rem) auto 0;

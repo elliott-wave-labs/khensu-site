@@ -8,11 +8,11 @@ const list = files as File[];
 const mb = (b: number) => (b >= 1e6 ? `${(b / 1e6).toFixed(1)} MB` : `${Math.round(b / 1e3)} kB`);
 ---
 
-<Base title="How we measure video" description="Why VMAF alone can’t judge ñü.media, the tests we use instead, and how to check every number yourself with public tools.">
+<Base title="How we measure video" description="Why VMAF alone can’t judge ñü-media, the tests we use instead, and how to check every number yourself with public tools.">
   <section class="page-head">
     <div class="wrap">
-      <p class="eyebrow">ñü.media · Measuring quality</p>
-      <h1>VMAF can’t see what ñü.media does.<br /><span class="dim">So we test it five ways.</span></h1>
+      <p class="eyebrow">ñü-media · Measuring quality</p>
+      <h1>VMAF can’t see what ñü-media does.<br /><span class="dim">So we test it five ways.</span></h1>
       <StatStrip
         items={[
           { n: 5, label: 'Layers of scoring on every clip, each a gate' },
@@ -31,11 +31,11 @@ const mb = (b: number) => (b >= 1e6 ? `${(b / 1e6).toFixed(1)} MB` : `${Math.rou
       <p>
         <a href="https://github.com/Netflix/vmaf">VMAF</a> is Netflix’s open quality score. It compares every frame of a
         video with the original and predicts, from 0 to 100, how viewers would rate it. For ordinary codecs it works
-        well, and we keep publishing it, unmodified, next to everything else. When ñü.media sends less detail than the
+        well, and we keep publishing it, unmodified, next to everything else. When ñü-media sends less detail than the
         original, as in its low-data mode, a low VMAF score is real lost detail, not a flaw in the test.
       </p>
 
-      <h2>Why it isn’t enough for ñü.media</h2>
+      <h2>Why it isn’t enough for ñü-media</h2>
       <ul>
         <li>
           <b>It only measures sameness.</b> VMAF rewards pixels that match the original. When a host or viewer device
@@ -137,7 +137,7 @@ ffprobe -v error -select_streams v:0 -show_entries packet=pts_time,size -of csv=
 
       <h2>What stays private</h2>
       <p>
-        ñü.media’s encoder and enhancement code aren’t published. The tests, the files and the numbers are public, so
+        ñü-media’s encoder and enhancement code aren’t published. The tests, the files and the numbers are public, so
         you can verify every claim without trusting us or seeing the code.
       </p>
     </div>

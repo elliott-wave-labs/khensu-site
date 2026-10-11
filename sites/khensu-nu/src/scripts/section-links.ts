@@ -43,6 +43,8 @@ async function copy(text: string) {
 
 document.querySelectorAll<HTMLElement>('main h2').forEach((h) => {
   if (h.querySelector('.sec-link')) return;
+  const prev = h.previousElementSibling;
+  const eyebrow = prev?.matches('.eyebrow, .kicker') ? prev : null;
   const id = anchorFor(h);
   const b = document.createElement('button');
   b.type = 'button';
@@ -62,8 +64,12 @@ document.querySelectorAll<HTMLElement>('main h2').forEach((h) => {
       tip.textContent = '';
     }, 1600);
   });
+  // Beside the small eyebrow label above the heading when there is one, otherwise at the end of the heading's first line.
   const second = h.querySelector(':scope > em, :scope > .dim');
-  if (second) h.insertBefore(b, second);
+  if (eyebrow) {
+    b.classList.add('in-eyebrow');
+    eyebrow.append(b);
+  } else if (second) h.insertBefore(b, second);
   else h.append(b);
 });
 

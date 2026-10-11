@@ -22,8 +22,8 @@ import shield as S  # noqa: E402
 P = S.P
 OUT = S.D3 / "glb"
 MODELS = [
-    ("maroon", "standard"), ("gold", "standard"), ("black", "standard"), ("brass", "standard"),
-    ("maroon", "moldavite"), ("gold", "moldavite"), ("black", "moldavite"), ("brass", "moldavite"),
+    ("maroon", "standard"), ("glacier", "standard"), ("silver", "standard"), ("black", "standard"), ("brass", "standard"),
+    ("maroon", "moldavite"), ("glacier", "moldavite"), ("silver", "moldavite"), ("black", "moldavite"), ("brass", "moldavite"),
 ]
 
 

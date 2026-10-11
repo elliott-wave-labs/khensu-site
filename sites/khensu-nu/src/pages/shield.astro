@@ -11,8 +11,34 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
 >
   <section class="page-head">
     <div class="wrap">
-      <p class="eyebrow">suñůlink.shield · to scale</p>
-      <h1>One shield.<br />Drawn to scale.</h1>
+      <div class="head-grid">
+        <div class="head-model">
+          <ew-viewer
+            src="/khensu/shell/3d/glb/black-moldavite-phone.glb"
+            alt="suñůlink.shield in Black titanium on an iPhone 18 Pro in Black, turning to show the khensu.ñü mark inlaid in stone and platinum"
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            ar-scale="fixed"
+            ar-label="View in your space"
+            camera-controls
+            auto-rotate
+            rotation-per-second="18deg"
+            shadow-intensity="1.2"
+            exposure="1.1"
+            camera-orbit="25deg 78deg auto"
+            background="transparent"
+            loading="eager"
+            height="100%"
+          ></ew-viewer>
+        </div>
+        <div class="head-copy">
+          <p class="eyebrow">suñůlink.shield · to scale</p>
+          <h1>One shield.<br />Drawn to scale.</h1>
+          <p class="lede">A mesh node on the back of your phone, drawn from the same CAD that machines it.</p>
+          <p class="hint">Drag to turn. On iPhone or Android, tap “View in your space” to see it at real size.</p>
+          <p class="cta"><a class="btn primary" href="/buy">Buy</a> <a class="btn" href="https://dev.khensu.nu/shell">Full specifications</a></p>
+        </div>
+      </div>
       <StatStrip
         items={[
           { n: 0, unit: 'mm', label: 'Above the lenses: your iPhone gets no thicker' },
@@ -23,9 +49,9 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
       >
         Figures for iPhone 18 Pro. Battery life varies with use and settings. Ranges are calculated from the HaLow link budget on open ground; see the <a href="https://dev.khensu.nu/shell">full specifications</a>.
       </StatStrip>
-      <p class="lede">A mesh node on the back of your phone, drawn from the same CAD that machines it.</p>
     </div>
   </section>
+  <script is:inline type="module" src="/vendor/ew-viewer/ew-viewer.min.js"></script>
 
   <div class="khensu">
     <Sections show={['exploded', 'sideview', 'finishes', 'specs']} />
@@ -108,6 +134,18 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
 </Base>
 
 <style>
+  .head-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: clamp(1.5rem, 4vw, 4rem); margin-bottom: clamp(1.5rem, 4vw, 3rem); }
+  .head-model { height: min(78vh, 680px); }
+  .head-model ew-viewer { display: block; width: 100%; height: 100%; }
+  .head-copy h1 { margin-top: 0.4rem; }
+  .head-copy .hint { color: var(--text-dim); font-size: 0.85rem; }
+  .head-copy .cta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.4rem; }
+  @media (max-width: 860px) {
+    .head-grid { grid-template-columns: 1fr; }
+    .head-model { height: 62vh; order: 1; }
+    .head-copy { order: 0; }
+  }
+
   .lede,
   .fits {
     max-width: 46rem;

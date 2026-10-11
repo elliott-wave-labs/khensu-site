@@ -11,71 +11,75 @@ import StatStrip from '../components/khensu/StatStrip.astro';
 // khensu.ñü app over the network's own shielded payments, and every reservation is invited to pay there first.
 const SHIPS = 'Q1 2027';
 // The only shipping option: overnight priority with Saturday delivery (FedEx Priority Overnight in the US; International
-// Priority elsewhere, 1–3 business days). Estimate from carrier list rates for a 1 kg box; contract rates set it at launch.
+// Priority elsewhere, 1–3 business days). Charged at cost on top of the price. Estimate from carrier list rates for a
+// 1 kg box; contract rates set it at launch.
 const SHIPPING = 95;
+// Prices include sales tax or VAT. The cost table assumes this blended rate to show what is left after tax.
+const TAX = 0.08;
 const RESERVE_TO = 'hello@elliottwave.studio';
-const reserveHref = (edition: string, finish: string, price: number) =>
-  `mailto:${RESERVE_TO}?subject=${encodeURIComponent(`Buy suñůlink.shield: ${edition}, ${finish}`)}&body=${encodeURIComponent(
-    `I’d like to buy one suñůlink.shield.\n\nEdition: ${edition} ($${price})\nFinish: ${finish}\niPhone: 18 Pro or 18 Pro Max\n\nNo payment now. Invite me to pay in the khensu.ñü app when payment opens.`,
-  )}`;
 
-const titanium = [
-  { id: 'maroon', name: 'Maroon', hex: '#5e1a24' },
-  { id: 'gold', name: 'Gold', hex: '#b8955a' },
-  { id: 'black', name: 'Black', hex: '#232427' },
+const colours = [
+  { id: 'maroon', name: 'Burgundy', hex: '#70222e' },
+  { id: 'glacier', name: 'Glacier', hex: '#c4d4df' },
+  { id: 'silver', name: 'Silver', hex: '#d4d5d8' },
+  { id: 'black', name: 'Black', hex: '#2e2f33' },
+];
+const models = [
+  { id: 'pro', name: 'iPhone 18 Pro' },
+  { id: 'max', name: 'iPhone 18 Pro Max' },
 ];
 const editions = [
   {
     id: 'titanium',
     tier: 'moldavite',
     name: 'Titanium',
-    price: 402,
+    price: { pro: 499, max: 529 },
     body: 'Ceramic powder-coated titanium in your iPhone’s colour. Every stone, moldavite and Paraíba included, with a platinum line.',
-    finishes: titanium,
   },
   {
     id: 'brass',
     tier: 'moldavite',
     name: 'Solid brass',
-    price: 373,
-    body: 'Solid brass that darkens to a patina as you carry it. The same full inlay and platinum line.',
-    finishes: [{ id: 'brass', name: 'Brass', hex: '#b8914a' }],
+    price: { pro: 555, max: 589 },
+    body: 'Solid brass that darkens to a patina as you carry it, on an iPhone of any colour. The same full inlay and platinum line.',
   },
 ];
+type Model = 'pro' | 'max';
+const reserveHref = (edition: string, model: string, colour: string, price: number) =>
+  `mailto:${RESERVE_TO}?subject=${encodeURIComponent(`Buy suñůlink.shield: ${edition}, ${model}, ${colour}`)}&body=${encodeURIComponent(
+    `I’d like to buy one suñůlink.shield.\n\nEdition: ${edition}\niPhone: ${model}\nFinish: ${colour}\nPrice: $${price} including tax, plus $${SHIPPING} overnight shipping, $${price + SHIPPING} total\n\nNo payment now. Invite me to pay in the khensu.ñü app when payment opens.`,
+  )}`;
 
-// Expected cost per shield at the first production run, in US dollars. Each price leaves a 10% profit.
+// Expected cost per shield at the first production run, in US dollars: [Ti Pro, Ti Pro Max, brass Pro, brass Pro Max].
 const parts = [
-  ['Electronics and battery', 78, 78],
-  ['Machined housing', 87, 62],
-  ['Stone inlay, cut and set', 125, 125],
-  ['Platinum line, laid by hand', 15, 15],
-  ['Assembly and testing', 12, 12],
-  ['Packaging and USB-C cable', 8, 8],
-  ['Certification, per unit', 5, 5],
+  ['Machined housing', 87, 96, 62, 70],
+  ['Electronics and battery', 78, 78, 78, 78],
+  ['Stone inlay, cut and set', 125, 125, 125, 125],
+  ['Platinum line, laid by hand', 15, 15, 15, 15],
+  ['Assembly and testing', 12, 12, 12, 12],
+  ['Packaging and USB-C cable', 8, 8, 8, 8],
+  ['Certification, per unit', 5, 5, 5, 5],
 ] as const;
-const costs = editions.map((e, i) => {
+const columns = editions.flatMap((e) => models.map((m) => ({ edition: e, model: m, price: e.price[m.id as Model] })));
+const costs = columns.map((c, i) => {
   const unit = parts.reduce((s, p) => s + (p[i + 1] as number), 0);
-  const shipping = SHIPPING;
   const warranty = unit * 0.05;
-  const total = unit + shipping + warranty;
-  return { unit, shipping, warranty, total, profit: e.price - total };
+  const tax = c.price - c.price / (1 + TAX);
+  const profit = c.price - tax - unit - warranty;
+  return { unit, warranty, tax, profit, net: c.price - tax };
 });
-// Prices are set from the costs so each leaves a 10% profit.
-for (const [i, e] of editions.entries()) {
-  e.price = Math.round(costs[i].total / 0.9);
-  costs[i].profit = e.price - costs[i].total;
-}
 const usd = (n: number) => `$${n.toFixed(2).replace(/\.00$/, '')}`;
 
 const stones = [
-  { name: 'Lapis lazuli', img: 'lapis', where: 'The crescent', note: 'Deep blue with flecks of pyrite. From Chile.', chakra: 'Third eye and throat', meaning: 'Wisdom and truth. Worn by Egyptian royalty, and inlaid in Tutankhamun’s golden mask.' },
-  { name: 'Black labradorite', img: 'labradorite', where: 'The disc, dark half', note: 'Near-black, with flashes of blue, green and gold. From Madagascar and Finland, where it’s called spectrolite.', chakra: 'Third eye and crown', meaning: 'Intuition and protection. Called a stone of transformation, for the light hidden inside it.' },
-  { name: 'White labradorite', img: 'labradorite', where: 'The disc, light half', note: 'Milky white with a blue glow, also sold as rainbow moonstone. From India and Madagascar.', chakra: 'Crown and third eye', meaning: 'Calm and new beginnings. Long carried by travellers at night.' },
-  { name: 'Black onyx', img: 'onyx', where: 'A node point in the disc', note: 'Deep, polished black. From Brazil.', chakra: 'Root', meaning: 'Strength and grounding. A shield that keeps what is yours, yours.' },
-  { name: 'Bloodstone', img: 'bloodstone', where: 'The ring', note: 'Green with red flecks, in every shield. From India.', chakra: 'Root and heart', meaning: 'Courage and vitality. Carried by warriors for endurance.' },
-  { name: 'Blue kyanite', img: 'kyanite', where: 'A node point in the disc', note: 'Bladed blue that shifts with the light, in every shield. From Brazil.', chakra: 'Throat', meaning: 'Clear communication and alignment. Said never to hold on to negative energy.' },
-  { name: 'Tourmaline', img: 'tourmaline', where: 'Twelve markers in the ring', note: 'Pink, green, blue, canary and watermelon, with neon Paraíba. From Brazil and Mozambique.', chakra: 'All seven, by colour; Paraíba for throat and heart', meaning: 'Balance and protection. Watermelon tourmaline joins the heart’s pink and green.' },
-  { name: 'Moldavite', img: 'moldavite', where: 'A second node point in the disc', rare: 'Rarer than diamond', note: 'All the moldavite on Earth is estimated at about 275 tonnes, from a single asteroid strike 15 million years ago. Diamond mines bring up about 22 tonnes every year. Found only in Czechia, and running out.', chakra: 'Heart and crown', meaning: 'The stone of manifestation: believers say it brings whatever you set your heart on, fast. Forged when an asteroid hit Earth, flung into the sky in the fireball and rained back down as green glass.' },
+  { name: 'moldavite', img: 'moldavite', where: 'A second node point in the disc', rare: 'Rarer than diamond', note: 'All the moldavite on Earth is estimated at about 275 tonnes, from a single asteroid strike 15 million years ago. Diamond mines bring up about 22 tonnes every year. Found only in Czechia, and running out.', chakra: 'Heart and crown', meaning: 'The stone of manifestation: believers say it brings whatever you set your heart on, fast. Forged when an asteroid hit Earth, flung into the sky in the fireball and rained back down as green glass.' },
+  { name: 'tourmaline', img: 'tourmaline', where: 'Twelve markers in the ring', note: 'Pink, green, blue, canary and watermelon, with neon Paraíba. From Brazil and Mozambique.', chakra: 'All seven, by colour; Paraíba for throat and heart', meaning: 'Balance and protection. Watermelon tourmaline joins the heart’s pink and green.' },
+  { name: 'white labradorite', img: 'labradorite', where: 'The disc, light half', note: 'Milky white with a blue glow, also sold as rainbow moonstone. From India and Madagascar.', chakra: 'Crown and third eye', meaning: 'Calm and new beginnings. Long carried by travellers at night.' },
+  { name: 'black labradorite', img: 'labradorite', where: 'The disc, dark half', note: 'Near-black, with flashes of blue, green and gold. From Madagascar and Finland, where it’s called spectrolite.', chakra: 'Third eye and crown', meaning: 'Intuition and protection. Called a stone of transformation, for the light hidden inside it.' },
+  { name: 'blue kyanite', img: 'kyanite', where: 'A node point in the disc', note: 'Bladed blue that shifts with the light, in every shield. From Brazil.', chakra: 'Throat', meaning: 'Clear communication and alignment. Said never to hold on to negative energy.' },
+  { name: 'bloodstone', img: 'bloodstone', where: 'The ring', note: 'Green with red flecks, in every shield. From India.', chakra: 'Root and heart', meaning: 'Courage and vitality. Carried by warriors for endurance.' },
+  { name: 'lapis lazuli', img: 'lapis', where: 'The crescent', note: 'Deep blue with flecks of pyrite. From Chile.', chakra: 'Third eye and throat', meaning: 'Wisdom and truth. Worn by Egyptian royalty, and inlaid in Tutankhamun’s golden mask.' },
+  { name: 'pyrite', img: 'pyrite', where: 'The square at the centre', note: 'Brassy gold, and square as it grows: from Navajún, Spain, where it forms in natural cubes. Cut as one slice, a little larger than the node points.', chakra: 'Solar plexus', meaning: 'Willpower and abundance. Called fool’s gold, and long carried as a shield against negative energy.' },
+  { name: 'black onyx', img: 'onyx', wide: true, where: 'The base every stone is set into, and a node point in the disc', note: 'Deep, polished black, framing the ring as a protective rim. From Brazil.', chakra: 'Root', meaning: 'Strength, grounding and protection: the base the whole mark stands on. A shield that keeps what is yours, yours.' },
 ];
 
 // The seven chakras, crown to root, with each lotus's traditional petal count, colour and inner shape.
@@ -108,7 +112,7 @@ const chakras = [
     <div class="wrap price-in" data-reveal>
       <p>A post-quantum node for your iPhone, inlaid with stone.</p>
       <div class="price-cta">
-        <span><b>From ${Math.min(...editions.map((e) => e.price))}</b> · Ships {SHIPS}</span>
+        <span><b>From ${Math.min(...columns.map((c) => c.price))}</b> including tax · Ships {SHIPS}</span>
         <a class="btn primary" href="#order">Buy</a>
       </div>
     </div>
@@ -130,7 +134,7 @@ const chakras = [
     title="Get the highlights."
     cards={[
       { img: '/khensu/renders/macro.webp', alt: 'Macro of the inlay: black and white labradorite, a lapis crescent, a bloodstone ring with tourmaline markers, kyanite and onyx points, set into brushed brass', text: 'The khensu.ñü mark in natural stone, lapped flush with the metal.', fit: 'cover' },
-      { img: '/khensu/renders/hero.webp', alt: 'suñůlink.shield in maroon ceramic-coated titanium, angled', text: 'Ceramic-coated titanium in maroon, gold or black.' },
+      { img: '/khensu/renders/hero.webp', alt: 'suñůlink.shield in Burgundy ceramic-coated titanium, angled', text: 'Ceramic-coated titanium in your iPhone’s colour: Burgundy, Glacier, Silver or Black.' },
       { img: '/khensu/renders/lineup.webp', alt: 'Four shields side by side: maroon, gold and black titanium, and solid brass', text: 'Four finishes. One inlay, cut from its own stones.' },
       { img: '/khensu/renders/phone.webp', alt: 'suñůlink.shield in maroon on the back of an iPhone 18 Pro', text: 'Made for iPhone 18 Pro and Pro Max.' },
     ]}
@@ -144,32 +148,43 @@ const chakras = [
       <ShieldViewer />
 
       <div class="order">
+        <p class="opt-label">Model</p>
+        <div class="seg" role="group" aria-label="iPhone model">
+          {models.map((m, i) => (
+            <button type="button" class:list={['model', { on: i === 0 }]} data-model={m.id} aria-pressed={i === 0 ? 'true' : 'false'}>{m.name}</button>
+          ))}
+        </div>
+
+        <p class="opt-label">Finish <span>· your iPhone’s colour</span></p>
+        <div class="swatches" role="group" aria-label="Finish">
+          {colours.map((f, j) => (
+            <button type="button" class:list={['swatch', { on: j === 0 }]} data-finish={f.id} data-name={f.name} aria-pressed={j === 0 ? 'true' : 'false'} title={f.name}>
+              <span class="dot" style={`background:${f.hex}`}></span>
+              <span class="sw-name">{f.name}</span>
+            </button>
+          ))}
+        </div>
+
+        <p class="opt-label">Material</p>
         <ul class="editions" role="list">
           {editions.map((e, i) => (
             <li>
-              <button class:list={['edition', { on: i === 0 }]} data-edition={e.id} data-tier={e.tier} aria-pressed={i === 0 ? 'true' : 'false'}>
-                <span class="ed-top"><b>{e.name}</b><span class="price">${e.price}</span></span>
+              <button type="button" class:list={['edition', { on: i === 0 }]} data-edition={e.id} data-name={e.name} data-tier={e.tier} data-pro={e.price.pro} data-max={e.price.max} aria-pressed={i === 0 ? 'true' : 'false'}>
+                <span class="ed-top"><b>{e.name}</b><span class="price">${e.price.pro}</span></span>
                 <span class="ed-body">{e.body}</span>
               </button>
             </li>
           ))}
         </ul>
 
-        {editions.map((e, i) => (
-          <div class="options" data-for={e.id} hidden={i !== 0}>
-            <p class="opt-label">Finish</p>
-            <div class="swatches">
-              {e.finishes.map((f, j) => (
-                <button class:list={['swatch', { on: j === 0 }]} data-finish={f.id} aria-label={f.name} title={f.name}>
-                  <span style={`background:${f.hex}`}></span>
-                </button>
-              ))}
-            </div>
-            <p class="opt-note">Platinum crescent line</p>
-            <a class="btn primary reserve" data-edition-name={e.name} data-price={e.price} href={reserveHref(e.name, e.finishes[0].name, e.price)}>Buy · ${e.price}</a>
-            <p class="ships">Ships {SHIPS}</p>
-          </div>
-        ))}
+        <dl class="total" aria-live="polite">
+          <div><dt>suñůlink.shield, tax included</dt><dd data-out="price">${editions[0].price.pro}</dd></div>
+          <div><dt>Overnight priority shipping, Saturday delivery</dt><dd>${SHIPPING}</dd></div>
+          <div class="sum"><dt>Total</dt><dd data-out="total">${editions[0].price.pro + SHIPPING}</dd></div>
+        </dl>
+        <p class="opt-note">Platinum crescent line, every stone, moldavite and Paraíba included.</p>
+        <a class="btn primary reserve" data-shipping={SHIPPING} href={reserveHref(editions[0].name, models[0].name, colours[0].name, editions[0].price.pro)}>Buy · ${editions[0].price.pro + SHIPPING} total</a>
+        <p class="ships">Ships {SHIPS}</p>
 
         <p class="fine">
           Buying starts with an email and costs nothing up front: your order holds your place in line. Orders pay in the
@@ -177,7 +192,7 @@ const chakras = [
           for a full refund at any time before it ships.
         </p>
         <p class="more-phones">
-          This shield fits iPhone 18 Pro and Pro Max. Shields for every iPhone back to iPhone X, and the equivalent Pixel
+          The 3D view shows iPhone 18 Pro; the Pro Max shield is the same design, sized to the larger phone. Shields for every iPhone back to iPhone X, and the equivalent Pixel
           and Galaxy S phones, ship in {SHIPS}.
         </p>
       </div>
@@ -210,7 +225,7 @@ const chakras = [
       <div class="stone-layout">
       <ul class="stones" role="list">
         {stones.map((s) => (
-          <li>
+          <li class:list={{ wide: 'wide' in s }}>
             <div class="stone-head">
               <img src={`/khensu/stones/${s.img}.jpg`} alt="" width="120" height="120" loading="lazy" decoding="async" />
               <div><b>{s.name}</b>{'rare' in s && <em class="rare">{(s as { rare: string }).rare}</em>}<small>{s.where}</small></div>
@@ -273,42 +288,38 @@ const chakras = [
   <section class="section">
     <div class="wrap">
       <p class="eyebrow">Cost and profit</p>
-      <h2 class="big">Priced close to cost. <em>On purpose.</em></h2>
+      <h2 class="big">Every cost, in the open.</h2>
       <p class="lede narrow">
-        Each price leaves a 10% profit over what we expect a shield to cost to make, ship and back with its warranty.
-        The money goes into the shield, not into margin. These are the expected costs of the first production run; the
-        actual costs are published when it ships.
+        What we expect a shield to cost to make and back with its warranty, the tax inside each price, and what is
+        left. These are the expected costs of the first production run; the actual costs are published when it ships.
       </p>
       <div class="cost-wrap">
         <table class="cost">
           <thead>
-            <tr><th scope="col">Expected cost per shield</th>{editions.map((e) => <th scope="col">{e.name}</th>)}</tr>
+            <tr><th scope="col">Expected, per shield</th>{columns.map((c) => <th scope="col">{c.edition.name}<small>{c.model.name.replace('iPhone 18 ', '')}</small></th>)}</tr>
           </thead>
           <tbody>
-            {parts.filter((p) => p[1] !== p[2]).map((p) => (
-              <tr><th scope="row">{p[0]}</th>{editions.map((_, i) => <td>{usd(p[i + 1] as number)}</td>)}</tr>
-            ))}
-            <tr class="group"><th scope="row" colspan={editions.length + 1}>Same in both</th></tr>
-            {parts.filter((p) => p[1] === p[2]).map((p) => (
-              <tr><th scope="row">{p[0]}</th>{editions.map((_, i) => <td>{usd(p[i + 1] as number)}</td>)}</tr>
+            {parts.map((p) => (
+              <tr><th scope="row">{p[0]}</th>{columns.map((_, i) => <td>{usd(p[i + 1] as number)}</td>)}</tr>
             ))}
             <tr class="sub"><th scope="row">Cost to make</th>{costs.map((c) => <td>{usd(c.unit)}</td>)}</tr>
-            <tr><th scope="row">Overnight priority shipping, Saturday delivery (estimate)</th>{costs.map((c) => <td>{usd(c.shipping)}</td>)}</tr>
             <tr><th scope="row">Warranty reserve (5%)</th>{costs.map((c) => <td>{usd(c.warranty)}</td>)}</tr>
             <tr><th scope="row">Payment processing</th>{costs.map(() => <td>$0</td>)}</tr>
-            <tr class="sub"><th scope="row">Total expected cost</th>{costs.map((c) => <td>{usd(c.total)}</td>)}</tr>
-            <tr><th scope="row">Price</th>{editions.map((e) => <td>{usd(e.price)}</td>)}</tr>
+            <tr class="sub"><th scope="row">Price, tax included</th>{columns.map((c) => <td>{usd(c.price)}</td>)}</tr>
+            <tr><th scope="row">Sales tax or VAT inside the price (estimate, {Math.round(TAX * 100)}%)</th>{costs.map((c) => <td>{usd(Math.round(c.tax * 100) / 100)}</td>)}</tr>
             <tr class="profit">
               <th scope="row">Expected profit</th>
-              {costs.map((c, i) => <td>{usd(c.profit)} <small>({((c.profit / editions[i].price) * 100).toFixed(1)}%)</small></td>)}
+              {costs.map((c) => <td>{usd(Math.round(c.profit * 100) / 100)} <small>({((c.profit / c.net) * 100).toFixed(0)}%)</small></td>)}
             </tr>
           </tbody>
         </table>
       </div>
       <p class="fine cost-note">
-        Prices include overnight priority shipping with Saturday delivery, the only option (FedEx Priority Overnight in the US; International Priority elsewhere, 1–3 business days). Payment goes over khensu.ñü’s own network: no card fee, only a network fee of a fraction
-        of a cent (estimate), paid to the people who run the nodes. Sales tax and import duty, where they apply, are
-        shown before you pay.
+        Prices include sales tax or VAT; the rate depends on where you live, so the tax line and the profit shift a
+        little by country and state. Shipping is extra and charged at cost: overnight priority with Saturday delivery,
+        the only option (FedEx Priority Overnight in the US; International Priority elsewhere, 1–3 business days),
+        ${SHIPPING} (estimate). Payment goes over khensu.ñü’s own network: no card fee, only a network fee of a fraction
+        of a cent (estimate), paid to the people who run the nodes. Import duty, where it applies, is shown before you pay.
       </p>
     </div>
   </section>
@@ -334,44 +345,41 @@ const chakras = [
     items.forEach((el) => { if (el.getBoundingClientRect().top > innerHeight) io.observe(el); else el.classList.add('in'); });
     document.documentElement.classList.add('reveal-ready');
   }
-  const state = { finish: 'maroon', tier: 'moldavite' };
+  const state = { finish: 'maroon', tier: 'moldavite', edition: 'titanium', model: 'pro' };
   const closeup = document.querySelector<HTMLImageElement>('.inlay-closeup');
-  const send = () => {
-    dispatchEvent(new CustomEvent('shield:finish', { detail: { ...state } }));
+  const on = (sel: string) => document.querySelector<HTMLElement>(`${sel}.on`)!;
+  const choose = (sel: string, el: Element) => {
+    for (const x of document.querySelectorAll(sel)) {
+      x.classList.toggle('on', x === el);
+      x.setAttribute('aria-pressed', String(x === el));
+    }
+  };
+  const update = () => {
+    const ed = on('.edition');
+    const model = on('.model');
+    const colour = on('.swatch').dataset.name!;
+    const price = Number(ed.dataset[state.model]);
+    for (const e of document.querySelectorAll<HTMLElement>('.edition')) e.querySelector('.price')!.textContent = `$${e.dataset[state.model]}`;
+    const a = document.querySelector<HTMLAnchorElement>('.reserve')!;
+    const ship = Number(a.dataset.shipping);
+    document.querySelector('[data-out="price"]')!.textContent = `$${price}`;
+    document.querySelector('[data-out="total"]')!.textContent = `$${price + ship}`;
+    a.textContent = `Buy · $${price + ship} total`;
+    const subject = `Buy suñůlink.shield: ${ed.dataset.name}, ${model.textContent}, ${colour}`;
+    const body = `I’d like to buy one suñůlink.shield.\n\nEdition: ${ed.dataset.name}\niPhone: ${model.textContent}\nFinish: ${colour}\nPrice: $${price} including tax, plus $${ship} overnight shipping, $${price + ship} total\n\nNo payment now. Invite me to pay in the khensu.ñü app when payment opens.`;
+    a.href = `mailto:${new URL(a.href).pathname}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const finish = state.edition === 'brass' ? 'brass' : state.finish;
+    dispatchEvent(new CustomEvent('shield:finish', { detail: { finish, tier: state.tier, phone: state.finish } }));
     if (closeup) closeup.src = `/khensu/stones/inlay-${state.tier}.png`;
   };
-  const pick = (group: Element, el: Element) => {
-    group.querySelectorAll('.on').forEach((b) => b.classList.remove('on'));
-    el.classList.add('on');
-  };
-  const sync = (opts: HTMLElement) => {
-    const sw = opts.querySelector<HTMLElement>('.swatch.on')!;
-    state.finish = sw.dataset.finish!;
-    const a = opts.querySelector<HTMLAnchorElement>('.reserve');
-    if (a) {
-      const subject = `Buy suñůlink.shield: ${a.dataset.editionName}, ${sw.title}`;
-      const url = new URL(a.href);
-      const body = (url.searchParams.get('body') ?? '').replace(/Finish: .*/, `Finish: ${sw.title}`);
-      a.href = `mailto:${url.pathname}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
-    send();
-  };
   for (const b of document.querySelectorAll<HTMLElement>('.edition')) {
-    b.addEventListener('click', () => {
-      document.querySelectorAll('.edition').forEach((x) => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
-      b.classList.add('on');
-      b.setAttribute('aria-pressed', 'true');
-      state.tier = b.dataset.tier!;
-      let shown: HTMLElement | null = null;
-      for (const o of document.querySelectorAll<HTMLElement>('.options')) {
-        o.hidden = o.dataset.for !== b.dataset.edition;
-        if (!o.hidden) shown = o;
-      }
-      if (shown) sync(shown);
-    });
+    b.addEventListener('click', () => { choose('.edition', b); state.edition = b.dataset.edition!; state.tier = b.dataset.tier!; update(); });
   }
-  for (const o of document.querySelectorAll<HTMLElement>('.options')) {
-    o.querySelectorAll('.swatch').forEach((s) => s.addEventListener('click', () => { pick(o.querySelector('.swatches')!, s); sync(o); }));
+  for (const b of document.querySelectorAll<HTMLElement>('.model')) {
+    b.addEventListener('click', () => { choose('.model', b); state.model = b.dataset.model!; update(); });
+  }
+  for (const b of document.querySelectorAll<HTMLElement>('.swatch')) {
+    b.addEventListener('click', () => { choose('.swatch', b); state.finish = b.dataset.finish!; update(); });
   }
 </script>
 
@@ -408,7 +416,6 @@ const chakras = [
     gap: clamp(1.5rem, 4vw, 3rem);
     align-items: start;
   }
-  .order { display: grid; gap: 1rem; }
   .editions { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
   .edition {
     width: 100%;
@@ -445,7 +452,7 @@ const chakras = [
     background: none;
     cursor: pointer;
   }
-  .swatch span { display: block; width: 100%; height: 100%; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2); }
+  .swatch .dot { display: block; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2); }
   .swatch.on { border-color: #fff; }
   .accent {
     padding: 0.45rem 0.9rem;
@@ -461,6 +468,21 @@ const chakras = [
   .reserve { margin-top: 0.6rem; justify-self: start; }
   .reserve[aria-disabled] { opacity: 0.6; cursor: default; }
   .ships { margin: 0.2rem 0 0; font-size: 0.85rem; color: var(--text-dim); }
+  .order { display: grid; gap: 0.6rem; align-content: start; }
+  .opt-label span { color: var(--text-dim); opacity: 0.8; }
+  .seg { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); }
+  .model { flex: 1; padding: 0.55rem 0.8rem; border: 0; border-radius: 999px; font: inherit; font-size: 0.9rem; color: var(--text-dim); background: none; cursor: pointer; }
+  .model.on { color: var(--text); background: rgba(255, 255, 255, 0.14); }
+  .swatches .swatch { width: auto; height: auto; display: grid; justify-items: center; gap: 0.35rem; padding: 0; border: 0; border-radius: 0; color: var(--text-dim); font: inherit; font-size: 0.78rem; }
+  .swatches .swatch .dot { width: 2.2rem; height: 2.2rem; border-radius: 50%; outline: 1.5px solid transparent; outline-offset: 3px; }
+  .swatches .swatch.on { color: var(--text); }
+  .swatches .swatch.on .dot { outline-color: #fff; }
+  .swatches { gap: 1.1rem; }
+  .total { margin: 0.8rem 0 0; display: grid; gap: 0.35rem; font-size: 0.92rem; }
+  .total div { display: flex; justify-content: space-between; gap: 1rem; color: var(--text-dim); }
+  .total dd { margin: 0; color: var(--text); font-variant-numeric: tabular-nums; }
+  .total .sum { padding-top: 0.5rem; border-top: 1px solid var(--line); font-size: 1.1rem; color: var(--text); font-weight: 600; }
+  .cost th small { display: block; font-weight: 400; color: var(--text-dim); }
   .fine { margin: 0; font-size: 0.8rem; color: var(--text-dim); }
   .more-phones { margin: 0; font-size: 0.85rem; padding: 0.8rem 1rem; border-radius: 14px; background: rgba(185, 173, 255, 0.08); border: 1px solid rgba(185, 173, 255, 0.2); }
   .cost-wrap { margin-top: 2rem; overflow-x: auto; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.03); }
@@ -502,9 +524,11 @@ const chakras = [
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
   }
+  .stones li.wide { grid-column: 1 / -1; }
+  @media (max-width: 640px) { .stones { grid-template-columns: 1fr; } }
   .stones li {
     display: grid;
     gap: 0.25rem;

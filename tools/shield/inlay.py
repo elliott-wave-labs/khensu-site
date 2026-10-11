@@ -37,6 +37,12 @@ def photo(name, size, hi=False):
     return im.resize((int(size), int(size)), Image.LANCZOS)
 
 
+def square(cx, cy, h):
+    m = Image.new("L", (SIZE * SS,) * 2, 0)
+    ImageDraw.Draw(m).rectangle([u(cx - h), u(cy - h), u(cx + h), u(cy + h)], fill=255)
+    return m
+
+
 def paste_in(canvas, img, mask, cx, cy, r):
     s = int(2 * r * PX)
     layer = Image.new("RGB", canvas.size)
@@ -87,6 +93,9 @@ def build(tier):
     color = Image.new("RGB", (N, N), (40, 40, 44))
     orm = Image.new("RGB", (N, N), (0, 38, 0))  # polished stone: roughness 0.15, not metal
 
+    # Black onyx is the base every stone is set into, showing as a polished rim outside the ring.
+    paste_in(color, photo("onyx", 1024), disc(50, 50, 53), 50, 50, 53)
+
     inner = disc(50, 50, 47.5)
     # Labradorite fills the disc; the lapis crescent is the disc minus the circle of the mark's inner arc.
     paste_in(color, photo("labradorite", 1024, True), inner, 50, 50, 47.5)
@@ -108,6 +117,10 @@ def build(tier):
     nodes = ["kyanite", "onyx"] + (["moldavite"] if tier == "moldavite" else [])
     for name, y in zip(nodes, ys):
         paste_in(color, photo(name, 512), disc(73, y, 6.5), 73, y, 6.5)
+
+    # A square slice of pyrite at the centre of the mark, a little larger than the node points.
+    paste_in(color, photo("pyrite", 1024, True), square(50, 50, 7.5), 50, 50, 7.5)
+    orm.paste((0, 50, 200), (0, 0), square(50, 50, 7.5))
 
     # Twelve tourmaline markers in the ring, in its top colours; Paraíba in the moldavite tier.
     import math
@@ -132,7 +145,7 @@ def build(tier):
     color.save(OUT / f"inlay-{tier}.jpg", quality=88)
     orm.save(OUT / f"inlay-{tier}-orm.png")
     # The close-up on the buy page: the mark alone on transparency.
-    alpha = disc(50, 50, 51).resize((SIZE, SIZE), Image.LANCZOS)
+    alpha = disc(50, 50, 53).resize((SIZE, SIZE), Image.LANCZOS)
     close = color.copy()
     close.putalpha(alpha)
     close.resize((1024, 1024), Image.LANCZOS).save(ROOT / "stones" / f"inlay-{tier}.png", optimize=True)

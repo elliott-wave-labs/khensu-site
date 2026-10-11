@@ -33,17 +33,19 @@ def _wrap_xl():
 T = _wrap_xl()["thickness_mm"]  # off the phone's back: level with the lens rings, no bump above the camera
 YMIN = -74.58  # bottom edge of the shield's outline
 INLAY_C = (0.0, -5.0)  # the inlay sits at the centre of the Qi2 coil window, on the MagSafe axis
-INLAY_R = 10.2  # mm: the ring's outer edge (51 of the mark's 60-unit radius on a 24 mm square)
+INLAY_R = 10.6  # mm: the onyx rim's outer edge (53 of the mark's 60-unit radius on a 24 mm square)
 INLAY_LIFT = 0.04  # above the back, so the inlay never z-fights with the window
 
 FINISHES = {
     "maroon": ("#5e1a24", "ceramic"),
     "gold": ("#bfa06a", "gold"),
+    "silver": ("#cbcccf", "ceramic"),
+    "glacier": ("#b0c2cf", "ceramic"),
     "black": ("#232427", "ceramic"),
     "brass": ("#ecd59c", "brass"),
 }
 # The iPhone 18 Pro colour each shield is shown on.
-PHONE_FOR = {"maroon": "burgundy", "black": "black", "gold": "silver", "brass": "silver"}
+PHONE_FOR = {"maroon": "burgundy", "black": "black", "silver": "silver", "glacier": "glacier", "gold": "silver", "brass": "silver"}
 
 
 def linear(hex_):
@@ -114,7 +116,7 @@ def brushed(m):
 
 # Path-traced in a black studio the ceramic takes its depth from the coat, so Cycles gets the deeper, true colour;
 # the web viewer's brighter neutral environment wants the lighter hex.
-CYCLES_BASE = {"maroon": (0.13, 0.012, 0.024, 1), "black": (0.012, 0.012, 0.013, 1)}
+CYCLES_BASE = {"maroon": (0.13, 0.012, 0.024, 1), "black": (0.012, 0.012, 0.013, 1), "silver": (0.58, 0.59, 0.61, 1), "glacier": (0.4, 0.51, 0.6, 1)}
 
 
 def body_material(finish, web=True):
@@ -133,12 +135,12 @@ def body_material(finish, web=True):
 
 
 def window_material(finish, web=True):
-    """The PC windows are moulded in the shield's colour, so a ceramic back reads as one surface. Against bare
-    metal (brass, gold) a coloured plastic would look like a patch, so there they are gloss black, an accent
-    ring round the inlay and a band along the bottom."""
+    """The PC windows are moulded in the shield's colour, so the back reads as one surface. Metal would block
+    Qi2 charging and the HaLow antenna, so on bare metal (brass, gold) the windows carry a metallic-pigment coat
+    in the same tone instead of the metal itself."""
     hex_, kind = FINISHES[finish]
     if kind in ("brass", "gold"):
-        return material(f"shield {finish} windows", linear("#0b0b0c"), metallic=0.0, roughness=0.18, coat=0.8, coat_rough=0.05)
+        return material(f"shield {finish} windows", linear(hex_), metallic=0.55, roughness=0.4, coat=0.3, coat_rough=0.3)
     if not web:
         return material(f"shield {finish} windows cycles", CYCLES_BASE[finish], metallic=0.0, roughness=0.44, coat=0.5, coat_rough=0.25)
     return material(f"shield {finish} windows", linear(hex_), metallic=0.0, roughness=0.46, coat=0.25, coat_rough=0.35)

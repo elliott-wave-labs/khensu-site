@@ -431,6 +431,22 @@ h2:hover > .sec-link,
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
 }
+.sec-link.in-eyebrow {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-left: 0.6rem;
+  vertical-align: middle;
+  opacity: 0.75;
+}
+.sec-link.in-eyebrow svg {
+  width: 11px;
+  height: 11px;
+}
+.sec-link.in-eyebrow::before {
+  content: '';
+  position: absolute;
+  inset: -0.75rem;
+}
 .sec-link.copied {
   opacity: 1;
   color: var(--accent);
