@@ -4,6 +4,7 @@ import Hero from '../components/khensu/Hero.astro';
 import AppScreen from '../components/khensu/AppScreen.astro';
 import Exploded from '../components/khensu/Exploded.astro';
 import Finishes from '../components/khensu/Finishes.astro';
+import SideView from '../components/khensu/SideView.astro';
 import Net from '../components/khensu/Net.astro';
 import Orbit from '../components/khensu/Orbit.astro';
 import Icon from '../components/khensu/Icon.astro';
@@ -32,7 +33,7 @@ const styles = [
   { name: 'Card', body: 'Pocket-size, on MagSafe.', spec: '5.2 mm · 4 Wh' },
   { name: 'Fill', body: 'Inset from the edges. A flat back, only the lenses showing.', spec: '4.2 mm · 5 Wh' },
   { name: 'Wrap', body: 'The whole back, flat. No camera bump, only the lenses showing.', spec: '4.2 mm · 6 Wh' },
-  { name: 'Wrap XL', body: 'About 11 hours as a node on its own cells.', spec: '7.2 mm · 13 Wh' },
+  { name: 'Wrap XL', body: 'About 11 hours as a node on its own battery.', spec: '7.2 mm · 13 Wh' },
 ];
 
 ---
@@ -107,13 +108,18 @@ const styles = [
           ))}
         </p>
         <div class="pulse" aria-hidden="true">
-          {['Typing a message', 'Idle', 'Asleep in a pocket'].map((label) => (
+          {['Typing a message', 'Idle', 'Asleep in a pocket', 'Battery at 5%'].map((label) => (
             <div class="pulse-row">
               <span>{label}</span>
               <span class="track"></span>
             </div>
           ))}
         </div>
+        <p class="lede switch">
+          And it’s light on battery. Each beat is one small, fixed-size burst every 2 seconds while the app is open, so
+          the cloak costs little power. It never slows down to save more: not in Low Power Mode, not at 5%. A phone that
+          went quiet when its battery ran low would stand out, so the rhythm stays exactly the same however low it gets.
+        </p>
         <p class="lede switch">
           And the path keeps changing. The relays carrying your messages, calls and streams switch at random while you
           use them, each on its own clock, so no relay and no one watching a few of them ever sees a whole conversation.
@@ -140,7 +146,7 @@ const styles = [
           </p>
           <dl class="stats">
             <div><dt>10 billion</dt><dd>people a day, on about 6 million nodes, and it keeps scaling as more join</dd></div>
-            <div><dt>1,700</dt><dd>people a day on one Raspberry Pi 5, sharing half of a gigabit fibre line</dd></div>
+            <div><dt>1,700</dt><dd>people a day on one <a href="https://www.raspberrypi.com/products/raspberry-pi-5/">Raspberry Pi 5</a>, sharing half of a gigabit fibre line</dd></div>
             <div><dt>3,400</dt><dd>people a day on an old iPhone 15 Pro in node mode, sharing half of 2 Gbit fibre over Wi-Fi 6E, past where a Pi 5’s gigabit port tops out</dd></div>
           </dl>
           <p class="footnote">
@@ -205,6 +211,7 @@ const styles = [
     </section>
 
     <Exploded />
+    <SideView />
 
     <Finishes />
 
