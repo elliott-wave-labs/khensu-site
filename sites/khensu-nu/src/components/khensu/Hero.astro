@@ -1,7 +1,6 @@
 ---
 // khensu.ñü hero: three app screens fan out from one phone as the page scrolls (--e from scenes.ts).
 import AppScreen from './AppScreen.astro';
-import Crescent from './Crescent.astro';
 
 interface Props {
   eyebrow?: string;
@@ -38,7 +37,6 @@ const H = heading;
           </>
         ))}
       </p>
-      <div class="mark"><img class="seal" src="/seal.webp" alt="" width="512" height="512" /></div>
       <H id="k-hero-title" class="title">khensu<span>.ñü</span></H>
       <p class="tag">webË, private by design. <em>Post-quantum.</em><br /><em>Run profitably by the people.</em></p>
       {cta && (
@@ -115,12 +113,6 @@ const H = heading;
   }
   .head .eyebrow {
     margin-bottom: 1rem;
-  }
-  .mark {
-    width: clamp(2.6rem, 5vw, 3.6rem);
-    aspect-ratio: 1;
-    color: var(--khensu);
-    margin-bottom: 0.6rem;
   }
   .title {
     font-size: clamp(3.4rem, 10vw, 8rem);
