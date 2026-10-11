@@ -9,7 +9,7 @@ const codecs = bench.codecs as Record<string, { points: Point[] }>;
 const grid = bench.grid.codecs as Record<string, { actual_kbps: number; vmaf: number }>;
 
 // Rate-quality chart: log bitrate across, VMAF up.
-const X0 = 150, X1 = 4500, L = 44, R = 784, T = 12, B = 262;
+const X0 = 150, X1 = 4500, L = 44, R = 628, T = 12, B = 292;
 const x = (k: number) => L + ((Math.log(k) - Math.log(X0)) / (Math.log(X1) - Math.log(X0))) * (R - L);
 const y = (v: number) => B - (v / 100) * (B - T);
 const pts = (key: string, scale = 1) => codecs[key].points.map((p) => ({ k: p.actual_kbps * scale, v: p.vmaf }));
@@ -171,7 +171,7 @@ const chips = [
 
       <figure class="card wide" data-scene="reveal">
         <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. Solid lines measured, dashed lines estimated.</span></figcaption>
-        <svg class="rd" viewBox="0 0 800 300" role="img" aria-label="Rate-quality curves: VMAF against bitrate for H.264 and HEVC hardware, AV1 software, the nu-media base layer, and estimates for AV2 and a learned codec">
+        <svg class="rd" viewBox="0 0 640 320" role="img" aria-label="Rate-quality curves: VMAF against bitrate for H.264 and HEVC hardware, AV1 software, the nu-media base layer, and estimates for AV2 and a learned codec">
           {[0, 20, 40, 60, 80, 100].map((v) => (
             <g class="gy">
               <line x1={L} x2={R} y1={y(v)} y2={y(v)} />

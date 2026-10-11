@@ -1,0 +1,227 @@
+---
+// Creators: paid directly into their own wallet. Platform shares are each platform's published
+// standard terms (see footnote); khensu.nu's network fee is a design target.
+
+const keep = [
+  { name: 'khensu.nu', note: 'Tip, network fee only', pct: 99.9, label: '$9.99+', ours: true },
+  { name: 'OnlyFans', note: 'Standard share', pct: 80, label: '$8.00' },
+  { name: 'YouTube', note: 'Super Chat', pct: 70, label: '$7.00' },
+  { name: 'Twitch', note: 'Standard subscription', pct: 50, label: '$5.00' },
+];
+
+const steps = [
+  { title: 'A fan pays', body: 'A tip, a subscription or a ticket, from a chat, the Feed, a live room or your site.' },
+  { title: 'Hidden on the way', body: 'Sent through the shielded pool over the mixnet. No public record of who paid whom.' },
+  { title: 'In your wallet', body: 'On your iPhone, in seconds. Nobody else holds it, so nobody can freeze it.' },
+  { title: 'Tap to spend', body: 'Apple Pay at any contactless terminal, converted to USDC and then your currency as you pay.' },
+];
+---
+
+<section class="section creators" aria-labelledby="creators-title">
+  <div class="wrap">
+    <p class="eyebrow">For creators</p>
+    <h2 id="creators-title" class="big">Get paid directly. <em>Keep all of it.</em></h2>
+    <p class="lede">
+      Tips, subscriptions and tickets go straight into your own wallet. No platform cut, no payout schedule, no account
+      someone can freeze. Spend it anywhere with a tap.
+    </p>
+
+    <ol class="money" role="list" data-scene="reveal">
+      {steps.map((s, i) => (
+        <li style={`--i:${i}`}>
+          <span class="dot" aria-hidden="true" />
+          <b>{s.title}</b>
+          <span>{s.body}</span>
+        </li>
+      ))}
+    </ol>
+
+    <div class="grid">
+      <figure class="card keep-card" data-scene="reveal">
+        <figcaption><b>What you keep from a $10 tip</b><span>Before tax</span></figcaption>
+        <ul class="keep" role="list">
+          {keep.map((r, i) => (
+            <li class:list={[{ ours: r.ours }]} style={`--w:${r.pct};--i:${i}`}>
+              <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
+              <span class="track"><span class="fill" /></span>
+              <span class="value"><b>{r.label}</b></span>
+            </li>
+          ))}
+        </ul>
+      </figure>
+
+      <ul class="cards" role="list">
+        <li><b>Straight to your wallet</b><span>Payments land on your own phone, not in a platform account. No minimum payout, no waiting for the end of the month.</span></li>
+        <li><b>No cut, tiny fees</b><span>khensu.nu takes nothing. The only cost is a network fee of a fraction of a cent, which pays the people running the nodes.</span></li>
+        <li><b>Your suñůlink.shield works too</b><span>It’s a full node. While it serves your posts and streams to followers, the network pays for that relay work into the same wallet.</span></li>
+        <li><b>Tap to pay anywhere</b><span>Apple Pay over NFC, with your balance converted to USDC and then your local currency the moment you pay.</span></li>
+        <li><b>Private for your fans</b><span>Supporters pay through the shielded pool, so there’s no public list of who backs whom.</span></li>
+        <li><b>Yours if you leave</b><span>Your handle, followers and money are tied to your keys, not to us. Nothing to deplatform.</span></li>
+      </ul>
+    </div>
+
+    <p class="footnote">
+      Payments switch on region by region after legal review. Apple Pay spending is planned with a licensed card partner,
+      which by law verifies your identity and sees purchases made with that card; your messages and the rest of your
+      wallet stay private. Paid digital content inside the iPhone app follows Apple’s purchase rules; tips go 100% to the
+      creator. The network fee is a design target. Shield and node rewards are paid by the protocol for verified work and
+      vary; this is not a promise of earnings. Other platforms’ shares are their published standard terms and differ by
+      programme and region. Apple Pay is a trademark of Apple Inc.; USDC is issued by Circle. No affiliation or endorsement.
+    </p>
+  </div>
+</section>
+
+<style>
+  .money {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    position: relative;
+  }
+  .money::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    right: 9px;
+    height: 2px;
+    background: linear-gradient(90deg, #8b7bff, #4fd1c5);
+    transform-origin: left;
+    transform: scaleX(var(--e, 1));
+    opacity: 0.6;
+  }
+  .money li {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    opacity: clamp(0.25, calc((var(--e, 1) - var(--i) * 0.22) / 0.2), 1);
+  }
+  .money .dot {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 3px, #8b7bff 4px 100%);
+    box-shadow: 0 0 0 6px rgba(139, 123, 255, 0.15);
+    margin-bottom: 0.6rem;
+  }
+  .money b {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  .money span:not(.dot) {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 1rem;
+    margin-top: 2.5rem;
+    align-items: start;
+  }
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  }
+  .cards li {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: 1.6rem;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 22px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+  .cards b {
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .cards span {
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .card {
+    margin: 0;
+    padding: 1.6rem;
+    display: grid;
+    gap: 1.1rem;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 22px;
+  }
+  figcaption {
+    display: grid;
+    gap: 0.2rem;
+  }
+  figcaption b {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+  figcaption span,
+  small {
+    color: var(--text-dim);
+  }
+  small {
+    font-size: 0.8rem;
+  }
+  .keep {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .keep li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.35rem 0.8rem;
+    align-items: center;
+  }
+  .keep .track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    height: 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+  }
+  .keep .fill {
+    display: block;
+    height: 100%;
+    width: calc(var(--w) * 1%);
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.35);
+    transform-origin: left;
+    transform: scaleX(clamp(0, calc((var(--e, 1) - var(--i) * 0.12) / 0.6), 1));
+  }
+  .keep .ours .fill {
+    background: linear-gradient(90deg, #8b7bff, #4fd1c5);
+  }
+  .keep .ours b {
+    color: #b9b0ff;
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .money {
+      grid-template-columns: 1fr 1fr;
+      row-gap: 1.6rem;
+    }
+    .money::before {
+      display: none;
+    }
+  }
+</style>

@@ -1,16 +1,17 @@
 ---
-// Side view at the long edge, path-traced from the CAD (khensu-specs/hardware/sunu/render_layers.py, iPhone 18 Pro
+// Side view at the long edge, path-traced from the CAD (khensu-specs/hardware/shell/render_layers.py, iPhone 18 Pro
 // placeholder geometry): the iPhone alone, then with the shell, whose outer face finishes level with the lens tops.
 // The camera is orthographic, so dropping the shell layer by a fixed amount is a true vertical move in millimetres.
 // It drops on with --e from the reveal scene in scripts/scenes.ts.
 import side from '../../../public/khensu/shell/side.json';
 
 const [W, H] = side.res;
+const [[x0, y0], [x1, y1]] = side.guide;
 const TOP = side.top_mm.toFixed(2);
 const drop = ((9 * side.px_per_mm_z) / H) * 100;
 const views = [
   { id: 'alone', title: 'iPhone 18 Pro', note: `${TOP} mm at the camera` },
-  { id: 'with-shell', title: 'With suñůlink.shield', note: `${TOP} mm. +0 mm at the thickest point` },
+  { id: 'with-shell', title: 'With the khensu shell', note: `${TOP} mm. +0 mm at the thickest point` },
 ];
 ---
 
@@ -19,13 +20,13 @@ const views = [
     <p class="eyebrow">Side view</p>
     <h2 id="side-title" class="big">No thicker than your iPhone. <em>The camera already set the line.</em></h2>
     <p class="lede">
-      Your iPhone is already as thick as its camera. suñůlink.shield finishes exactly level with the lenses and never
+      Your iPhone is already as thick as its camera. The khensu shell finishes exactly level with the lenses and never
       goes past them, so the back turns flat and the phone is no thicker at its thickest point than before. The bump
       goes away; nothing is added on top.
     </p>
     <p class="lede">
-      Each suñůlink.shield is CNC-machined from titanium for a precise fit, following the iPhone 18 Pro’s own edge curve, so
-      suñůlink.shield picks up where the phone’s edge leaves off. No step, no lip, one seamless shape.
+      Each shell is CNC-machined from titanium for a precise fit, following the iPhone 18 Pro’s own edge curve, so
+      the shell picks up where the phone’s edge leaves off. No step, no lip, one seamless shape.
     </p>
 
     <div class="views">
@@ -39,6 +40,9 @@ const views = [
                 <img class="lenses" src="/khensu/shell/side_camera.png" alt="" width={W} height={H} loading="lazy" decoding="async" />
               </>
             )}
+            <svg viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+              <line x1={x0} y1={y0} x2={x1} y2={y1} />
+            </svg>
             <span class="dim" aria-hidden="true">{TOP} mm</span>
           </div>
           <figcaption><span>{v.title}</span>{v.note}</figcaption>
@@ -75,7 +79,8 @@ const views = [
     overflow: hidden;
     background: radial-gradient(ellipse 70% 90% at 50% 60%, rgba(255, 255, 255, 0.06), transparent 70%);
   }
-  .render img {
+  .render img,
+  .render svg {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -88,6 +93,12 @@ const views = [
   /* The lenses show through the shell's openings only once it's seated. */
   .lenses {
     opacity: clamp(0, calc(var(--e) * 40 - 39), 1);
+  }
+  line {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 9 6;
+    opacity: 0.85;
   }
   .dim {
     position: absolute;

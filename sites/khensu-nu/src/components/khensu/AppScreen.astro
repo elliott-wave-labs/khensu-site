@@ -90,14 +90,15 @@ const chats = [
         </div>
         <p class="sys"><Icon name="lock" /> Post-quantum end-to-end encrypted</p>
         <div class="b them">You left your hoodie here. It’s mine now.</div>
+        <div class="b me reacted">Bail is dinner Friday.<small>9:31</small><span class="react" aria-label="Isis reacted with a heart on fire">❤️‍🔥</span></div>
         <div class="b them">Door code’s 4471. Try to be charming.<small><span class="moon" /> 2h left</small></div>
-        <div class="pay them">
-          <span class="pay-k">Isis sent you a shielded payment</span>
+        <div class="pay">
+          <span class="pay-k">Shielded payment</span>
           <span class="pay-v">42</span>
           <span class="pay-k dim">Hidden amount · no lasting record</span>
         </div>
-        <div class="b them">For the wine. Pick something good.<small>9:38</small></div>
-        <div class="b me reacted">Can’t wait to eat out with you. Dinner tonight 💜<small>9:41</small><span class="react" aria-label="Isis reacted with a heart on fire">❤️‍🔥</span></div>
+        <div class="b them">For the wine. Charm isn’t free.<small>9:38</small></div>
+        <p class="typing">Isis is typing…</p>
         <div class="composer">
           <span class="glass-circle lg"><Icon name="plus" /></span>
           <span class="field">Message <Icon name="mic" /></span>
@@ -115,16 +116,16 @@ const chats = [
         <div class="chips"><span class="on">For you</span><span>Forums</span><span>Sites</span><span>Live</span></div>
         <article class="post">
           <header><span class="avatar sm">A</span><b>ada.khensu.nu</b><span class="check" /><span class="dim">· 2h</span></header>
-          <div class="media sunrise"><span>Naxos, the Portara at dawn</span></div>
+          <div class="media sunrise"><span>Lisbon, tram 28 at dawn</span></div>
           <footer><Icon name="heart" /> 1.2k <Icon name="reply" /> 84 <Icon name="share" /><span class="signed">Signed</span></footer>
         </article>
         <article class="post">
           <header><span class="live-dot">LIVE</span><b>Node operators</b><span class="dim">· 3.1k watching</span></header>
-          <div class="media stream"><span><Icon name="live" /> Ask us anything: running a suñůlink.shield transceiver node</span></div>
+          <div class="media stream"><span><Icon name="live" /> Ask us anything: running a node at home</span></div>
         </article>
         <article class="post">
           <header><span class="avatar sm">M</span><b>forum/makers</b><span class="dim">· Mara</span></header>
-          <p class="post-text">Printed a stand for my suñůlink.shield. Files on my site, mara.khensu.nu</p>
+          <p class="post-text">Printed a stand for the shell. Files on my site, mara.khensu.nu</p>
         </article>
         <p class="anon">You read anonymously. Posters sign what they publish.</p>
       </div>
@@ -133,9 +134,9 @@ const chats = [
     {screen === 'call' && (
       <div class="body call">
         <div class="call-top">
-          <span class="avatar xl">I</span>
-          <b class="call-name">Isis</b>
-          <span class="dim">Isis called you · 04:12</span>
+          <span class="avatar xl">A</span>
+          <b class="call-name">Ada</b>
+          <span class="dim">khensu call · 04:12</span>
           <span class="call-tag"><Icon name="shield" /> Post-quantum · relays change as you talk</span>
         </div>
         <div class="call-grid">
@@ -155,23 +156,15 @@ const chats = [
           <span></span>
           <span class="nav-trail"><span class="glass-circle"><Icon name="more" /></span></span>
         </div>
-        <h3 class="large">Akashic Link</h3>
-        <div class="field q"><Icon name="search" /> When is the sail to Naxos?</div>
+        <h3 class="large">Ask khensu</h3>
+        <div class="field q"><Icon name="search" /> When is the Lisbon trip?</div>
         <div class="answer">
           <p class="answer-k"><Icon name="sparkle" /> Private AI on this iPhone</p>
-          <p>12–19 May. Ada moved it a week on Monday. You sail from Piraeus to Aegina, Greece’s first capital, then through the Cyclades by Paros to Naxos.</p>
-          <div class="route" role="img" aria-label="Route map: Piraeus, Aegina, Paros, Naxos">
-            <svg viewBox="0 0 100 50" aria-hidden="true">
-              <path class="leg" d="M17 7 Q12 9 9.5 14 Q40 26 77 41 Q82 39 87 41" />
-              <circle cx="17" cy="7" r="1.6" /><circle cx="9.5" cy="14" r="1.6" /><circle cx="77" cy="41" r="1.6" /><circle cx="87" cy="41" r="2.2" class="end" />
-              <text x="20" y="8">Piraeus</text><text x="2" y="21">Aegina</text><text x="60" y="47">Paros</text><text x="78" y="33">Naxos</text>
-            </svg>
-            <span>Route and itinerary · 4 stops <Icon name="chevron" /></span>
-          </div>
+          <p>12–19 May. Ada moved it a week on Monday, and you booked a flat near Cais do Sodré.</p>
           <ul class="cites">
-            <li><span class="tag">Chat</span> Ada: Naxos sail moved to 12–19 May</li>
-            <li><span class="tag">Chat</span> Boat booked out of Piraeus</li>
-            <li><span class="tag">Note</span> Ferry home from Naxos on hold until Friday</li>
+            <li><span class="tag">Chat</span> Ada: Lisbon moved to 12–19 May</li>
+            <li><span class="tag">Chat</span> Flat booked near Cais do Sodré</li>
+            <li><span class="tag">Note</span> Flights on hold until Friday</li>
           </ul>
         </div>
         <p class="anon">Only you have your data. No AI servers, nothing to leak.</p>
@@ -182,16 +175,9 @@ const chats = [
       <div class="body">
         <div class="nav"><span></span><span class="nav-trail"><span class="glass-circle"><Icon name="plus" /></span></span></div>
         <h3 class="large">Wallet</h3>
-        <p class="coin-k">khensu.nu coin · coin.khensu.nu</p>
         <div class="card-balance">
           <span class="dim">Shielded balance</span>
-          <span class="bal">1,284.50 <small>coin</small></span>
-          <span class="usd">≈ $3,211.25 <em>+18.4% this month</em></span>
-          <svg class="growth" viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true">
-            <defs><linearGradient id="growth-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ee0b0" stop-opacity="0.35" /><stop offset="1" stop-color="#7ee0b0" stop-opacity="0" /></linearGradient></defs>
-            <path d="M0 26 L8 25 L16 24.5 L24 23 L32 23.4 L40 21 L48 19.5 L56 20 L64 16 L72 13.5 L80 12 L88 8 L100 3 L100 28 L0 28 Z" fill="url(#growth-fill)" />
-            <path d="M0 26 L8 25 L16 24.5 L24 23 L32 23.4 L40 21 L48 19.5 L56 20 L64 16 L72 13.5 L80 12 L88 8 L100 3" fill="none" stroke="#7ee0b0" stroke-width="1.2" vector-effect="non-scaling-stroke" />
-          </svg>
+          <span class="bal">•••••</span>
           <span class="dim small"><Icon name="lock" /> Only you can see it</span>
         </div>
         <ul class="rows tx">
@@ -199,11 +185,8 @@ const chats = [
           <li class="row"><span class="avatar">A</span><span class="row-main"><b>Ada</b><span class="row-sub">Received · shielded</span></span><span class="row-meta">40</span></li>
         </ul>
         <div class="node-card">
-          <span class="node-k"><Crescent size="1.1em" /> Your suñůlink.shield node <span class="online">Online</span></span>
-          <span class="node-stats">
-            <span><b>+46.20 coin</b><span class="dim">earned this week · ≈ $115.50</span></span>
-            <span><b>41 d 6 h</b><span class="dim">total uptime</span></span>
-          </span>
+          <span class="node-k"><Crescent size="1.1em" /> Your node</span>
+          <b>Online for 6 days</b>
           <span class="dim">Carrying traffic for people nearby</span>
         </div>
       </div>
@@ -523,9 +506,6 @@ const chats = [
     border: 1px solid var(--star);
     background: var(--fill);
   }
-  .pay.them {
-    align-self: flex-start;
-  }
   .pay-k {
     font-size: 3.1cqw;
   }
@@ -706,43 +686,6 @@ const chats = [
     font-size: 3.2cqw;
     color: var(--silver);
   }
-  .route {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2cqw;
-    padding: 1.6cqw;
-    border-radius: 3cqw;
-    background: #0d1620;
-    border: 1px solid var(--stroke);
-    color: var(--star);
-    text-decoration: none;
-    font-size: 3cqw;
-  }
-  .route svg {
-    width: 100%;
-    display: block;
-  }
-  .route .leg {
-    fill: none;
-    stroke: #8fd0ff;
-    stroke-width: 0.9;
-    stroke-dasharray: 2 1.6;
-  }
-  .route circle {
-    fill: #f2f1ec;
-  }
-  .route circle.end {
-    fill: #8fd0ff;
-  }
-  .route text {
-    font-size: 4.2px;
-    fill: var(--silver);
-  }
-  .route span {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
   .cites {
     list-style: none;
     margin: 0;
@@ -778,66 +721,9 @@ const chats = [
     border: 1px solid var(--stroke);
   }
   .bal {
-    font-size: 8.6cqw;
+    font-size: 10cqw;
     font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-  .bal small {
-    font-size: 3.6cqw;
-    font-weight: 500;
-    color: var(--silver);
-  }
-  .usd {
-    font-size: 3.4cqw;
-    color: var(--star);
-  }
-  .usd em {
-    font-style: normal;
-    color: #7ee0b0;
-    margin-left: 1cqw;
-  }
-  .growth {
-    width: 100%;
-    height: 12cqw;
-    margin: 1cqw 0;
-  }
-  .coin-k {
-    margin: -1.6cqw 0 0;
-    font-size: 3.1cqw;
-    color: var(--ash);
-  }
-  .online {
-    margin-left: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 1cqw;
-    color: #7ee0b0;
-  }
-  .online::before {
-    content: '';
-    width: 1.6cqw;
-    height: 1.6cqw;
-    border-radius: 50%;
-    background: #7ee0b0;
-    box-shadow: 0 0 1.6cqw #7ee0b0;
-  }
-  .node-k {
-    width: 100%;
-  }
-  .node-stats {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 2cqw;
-    margin: 1cqw 0;
-  }
-  .node-stats > span {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4cqw;
-    font-size: 3.6cqw;
-  }
-  .node-stats .dim {
-    font-size: 2.8cqw;
+    letter-spacing: 0.08em;
   }
   .card-balance .small {
     display: inline-flex;
