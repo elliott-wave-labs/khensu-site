@@ -1,10 +1,10 @@
 ---
-// A home node on satellite internet: the Earth's limb, a low-orbit shell of satellites drifting
-// past, and a dish on a house beaming up. Pure SVG with CSS motion.
+// A node at sea on satellite internet: the Earth's limb, a low-orbit shell of satellites drifting
+// past, and a dish on a sailboat beaming up. Pure SVG with CSS motion.
 const sats = Array.from({ length: 14 }, (_, i) => i);
 ---
 
-<svg class="orbit" viewBox="0 0 800 460" role="img" aria-label="A home node with a satellite dish, linked to a satellite passing overhead in low Earth orbit.">
+<svg class="orbit" viewBox="0 0 800 460" role="img" aria-label="A sailboat with a satellite dish, linked to a satellite passing overhead in low Earth orbit.">
   <defs>
     <radialGradient id="earth" cx="50%" cy="0%" r="75%">
       <stop offset="0" stop-color="#1b2433"></stop>
@@ -33,16 +33,19 @@ const sats = Array.from({ length: 14 }, (_, i) => i);
     ))}
   </g>
 
-  <path class="beam" d="M402 368 L404 252" stroke="url(#beam)" stroke-width="2" fill="none"></path>
+  <path class="beam" d="M437 362 L404 252" stroke="url(#beam)" stroke-width="2" fill="none"></path>
   <circle class="ping" cx="404" cy="252" r="8" fill="none" stroke="#f2f1ec"></circle>
 
-  <g transform="translate(372 368)">
-    <path d="M0 22 L28 2 L56 22 V44 H0 Z" fill="#15171b" stroke="#3a3e46"></path>
-    <rect x="22" y="28" width="12" height="16" fill="#0a0b0d" stroke="#3a3e46"></rect>
-    <path d="M24 2 q8 -12 22 -6" fill="none" stroke="#c9ccd2" stroke-width="2"></path>
-    <ellipse cx="32" cy="-2" rx="9" ry="4" transform="rotate(-20 32 -2)" fill="#c9ccd2"></ellipse>
-    <circle class="node" cx="44" cy="36" r="3.2" fill="#f2f1ec"></circle>
+  <g class="boat">
+    <path d="M396 304 V376" stroke="#c9ccd2" stroke-width="2"></path>
+    <path d="M399 306 L399 372 L436 372 Z" fill="#c9ccd2" fill-opacity="0.9"></path>
+    <path d="M393 312 L393 372 L364 372 Z" fill="#8f949c" fill-opacity="0.85"></path>
+    <path d="M352 376 H448 L438 390 H364 Z" fill="#15171b" stroke="#3a3e46"></path>
+    <path d="M437 376 V364" stroke="#c9ccd2" stroke-width="1.5"></path>
+    <rect x="430" y="359" width="14" height="4" rx="1" transform="rotate(-18 437 361)" fill="#c9ccd2"></rect>
+    <circle class="node" cx="378" cy="383" r="2.6" fill="#f2f1ec"></circle>
   </g>
+  <path class="waves" d="M330 393 q8 -4 16 0 t16 0 M440 393 q8 -4 16 0 t16 0" fill="none" stroke="#5b7aa8" stroke-opacity="0.5" stroke-width="1.2"></path>
 </svg>
 
 <style>
@@ -74,6 +77,20 @@ const sats = Array.from({ length: 14 }, (_, i) => i);
     from { scale: 0.4; opacity: 0.9; }
     to { scale: 2.4; opacity: 0; }
   }
+  .boat {
+    transform-origin: 400px 388px;
+    animation: rock 5s ease-in-out infinite;
+  }
+  @keyframes rock {
+    0%, 100% { rotate: -2deg; translate: 0 0; }
+    50% { rotate: 2deg; translate: 0 1.5px; }
+  }
+  .waves {
+    animation: swell 5s ease-in-out infinite;
+  }
+  @keyframes swell {
+    50% { translate: 6px 0; }
+  }
   .node {
     animation: blink 2s steps(1) infinite;
   }
@@ -81,7 +98,7 @@ const sats = Array.from({ length: 14 }, (_, i) => i);
     50% { opacity: 0.25; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .sats, .beam, .ping, .node {
+    .sats, .beam, .ping, .node, .boat, .waves {
       animation: none;
     }
   }

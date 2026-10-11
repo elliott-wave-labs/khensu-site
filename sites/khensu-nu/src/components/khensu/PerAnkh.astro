@@ -13,16 +13,20 @@ const points = [
   { t: 'Post-quantum encrypted, never exported', b: 'Kept under AES-256 with a key the Secure Enclave never releases. Never backed up, synced or sent anywhere, so there’s no traffic to see.' },
   { t: 'Built on Apple Intelligence', b: 'Apple’s on-device model only, after Face ID. No cloud, ever. Delete a message and everything learned from it goes too.' },
 ];
+// Points with `via` are unlabelled waypoints that keep the route at sea (round Cape Sounion, pass east of Ios).
 const stops = [
-  { name: 'Lavrio', lat: 37.714, lon: 24.056 },
+  { name: 'Athens', lat: 37.912, lon: 23.708 },
+  { via: true, lat: 37.62, lon: 24.03 },
   { name: 'Kea', lat: 37.665, lon: 24.33 },
   { name: 'Syros', lat: 37.444, lon: 24.943 },
   { name: 'Mykonos', lat: 37.446, lon: 25.328 },
   { name: 'Paros', lat: 37.124, lon: 25.236 },
-  { name: 'Naxos', lat: 37.105, lon: 25.376 },
   { name: 'Ios', lat: 36.723, lon: 25.282 },
   { name: 'Santorini', lat: 36.417, lon: 25.432 },
+  { via: true, lat: 36.72, lon: 25.5 },
+  { name: 'Naxos', lat: 37.105, lon: 25.376 },
 ];
+const named = stops.filter((s) => s.name);
 ---
 
 <section class="section ankh-sec" aria-labelledby="ankh-title">
@@ -39,7 +43,7 @@ const stops = [
       </ul>
     </div>
 
-    <figure class="ankh-fig" aria-label="Four searches run on the device and merge into one answer, with the sailing route drawn on a globe.">
+    <figure class="ankh-fig" aria-label="Four searches run on the device and merge into one answer, with a sailboat sailing the route from Athens to Naxos on a globe.">
       <div class="ankh-ask">What’s our Greek islands sailing plan?</div>
       <ul class="ankh-lanes" role="list">
         {lanes.map((l, i) => (
@@ -49,9 +53,13 @@ const stops = [
       <div class="ankh-answer">
         <div class="ankh-globe" data-stops={JSON.stringify(stops)}>
           <canvas aria-hidden="true"></canvas>
-          <ol class="ankh-labels" aria-hidden="true">{stops.map((s) => <li>{s.name}</li>)}</ol>
+          <ol class="ankh-labels" aria-hidden="true">{named.map((s) => <li>{s.name}</li>)}</ol>
+          <svg class="ankh-boat" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2v14M12 3l7 12h-7zM11 5l-6 10h6z" fill="#fff" stroke="#fff" stroke-width="0.6" stroke-linejoin="round" />
+            <path d="M3 17h18l-2.6 3.6H5.6z" fill="#8b7bff" />
+          </svg>
         </div>
-        <p><b>12–19 May, from Lavrio.</b> Kea, Syros, Mykonos, Paros, Naxos, Ios, then Santorini. Ana added Ios on Tuesday; Sam booked the boat.</p>
+        <p><b>12–19 May, from Athens.</b> Kea, Syros, Mykonos, Paros, Ios, Santorini, then Naxos. Ana added Ios on Tuesday; Sam booked the boat.</p>
         <p class="ankh-cites"><span>Ana · Tue 14:02</span><span>Sam · charter PDF</span><span>Skipper · voice note</span></p>
       </div>
       <figcaption>Illustrative. Search works on every iPhone with iOS 26; answers need Apple Intelligence (iPhone 15 Pro or later). Apple Intelligence is a trademark of Apple Inc.</figcaption>
@@ -63,7 +71,7 @@ const stops = [
   import * as THREE from 'three';
   import dots from '../../data/globe-dots.json';
 
-  type Stop = { name: string; lat: number; lon: number };
+  type Stop = { name?: string; via?: boolean; lat: number; lon: number };
   const R = 1;
   const v3 = (lat: number, lon: number, r = R) => {
     const p = (lat * Math.PI) / 180, l = (lon * Math.PI) / 180;
@@ -73,6 +81,7 @@ const stops = [
   for (const host of document.querySelectorAll<HTMLElement>('.ankh-globe')) {
     const canvas = host.querySelector('canvas')!;
     const labels = [...host.querySelectorAll<HTMLElement>('.ankh-labels li')];
+    const boat = host.querySelector<SVGElement>('.ankh-boat')!;
     const stops: Stop[] = JSON.parse(host.dataset.stops!);
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -90,19 +99,22 @@ const stops = [
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     globe.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0x9a96b8, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0.7 })));
 
-    // Route: each leg as a low arc over the sea, drawn progressively.
+    // Route: sampled along each sub-segment; legStart[k] is the route index where leg k (named stop k to k + 1) begins.
     const route: THREE.Vector3[] = [];
+    const legStart: number[] = [0];
     for (let i = 1; i < stops.length; i++) {
       const a = v3(stops[i - 1].lat, stops[i - 1].lon), b = v3(stops[i].lat, stops[i].lon);
-      for (let t = 0; t <= 1; t += 1 / 24) route.push(a.clone().lerp(b, t).normalize().multiplyScalar(R * (1.002 + Math.sin(Math.PI * t) * 0.004)));
+      for (let t = route.length ? 1 / 20 : 0; t <= 1.0001; t += 1 / 20) route.push(a.clone().lerp(b, t).normalize().multiplyScalar(R * 1.002));
+      if (stops[i].name) legStart.push(route.length - 1);
     }
+    const legs = legStart.length - 1;
     const rg = new THREE.BufferGeometry().setFromPoints(route);
     const colors = new Float32Array(route.length * 3);
     const c0 = new THREE.Color(0x8b7bff), c1 = new THREE.Color(0x4fd1c5);
     route.forEach((_, i) => c0.clone().lerp(c1, i / (route.length - 1)).toArray(colors, i * 3));
     rg.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     globe.add(new THREE.Line(rg, new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 })));
-    const marks = stops.map((s) => v3(s.lat, s.lon, R * 1.003));
+    const marks = stops.filter((s) => s.name).map((s) => v3(s.lat, s.lon, R * 1.003));
     const mg = new THREE.BufferGeometry().setFromPoints(marks);
     globe.add(new THREE.Points(mg, new THREE.PointsMaterial({ color: 0xffffff, size: 5, sizeAttenuation: false })));
 
@@ -120,27 +132,50 @@ const stops = [
     resize();
 
     const ease = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
-    const LOOP = 18;
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    // 0-4 s zoom in, then each leg sails for SAIL seconds and rests PAUSE seconds at the island; hold at Naxos.
+    const SAIL = 1.4, PAUSE = 0.5, START = 4.4;
+    const LOOP = START + legs * (SAIL + PAUSE) + 2.5;
     let visible = false;
     new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(host);
-    const v = new THREE.Vector3();
+    const v = new THREE.Vector3(), here = new THREE.Vector3(), ahead = new THREE.Vector3();
+    const screen = (p: THREE.Vector3, w: number, h: number) => {
+      v.copy(p).applyMatrix4(globe.matrixWorld).project(camera);
+      return [((v.x + 1) / 2) * w, ((1 - v.y) / 2) * h];
+    };
+    const at = (f: number, out: THREE.Vector3) => {
+      const i = Math.min(route.length - 2, Math.floor(f));
+      return out.copy(route[i]).lerp(route[i + 1], f - i);
+    };
     const frame = (ms: number) => {
-      const t = still ? LOOP * 0.9 : (ms / 1000) % LOOP;
+      const t = still ? LOOP : (ms / 1000) % LOOP;
       const zoom = ease((t - 1) / 3);
       globe.rotation.y = target.y - (1 - ease(t / 4)) * 1.4;
       globe.rotation.x = target.x * ease(t / 4);
       camera.position.set(0, 0, 4.2 - zoom * 3.13);
       camera.lookAt(0, 0, 0);
-      const drawn = Math.floor(route.length * ease((t - 4) / 4.5));
-      rg.setDrawRange(0, Math.max(0, drawn));
-      mg.setDrawRange(0, Math.min(stops.length, Math.floor(drawn / 24) + (drawn > 0 ? 1 : 0)));
+      globe.updateMatrixWorld();
+
+      const s = Math.max(0, t - START);
+      const leg = Math.min(legs - 1, Math.floor(s / (SAIL + PAUSE)));
+      const p = Math.min(1, (s - leg * (SAIL + PAUSE)) / SAIL);
+      const f = t < START ? 0 : legStart[leg] + smooth(p) * (legStart[leg + 1] - legStart[leg]);
+      const reached = t < START ? 0 : leg + (p >= 1 ? 2 : 1);
+      rg.setDrawRange(0, t < START ? 0 : Math.floor(f) + 1);
+      mg.setDrawRange(0, reached);
+
       const w = host.clientWidth, h = host.clientHeight;
       marks.forEach((m, i) => {
-        v.copy(m).applyMatrix4(globe.matrixWorld).project(camera);
-        const shown = i < Math.floor(drawn / 24) + (drawn > 0 ? 1 : 0) && zoom > 0.9;
-        labels[i].style.transform = `translate(${((v.x + 1) / 2) * w + 6}px, ${((1 - v.y) / 2) * h - 7}px)`;
-        labels[i].style.opacity = shown ? '1' : '0';
+        const [x, y] = screen(m, w, h);
+        labels[i].style.transform = `translate(${x + 6}px, ${y - 7}px)`;
+        labels[i].style.opacity = i < reached && zoom > 0.9 ? '1' : '0';
       });
+      const [bx, by] = screen(at(f, here), w, h);
+      const [ax] = screen(at(Math.min(route.length - 1.001, f + 1), ahead), w, h);
+      const sailing = t >= START && p < 1;
+      const bob = sailing ? Math.sin(t * 9) * 1.2 : 0;
+      boat.style.transform = `translate(${bx - 9}px, ${by - 17 + bob}px) scaleX(${ax < bx ? -1 : 1})`;
+      boat.style.opacity = zoom > 0.9 ? '1' : '0';
       if (visible || still) renderer.render(scene, camera);
       if (!still) requestAnimationFrame(frame);
     };
@@ -221,6 +256,17 @@ const stops = [
     opacity: 0;
     transition: opacity 0.4s;
     white-space: nowrap;
+  }
+  .ankh-boat {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    opacity: 0;
+    transition: opacity 0.4s;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+    pointer-events: none;
   }
   .ankh-answer p { margin: 0; }
   .ankh-cites { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem !important; }
