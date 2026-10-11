@@ -13,7 +13,7 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
       <h1>One shield.<br />Drawn to scale.</h1>
       <p class="lede">
         A mesh node on the back of the phone: HaLow radio for the neighbourhood mesh, Wi-Fi and Bluetooth to the phone, its
-        own 14 Wh battery, and power from the phone over USB-C when its cells run out. Every drawing here is to scale and
+        own 14 Wh battery, charged over USB-C from a wall charger or power bank. Every drawing here is to scale and
         comes from the same parametric CAD that exports STEP and STL for CNC and tooling.
       </p>
       <p class="fits">
@@ -61,8 +61,9 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
                   <div><dt>about {r.wh.toFixed(0)} h</dt><dd>relaying on its own cells (estimate)</dd></div>
                 </dl>
                 <p class="small">
-                  Footprint {r.footprint[0]} × {r.footprint[1]} mm. Magnet ring {r.ring} mm. Charges on any Qi2 pad through a
-                  window over its coil, or over its own USB-C; a short cable powers it from the phone when its cells run out.
+                  Footprint {r.footprint[0]} × {r.footprint[1]} mm. Magnet ring {r.ring} mm. Charges over its USB-C from a wall
+                  charger or power bank. When its cells run out it takes a little from the phone through its Qi2 coil, where the
+                  phone supports it, or over a short USB-C cable.
                 </p>
                 <h3>Section through the magnet centre</h3>
                 <div class="section-draw" set:html={sectionView(p, SHIELD)} />

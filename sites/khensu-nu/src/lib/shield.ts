@@ -194,7 +194,7 @@ export function sectionView(p: Phone, s: Slim): string {
   const kx = 3.4, kz = 14, padX = 20, padTop = 18;
   const y0 = o.cy - o.h / 2, y1 = o.cy + o.h / 2;
   const W = (y1 - y0) * kx + padX * 2;
-  const H = (Math.max(T, p.bump.lens) + 1.8) * kz + padTop + 40;
+  const H = (Math.max(T, p.bump.lens) + 1.8) * kz + padTop + 58;
   const X = (y: number) => padX + (y - y0) * kx;
   const Z = (z: number) => padTop + (Math.max(T, p.bump.lens) - z) * kz;
   const box = (ya: number, yb: number, za: number, zb: number, fill: string, op = 1) =>
@@ -233,8 +233,8 @@ export function sectionView(p: Phone, s: Slim): string {
     stacked >= 0.8 ? box(Math.max(zoneA, yi0 + 0.5), Math.min(zoneB, yi1 - 0.5), zb + B.magnetT + 0.1, zb + B.magnetT + 0.1 + stacked, C.green, 0.45) : '',
     hasCoil ? box(n.magsafe.y - B.coilD / 2, n.magsafe.y + B.coilD / 2, coilZ, top, C.yellow, 0.75) : '',
     `<line x1="${X(yi0).toFixed(1)}" x2="${X(yi1).toFixed(1)}" y1="${(Z(top) + 1).toFixed(1)}" y2="${(Z(top) + 1).toFixed(1)}" stroke="${C.orange}" stroke-width="2"/>`,
-    t(X(y0), H - 8, 'bottom edge'),
-    t(X(y1), H - 8, 'toward camera', 'end'),
+    t(X(y0), H - 28, 'bottom edge'),
+    t(X(y1), H - 28, 'toward camera', 'end'),
     t((X(y0) + X(y1)) / 2, H - 8, `${(y1 - y0).toFixed(0)} mm long, ${T} mm thick (height drawn ${(kz / kx).toFixed(1)}× for legibility)`, 'middle'),
   ];
   return `<svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" width="${W.toFixed(0)}" height="${H.toFixed(0)}" role="img" aria-label="Section through the magnet centre">${parts.join('')}</svg>`;
@@ -244,9 +244,9 @@ export const LEGEND: { label: string; color: string; dashed: boolean }[] = [
   { label: 'Shield outline', color: C.accent, dashed: false },
   { label: 'Battery cells', color: C.green, dashed: false },
   { label: 'Magnet ring', color: C.dim, dashed: false },
-  { label: 'Qi2 coil (charges the shield)', color: C.yellow, dashed: true },
+  { label: 'Qi2 coil: a sip from the phone when its cells run out', color: C.yellow, dashed: true },
   { label: 'Board and radios', color: C.blue, dashed: false },
   { label: 'Heat spreader: 25 µm graphite under the whole skin, into the titanium back', color: C.orange, dashed: false },
   { label: 'HaLow antenna window (no metal)', color: C.pink, dashed: true },
-  { label: 'USB-C to the phone', color: C.text, dashed: false },
+  { label: 'USB-C: charges from a wall charger or power bank', color: C.text, dashed: false },
 ];
