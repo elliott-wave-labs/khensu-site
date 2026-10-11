@@ -8,8 +8,10 @@ STUDIO="${STUDIO_DIR:-$HOME/Documents/GitHub/moqom-cloud/sites/elliottwave-studi
 K="$HERE/sites/khensu-nu/src"
 cp "$K"/components/khensu/*.astro "$STUDIO/src/components/khensu/"
 cp "$K/scripts/scenes.ts" "$STUDIO/src/scripts/scenes.ts"
-mkdir -p "$STUDIO/src/data" && cp "$K"/data/*.ts "$STUDIO/src/data/"
-rsync -a --delete "$HERE/sites/khensu-nu/public/khensu/shell/" "$STUDIO/public/khensu/shell/"
+mkdir -p "$STUDIO/src/data" && cp "$K"/data/*.ts "$K"/data/*.json "$STUDIO/src/data/"
+for d in shell codec; do
+  rsync -a --delete "$HERE/sites/khensu-nu/public/khensu/$d/" "$STUDIO/public/khensu/$d/"
+done
 sed 's/--accent: #18e0c8;/--accent: #f59e0b;/' "$K/styles/global.css" > "$STUDIO/src/styles/global.css"
 cp "$HERE/studio/pages/index.astro" "$STUDIO/src/pages/index.astro"
 python3 - "$K/pages/index.astro" "$STUDIO/src/pages/khensu.astro" <<'PY'
