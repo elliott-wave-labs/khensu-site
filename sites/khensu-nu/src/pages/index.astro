@@ -12,7 +12,7 @@ import StatStrip from '../components/khensu/StatStrip.astro';
     links={[
       APP_STORE_ID
         ? { href: APP_STORE_URL, label: 'Download on the App Store', badge: '/badges/download-on-the-app-store-black.svg' }
-        : { href: APP_STORE_URL, label: 'App Store' },
+        : { href: APP_STORE_URL, label: 'App Store', icon: 'apple' as const },
       ...(GOOGLE_PLAY_ID ? [{ href: GOOGLE_PLAY_URL, label: 'Get it on Google Play', badge: '/badges/get-it-on-google-play.png' }] : []),
       { href: '#run-a-node-section', label: 'Run a node' },
       { href: 'https://dev.khensu.nu', label: 'Developer docs' },

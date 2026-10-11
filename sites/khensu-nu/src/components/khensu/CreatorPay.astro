@@ -61,7 +61,7 @@ const points = [
     <h2 id="creator-pay-title" class="big">Fans pay artists directly.<br /><em>Nobody takes a cut in between.</em></h2>
     <p class="lede">
       Studios, labels and streaming services keep most of what people spend on art. On khensu.ñü, fans pay the people
-      who made it, in the app, and the only charge is a network fee of a fraction of a cent. And you keep every right
+      who made it, in the app, and the only charge is a network fee under 1¢ to send, receive or withdraw. And you keep every right
       to your work: publishing, copyright, trademarks and IP, like nowhere else. There are no ads: you’re paid for
       people using and interacting with your work, every play and view, and every tip, gift and subscription.
     </p>
@@ -203,6 +203,7 @@ const points = [
       const label = plays.toLocaleString('en-US');
       out.textContent = label;
       input.setAttribute('aria-valuetext', `${label} plays`);
+      input.style.setProperty('--p', `${(Number(input.value) / Number(input.max)) * 100}%`);
       cells.forEach((c, i) => {
         if (plays === 1000) return void (c.textContent = first[i]);
         const [lo, hi] = c.dataset.per!.split(',').map((k) => (Number(k) * plays) / 1000);
@@ -219,6 +220,7 @@ const points = [
       const amt = 100 * 10 ** Number(input.value);
       out.textContent = short(amt);
       input.setAttribute('aria-valuetext', short(amt));
+      input.style.setProperty('--p', `${(Number(input.value) / Number(input.max)) * 100}%`);
       for (const c of cells) {
         const [lo, hi] = c.dataset.kept!.split(',').map((k) => (amt * Number(k)) / 100);
         c.textContent = lo === hi ? short(lo) : `${short(lo)}–${short(hi)}`;

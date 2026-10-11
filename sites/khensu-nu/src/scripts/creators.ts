@@ -1,6 +1,8 @@
 // Creators page motion: parallax (--v), scroll-scrubbed counters, videos that play only while visible, the
 // particle burst into the big numbers, the H.264 / ñü.media wipe and the Sounds phone. Without this script, or with
 // reduced motion, every scene shows its final state and videos show their posters.
+const AURA_GLOW = ['#22f59a', '#1e8fff', '#8b5cff'];
+const AURA_CORE = ['#6dffbf', '#4fb0ff', '#a98bff'];
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 const root = document.documentElement;
@@ -215,14 +217,15 @@ for (const scene of document.querySelectorAll<HTMLElement>('[data-burst]')) {
       y += Math.cos(t * 1.1 + p.hue * 30) * 0.6;
       const pulse = 0.5 + 0.5 * Math.sin(t * 2.6 + p.hue * 60);
       const rad = p.r * (W < 600 ? 0.8 : 1) * (0.75 + pulse * 0.6);
-      const green = p.hue > 0.5;
+      // ñü.aura: each particle drifts through green, electric blue and purple.
+      const c = Math.floor(p.hue * 3 + t * 0.12) % 3;
       ctx.globalAlpha = 0.18 + pulse * 0.22;
-      ctx.fillStyle = green ? '#2ee59d' : '#9b7bff';
+      ctx.fillStyle = AURA_GLOW[c];
       ctx.beginPath();
       ctx.arc(x, y, rad * 3.2, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 0.75 + pulse * 0.25;
-      ctx.fillStyle = green ? '#b8ffe0' : '#e2d9ff';
+      ctx.fillStyle = AURA_CORE[c];
       ctx.beginPath();
       ctx.arc(x, y, rad, 0, Math.PI * 2);
       ctx.fill();
