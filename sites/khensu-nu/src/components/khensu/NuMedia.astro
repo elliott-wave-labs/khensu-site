@@ -103,6 +103,7 @@ const videos = [
       { big: 'Same look', small: 'nu-media’s quality target at this size' },
     ],
     src: '/khensu/codec/compare-720p.mp4', poster: '/khensu/codec/compare-720p.jpg', w: 1440, h: 1280, cols: 4, rows: 2, maxw: '46rem',
+    mobile: '/khensu/codec/compare-720p-m.mp4',
     tiles: [
       { name: 'Original', note: 'Instagram, 2.44 Mbit/s' },
       { name: 'nu-media', note: `Neural Engine · ${v720('nu-media')}`, ours: true },
@@ -293,9 +294,12 @@ const chips = [
               {v.stats.map((x) => <li><b>{x.big}</b><small>{x.small}</small></li>)}
             </ul>
           )}
-          <div class="cmp" style={`max-width:${v.maxw}`}>
-            <video src={v.src} poster={v.poster} width={v.w} height={v.h} autoplay muted loop playsinline preload="auto"
-              aria-label={`${v.title}: the original and each codec side by side`} />
+          <div class:list={['cmp', { 'has-m': v.mobile }]} style={`max-width:${v.maxw}`}>
+            <video poster={v.poster} width={v.w} height={v.h} autoplay muted loop playsinline preload="auto"
+              aria-label={`${v.title}: the original and each codec side by side`}>
+              {v.mobile && <source src={v.mobile} type="video/mp4" media="(max-width: 640px)" />}
+              <source src={v.src} type="video/mp4" />
+            </video>
             <ol class:list={['tiles', { many: v.cols > 3 }]} role="list" style={`--cols:${v.cols};--rows:${v.rows}`}>
               {v.tiles.map((t) => (
                 <li class:list={[{ ours: t.ours }]}><b>{t.name}</b> <small>{t.note}</small></li>
@@ -737,6 +741,27 @@ const chips = [
   }
 
   @media (max-width: 640px) {
+    .cmp.has-m video {
+      aspect-ratio: 720 / 1800;
+      object-fit: cover;
+    }
+    .cmp.has-m .tiles {
+      --cols: 2 !important;
+      --rows: 4 !important;
+    }
+    .cmp.has-m .tiles li {
+      font-size: 0.72rem;
+    }
+    .cmp.has-m .tiles small {
+      display: block;
+      font-size: 0.62rem;
+    }
+    .stats {
+      gap: 0.4rem 1.4rem;
+    }
+    .stats b {
+      font-size: 1.4rem;
+    }
     .bars li {
       grid-template-columns: 1fr auto;
     }
