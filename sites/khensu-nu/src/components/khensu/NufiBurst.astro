@@ -53,7 +53,9 @@ const steps = [
 <script>
   type P = { sx: number; sy: number; bx: number; by: number; tx: number; ty: number; d: number; r: number; w: number };
   const sec = document.querySelector<HTMLElement>('.fb');
-  if (sec && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  // The pinned scene needs room for the heading, all three steps and the chart; phones get the static layout.
+  const roomy = matchMedia('(min-width: 701px) and (min-height: 640px)').matches;
+  if (sec && roomy && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const canvas = sec.querySelector<HTMLCanvasElement>('.fb-canvas')!;
     const ctx = canvas.getContext('2d')!;
     const daily: number[] = JSON.parse(sec.dataset.daily || '[]');

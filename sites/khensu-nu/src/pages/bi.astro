@@ -1,0 +1,445 @@
+---
+import Base from '../layouts/Base.astro';
+
+const DEV = 'https://dev.khensu.nu';
+const CONTACT = 'mailto:hello@elliottwave.studio?subject=%C3%B1%C3%BC.bi%20%E2%80%94%20government%20enquiry';
+
+const tiers = [
+  { name: 'Pro', price: 4.99 },
+  { name: 'Ultra', price: 200 },
+  { name: 'Akashic', price: 1000 },
+].map((t) => {
+  const net = Math.round(t.price * 0.85 * 100) / 100;
+  const founder = Math.floor((net / 2) * 100) / 100;
+  return { ...t, network: Math.round((net - founder) * 100) / 100 };
+});
+const usd = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })}`;
+
+const stages = [
+  {
+    k: 'Stage one · at launch',
+    t: 'Everyone who runs a node is paid.',
+    b: 'A Mac, a Raspberry Pi 5 or a suñůlink.shield on an ordinary home connection becomes a node. It carries encrypted traffic, stores encrypted data and does proved work for the network while its owner gets on with life, and it is paid every epoch in US-dollar stablecoin for that work.',
+  },
+  {
+    k: 'Stage two · in research',
+    t: 'Then every person gets an equal share.',
+    b: 'A dividend paid equally to every unique person on the network, whether or not they run a node, funded from the network’s revenue. Each person counts once, proven without a name, a document number or a biometric scan. This is the universal part of ñü.bi, and it is not live yet.',
+  },
+];
+
+const how = [
+  { t: 'People subscribe', b: 'Pro, Ultra or Akashic, through the App Store. After Apple’s 15%, half of every subscription belongs to the network.' },
+  { t: 'The network’s half becomes the pay pool', b: 'It is converted one-for-one to USDC, a fully reserved dollar stablecoin, and paid into the shielded pool for that epoch.' },
+  { t: 'Nodes prove their work', b: 'Every job yields a work receipt: packets mixed, bytes stored and challenged, relay minutes, media delivered. Receipts are checked by the network; forged ones cost the node its pay and part of its stake.' },
+  { t: 'The pool is shared by work', b: 'Each node receives the pool multiplied by its share of all verified work in the epoch. One worldwide rate per unit of work, with no cut taken in between.' },
+  { t: 'Operators spend it', b: 'Keep it, send it, spend it with a USDC card in Apple Pay, or withdraw to a bank. Nobody else can see who was paid or how much.' },
+];
+
+const fair = [
+  { t: 'One rate for the whole world', b: 'A node in Casablanca earns the same for the same work as a node in Berlin. Those dollars go about two and a half times further where living costs are lower, so the same node supports more of a living where it’s needed most.' },
+  { t: 'No location tracking', b: 'Pay never depends on where a node is, so the network never needs to know. That keeps operators safe, and it can’t be gamed with a fake location.' },
+  { t: 'Modest hardware', b: 'A Raspberry Pi 5 uses about 5 kWh a month. No mining, no special equipment and no wasted energy: every unit of work is something people actually use.' },
+  { t: 'Paid for real work only', b: 'No pay for holding tokens, no pay for doing nothing, and no token sale. Money comes from subscriptions and delivery customers, not from new buyers.' },
+];
+
+const sources = [
+  { t: 'Subscriptions', b: 'Half of every Pro, Ultra and Akashic subscription after Apple’s share, every month.', live: 'At launch' },
+  { t: 'Media and web delivery', b: 'Creators, sites on webË and MOQOM Cloud customers pay for delivery; that money is paid to the nodes that deliver.', live: 'At launch, growing' },
+  { t: 'Network fees', b: 'Private payments carry a fee under one cent, paid to the nodes that process them.', live: 'At launch' },
+  { t: 'The dividend share', b: 'A fixed share of network revenue set aside for the stage-two dividend. The share is not decided yet.', live: 'In research' },
+];
+
+const safeguards = [
+  { t: 'No registry of people', b: 'Personhood is proven once through a partner, then turned into an anonymous credential. The network learns that someone is a unique person, never who.' },
+  { t: 'No biometrics', b: 'No iris scans, no face templates, no fingerprints held by anyone. Systems that collect them conflict with our threat model.' },
+  { t: 'Private by construction', b: 'Payments are shielded and post-quantum. Node traffic looks the same whatever it carries, so nobody can tell who earns, who spends or what a node is doing.' },
+  { t: 'It outlives its founder', b: 'If the founder stops checking in for 42 days, every founder power passes to the network’s consensus for good, and all code is released to the public.' },
+];
+
+const gov = [
+  { t: 'Personhood credentials', b: 'Let a national digital ID or civil registry issue one-time, blind credentials to residents who opt in. The government confirms a real person; khensu.ñü never learns who. This unlocks the stage-two dividend for your residents.' },
+  { t: 'Community nodes', b: 'Libraries, schools, clinics and municipal buildings already have fibre. A node there earns for its community, and strengthens private communication in the area at the same time.' },
+  { t: 'Clear tax treatment', b: 'Node pay is income for work. Each operator’s app produces an annual earnings statement for their own tax filing, on their device. Guidance on how it is taxed helps operators comply.' },
+  { t: 'Regulatory clarity', b: 'Payouts are in USDC, a regulated dollar stablecoin, redeemable one-for-one. Clear rules on receiving and spending stablecoin pay make it simpler for ordinary people to take part.' },
+  { t: 'A measured pilot', b: 'Start with one city or region: subsidised hardware for households that want it, published measurements of earnings, costs and uptime from our test network, and an independent evaluation.' },
+];
+
+const status = [
+  { what: 'Nodes paid for verified work, at one worldwide rate', s: 'Decided' },
+  { what: 'Half of every subscription to the network, paid in USDC', s: 'Decided' },
+  { what: 'No pay by location; the network never knows where a node is', s: 'Decided' },
+  { what: 'No platform cut on node work, hosting, creators’ views, gifts or sales', s: 'Decided' },
+  { what: 'Founder powers pass to consensus on the dead-man’s switch', s: 'Decided' },
+  { what: 'Stage-two dividend: funded from revenue, equal per unique person', s: 'Proposed' },
+  { what: 'How personhood is proven without identity or biometrics', s: 'In research' },
+  { what: 'The share of revenue set aside for the dividend', s: 'Open' },
+  { what: 'Public income figures, reviewed with counsel', s: 'Open' },
+];
+---
+
+<Base
+  title="ñü.bi: the ñü basic income"
+  description="ñü.bi, the ñü basic income: everyone who runs a khensu.ñü node is paid in US-dollar stablecoin for proved work at one worldwide rate, and an equal dividend for every person is in research. No location tracking, no biometrics, no registry of people."
+>
+  <div class="khensu bi">
+    <section class="bi-hero" aria-labelledby="bi-title">
+      <div class="wrap">
+        <p class="eyebrow">ñü.bi · ñü basic income</p>
+        <h1 id="bi-title">A basic income,<em>paid by the network people run.</em></h1>
+        <p class="bi-lede">
+          khensu.ñü is a gift to humanity and all beings: freedom and privacy, plus a universal basic income, so people
+          everywhere can create, build and live securely. ñü.bi is how the income part works.
+        </p>
+        <p class="bi-status">Published 11 October 2026 · in development, not yet live · nothing here is a promise of income</p>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Two stages">
+      <div class="wrap">
+        <div class="bi-two">
+          {stages.map((s, i) => (
+            <article class:list={['glass', 'bi-stage', { on: i === 0 }]}>
+              <p class="bi-k">{s.k}</p>
+              <h3>{s.t}</h3>
+              <p>{s.b}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="bi-how" aria-labelledby="bi-how-title">
+      <div class="wrap">
+        <p class="eyebrow">how node pay works</p>
+        <h2 id="bi-how-title">From a subscription<br /><span class="dim">to an operator’s pocket.</span></h2>
+        <ol class="bi-steps" role="list">
+          {how.map((h, i) => (
+            <li class="glass"><span class="num">{String(i + 1).padStart(2, '0')}</span><h3>{h.t}</h3><p>{h.b}</p></li>
+          ))}
+        </ol>
+        <figure class="glass bi-formula">
+          <figcaption>Each node’s pay for an epoch</figcaption>
+          <p class="f">pay = pool × <span>(this node’s verified work ÷ all verified work)</span></p>
+          <p class="fn">So pay grows with what people use, and is shared by everyone who runs a node. When more nodes join than the work needs, each earns less; the network’s committee can pace new nodes in a region so pay stays above running costs.</p>
+        </figure>
+        <figure class="glass bi-table">
+          <figcaption>What one month of each subscription puts in the pool</figcaption>
+          <table>
+            <thead><tr><th scope="col">Plan</th><th scope="col">Price</th><th scope="col">To the network’s pay pool</th></tr></thead>
+            <tbody>
+              {tiers.map((t) => <tr><th scope="row">{t.name}</th><td>{usd(t.price)}</td><td class="ours">{usd(t.network)}</td></tr>)}
+            </tbody>
+          </table>
+        </figure>
+        <p class="footnote">
+          After Apple’s 15%, split evenly between the network and Elliott Wave LLC, the founder’s company; that split is
+          the only cut. Estimated node earnings at different audience sizes are on the <a href="/network#network-earnings">network page</a>.
+          Real earnings depend on usage and are not guaranteed.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="bi-fair-title">
+      <div class="wrap">
+        <p class="eyebrow">fair everywhere</p>
+        <h2 id="bi-fair-title">One rate for the whole world.<br /><span class="dim">Worth the most where it’s needed most.</span></h2>
+        <div class="bi-grid">
+          {fair.map((f) => <article class="glass"><h3>{f.t}</h3><p>{f.b}</p></article>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="bi-src-title">
+      <div class="wrap">
+        <p class="eyebrow">where the money comes from</p>
+        <h2 id="bi-src-title">Real customers.<br /><span class="dim">Never ads, data or token sales.</span></h2>
+        <ul class="bi-src" role="list">
+          {sources.map((s) => <li class="glass"><span class="tag">{s.live}</span><h3>{s.t}</h3><p>{s.b}</p></li>)}
+        </ul>
+        <p class="footnote">
+          The network also mints tokens to operators, falling by half every two years. Their value depends on a market
+          price, so they are left out of every figure on this site.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="bi-safe-title">
+      <div class="wrap">
+        <p class="eyebrow">safeguards</p>
+        <h2 id="bi-safe-title">A basic income without surveillance.</h2>
+        <div class="bi-grid">
+          {safeguards.map((f) => <article class="glass"><h3>{f.t}</h3><p>{f.b}</p></article>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="section bi-gov" id="bi-governments" aria-labelledby="bi-gov-title">
+      <div class="wrap">
+        <p class="eyebrow">for governments</p>
+        <h2 id="bi-gov-title">Five ways to bring ñü.bi<br /><span class="dim">to your residents.</span></h2>
+        <p class="intro">
+          ñü.bi needs no public money to run: the network pays its operators from its own revenue. What governments can
+          add is reach, trust and clarity.
+        </p>
+        <ol class="bi-steps" role="list">
+          {gov.map((h, i) => (
+            <li class="glass"><span class="num">{String(i + 1).padStart(2, '0')}</span><h3>{h.t}</h3><p>{h.b}</p></li>
+          ))}
+        </ol>
+        <div class="btn-row">
+          <a class="btn primary" href={CONTACT}>Talk to us</a>
+          <a class="btn" href="/network">How the network works</a>
+          <a class="btn" href={`${DEV}/specs/work`}>Work specification</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="bi-status-title">
+      <div class="wrap">
+        <p class="eyebrow">where it stands</p>
+        <h2 id="bi-status-title">What’s decided,<br /><span class="dim">and what isn’t yet.</span></h2>
+        <figure class="glass bi-table">
+          <table>
+            <thead><tr><th scope="col">Part of ñü.bi</th><th scope="col">Status</th></tr></thead>
+            <tbody>
+              {status.map((r) => <tr><th scope="row">{r.what}</th><td><span class:list={['st', r.s.toLowerCase().replace(/\s/g, '-')]}>{r.s}</span></td></tr>)}
+            </tbody>
+          </table>
+        </figure>
+        <p class="footnote">
+          khensu.ñü is built by Elliott Wave LLC. The network, its token and the stage-two dividend are in development and
+          not yet offered anywhere. Nothing on this page is an offer of securities, investment advice or a promise of
+          income; amounts will be published only as labelled estimates after legal review. USDC is issued by Circle and
+          redeemable one-for-one for US dollars. Apple and Apple Pay are trademarks of Apple Inc.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .bi {
+    background: #000;
+  }
+  .bi-hero {
+    padding: clamp(8rem, 16vw, 12rem) 0 clamp(3rem, 6vw, 5rem);
+    text-align: center;
+    background:
+      radial-gradient(50rem 26rem at 50% 20%, rgba(34, 245, 154, 0.12), transparent 70%),
+      radial-gradient(40rem 22rem at 70% 60%, rgba(30, 143, 255, 0.12), transparent 70%),
+      #000;
+  }
+  .bi-hero h1 {
+    font-size: clamp(2.8rem, 8vw, 6rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin: 0.5rem auto 1.4rem;
+    max-width: 18ch;
+  }
+  .bi-hero h1 em {
+    display: block;
+    font-style: normal;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bi-lede {
+    color: var(--text-dim, #a1a1aa);
+    font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+    line-height: 1.55;
+    max-width: 44rem;
+    margin: 0 auto;
+  }
+  .bi-status {
+    display: inline-block;
+    margin-top: 1.8rem;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.7);
+    font: 500 0.78rem/1.4 var(--font-mono);
+  }
+  .glass {
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    padding: clamp(1.2rem, 2.4vw, 1.8rem);
+  }
+  .glass h3 {
+    font-size: 1.12rem;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  .glass p {
+    color: var(--text-dim, #a1a1aa);
+    line-height: 1.55;
+    margin: 0;
+  }
+  .dim {
+    color: var(--text-dim, #a1a1aa);
+  }
+  .bi h2 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    margin: 0.4rem 0 1.6rem;
+  }
+  .intro {
+    color: var(--text-dim, #a1a1aa);
+    max-width: 44rem;
+    line-height: 1.6;
+    margin: -0.6rem 0 1.8rem;
+  }
+  .bi-two {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .bi-stage h3 {
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+  .bi-stage.on {
+    border-color: rgba(34, 245, 154, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 60px rgba(34, 245, 154, 0.08);
+  }
+  .bi-k {
+    font: 500 0.75rem/1 var(--font-mono) !important;
+    color: #6dffbf !important;
+    margin-bottom: 0.9rem !important;
+  }
+  .bi-stage:not(.on) .bi-k {
+    color: #a98bff !important;
+  }
+  .bi-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.9rem;
+  }
+  .bi-steps .num {
+    display: block;
+    font: 500 0.72rem var(--font-mono);
+    color: var(--text-faint, #71717a);
+    margin-bottom: 0.8rem;
+  }
+  .bi-formula {
+    margin: 0 0 1.4rem;
+  }
+  .bi-formula figcaption,
+  .bi-table figcaption {
+    font: 500 0.78rem var(--font-mono);
+    color: var(--text-faint, #71717a);
+    margin-bottom: 0.8rem;
+  }
+  .bi-formula .f {
+    font: 500 clamp(1.05rem, 2.4vw, 1.5rem) / 1.4 var(--font-mono);
+    color: #fff;
+    margin-bottom: 0.9rem;
+  }
+  .bi-formula .f span {
+    background: var(--aura);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bi-table {
+    margin: 0 0 1.2rem;
+    overflow-x: auto;
+  }
+  .bi-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  .bi-table th,
+  .bi-table td {
+    text-align: left;
+    padding: 0.7rem 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .bi-table thead th {
+    font: 500 0.75rem var(--font-mono);
+    color: var(--text-faint, #71717a);
+  }
+  .bi-table tbody th {
+    font-weight: 500;
+  }
+  .bi-table .ours {
+    color: #6dffbf;
+    font-weight: 600;
+  }
+  .st {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font: 500 0.75rem var(--font-mono);
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .st.decided {
+    color: #6dffbf;
+    border-color: rgba(109, 255, 191, 0.4);
+  }
+  .st.proposed {
+    color: #4fb0ff;
+    border-color: rgba(79, 176, 255, 0.4);
+  }
+  .st.in-research {
+    color: #a98bff;
+    border-color: rgba(169, 139, 255, 0.4);
+  }
+  .bi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .bi-src {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.9rem;
+  }
+  .bi-src .tag {
+    display: inline-block;
+    font: 500 0.7rem var(--font-mono);
+    color: #6dffbf;
+    margin-bottom: 0.8rem;
+  }
+  .bi-gov {
+    background: radial-gradient(60rem 30rem at 50% 0%, rgba(30, 143, 255, 0.1), transparent 70%), #000;
+  }
+  .footnote a {
+    color: inherit;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  @media (max-width: 760px) {
+    .bi-two,
+    .bi-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bi-hero h1 em {
+      animation: none;
+    }
+  }
+</style>
