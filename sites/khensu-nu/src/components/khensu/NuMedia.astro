@@ -5,6 +5,7 @@
 // Each card draws from its own --e (scripts/scenes.ts, reveal); without the script they show complete.
 import reel from '../../data/iphone-reel.json';
 import aurora from '../../data/iphone-aurora.json';
+import g720 from '../../data/iphone-720p.json';
 
 type Point = { actual_kbps: number; vmaf: number };
 type Run = { codecs: Record<string, { points: Point[] }>; grid: { want_kbps: number; codecs: Record<string, Point> } };
@@ -90,20 +91,31 @@ const tileSet = (run: Run, src: string, half: string) => {
     { name: 'nu-media base, AV1', note: `${half} · ${v('nu-base-av1')}`, ours: true },
   ];
 };
+const t720 = g720.tiles as Record<string, { vmaf: number; actual_kbps: number }>;
+const v720 = (k: string) => `VMAF ${t720[k].vmaf.toFixed(0)}`;
 const videos = [
   {
-    title: '720p at 500 kbit/s, encoded on iPhone Air',
-    sub: '1:1 crops of 720 × 1280 frames, every codec at the same bitrate',
-    src: '/khensu/codec/compare-reel.mp4', poster: '/khensu/codec/compare-reel.jpg', w: 2160, h: 640, cols: 6,
-    tiles: tileSet(r, '720p source', '360 × 640'),
-    credit: 'Video: @deemsterhotline on Instagram, used with thanks.',
+    title: 'Every codec at 500 kbit/s, 720p',
+    sub: 'Top row encoded on an iPhone Air. Bottom row encoded on a Mac, since iPhone has no encoder for them. 1:1 crops of 720 × 1280 frames.',
+    src: '/khensu/codec/compare-720p.mp4', poster: '/khensu/codec/compare-720p.jpg', w: 1440, h: 1280, cols: 4, rows: 2, maxw: '46rem',
+    tiles: [
+      { name: 'Original', note: 'Instagram, 2.44 Mbit/s' },
+      { name: 'nu-media', note: `Neural Engine · ${v720('nu-media')}`, ours: true },
+      { name: 'H.264', note: `iPhone hardware · ${v720('h264-hw')}` },
+      { name: 'HEVC (H.265)', note: `iPhone hardware · ${v720('hevc-hw')}` },
+      { name: 'AV1', note: `Real time · ${v720('av1-rt')}` },
+      { name: 'AV1', note: `Best, not live · ${v720('av1-best')}` },
+      { name: 'VP9', note: `Real time · ${v720('vp9-rt')}` },
+      { name: 'HEVC (x265)', note: `Software, slow · ${v720('hevc-x265')}` },
+    ],
+    credit: `Source: @deemsterhotline on Instagram, used with thanks: H.264 High profile, 720 × 1280 at 30 fps, 2.44 Mbit/s video (2.51 Mbit/s with audio), so every tile here uses about a fifth of the bits Instagram serves. nu-media is the iPhone’s hardware HEVC at 360 × 640 plus Apple’s low-latency super resolution on the Neural Engine, our first prototype of the enhancement layer. It looks sharper but scores VMAF ${t720['nu-media'].vmaf.toFixed(0)}, below a plain upscale (${(g720.tiles as any)['nu-base-lanczos'].vmaf.toFixed(0)}), because it adds texture the original doesn’t have; nu-media’s own trained network replaces it.`,
   },
   {
     title: '4K at 4 Mbit/s, encoded on iPhone Air',
     sub: '1:1 crops of 3840 × 2160 frames, every codec at the same bitrate',
-    src: '/khensu/codec/compare-aurora.mp4', poster: '/khensu/codec/compare-aurora.jpg', w: 2880, h: 1080, cols: 3,
+    src: '/khensu/codec/compare-aurora.mp4', poster: '/khensu/codec/compare-aurora.jpg', w: 2880, h: 1080, cols: 3, rows: 2, maxw: 'none',
     tiles: tileSet(aurora as Run, '4K source', '1920 × 1080'),
-    credit: 'Aurora during the November 2025 geomagnetic storm, photographed from the International Space Station. NASA Scientific Visualization Studio.',
+    credit: 'The nu-media tiles are the base layer only, upscaled with a plain filter; the Neural Engine enhancement isn’t in this video yet. Aurora during the November 2025 geomagnetic storm, photographed from the International Space Station. NASA Scientific Visualization Studio.',
   },
 ];
 
@@ -256,19 +268,16 @@ const chips = [
       {videos.map((v) => (
         <figure class="card wide" data-scene="reveal">
           <figcaption><b>{v.title}</b><span>{v.sub}</span></figcaption>
-          <div class="cmp">
+          <div class="cmp" style={`max-width:${v.maxw}`}>
             <video src={v.src} poster={v.poster} width={v.w} height={v.h} autoplay muted loop playsinline preload="auto"
               aria-label={`${v.title}: the original and each codec side by side`} />
-            <ol class:list={['tiles', { many: v.cols > 3 }]} role="list" style={`--cols:${v.cols};--rows:${6 / v.cols}`}>
+            <ol class:list={['tiles', { many: v.cols > 3 }]} role="list" style={`--cols:${v.cols};--rows:${v.rows}`}>
               {v.tiles.map((t) => (
                 <li class:list={[{ ours: t.ours }]}><b>{t.name}</b> <small>{t.note}</small></li>
               ))}
             </ol>
           </div>
-          <p class="note">
-            The nu-media tiles are the base layer only, upscaled with a plain filter; the Neural Engine enhancement isn’t in
-            this video yet. {v.credit}
-          </p>
+          <p class="note">{v.credit}</p>
         </figure>
       ))}
 
