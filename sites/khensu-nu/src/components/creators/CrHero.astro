@@ -124,7 +124,9 @@ const floats = [
     animation-delay: calc(0.08s + var(--i) * 0.07s);
   }
   h1 em .w {
-    background: linear-gradient(100deg, #b9b0ff, #8b7bff 40%, #18e0c8);
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

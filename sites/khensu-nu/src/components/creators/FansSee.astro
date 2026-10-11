@@ -116,7 +116,9 @@ const kbps = Math.round(nu.actual_kbps);
     font-weight: 600;
   }
   h2 em {
-    background: linear-gradient(100deg, #b9b0ff, #18e0c8);
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
     -webkit-background-clip: text;
     background-clip: text;
   }

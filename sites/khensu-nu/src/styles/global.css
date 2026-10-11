@@ -115,10 +115,12 @@ p {
 }
 em {
   font-style: normal;
-  background: linear-gradient(100deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #fff));
+  background: var(--aura);
+  background-size: 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: aura-flow var(--aura-flow-dur) linear infinite;
 }
 code,
 .mono {
@@ -237,9 +239,9 @@ code,
   z-index: -2;
   background:
     radial-gradient(42% 60% at 22% 70%, rgba(34, 245, 154, 0.95), transparent 70%),
-    radial-gradient(38% 55% at 50% 40%, rgba(24, 224, 200, 0.8), transparent 70%),
+    radial-gradient(38% 55% at 50% 40%, rgba(30, 143, 255, 0.9), transparent 70%),
     radial-gradient(42% 60% at 78% 30%, rgba(139, 92, 255, 0.95), transparent 70%),
-    radial-gradient(34% 50% at 60% 85%, rgba(255, 79, 216, 0.75), transparent 70%),
+    radial-gradient(34% 50% at 60% 85%, rgba(30, 143, 255, 0.7), transparent 70%),
     #1a1640;
   filter: blur(10px) saturate(1.25) hue-rotate(var(--aura-hue, 0deg));
   animation:
@@ -303,9 +305,11 @@ code,
   --accent-soft: var(--khensu-soft);
 }
 .khensu em {
-  background: linear-gradient(100deg, #9aa0a9, #ffffff 55%, #c9ccd2);
+  background: var(--aura);
+  background-size: 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
+  animation: aura-flow var(--aura-flow-dur) linear infinite;
 }
 
 .prose {
@@ -473,3 +477,57 @@ h2:hover > .sec-link,
   height: 0;
   scroll-margin-top: 84px;
 }
+
+/* ñü.aura: the house gradient, green, electric blue and purple, drifting slowly. Used for every highlight: chart fills,
+   khensu.ñü's own rows, emphasised text, sliders and primary buttons. */
+:root {
+  --aura-green: #22f59a;
+  --aura-blue: #1e8fff;
+  --aura-purple: #8b5cff;
+  --aura: linear-gradient(100deg, var(--aura-green), var(--aura-blue) 33%, var(--aura-purple) 66%, var(--aura-green));
+  --aura-flow-dur: 9s;
+}
+@keyframes aura-flow {
+  from { background-position: 0% 50%; }
+  to { background-position: 300% 50%; }
+}
+.aura-fill {
+  background: var(--aura);
+  background-size: 300% 100%;
+  animation: aura-flow var(--aura-flow-dur) linear infinite;
+}
+.aura-text {
+  background: var(--aura);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: aura-flow var(--aura-flow-dur) linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aura-fill, .aura-text { animation: none; }
+}
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border: 0;
+  outline: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+input[type='range']::-webkit-slider-runnable-track { height: 6px; border-radius: 999px; background: transparent; }
+input[type='range']::-moz-range-track { height: 6px; border-radius: 999px; background: transparent; }
+input[type='range']::-moz-range-progress { height: 6px; border-radius: 999px; background: var(--aura); }
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(30, 143, 255, 0.35), 0 0 16px rgba(30, 143, 255, 0.7);
+}
+input[type='range']::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(30, 143, 255, 0.35), 0 0 16px rgba(30, 143, 255, 0.7); }
+input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgba(34, 245, 154, 0.55), 0 0 18px rgba(30, 143, 255, 0.8); }

@@ -47,6 +47,7 @@ const perLabel = `${data.perThousand.title}, in US dollars: ` +
   per.map((r) => `${r.name} ${r.display}${r.ours ? ', a cent a play with no cut' : ` (${r.kind})`}`).join('; ') + '.';
 
 const points = [
+  { t: 'No ads, ever', b: 'You’re paid for people using and interacting with your work: a cent for every play and view, and every tip, gift and subscription in full. Nobody pays to put an ad in front of your fans.' },
   { t: 'Paid straight to you', b: 'Subscriptions, tips, pay-per-view and live tickets go from a fan’s wallet to yours. No platform cut and no card processor in between.' },
   { t: 'Funded by fans, not advances', b: 'Raise the money for a film, an album or a tour with ñüFi. Backers pay only if you reach your goal, and you keep your rights.' },
   { t: 'Everyone on the credits paid', b: 'Set the split once, and every payment is shared between collaborators automatically. No label recoupment first.' },
@@ -61,7 +62,8 @@ const points = [
     <p class="lede">
       Studios, labels and streaming services keep most of what people spend on art. On khensu.ñü, fans pay the people
       who made it, in the app, and the only charge is a network fee of a fraction of a cent. And you keep every right
-      to your work: publishing, copyright, trademarks and IP, like nowhere else.
+      to your work: publishing, copyright, trademarks and IP, like nowhere else. There are no ads: you’re paid for
+      people using and interacting with your work, every play and view, and every tip, gift and subscription.
     </p>
 
     <div class="stats" aria-label="How khensu.ñü payments work" hidden={page}>
@@ -73,8 +75,18 @@ const points = [
     </div>
 
     <div class="charts">
-      <figure class="card cp-card" data-scene="reveal">
-        <figcaption><b>Views and plays: {data.perThousand.title.replace(/^What reaches/, 'what reaches')}</b><span>US dollars per 1,000 streams or views. On khensu.ñü, a cent a play with no cut</span></figcaption>
+      <figure class="card cp-card views-card" data-scene="reveal">
+        <figcaption>
+          <b>Views and plays: what reaches the artist for <output class="amt" data-plays>1,000</output> plays</b>
+          <span>US dollars for streams or views. On khensu.ñü, a cent a play with no cut; drag to change the number of plays.</span>
+        </figcaption>
+        <label class="scale">
+          <span class="sr-only">Number of plays, from 1,000 to 1 billion</span>
+          <input type="range" min="0" max="6" step="1" value="0" data-views aria-valuetext="1,000 plays" />
+          <span class="ticks" aria-hidden="true">
+            <span>1K</span><span>10K</span><span>100K</span><span>1M</span><span>10M</span><span>100M</span><span>1B</span>
+          </span>
+        </label>
         <div role="img" aria-label={perLabel}>
           <ul class="bars per" role="list" aria-hidden="true">
             {per.map((r, i) => (
@@ -87,7 +99,7 @@ const points = [
                     {r.artist[1] > r.artist[0] && <span class="seg range" style={`--w:${pct(r.artist[1] - r.artist[0])}`} />}
                   </span>
                 </span>
-                <span class="value"><b>{r.display}</b> <small class="kind">{r.kind}</small></span>
+                <span class="value"><b data-per={r.artist.join(',')}>{r.display}</b> <small class="kind">{r.kind}</small></span>
               </li>
             ))}
           </ul>
@@ -180,6 +192,25 @@ const points = [
     if (v >= 1e6) return `$${+(v / 1e6).toFixed(2)}M`;
     return '$' + Math.round(v).toLocaleString('en-US');
   };
+  const money = (v: number) => (v < 100 ? `$${v.toFixed(2)}` : short(v));
+  for (const card of document.querySelectorAll<HTMLElement>('.views-card')) {
+    const input = card.querySelector<HTMLInputElement>('[data-views]')!;
+    const out = card.querySelector<HTMLElement>('[data-plays]')!;
+    const cells = [...card.querySelectorAll<HTMLElement>('[data-per]')];
+    const first = cells.map((c) => c.textContent);
+    const update = () => {
+      const plays = 1000 * 10 ** Number(input.value);
+      const label = plays.toLocaleString('en-US');
+      out.textContent = label;
+      input.setAttribute('aria-valuetext', `${label} plays`);
+      cells.forEach((c, i) => {
+        if (plays === 1000) return void (c.textContent = first[i]);
+        const [lo, hi] = c.dataset.per!.split(',').map((k) => (Number(k) * plays) / 1000);
+        c.textContent = lo === hi ? money(lo) : `${money(lo)}–${money(hi)}`;
+      });
+    };
+    input.addEventListener('input', update);
+  }
   for (const card of document.querySelectorAll<HTMLElement>('.keep-card')) {
     const input = card.querySelector<HTMLInputElement>('[data-scale]')!;
     const out = card.querySelector<HTMLElement>('[data-amt]')!;
@@ -204,7 +235,10 @@ const points = [
   }
   .scale input {
     width: 100%;
-    accent-color: #8b7bff;
+    margin: 0.4rem 0;
+    background: linear-gradient(90deg, transparent var(--p, 0%), rgba(255, 255, 255, 0.1) var(--p, 0%)), var(--aura);
+    background-size: 100% 100%, 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
   }
   .ticks {
     display: flex;
@@ -214,7 +248,12 @@ const points = [
     font-variant-numeric: tabular-nums;
   }
   .amt {
-    color: #c9c0ff;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     font-variant-numeric: tabular-nums;
   }
   .sr-only {
@@ -279,7 +318,9 @@ const points = [
     font-weight: 600;
     line-height: 1;
     letter-spacing: -0.03em;
-    background: linear-gradient(120deg, #ffffff, #c9c0ff 45%, #b9b0ff);
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -376,8 +417,10 @@ const points = [
   }
   .ours-seg {
     min-width: 6px;
-    background: linear-gradient(90deg, #8b7bff, #b9b0ff);
-    box-shadow: 0 0 10px rgba(139, 123, 255, 0.55);
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    box-shadow: 0 0 12px rgba(30, 143, 255, 0.55);
   }
   .ghost {
     position: absolute;
@@ -402,11 +445,16 @@ const points = [
   }
   .ours .label b,
   .ours .value b {
-    color: #b9b0ff;
     font-weight: 600;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .ours .kind {
-    color: #b9b0ff;
+    color: #8fc6ff;
     opacity: 0.8;
   }
 
@@ -444,10 +492,12 @@ const points = [
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
   }
   .k-ours {
-    color: #c9c0ff;
+    color: #8fc6ff;
   }
   .k-ours i {
-    background: linear-gradient(90deg, #8b7bff, #b9b0ff);
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
   }
 
   .src {

@@ -249,7 +249,9 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
     font-weight: 600;
   }
   .cr-h em {
-    background: linear-gradient(100deg, #b9b0ff, #18e0c8);
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
     -webkit-background-clip: text;
     background-clip: text;
   }
