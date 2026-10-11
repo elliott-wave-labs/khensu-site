@@ -1,0 +1,203 @@
+---
+// suñůlink.shield in 3D: the housing is the CAD model's own STL (khensu-specs/hardware/sunu/out/iphone-18-pro/wrap),
+// with the khensu.nu stone inlay drawn on the back as a flush roundel. The page sets the finish with a
+// `shield:finish` event; see pages/buy.astro.
+---
+
+<div class="viewer">
+  <canvas aria-hidden="true"></canvas>
+  <p class="hint">Drag to turn</p>
+</div>
+
+<script>
+  import * as THREE from 'three';
+  import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+  import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+
+  type Finish = { housing: string; brass: boolean; accents: 'gold' | 'platinum' | 'both'; moldavite: boolean };
+
+  // Inlay in the mark's own 100-unit box, inside a 120-unit onyx roundel (24 mm on the shield).
+  const RING = 'M50 2.5 a47.5 47.5 0 1 0 0.001 0';
+  const ARC = 'M50 2.5 A49.5 49.5 0 0 0 50 97.5';
+  const CRESCENT = 'M50 2.5 A49.5 49.5 0 0 0 50 97.5 A47.5 47.5 0 0 1 50 2.5 Z';
+
+  const rand = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+  function speckle(g: CanvasRenderingContext2D, n: number, colors: string[], r: [number, number], seed: number) {
+    const rnd = rand(seed);
+    for (let i = 0; i < n; i++) {
+      g.fillStyle = colors[Math.floor(rnd() * colors.length)];
+      g.globalAlpha = 0.25 + rnd() * 0.6;
+      g.beginPath();
+      g.arc(rnd() * 120 - 10, rnd() * 120 - 10, r[0] + rnd() * (r[1] - r[0]), 0, Math.PI * 2);
+      g.fill();
+    }
+    g.globalAlpha = 1;
+  }
+
+  function streaks(g: CanvasRenderingContext2D, n: number, colors: string[], angle: number, seed: number, alpha = 0.5) {
+    const rnd = rand(seed);
+    g.save();
+    g.translate(50, 50);
+    g.rotate(angle);
+    for (let i = 0; i < n; i++) {
+      const y = rnd() * 120 - 60, h = 1 + rnd() * 7;
+      const grad = g.createLinearGradient(-60, 0, 60, 0);
+      const c = colors[Math.floor(rnd() * colors.length)];
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(0.3 + rnd() * 0.3, c);
+      grad.addColorStop(1, 'transparent');
+      g.globalAlpha = alpha * (0.3 + rnd() * 0.7);
+      g.fillStyle = grad;
+      g.fillRect(-60, y, 120, h);
+    }
+    g.restore();
+    g.globalAlpha = 1;
+  }
+
+  function drawInlay(f: Finish) {
+    const S = 1024, k = S / 120;
+    const color = document.createElement('canvas');
+    const orm = document.createElement('canvas');
+    color.width = color.height = orm.width = orm.height = S;
+    const g = color.getContext('2d')!, o = orm.getContext('2d')!;
+    for (const c of [g, o]) c.setTransform(k, 0, 0, k, 10 * k, 10 * k);
+
+    // Onyx roundel
+    g.fillStyle = '#0a0a0b';
+    g.beginPath(); g.arc(50, 50, 60, 0, Math.PI * 2); g.fill();
+    streaks(g, 14, ['#2a2a2e', '#1a1a1d'], 0.5, 7, 0.6);
+    // Labradorite field, with its blue and gold flash
+    g.save(); g.clip(new Path2D(RING));
+    g.fillStyle = '#4b5660'; g.fillRect(-10, -10, 120, 120);
+    streaks(g, 40, ['#2f8cff', '#36d1c4', '#8fd0ff', '#c9a64a', '#1b2a38'], -0.7, 11, 0.7);
+    // Lapis crescent, with pyrite and calcite
+    const cres = new Path2D(CRESCENT);
+    g.save(); g.clip(cres);
+    g.fillStyle = '#1c348c'; g.fillRect(-10, -10, 120, 120);
+    speckle(g, 260, ['#13266b', '#2a49b8'], [0.6, 2.2], 3);
+    speckle(g, 70, ['#e2bd55', '#f3d27a'], [0.2, 0.55], 5);
+    streaks(g, 4, ['#c9d3ea'], 1.2, 9, 0.25);
+    g.restore(); g.restore();
+
+    // Bloodstone in every edition, moldavite in the limited edition
+    const stone = (x: number, y: number, base: string, flecks: string[], seed: number) => {
+      g.save();
+      g.beginPath(); g.arc(x, y, 6.5, 0, Math.PI * 2); g.clip();
+      g.fillStyle = base; g.fillRect(x - 7, y - 7, 14, 14);
+      g.translate(x - 50, y - 50);
+      speckle(g, 160, flecks, [0.25, 0.9], seed);
+      g.restore();
+    };
+    stone(73, f.moldavite ? 36 : 50, '#1f3d2b', ['#b32a2a', '#7e1e1e', '#2d5a3e'], 13);
+    if (f.moldavite) stone(73, 64, '#3f6f22', ['#5d9431', '#2c4f17', '#79b043'], 17);
+
+    // Metal accents: the ring and the crescent's inner line, as in the mark
+    const gold = '#e3b553', plat = '#e7e7e4';
+    const ringC = f.accents === 'gold' ? gold : plat, arcC = f.accents === 'platinum' ? plat : gold;
+    for (const [d, c] of [[RING, ringC], [ARC, arcC]] as const) {
+      g.strokeStyle = c; g.lineWidth = 5; g.lineCap = 'round'; g.stroke(new Path2D(d));
+    }
+    // Stones are dielectric and polished; metal lines are metal and a touch rougher.
+    o.fillStyle = 'rgb(0, 30, 0)';
+    o.beginPath(); o.arc(50, 50, 60, 0, Math.PI * 2); o.fill();
+    o.strokeStyle = 'rgb(0, 70, 255)'; o.lineWidth = 5; o.lineCap = 'round';
+    o.stroke(new Path2D(RING)); o.stroke(new Path2D(ARC));
+
+    const map = new THREE.CanvasTexture(color);
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.anisotropy = 8;
+    return { map, orm: new THREE.CanvasTexture(orm) };
+  }
+
+  for (const host of document.querySelectorAll<HTMLElement>('.viewer')) {
+    const canvas = host.querySelector('canvas')!;
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    const scene = new THREE.Scene();
+    scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+    const camera = new THREE.PerspectiveCamera(28, 1, 1, 2000);
+    camera.position.set(170, -110, 300);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.enableZoom = false;
+    controls.enablePan = false;
+    controls.autoRotate = !still;
+    controls.autoRotateSpeed = 1.2;
+
+    const shield = new THREE.Group();
+    scene.add(shield);
+    const body = new THREE.MeshPhysicalMaterial({ color: 0x5e1a24, metalness: 0.55, roughness: 0.42, clearcoat: 0.3 });
+    const inlayMat = new THREE.MeshPhysicalMaterial({ metalness: 1, roughness: 1, clearcoat: 1, clearcoatRoughness: 0.06 });
+    const inlay = new THREE.Mesh(new THREE.CircleGeometry(12, 96), inlayMat);
+    inlay.position.set(0, 0, 4.21);
+    shield.add(inlay);
+
+    new STLLoader().load('/khensu/shell/3d/housing.stl', (geo) => {
+      geo.center();
+      geo.translate(0, 0, 2.35);
+      shield.add(new THREE.Mesh(geo, body));
+    });
+
+    const apply = (f: Finish) => {
+      body.color.set(f.housing);
+      body.metalness = f.brass ? 1 : 0.55;
+      body.roughness = f.brass ? 0.28 : 0.42;
+      const { map, orm } = drawInlay(f);
+      inlayMat.map?.dispose(); inlayMat.metalnessMap?.dispose();
+      inlayMat.map = map; inlayMat.metalnessMap = orm; inlayMat.roughnessMap = orm;
+      inlayMat.needsUpdate = true;
+    };
+    apply({ housing: '#5e1a24', brass: false, accents: 'gold', moldavite: false });
+    addEventListener('shield:finish', (e) => apply((e as CustomEvent<Finish>).detail));
+
+    const resize = () => {
+      const w = host.clientWidth, h = host.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    new ResizeObserver(resize).observe(host);
+    resize();
+    let visible = false;
+    new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(host);
+    renderer.setAnimationLoop(() => {
+      if (!visible) return;
+      controls.update();
+      renderer.render(scene, camera);
+    });
+  }
+</script>
+
+<style>
+  .viewer {
+    position: relative;
+    height: min(72vh, 620px);
+    border-radius: 28px;
+    background: radial-gradient(70% 60% at 50% 40%, rgba(139, 123, 255, 0.14), transparent 70%), #060608;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .viewer canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  .viewer canvas:active { cursor: grabbing; }
+  .hint {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    translate: -50% 0;
+    margin: 0;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(16px) saturate(160%);
+    pointer-events: none;
+  }
+</style>

@@ -1,5 +1,5 @@
 ---
-import { APP_STORE_URL } from '../data/app';
+import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 import Base from '../layouts/Base.astro';
 import Hero from '../components/khensu/Hero.astro';
 import AppScreen from '../components/khensu/AppScreen.astro';
@@ -38,9 +38,9 @@ const statement = 'Every phone keeps the same quiet rhythm, all day. Typing, idl
 
 const specs = [
   { name: '+0 mm', body: 'Level with the lens tops, so your iPhone is no thicker at its thickest point.' },
-  { name: '6 Wh', body: 'Its own battery: about 5 hours as a node on its own.' },
+  { name: '5 hours', body: 'On a full charge of its own 6 Wh battery. When that runs out, it sips a little of your iPhone’s over the short cable in the box (iPhone 15 or later).' },
+  { name: '15 min', body: 'Fast charging over its own USB-C: 50% in about 15 minutes, full in about 45. Your iPhone’s port stays open.' },
   { name: '93 g', body: 'In titanium. Solid brass is about 136 g.' },
-  { name: 'USB-C', body: 'Its own port. Your iPhone’s USB-C stays open for charging and accessories.' },
 ];
 
 ---
@@ -49,7 +49,9 @@ const specs = [
   <Hero
     eyebrow="The first app on webË"
     links={[
-      { href: APP_STORE_URL, label: 'App Store · Coming soon' },
+      APP_STORE_ID
+        ? { href: APP_STORE_URL, label: 'Download on the App Store', badge: '/badges/download-on-the-app-store-black.svg' }
+        : { href: APP_STORE_URL, label: 'App Store · Coming soon' },
       { href: '#run-a-node', label: 'Run a node' },
       { href: 'https://dev.khensu.nu', label: 'Developer docs' },
     ]}
@@ -78,8 +80,7 @@ const specs = [
         <ul class="highlights">
           {highlights.map((h) => (
             <li class="hl">
-              <Icon name={h.icon} size="1.6rem" />
-              <h3>{h.title}</h3>
+              <h3><Icon name={h.icon} size="1.35rem" /><span>{h.title}</span></h3>
               <p>{h.body}</p>
             </li>
           ))}
@@ -328,7 +329,7 @@ const specs = [
             </li>
           ))}
         </ul>
-        <p class="footnote">One model for iPhone 18 Pro and Pro Max, coming to iPhone 18 when it arrives, in your iPhone’s colour, matte titanium or solid brass. Figures for iPhone 18 Pro from the current CAD model; production figures may change. It clears every lens, flash and sensor.</p>
+        <p class="footnote">One model for iPhone 18 Pro and Pro Max, coming to iPhone 18 when it arrives, in your iPhone’s colour, matte titanium or solid brass. Figures for iPhone 18 Pro from the current CAD model; production figures may change. Battery life at about 1 W of relaying; charge times are targets for a 20 W or larger USB-C PD charger. From your iPhone it takes at most 1 W, roughly 5–8% of the iPhone’s battery an hour. It clears every lens, flash and sensor.</p>
         <div class="btn-row">
           <a class="btn" href="https://dev.khensu.nu/shell">Full suñůlink.shield specifications</a>
         </div>
@@ -390,8 +391,14 @@ const specs = [
     padding: 2rem;
   }
   .hl h3 {
-    margin: 1rem 0 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0 0 0.6rem;
     font-weight: 500;
+  }
+  .hl h3 :global(svg) {
+    flex: none;
   }
   .hl p {
     color: var(--text-dim);

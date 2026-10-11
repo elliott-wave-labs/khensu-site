@@ -8,7 +8,7 @@ interface Props {
   eyebrow?: string;
   heading?: 'h1' | 'h2';
   cta?: boolean;
-  links?: { href: string; label: string }[];
+  links?: { href: string; label: string; badge?: string }[];
 }
 const {
   eyebrow = 'Flagship 00000000',
@@ -39,7 +39,13 @@ const H = heading;
       <p class="tag">webË, private by design. <em>Post-quantum.</em><br /><em>Run profitably by the people.</em></p>
       {cta && (
         <div class="btn-row">
-          {links.map((l, i) => <a class:list={['btn', i === 0 && 'primary']} href={l.href}>{l.label}</a>)}
+          {links.map((l, i) =>
+            l.badge ? (
+              <a class="store-badge" href={l.href}><img src={l.badge} alt={l.label} width="150" height="50" /></a>
+            ) : (
+              <a class:list={['btn', i === 0 && 'primary']} href={l.href}>{l.label}</a>
+            ),
+          )}
         </div>
       )}
     </div>
@@ -160,4 +166,6 @@ const H = heading;
       --phone-w: min(52vw, 30vh);
     }
   }
+  .store-badge { display: inline-flex; align-items: center; }
+  .store-badge img { display: block; height: 50px; width: auto; }
 </style>
