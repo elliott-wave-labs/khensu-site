@@ -263,13 +263,13 @@ const { full = false } = Astro.props as { full?: boolean };
         srcKbps={2437.958} srcName="Instagram’s own file" start={500}
         title="The whole reel, two at a time"
         sub={`All ${Math.round((ladReel as any).seconds)} seconds, whole frames, encoded on an iPhone Air over USB. Pick a bitrate and a pair; one side is always the original or nu-media.`}>
-        <p class="note">Source: @deemsterhotline on Instagram, used with thanks: H.264, 720 × 1280 at 30 fps, 2.44 Mbit/s. A dropped frame shows as the previous frame held, and is counted in the label. VMAF is Netflix’s 0 to 100 quality score; 93 and up looks the same as the original to most viewers.</p>
+        <p class="note">Source: @deemsterhotline on Instagram, used with thanks: H.264, 720 × 1280 at 30 fps, 2.44 Mbit/s. A dropped frame shows as the previous frame held, and is counted in the label. Rebuilt to 4K (2160 × 3840) from the same bits, the reel scores the same as at 720p: VMAF 87 at 1.4 Mbit/s and 59 at 351 kbit/s, no dropped frames. Apple’s scaler doesn’t accept 720 × 1280 frames, so that step is a plain upscale until nu-media’s own network does it. VMAF is Netflix’s 0 to 100 quality score; 93 and up looks the same as the original to most viewers.</p>
       </CodecPair>
 
       <CodecPair run={lad4k as any} dir="ladder-4k" origin="NASA · 3840 × 2160 · 16 Mbit/s"
         srcKbps={16197} srcName="YouTube’s 4K stream" start={4000}
-        title="4K, two at a time"
-        sub="Whole 3840 × 2160 frames, shown at 2560 × 1440. Encoded on an iPhone Air over USB; AV1 in software on a Mac, because iPhone has no AV1 encoder.">
+        title="4K, two at a time: nu-media rebuilt to 4K"
+        sub="nu-media sends a smaller picture and the receiving iPhone rebuilds it to the full 3840 × 2160. Whole frames, shown at 2560 × 1440; use Zoom 3× to see the detail. Encoded on an iPhone Air over USB; AV1 in software on a Mac, because iPhone has no AV1 encoder.">
         <p class="note">Stunning Aurora Borealis from Space in Ultra-High Definition (4K), NASA, filmed from the International Space Station; public domain. The source is YouTube’s best stream, VP9 at about 16 Mbit/s. nu-media picks the base size that scores best at each bitrate and rebuilds it on the receiving iPhone’s Neural Engine; Apple’s scaler, which the prototype uses, stops at 1920 × 1080, so the last step to 4K is a plain upscale until nu-media’s own network replaces it.</p>
       </CodecPair>
 
@@ -369,9 +369,10 @@ const { full = false } = Astro.props as { full?: boolean };
       grid-template-columns: repeat(3, 1fr);
     }
   }
-  .card {
+  .charts :global(.card) {
     margin: 0;
     padding: 1.6rem;
+    min-width: 0;
     display: grid;
     align-content: start;
     gap: 1.1rem;
@@ -379,7 +380,7 @@ const { full = false } = Astro.props as { full?: boolean };
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 22px;
   }
-  .card.wide {
+  .charts :global(.card.wide) {
     grid-column: 1 / -1;
   }
   .saves { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 1rem; margin: 2.2rem 0 2.6rem; }

@@ -21,8 +21,8 @@ export const PHONES: Phone[] = [
     id: 'iphone-18-pro',
     label: 'iPhone 18 Pro, long camera plateau',
     short: 'iPhone 18 Pro',
-    w: 71.9, h: 150.0, r: 10,
-    bump: { x0: 3.5, y0: 3.5, w: 64.9, h: 40, r: 8, lens: 4.2 },
+    w: 71.78, h: 149.96, r: 12.5,
+    bump: { x0: 0, y0: 0, w: 71.78, h: 43.1, r: 12.5, lens: 4.68 },
     magsafeY: -5,
   },
   {
@@ -55,10 +55,10 @@ export type Result = {
 
 export const RESULTS: Record<PhoneId, Record<Slim, Result>> = {
   'iphone-18-pro': {
-    card: { footprint: [56, 86], t: 5.2, wh: 4.1, cm3: 9.2, tiG: 50, proud: 1.0, draft: 0, usb: false, ring: 53 },
-    fill: { footprint: [65.9, 143.0], t: 4.2, wh: 5.4, cm3: 11.92, tiG: 73, proud: 0, draft: 0, usb: true, ring: 56 },
-    wrap: { footprint: [71.1, 149.2], t: 4.2, wh: 6.2, cm3: 13.81, tiG: 93, proud: 0, draft: 0, usb: true, ring: 56 },
-    'wrap-xl': { footprint: [71.1, 149.2], t: 7.2, wh: 13.2, cm3: 29.41, tiG: 124, proud: 3.0, draft: 1.3, usb: true, ring: 56 },
+    card: { footprint: [56, 86], t: 5.2, wh: 4.1, cm3: 9.2, tiG: 50, proud: 0.52, draft: 0, usb: false, ring: 53 },
+    fill: { footprint: [65.8, 143.0], t: 4.68, wh: 6.5, cm3: 14.43, tiG: 84, proud: 0, draft: 0, usb: true, ring: 56 },
+    wrap: { footprint: [71.0, 149.2], t: 4.68, wh: 7.5, cm3: 16.6, tiG: 95, proud: 0, draft: 0, usb: true, ring: 56 },
+    'wrap-xl': { footprint: [71.0, 105.9], t: 7.68, wh: 14.0, cm3: 31.09, tiG: 121, proud: 3.0, draft: 3.69, usb: true, ring: 56 },
   },
   island: {
     card: { footprint: [56, 86], t: 5.2, wh: 4.1, cm3: 9.17, tiG: 50, proud: 1.6, draft: 0, usb: false, ring: 53 },
@@ -68,12 +68,10 @@ export const RESULTS: Record<PhoneId, Record<Slim, Result>> = {
   },
 };
 
+// One product. The other CAD styles stay in hardware/sunu as engineering references only.
+export const SHIELD = 'wrap-xl' as const;
 export const STYLES: { id: StyleId; name: string; line: string }[] = [
-  { id: 'card', name: 'Card', line: 'Pocket-size, 56 × 86 mm, snaps on magnetically below the camera' },
-  { id: 'fill', name: 'Fill', line: 'Inset from the edges and over the camera: a flat back with an opening for each sensor' },
-  { id: 'wrap', name: 'Wrap', line: 'The whole back and over the camera: flat, no camera bump, an opening for each sensor' },
-  { id: 'wrap-xl', name: 'Wrap XL', line: 'A Wrap 3 mm above the lenses with twice the battery, its camera well angled clear of every field of view' },
-  { id: 'case', name: 'Shock case', line: 'A silicone case for the phone with a Wrap module inside, made for each phone model' },
+  { id: SHIELD, name: 'suñůlink.shield', line: 'The back of the phone below the camera, 3 mm above the lens tops, its top edge angled clear of every field of view' },
 ];
 
 const C = {
@@ -90,6 +88,7 @@ const C = {
   blue: '#6aa6ff',
   yellow: '#f2c94c',
   pink: '#ff7ab8',
+  orange: '#ff9f43',
   text: '#f2f2f5',
 };
 
@@ -233,6 +232,7 @@ export function sectionView(p: Phone, s: Slim): string {
     box(n.magsafe.y + ringA - ringW / 2, n.magsafe.y + ringA + ringW / 2, zb, zb + B.magnetT, C.text, 0.8),
     stacked >= 0.8 ? box(Math.max(zoneA, yi0 + 0.5), Math.min(zoneB, yi1 - 0.5), zb + B.magnetT + 0.1, zb + B.magnetT + 0.1 + stacked, C.green, 0.45) : '',
     hasCoil ? box(n.magsafe.y - B.coilD / 2, n.magsafe.y + B.coilD / 2, coilZ, top, C.yellow, 0.75) : '',
+    `<line x1="${X(yi0).toFixed(1)}" x2="${X(yi1).toFixed(1)}" y1="${(Z(top) + 1).toFixed(1)}" y2="${(Z(top) + 1).toFixed(1)}" stroke="${C.orange}" stroke-width="2"/>`,
     t(X(y0), H - 8, 'bottom edge'),
     t(X(y1), H - 8, 'toward camera', 'end'),
     t((X(y0) + X(y1)) / 2, H - 8, `${(y1 - y0).toFixed(0)} mm long, ${T} mm thick (height drawn ${(kz / kx).toFixed(1)}× for legibility)`, 'middle'),
@@ -246,6 +246,7 @@ export const LEGEND: { label: string; color: string; dashed: boolean }[] = [
   { label: 'Magnet ring', color: C.dim, dashed: false },
   { label: 'Qi2 coil (charges the shield)', color: C.yellow, dashed: true },
   { label: 'Board and radios', color: C.blue, dashed: false },
+  { label: 'Heat spreader: 25 µm graphite under the whole skin, into the titanium back', color: C.orange, dashed: false },
   { label: 'HaLow antenna window (no metal)', color: C.pink, dashed: true },
   { label: 'USB-C to the phone', color: C.text, dashed: false },
 ];

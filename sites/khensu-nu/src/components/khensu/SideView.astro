@@ -1,6 +1,6 @@
 ---
 // Side view at the long edge, path-traced from the CAD (khensu-specs/hardware/shell/render_layers.py, iPhone 18 Pro
-// placeholder geometry): the iPhone alone, then with the shell, whose outer face finishes level with the lens tops.
+// measured geometry): the iPhone alone, then with the shield below the camera, 3 mm above the lens tops.
 // The camera is orthographic, so dropping the shell layer by a fixed amount is a true vertical move in millimetres.
 // It drops on with --e from the reveal scene in scripts/scenes.ts.
 import side from '../../../public/khensu/shell/side.json';
@@ -11,22 +11,22 @@ const TOP = side.top_mm.toFixed(2);
 const drop = ((9 * side.px_per_mm_z) / H) * 100;
 const views = [
   { id: 'alone', title: 'iPhone 18 Pro', note: `${TOP} mm at the camera` },
-  { id: 'with-shell', title: 'With the khensu shell', note: `${TOP} mm. +0 mm at the thickest point` },
+  { id: 'with-shell', title: 'With suñůlink.shield', note: 'Below the camera, 3 mm above the lens tops' },
 ];
 ---
 
 <section class="section side" data-scene="reveal" aria-labelledby="side-title" style={`--drop:${drop.toFixed(2)}%`}>
   <div class="wrap">
     <p class="eyebrow">Side view</p>
-    <h2 id="side-title" class="big">No thicker than your iPhone. <em>The camera already set the line.</em></h2>
+    <h2 id="side-title" class="big">Three millimetres. <em>Fourteen hours of node.</em></h2>
     <p class="lede">
-      Your iPhone is already as thick as its camera. The khensu shell finishes exactly level with the lenses and never
-      goes past them, so the back turns flat and the phone is no thicker at its thickest point than before. The bump
-      goes away; nothing is added on top.
+      The shield sits below the camera and rises 3 mm past the lens tops. Its top edge is angled so no lens, flash or
+      sensor ever sees it, even the ultra wide at 120°. That 3 mm holds a 14 Wh battery: about fourteen hours of
+      relaying on its own cells.
     </p>
     <p class="lede">
-      Each shell is CNC-machined from titanium for a precise fit, following the iPhone 18 Pro’s own edge curve, so
-      the shell picks up where the phone’s edge leaves off. No step, no lip, one seamless shape.
+      Each shield is CNC-machined from titanium for a precise fit, following the iPhone 18 Pro’s own edge curve, so
+      the shield picks up where the phone’s edge leaves off. No step, no lip, one seamless shape.
     </p>
 
     <div class="views">
@@ -51,11 +51,11 @@ const views = [
     </div>
 
     <dl class="stats">
-      <div><dt>+0 mm</dt><dd>at the iPhone’s thickest point. A flat back, with only the lenses showing.</dd></div>
+      <div><dt>+3 mm</dt><dd>above the lens tops, clear of every camera’s field of view.</dd></div>
     </dl>
     <p class="footnote">
-      Path-traced to scale from the CAD model on placeholder iPhone 18 Pro geometry until Apple’s accessory drawings
-      are available. Thickest point means the phone at its camera lenses. iPhone is a trademark of Apple Inc.
+      Path-traced to scale from the CAD model, on iPhone 18 Pro geometry measured from Apple’s published model; Apple’s
+      accessory drawings take precedence when available. Relay time is an estimate at about 1 W. iPhone is a trademark of Apple Inc.
     </p>
   </div>
 </section>
