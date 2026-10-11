@@ -194,8 +194,10 @@ const specs = [
           use them, each on its own clock, so no relay and no one watching a few of them ever sees a whole conversation.
         </p>
         <p class="lede switch">
-          And it keeps working in the background. Calls and live streams keep streaming when you switch apps or lock
-          your phone, encrypted end to end over HTTP/3, the faster successor to secure WebSockets. New messages arrive
+          And it keeps working in the background. Calls use Apple’s VoIP capabilities, PushKit and CallKit, so they ring
+          on your lock screen and stay live when you switch apps, like any phone call. The VoIP itself runs on our own
+          network, not a phone carrier’s: encrypted end to end over HTTP/3, the faster successor to secure WebSockets,
+          and the same goes for live streams you’re in. New messages arrive
           through a wake-up that carries nothing, then one standard-size fetch. With a suñůlink.shield on your phone,
           the rhythm never stops at all: it’s a full node with its own battery.
         </p>
@@ -221,9 +223,30 @@ const specs = [
           </p>
           <dl class="stats">
             <div><dt>10 billion</dt><dd>people a day, on about 6 million nodes, and it keeps scaling as more join</dd></div>
-            <div><dt>1,700</dt><dd>people a day on one <a href="https://www.raspberrypi.com/products/raspberry-pi-5/">Raspberry Pi 5</a>, sharing half of a gigabit fibre line</dd></div>
-            <div><dt>3,400</dt><dd>people a day on an old iPhone 15 Pro in node mode, sharing half of 2 Gbit fibre over Wi-Fi 6E, past where a Pi 5’s gigabit port tops out</dd></div>
           </dl>
+          <ul class="node-cards" role="list">
+            <li>
+              <p class="nc-kind">Old phone</p>
+              <b class="nc-big">3,400</b><span class="nc-unit">people a day</span>
+              <p>An iPhone 11 or later in node mode, plugged in on Wi-Fi. An iPhone 15 Pro sharing half of 2 Gbit fibre over Wi-Fi 6E. Nothing to buy.</p>
+            </li>
+            <li>
+              <p class="nc-kind"><a href="https://www.raspberrypi.com/products/raspberry-pi-5/">Raspberry Pi 5</a></p>
+              <b class="nc-big">1,700</b><span class="nc-unit">people a day</span>
+              <p>Always on, sharing half of a gigabit fibre line, on about 5 kWh of power a month.</p>
+            </li>
+            <li>
+              <p class="nc-kind">Idle computer</p>
+              <b class="nc-big">1,700+</b><span class="nc-unit">people a day</span>
+              <p>Your Mac or PC, in the background while you work, using 50% or less of its idle power. More on faster fibre.</p>
+            </li>
+            <li class="nc-best">
+              <p class="nc-kind">suñůlink.shield <small>Best</small></p>
+              <b class="nc-big">24/7</b><span class="nc-unit">wherever you go</span>
+              <p>A full node on your phone with its own battery and a guard chip, so the rhythm never stops, even in your pocket. Its mesh radio carries the network where there’s no internet.</p>
+              <a class="nc-link" href="/shield">Explore suñůlink.shield</a>
+            </li>
+          </ul>
           <p class="footnote">
             Engineering estimates from the protocol design: 1 hour of app use per person per day, about 2.5 Mbit/s of node
             capacity for each open phone at peak, each node sharing half its connection. Real capacity depends on
@@ -633,7 +656,58 @@ const specs = [
   .cta h2 {
     max-width: none;
   }
-  .relays-copy {
+  .relays-copy > :not(.node-cards) {
     max-width: 52rem;
+  }
+  .node-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.6rem 0;
+    padding: 0;
+    list-style: none;
+  }
+  .node-cards li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1.3rem;
+    border-radius: 20px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px) saturate(150%);
+  }
+  .node-cards p { margin: 0; color: var(--muted, rgba(255, 255, 255, 0.65)); font-size: 0.92rem; }
+  .node-cards .nc-kind { color: #fff; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .node-cards .nc-kind a { color: inherit; }
+  .nc-big { font-size: 2.4rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; margin-top: 0.4rem; }
+  .nc-unit { color: var(--muted, rgba(255, 255, 255, 0.6)); font-size: 0.85rem; margin-bottom: 0.4rem; }
+  .node-cards .nc-best {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(160deg, rgba(139, 123, 255, 0.22), rgba(79, 209, 197, 0.08)) padding-box,
+      linear-gradient(135deg, #8b7bff, #4fd1c5) border-box;
+    box-shadow: 0 0 40px rgba(139, 123, 255, 0.25);
+  }
+  .nc-best .nc-big {
+    background: linear-gradient(90deg, #b9adff, #4fd1c5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .nc-best small {
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: linear-gradient(90deg, #8b7bff, #4fd1c5);
+    color: #0b0b10;
+  }
+  .nc-link { margin-top: auto; padding-top: 0.6rem; font-size: 0.88rem; color: #c9c0ff; }
+  @media (max-width: 960px) {
+    .node-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .node-cards { grid-template-columns: 1fr; }
   }
 </style>

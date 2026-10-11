@@ -1,16 +1,27 @@
 ---
 // Per-Ankh, the on-device memory layer (khensu-specs PLAN.md, Local search and memory; code name KhensuMemory).
+// The answer card draws the trip on a dot-matrix globe with three.js; the app draws it with RealityKit.
 const lanes = [
   { name: 'Words', note: 'Full-text search' },
   { name: 'Meaning', note: 'On-device embeddings' },
   { name: 'Connections', note: 'People, places, plans' },
-  { name: 'Time', note: '“Last spring”' },
+  { name: 'Time', note: '“In May”' },
 ];
 const points = [
-  { t: 'Remembers what matters', b: 'Plans, dates, decisions, addresses and the things people asked you, each linked to the message it came from.' },
+  { t: 'Remembers what matters', b: 'Plans, dates, decisions, places and the things people asked you, each linked to the message it came from.' },
   { t: 'Answers with sources', b: 'Ask anything and get an answer that cites the exact messages, voice notes and photos it read.' },
-  { t: 'Forgets when you do', b: 'Delete a message or let it disappear, and everything learned from it goes too. Never backed up, never synced.' },
-  { t: 'Only after Face ID', b: 'Nothing is indexed or readable while your phone is locked. Apple’s on-device model only; no cloud, ever.' },
+  { t: 'Post-quantum encrypted, never exported', b: 'Kept under AES-256 with a key the Secure Enclave never releases. Never backed up, synced or sent anywhere, so there’s no traffic to see.' },
+  { t: 'Built on Apple Intelligence', b: 'Apple’s on-device model only, after Face ID. No cloud, ever. Delete a message and everything learned from it goes too.' },
+];
+const stops = [
+  { name: 'Lavrio', lat: 37.714, lon: 24.056 },
+  { name: 'Kea', lat: 37.665, lon: 24.33 },
+  { name: 'Syros', lat: 37.444, lon: 24.943 },
+  { name: 'Mykonos', lat: 37.446, lon: 25.328 },
+  { name: 'Paros', lat: 37.124, lon: 25.236 },
+  { name: 'Naxos', lat: 37.105, lon: 25.376 },
+  { name: 'Ios', lat: 36.723, lon: 25.282 },
+  { name: 'Santorini', lat: 36.417, lon: 25.432 },
 ];
 ---
 
@@ -28,21 +39,114 @@ const points = [
       </ul>
     </div>
 
-    <figure class="ankh-fig" aria-label="Four searches run on the device and merge into one answer with citations.">
-      <div class="ankh-ask">When is the Lisbon trip now?</div>
+    <figure class="ankh-fig" aria-label="Four searches run on the device and merge into one answer, with the sailing route drawn on a globe.">
+      <div class="ankh-ask">What’s our Greek islands sailing plan?</div>
       <ul class="ankh-lanes" role="list">
         {lanes.map((l, i) => (
           <li style={`--i:${i}`}><b>{l.name}</b><small>{l.note}</small><span class="ankh-beam" /></li>
         ))}
       </ul>
       <div class="ankh-answer">
-        <p><b>12–19 May.</b> Ana moved it from April last Tuesday, and Sam booked the flat in Alfama.</p>
-        <p class="ankh-cites"><span>Ana · Tue 14:02</span><span>Sam · voice note</span><span>Booking photo</span></p>
+        <div class="ankh-globe" data-stops={JSON.stringify(stops)}>
+          <canvas aria-hidden="true"></canvas>
+          <ol class="ankh-labels" aria-hidden="true">{stops.map((s) => <li>{s.name}</li>)}</ol>
+        </div>
+        <p><b>12–19 May, from Lavrio.</b> Kea, Syros, Mykonos, Paros, Naxos, Ios, then Santorini. Ana added Ios on Tuesday; Sam booked the boat.</p>
+        <p class="ankh-cites"><span>Ana · Tue 14:02</span><span>Sam · charter PDF</span><span>Skipper · voice note</span></p>
       </div>
-      <figcaption>Illustrative. Search works on every iPhone with iOS 26; answers need iPhone 15 Pro or later.</figcaption>
+      <figcaption>Illustrative. Search works on every iPhone with iOS 26; answers need Apple Intelligence (iPhone 15 Pro or later). Apple Intelligence is a trademark of Apple Inc.</figcaption>
     </figure>
   </div>
 </section>
+
+<script>
+  import * as THREE from 'three';
+  import dots from '../../data/globe-dots.json';
+
+  type Stop = { name: string; lat: number; lon: number };
+  const R = 1;
+  const v3 = (lat: number, lon: number, r = R) => {
+    const p = (lat * Math.PI) / 180, l = (lon * Math.PI) / 180;
+    return new THREE.Vector3(r * Math.cos(p) * Math.sin(l), r * Math.sin(p), r * Math.cos(p) * Math.cos(l));
+  };
+
+  for (const host of document.querySelectorAll<HTMLElement>('.ankh-globe')) {
+    const canvas = host.querySelector('canvas')!;
+    const labels = [...host.querySelectorAll<HTMLElement>('.ankh-labels li')];
+    const stops: Stop[] = JSON.parse(host.dataset.stops!);
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(30, 2, 0.01, 10);
+    const globe = new THREE.Group();
+    scene.add(globe);
+
+    globe.add(new THREE.Mesh(new THREE.SphereGeometry(R * 0.995, 64, 64), new THREE.MeshBasicMaterial({ color: 0x0b0b12 })));
+    const pos = new Float32Array((dots as number[][]).length * 3);
+    (dots as number[][]).forEach(([la, lo], i) => v3(la / 100, lo / 100).toArray(pos, i * 3));
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    globe.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0x9a96b8, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0.7 })));
+
+    // Route: each leg as a low arc over the sea, drawn progressively.
+    const route: THREE.Vector3[] = [];
+    for (let i = 1; i < stops.length; i++) {
+      const a = v3(stops[i - 1].lat, stops[i - 1].lon), b = v3(stops[i].lat, stops[i].lon);
+      for (let t = 0; t <= 1; t += 1 / 24) route.push(a.clone().lerp(b, t).normalize().multiplyScalar(R * (1.002 + Math.sin(Math.PI * t) * 0.004)));
+    }
+    const rg = new THREE.BufferGeometry().setFromPoints(route);
+    const colors = new Float32Array(route.length * 3);
+    const c0 = new THREE.Color(0x8b7bff), c1 = new THREE.Color(0x4fd1c5);
+    route.forEach((_, i) => c0.clone().lerp(c1, i / (route.length - 1)).toArray(colors, i * 3));
+    rg.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    globe.add(new THREE.Line(rg, new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 })));
+    const marks = stops.map((s) => v3(s.lat, s.lon, R * 1.003));
+    const mg = new THREE.BufferGeometry().setFromPoints(marks);
+    globe.add(new THREE.Points(mg, new THREE.PointsMaterial({ color: 0xffffff, size: 5, sizeAttenuation: false })));
+
+    // Face the Aegean: rotate the globe so 37° N, 25° E points at the camera.
+    globe.rotation.order = 'XYZ';
+    const target = { x: (37 * Math.PI) / 180, y: (-25.1 * Math.PI) / 180 };
+
+    const resize = () => {
+      const w = host.clientWidth, h = host.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    new ResizeObserver(resize).observe(host);
+    resize();
+
+    const ease = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+    const LOOP = 18;
+    let visible = false;
+    new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(host);
+    const v = new THREE.Vector3();
+    const frame = (ms: number) => {
+      const t = still ? LOOP * 0.9 : (ms / 1000) % LOOP;
+      const zoom = ease((t - 1) / 3);
+      globe.rotation.y = target.y - (1 - ease(t / 4)) * 1.4;
+      globe.rotation.x = target.x * ease(t / 4);
+      camera.position.set(0, 0, 4.2 - zoom * 3.13);
+      camera.lookAt(0, 0, 0);
+      const drawn = Math.floor(route.length * ease((t - 4) / 4.5));
+      rg.setDrawRange(0, Math.max(0, drawn));
+      mg.setDrawRange(0, Math.min(stops.length, Math.floor(drawn / 24) + (drawn > 0 ? 1 : 0)));
+      const w = host.clientWidth, h = host.clientHeight;
+      marks.forEach((m, i) => {
+        v.copy(m).applyMatrix4(globe.matrixWorld).project(camera);
+        const shown = i < Math.floor(drawn / 24) + (drawn > 0 ? 1 : 0) && zoom > 0.9;
+        labels[i].style.transform = `translate(${((v.x + 1) / 2) * w + 6}px, ${((1 - v.y) / 2) * h - 7}px)`;
+        labels[i].style.opacity = shown ? '1' : '0';
+      });
+      if (visible || still) renderer.render(scene, camera);
+      if (!still) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+</script>
 
 <style>
   .ankh-grid {
@@ -96,6 +200,27 @@ const points = [
     background-size: 50% 100%;
     animation: ankh-scan 2.6s ease-in-out infinite;
     animation-delay: calc(var(--i) * 0.25s);
+  }
+  .ankh-globe {
+    position: relative;
+    height: 250px;
+    margin: -0.2rem -0.4rem 0.8rem;
+    border-radius: 14px;
+    overflow: hidden;
+    background: radial-gradient(80% 90% at 50% 50%, rgba(139, 123, 255, 0.12), transparent 70%);
+  }
+  .ankh-globe canvas { display: block; width: 100%; height: 100%; }
+  .ankh-labels { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+  .ankh-labels li {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: opacity 0.4s;
+    white-space: nowrap;
   }
   .ankh-answer p { margin: 0; }
   .ankh-cites { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem !important; }
