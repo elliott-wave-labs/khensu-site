@@ -27,7 +27,7 @@ const floats = [
 
 <section class="crh" id="for-creators-section" data-hero data-par aria-labelledby="crh-title">
   <div class="crh-net"><Net coins nodes={110} /></div>
-  <img class="crh-glow" src={`${V}/hero.webp`} alt="" width="540" height="960" aria-hidden="true" fetchpriority="high" />
+  <img class="crh-glow" src={`${V}/hero-720.webp`} alt="" width="720" height="1280" aria-hidden="true" fetchpriority="high" />
   <div class="wrap crh-grid">
     <div class="crh-copy">
       <p class="eyebrow">for creators</p>
@@ -53,7 +53,17 @@ const floats = [
     <div class="crh-stage">
       <div class="crh-phone">
         <Phone label="A creator’s reel playing in the khensu.ñü app, with Subscribe and Tip buttons">
-          <video class="reel" src={`${V}/hero.mp4`} poster={`${V}/hero.webp`} muted loop playsinline autoplay preload="auto" data-loop width="540" height="960"></video>
+          <div class="hwipe" data-wipe style="--x:50%">
+            <video class="reel" src={`${V}/hero-1080.mp4`} poster={`${V}/hero-1080.webp`} muted loop playsinline autoplay preload="auto" data-loop width="1080" height="1920" aria-label="1080p, upscaled from 720p on the Neural Engine"></video>
+            <video class="reel b" src={`${V}/hero-720.mp4`} poster={`${V}/hero-720.webp`} muted loop playsinline autoplay preload="auto" width="720" height="1280" aria-label="The 720p original"></video>
+            <span class="hw-l l" aria-hidden="true"><b>720p</b>original</span>
+            <span class="hw-l r" aria-hidden="true"><b>1080p</b>ñü upscale</span>
+            <span class="hw-bar" aria-hidden="true"><i></i></span>
+            <label class="hw-range">
+              <span class="sr">Compare the 720p original with the 1080p ñü upscale</span>
+              <input type="range" min="0" max="100" value="50" step="1" />
+            </label>
+          </div>
           <div class="reel-ui" aria-hidden="true">
             <span class="reel-who"><i></i><b>you.khensu.nu</b><span class="tick"></span></span>
             <span class="reel-rail">
@@ -215,10 +225,109 @@ const floats = [
     height: 100%;
     object-fit: cover;
   }
+  .hwipe {
+    --x: 50%;
+    position: absolute;
+    inset: 0;
+    user-select: none;
+  }
+  .reel.b {
+    clip-path: inset(0 calc(100% - var(--x)) 0 0);
+  }
+  .hw-l {
+    position: absolute;
+    top: 15cqw;
+    z-index: 3;
+    display: grid;
+    padding: 1.4cqw 2.6cqw;
+    border-radius: 3.6cqw;
+    font-size: 2.8cqw;
+    line-height: 1.25;
+    color: rgba(255, 255, 255, 0.78);
+    background: rgba(20, 20, 26, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px) saturate(170%);
+    -webkit-backdrop-filter: blur(14px) saturate(170%);
+  }
+  .hw-l b {
+    font-size: 3.8cqw;
+    color: #fff;
+  }
+  .hw-l.l { left: 4cqw; }
+  .hw-l.r { right: 4cqw; text-align: right; }
+  .hw-l.r b {
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hw-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--x);
+    z-index: 3;
+    width: 2px;
+    margin-left: -1px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+  }
+  .hw-bar i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 11cqw;
+    height: 11cqw;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .hw-bar i::before,
+  .hw-bar i::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    margin-top: -1.2cqw;
+    border: 1.2cqw solid transparent;
+  }
+  .hw-bar i::before { left: 1.6cqw; border-right-color: #fff; }
+  .hw-bar i::after { right: 1.6cqw; border-left-color: #fff; }
+  .hw-range {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+  }
+  .hw-range input {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  .hwipe:has(input:focus-visible) .hw-bar i {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
   .reel-ui {
     position: absolute;
     inset: 0;
     z-index: 2;
+    pointer-events: none;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 32%);
   }
   .reel-who {
