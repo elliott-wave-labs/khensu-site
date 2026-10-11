@@ -45,7 +45,7 @@ const H = heading;
         <div class="btn-row">
           {links.map((l, i) =>
             l.badge ? (
-              <a class="store-badge" href={l.href}><img src={l.badge} alt={l.label} width="150" height="50" /></a>
+              <a class="store-badge" href={l.href}><img src={l.badge} alt={l.label} height="48" /></a>
             ) : (
               <a class:list={['btn', i === 0 && 'primary']} href={l.href}>{l.label}</a>
             ),
@@ -190,6 +190,7 @@ const H = heading;
       --phone-w: min(52vw, 30vh);
     }
   }
-  .store-badge { display: inline-flex; align-items: center; }
-  .store-badge img { display: block; height: 50px; width: auto; }
+  /* Store badges: unmodified artwork, at least 40 px tall, with a quarter of their height clear around them. */
+  .store-badge { display: inline-flex; align-items: center; margin: 12px; }
+  .store-badge img { display: block; height: 48px; width: auto; }
 </style>
