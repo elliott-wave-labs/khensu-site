@@ -44,7 +44,7 @@ def image(name):
     return img
 
 
-def material(name, base, orm_name, coat=0.0, coat_rough=0.05, base_tex=None, non_color=True):
+def material(name, base, orm_name=None, coat=0.0, coat_rough=0.05, base_tex=None, metallic=0.0, roughness=0.5):
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     nt = m.node_tree
@@ -52,10 +52,14 @@ def material(name, base, orm_name, coat=0.0, coat_rough=0.05, base_tex=None, non
     bsdf.inputs["Base Color"].default_value = base
     bsdf.inputs["Coat Weight"].default_value = coat
     bsdf.inputs["Coat Roughness"].default_value = coat_rough
+    bsdf.inputs["Metallic"].default_value = metallic
+    bsdf.inputs["Roughness"].default_value = roughness
     if base_tex:
         t = nt.nodes.new("ShaderNodeTexImage")
         t.image = image(base_tex)
         nt.links.new(t.outputs["Color"], bsdf.inputs["Base Color"])
+    if not orm_name:
+        return m
     o = nt.nodes.new("ShaderNodeTexImage")
     o.image = image(orm_name)
     o.image.colorspace_settings.name = "Non-Color"
@@ -118,13 +122,15 @@ def main():
     housing = import_stl("housing.stl")
     uv_project(housing)
     phone = import_stl("phone.stl")
-    phone.data.materials.append(
-        material("iPhone", linear("#3a3b3e"), "titanium-orm.jpg", coat=0.2)
-    )
+    phone.data.materials.append(material("iPhone", linear("#3a3b3e"), metallic=0.85, roughness=0.32))
     disc = inlay_disc()
 
-    body_mats = {f: material(f, linear(h), f"{kind}-orm.jpg", coat=0.0 if kind == "brass" else 0.45, coat_rough=0.08)
-                 for f, (h, kind) in FINISHES.items()}
+    # Ceramic powder coat: an even, non-metallic satin with a soft sheen and no grain. Bare brass keeps a fine brush.
+    body_mats = {
+        f: material(f, linear(h), "brass-orm.jpg") if kind == "brass"
+        else material(f, linear(h), metallic=0.0, roughness=0.42, coat=0.25, coat_rough=0.35)
+        for f, (h, kind) in FINISHES.items()
+    }
     inlay_mats = {t: material(f"inlay-{t}", [1, 1, 1, 1], f"inlay-{t}-orm.png", coat=1.0, coat_rough=0.03,
                               base_tex=f"inlay-{t}.jpg") for t in ("standard", "moldavite")}
 
