@@ -34,7 +34,7 @@ swaps = [
      """<a class="btn primary" href="https://khensu.nu">Visit khensu.nu</a>
           <a class="btn" href="#run-a-node">Run a node</a>"""),
     ('<a class="btn" href="https://dev.khensu.nu/node">Node guide</a>', '<a class="btn" href="/">Back to the studio</a>'),
-    ('<a class="btn primary" href="/buy">Buy suñůlink Shield</a>', '<a class="btn primary" href="https://khensu.nu/buy">Buy suñůlink Shield</a>'),
+    ('<a class="btn primary" href="/buy">Buy suñůlink shield</a>', '<a class="btn primary" href="https://khensu.nu/buy">Buy suñůlink shield</a>'),
 ]
 for a, b in swaps:
     assert a in s, a[:60]
