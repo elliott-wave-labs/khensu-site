@@ -1,0 +1,76 @@
+---
+// Product hero: the real-size GLB in <ew-viewer>, turning on its own, drag to turn, "View in your space" opens AR
+// (Quick Look on iPhone, Scene Viewer on Android, WebXR elsewhere) at true size, because the models are in metres.
+interface Props { src: string; alt: string; name: string; poster?: string }
+const { src, alt, name, poster } = Astro.props;
+---
+
+<section class="arh" data-hero>
+  <div class="arh-stage">
+    <ew-viewer
+      src={src}
+      poster={poster}
+      alt={alt}
+      ar
+      ar-label="View in your space"
+      camera-controls
+      auto-rotate
+      rotation-per-second="24deg"
+      shadow-intensity="1.2"
+      exposure="1.1"
+      camera-orbit="0deg 80deg auto"
+      background="transparent"
+      loading="eager"
+      height="100%"
+    ></ew-viewer>
+  </div>
+  <div class="arh-copy wrap">
+    <p class="arh-name">{name}</p>
+    <h1 class="arh-head"><slot /></h1>
+    <p class="arh-hint">Drag to turn. On iPhone or Android, tap “View in your space” to see it at real size.</p>
+  </div>
+</section>
+
+<script is:inline type="module" src="/vendor/ew-viewer/ew-viewer.min.js"></script>
+
+<style>
+  .arh {
+    position: relative;
+    padding-top: 4.5rem;
+    background: radial-gradient(60% 50% at 50% 35%, rgba(139, 123, 255, 0.12), transparent 70%), #000;
+  }
+  .arh-stage {
+    height: min(78svh, 760px);
+    max-width: 1100px;
+    margin-inline: auto;
+  }
+  ew-viewer {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .arh-copy {
+    padding-block: 0.5rem 3rem;
+  }
+  .arh-name {
+    margin: 0 0 0.4rem;
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.92);
+  }
+  .arh-head {
+    margin: 0;
+    font-size: clamp(2.8rem, 8vw, 6rem);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+  .arh-head :global(em) {
+    font-style: normal;
+    color: #2fe0c8;
+  }
+  .arh-hint {
+    margin: 1rem 0 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+  }
+</style>

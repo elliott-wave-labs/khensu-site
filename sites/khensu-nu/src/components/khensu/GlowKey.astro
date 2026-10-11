@@ -1,0 +1,269 @@
+---
+// Light on black, keyed on the viewer's device: the aurora's black is punched out live in WebGL and the light is laid
+// over a new background, once plain and once with bloom, contact shadows and aurora gradients like the close-up net.
+import Net from './Net.astro';
+const DIR = '/khensu/codec/glowkey/';
+---
+
+<figure class="card wide gk" data-scene="reveal">
+  <figcaption><b>Light on black, keyed</b> <span>The black is punched out on the viewer’s device, so only the light lands on the new background. The second version adds glow, soft shadows and moving aurora gradients.</span></figcaption>
+  <video class="src fg" muted loop playsinline preload="auto" crossorigin="anonymous" src={`${DIR}iss-aurora.mp4`} aria-hidden="true"></video>
+  <video class="src bg" muted loop playsinline preload="auto" crossorigin="anonymous" src={`${DIR}rick.mp4`} aria-hidden="true"></video>
+  <div class="grid">
+    <div class="side">
+      <img src={`${DIR}iss-aurora.jpg`} alt="" class="poster" />
+      <canvas data-mode="original" aria-label="Original: aurora over the night side of Earth, filmed from the International Space Station"></canvas>
+      <p class="tag"><b>Original</b> <small>Aurora over the night side, filmed from the ISS</small></p>
+    </div>
+    <div class="side ours">
+      <img src={`${DIR}rick.jpg`} alt="" class="poster" />
+      <canvas data-mode="key" aria-label="nu-media: the black keyed out, the aurora over a new background"></canvas>
+      <p class="tag"><b>nu-media</b> <small>Black keyed out, light laid over a new background</small></p>
+    </div>
+    <div class="side ours fx">
+      <img src={`${DIR}rick.jpg`} alt="" class="poster" />
+      <canvas data-mode="fx" aria-label="nu-media with effects: glow, soft shadows and moving aurora gradients"></canvas>
+      <Net closeup nodes={70} class="over" />
+      <p class="tag"><b>nu-media, with effects</b> <small>Glow, soft shadows under the light, aurora gradients and the relay web, all drawn live on this device</small></p>
+    </div>
+  </div>
+  <p class="note">Composited live in your browser with WebGL; nothing is rendered on a server. Light: NASA, ISS Expedition 29 aurora time-lapse, 17 September 2011, public domain. Background: Rick Astley, “Never Gonna Give You Up” (1987), © Sony Music Entertainment, a short silent excerpt used as a meme.</p>
+</figure>
+
+<script>
+  const VERT = `attribute vec2 p; varying vec2 uv; void main(){ uv = vec2(p.x, -p.y) * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
+  const FRAG = `
+    precision mediump float;
+    uniform sampler2D fg, bg;
+    uniform int mode;
+    uniform float t;
+    uniform vec2 texel;
+    varying vec2 uv;
+    float lum(vec3 c) { return max(c.r, max(c.g, c.b)); }
+    // Soft key: black goes fully transparent, light keeps its own brightness as coverage.
+    float key(vec3 c) { return smoothstep(0.05, 0.32, lum(c)); }
+    vec3 aurora(float x) {
+      x = fract(x);
+      vec3 a = vec3(0.133, 0.961, 0.604), b = vec3(0.094, 0.878, 0.784), c = vec3(0.231, 0.616, 1.0),
+           d = vec3(0.545, 0.361, 1.0), e = vec3(1.0, 0.31, 0.847);
+      x *= 4.0;
+      return x < 1.0 ? mix(a, b, x) : x < 2.0 ? mix(b, c, x - 1.0) : x < 3.0 ? mix(c, d, x - 2.0) : mix(d, e, x - 3.0);
+    }
+    void main() {
+      vec3 f = texture2D(fg, uv).rgb;
+      if (mode == 0) { gl_FragColor = vec4(f, 1.0); return; }
+      vec3 b = texture2D(bg, uv).rgb;
+      float a = key(f);
+      if (mode == 1) { gl_FragColor = vec4(f * a + b * (1.0 - a), 1.0); return; }
+      // Blur the light in two rings for a contact shadow (near) and bloom (far).
+      vec3 glow = vec3(0.0);
+      float near = 0.0;
+      for (int i = 0; i < 12; i++) {
+        float ang = float(i) * 0.5236;
+        vec2 dir = vec2(cos(ang), sin(ang));
+        vec3 s1 = texture2D(fg, uv + dir * texel * 14.0).rgb;
+        vec3 s2 = texture2D(fg, uv + dir * texel * 38.0).rgb;
+        float k1 = key(s1), k2 = key(s2);
+        near += k1;
+        glow += s1 * k1 * 0.5 + s2 * k2;
+      }
+      near /= 12.0;
+      glow /= 18.0;
+      float pulse = 0.85 + 0.15 * sin(t * 1.7) + 0.08 * sin(t * 4.3 + uv.x * 6.0);
+      // Aurora gradient shadows drifting over the background, like the glow behind the relay web.
+      vec2 q = uv - 0.5;
+      float g1 = exp(-8.0 * dot(q - vec2(-0.25 + 0.12 * sin(t * 0.31), 0.22 + 0.08 * cos(t * 0.27)), q - vec2(-0.25 + 0.12 * sin(t * 0.31), 0.22 + 0.08 * cos(t * 0.27))));
+      float g2 = exp(-9.0 * dot(q - vec2(0.28 + 0.1 * cos(t * 0.23), -0.18 + 0.1 * sin(t * 0.37)), q - vec2(0.28 + 0.1 * cos(t * 0.23), -0.18 + 0.1 * sin(t * 0.37))));
+      vec3 tint = aurora(uv.y * 0.6 + t * 0.03 + 0.15 * sin(uv.x * 3.0 + t * 0.3));
+      vec3 back = b * (0.5 + 0.2 * (1.0 - length(q) * 1.4));
+      back *= 1.0 - 0.55 * near;
+      back = back * (1.0 - 0.25 * (g1 + g2)) + (aurora(t * 0.02) * g1 + aurora(t * 0.02 + 0.5) * g2) * 0.12;
+      vec3 light = f * a * 1.05 * pulse;
+      vec3 bloom = mix(glow, tint * lum(glow), 0.45) * 0.9 * pulse;
+      vec3 o = light + bloom + back * (1.0 - a);
+      gl_FragColor = vec4(o / (1.0 + max(o.r, max(o.g, o.b)) * 0.25), 1.0);
+    }
+  `;
+
+  function mount(fig: HTMLElement) {
+    const fgV = fig.querySelector<HTMLVideoElement>('video.fg')!;
+    const bgV = fig.querySelector<HTMLVideoElement>('video.bg')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const views = [...fig.querySelectorAll<HTMLCanvasElement>('canvas')].map((canvas) => {
+      const gl = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: false });
+      if (!gl) return null;
+      const sh = (type: number, src: string) => {
+        const s = gl.createShader(type)!;
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+      };
+      const prog = gl.createProgram()!;
+      gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
+      gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+      gl.useProgram(prog);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(prog, 'p');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      const tex = [0, 1].map((u) => {
+        const tx = gl.createTexture();
+        gl.activeTexture(gl.TEXTURE0 + u);
+        gl.bindTexture(gl.TEXTURE_2D, tx);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        return tx;
+      });
+      gl.uniform1i(gl.getUniformLocation(prog, 'fg'), 0);
+      gl.uniform1i(gl.getUniformLocation(prog, 'bg'), 1);
+      const mode = { original: 0, key: 1, fx: 2 }[canvas.dataset.mode as 'original' | 'key' | 'fx'];
+      gl.uniform1i(gl.getUniformLocation(prog, 'mode'), mode);
+      return { canvas, gl, tex, mode, t: gl.getUniformLocation(prog, 't'), texel: gl.getUniformLocation(prog, 'texel') };
+    });
+
+    const draw = (now: number) => {
+      for (const v of views) {
+        if (!v) continue;
+        const { canvas, gl } = v;
+        const w = Math.round(canvas.clientWidth * Math.min(devicePixelRatio, 2));
+        const h = Math.round(canvas.clientHeight * Math.min(devicePixelRatio, 2));
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+        gl.viewport(0, 0, w, h);
+        [fgV, bgV].forEach((vid, u) => {
+          if (u === 1 && v.mode === 0) return;
+          gl.activeTexture(gl.TEXTURE0 + u);
+          gl.bindTexture(gl.TEXTURE_2D, v.tex[u]);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, vid);
+        });
+        gl.uniform1f(v.t, reduced ? 0 : now / 1000);
+        gl.uniform2f(v.texel, 1 / 1920, 1 / 1080);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        canvas.classList.add('live');
+      }
+    };
+
+    let visible = false;
+    let running = false;
+    const loop = (now: number) => {
+      if (!visible) {
+        running = false;
+        return;
+      }
+      if (fgV.readyState >= 2 && bgV.readyState >= 2) draw(now);
+      requestAnimationFrame(loop);
+    };
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) {
+        fgV.play().catch(() => {});
+        bgV.play().catch(() => {});
+        if (!running) {
+          running = true;
+          requestAnimationFrame(loop);
+        }
+      } else {
+        fgV.pause();
+        bgV.pause();
+      }
+    }).observe(fig);
+  }
+
+  document.querySelectorAll<HTMLElement>('.gk').forEach(mount);
+</script>
+
+<style>
+  figcaption {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .src {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .fx {
+    grid-column: 1 / -1;
+  }
+  .side {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    isolation: isolate;
+  }
+  .side.ours {
+    box-shadow: 0 0 0 1.5px rgba(139, 123, 255, 0.7);
+  }
+  .poster,
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  canvas {
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  canvas:global(.live) {
+    opacity: 1;
+  }
+  .fx :global(.net.over) {
+    mix-blend-mode: screen;
+    opacity: 0.4;
+    z-index: 1;
+    mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, transparent 25%, #000 90%);
+  }
+  .tag {
+    position: absolute;
+    z-index: 2;
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    width: fit-content;
+    margin: 0;
+    padding: 0.3rem 0.65rem;
+    border-radius: 9px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    font-size: 0.9rem;
+    line-height: 1.35;
+  }
+  .tag small {
+    display: block;
+    font-size: 0.76rem;
+    color: rgba(255, 255, 255, 0.78);
+  }
+  .ours .tag b {
+    color: #b9b0ff;
+  }
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .tag {
+      font-size: 0.78rem;
+    }
+    .tag small {
+      font-size: 0.68rem;
+    }
+  }
+</style>

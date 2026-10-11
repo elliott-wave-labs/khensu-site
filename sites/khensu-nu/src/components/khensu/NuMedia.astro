@@ -12,6 +12,7 @@ import CodecPair from './CodecPair.astro';
 import LadderChart from './LadderChart.astro';
 import BigFormats from './BigFormats.astro';
 import GreenScreen from './GreenScreen.astro';
+import GlowKey from './GlowKey.astro';
 
 type Point = { actual_kbps: number; vmaf: number };
 type Run = { codecs: Record<string, { points: Point[] }>; grid: { want_kbps: number; codecs: Record<string, Point> } };
@@ -274,6 +275,7 @@ const { full = false } = Astro.props as { full?: boolean };
       </CodecPair>
 
       <GreenScreen />
+      <GlowKey />
 
       {full && (<>
         <LadderChart run={lad4k as any} title="How low 4K can go, measured" refName="H.265 at 4 Mbit/s"
