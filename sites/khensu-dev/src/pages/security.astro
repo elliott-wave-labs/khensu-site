@@ -2,18 +2,53 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="Security" description="How to report a security vulnerability in khensu.nu.">
-  <p class="eyebrow">Security</p>
+<Base title="Security" description="Report a vulnerability in khensu.ñü, and how khensu.ñü meets GDPR, CCPA and every major privacy law.">
+  <p class="eyebrow">security</p>
   <h1>Report a vulnerability</h1>
   <p class="lede">
-    If you find a security problem in khensu.nu, its network or these sites, email
+    If you find a security problem in khensu.ñü, its network or these sites, email
     <a href="mailto:security@elliottwave.studio">security@elliottwave.studio</a>. Please don’t open a public issue.
   </p>
   <ul>
     <li>Include what you found, how to reproduce it, and what an attacker could do with it.</li>
-    <li>We’ll acknowledge your report within three working days and keep you updated until it’s fixed.</li>
+    <li>We acknowledge every report within three working days and keep you updated until it’s fixed.</li>
     <li>We won’t take legal action against good-faith research that avoids harming users and gives us time to fix the problem before you publish.</li>
+    <li>Actively exploited vulnerabilities are reported to ENISA within 24 hours, as the EU Cyber Resilience Act requires.</li>
   </ul>
   <p>The cryptography, protocol and app are reviewed by independent outside experts.</p>
   <p class="footnote">Machine-readable contact: <a href="/.well-known/security.txt">/.well-known/security.txt</a></p>
+
+  <h2 id="privacy-law">Privacy law</h2>
+  <p>
+    khensu.ñü meets GDPR, CCPA and every major privacy law by not having your data.<br />
+    Nothing is processed on a server, so there is almost nothing for a law to govern.
+  </p>
+  <table>
+    <thead><tr><th>Data</th><th>Who can read it</th><th>Kept</th></tr></thead>
+    <tbody>
+      <tr><td>Messages, calls, media, files, payments, contacts, search</td><td>Only you and the people you talk to</td><td>On your devices, until you delete them</td></tr>
+      <tr><td>IP address</td><td>The entry node you connect to, in memory</td><td>Never logged; gone when the connection closes</td></tr>
+      <tr><td>Push token</td><td>The push gateway, in memory</td><td>Up to 20 seconds, never stored</td></tr>
+      <tr><td>Handle and public keys</td><td>Anyone, because you chose to publish a handle</td><td>Until you release it</td></tr>
+      <tr><td>Email you send us</td><td>Elliott Wave LLC</td><td>Until your request is handled</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><strong>Laws:</strong> GDPR, UK GDPR, ePrivacy, Switzerland’s nFADP, CCPA and CPRA with every US state privacy law, COPPA, Brazil’s LGPD, Canada’s PIPEDA and Québec Law 25, Japan’s APPI, South Korea’s PIPA, Australia’s Privacy Act, New Zealand’s Privacy Act, India’s DPDP Act, Singapore’s PDPA and South Africa’s POPIA.</li>
+    <li><strong>Your rights:</strong> access, portability and erasure are in the app, because your devices hold the only readable copies. Releasing your handle removes it from every lookup within an hour.</li>
+    <li><strong>No sale, no sharing, no profiling:</strong> no advertising, no analytics, no data brokers and no automated decisions about you.</li>
+    <li><strong>Breaches:</strong> a breach of any node, mailbox or gateway exposes only sealed packets. For the little we hold, regulators hear within 72 hours.</li>
+    <li><strong>Lawful access:</strong> we answer valid legal process with what we hold, listed above. We can’t decrypt content, and no key, mode or update could.</li>
+  </ul>
+
+  <h2 id="standards">Standards</h2>
+  <p>
+    Every key exchange is ML-KEM-1024 (FIPS 203) and every signature ML-DSA-87 (FIPS 204), with AES-256-GCM and
+    SHA-512: exactly the NSA’s CNSA 2.0 suite.<br />
+    Builds are reproducible, every release ships with a software bill of materials, and the sites and app meet WCAG 2.2 AA.
+  </p>
+  <p>
+    Every law, standard and certification, with the details:
+    <a href="/specs/compliance">compliance</a>.
+  </p>
 </Base>

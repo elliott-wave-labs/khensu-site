@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+
+const jobs = [
+  { id: 'aggregation', name: 'Proof aggregation', hw: 'Apple silicon Mac or recent desktop, 16 GB memory', text: 'Fold every spend and contract proof in an epoch into one recursive STARK, so phones verify one small proof instead of thousands.' },
+  { id: 'storage', name: 'Encrypted storage', hw: 'A disk that stays online', text: 'Hold erasure-coded ciphertext shards of sites, media, backups and the network archive. Random challenges prove you still have them; you’re paid per byte-day.' },
+  { id: 'renditions', name: 'Public media renditions', hw: 'Apple silicon Mac or a hardware encoder', text: 'Encode ñü-media versions of posts their creators published openly and asked the network to render. Private media never leaves the sender’s device.' },
+  { id: 'lookups', name: 'Private lookups', hw: '8 GB memory per database shard', text: 'Answer name, key and directory lookups with private information retrieval, so you answer a query without learning what was asked.' },
+  { id: 'beacon', name: 'Randomness and timestamps', hw: 'An always-on node', text: 'Sign the threshold randomness beacon for lotteries, ballots and fair ordering, and batch post-quantum timestamps that prove a hash existed at a given time.' },
+  { id: 'mesh', name: 'Mesh and satellite bridging', hw: 'suñůlink.shield, a Raspberry Pi 5 with a HaLow radio, or a satellite link', text: 'Carry sealed mix packets between places with no internet and the rest of the network, over Wi-Fi HaLow, Bluetooth or satellite.' },
+];
+---
+
+<Base title="Earn with your node" description="Six jobs your khensu.ñü node can do for the network and for contracts, all on ciphertext or published data, paid from work receipts.">
+  <p class="eyebrow">network work</p>
+  <h1>Your node can do more than relay</h1>
+  <p class="lede">
+    Turn on a job and the network pays you for it, every epoch.<br />
+    Every job touches only ciphertext or data its owner chose to publish.
+  </p>
+
+  {jobs.map((j) => (
+    <section id={j.id}>
+      <h2>{j.name}</h2>
+      <p>{j.text}</p>
+      <p class="footnote">Hardware: {j.hw}.</p>
+    </section>
+  ))}
+
+  <h2 id="turn-on">Turn a job on</h2>
+  <pre><code>{`~node work                                       # roles, earnings and challenges this epoch
+~node work enable storage --gb 500 --class durable
+~node work enable render
+~node work enable aggregator
+~node work orders                                # contract work orders this node can take
+~node work take <order-id>`}</code></pre>
+
+  <h2 id="paid">How you’re paid</h2>
+  <ul>
+    <li><strong>From the network:</strong> each job produces a signed work receipt, checked by challenges, auditors or the proof itself. Each epoch the protocol pays every role in proportion to verified work.</li>
+    <li><strong>From contracts:</strong> anyone can commission a job with a work order, such as a year of archive storage for a site or renditions of a film. The contract checks your receipts and pays you in shielded notes, without learning which node you are.</li>
+    <li><strong>Penalties:</strong> a failed challenge or a forged receipt loses that role’s pay for the epoch and part of your stake.</li>
+  </ul>
+
+  <h2 id="stake">Stake and hardware</h2>
+  <table>
+    <thead><tr><th>Role</th><th>Stake floor</th><th>Hardware</th></tr></thead>
+    <tbody>
+      <tr><td>aggregator</td><td>1,000</td><td>Apple silicon Mac or recent desktop, 16 GB memory</td></tr>
+      <tr><td>storage</td><td>100 per TB</td><td>A disk online at least 99% of the month</td></tr>
+      <tr><td>render</td><td>500</td><td>Apple silicon Mac or hardware encoder</td></tr>
+      <tr><td>pir</td><td>500</td><td>8 GB memory per shard</td></tr>
+      <tr><td>beacon</td><td>2,000</td><td>Always-on lease for the whole era</td></tr>
+      <tr><td>mesh</td><td>50</td><td>suñůlink.shield, Raspberry Pi 5 with HaLow, or a satellite link</td></tr>
+    </tbody>
+  </table>
+  <p class="footnote">Stake floors are in network tokens and change only through governance.</p>
+
+  <p>
+    Start with <a href="/node">Run a node</a>. Full specification: <a href="/specs/work">network work</a>.
+  </p>
+</Base>

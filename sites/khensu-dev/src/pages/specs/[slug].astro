@@ -1,0 +1,48 @@
+---
+// The public specifications, copied from khensu-specs by tools/sync-specs.py.
+import Base from '../../layouts/Base.astro';
+
+type Doc = { frontmatter: { title: string; source: string }; Content: (props: object) => unknown };
+const docs = import.meta.glob<Doc>('../../specs/*.md', { eager: true });
+
+export function getStaticPaths() {
+  const all = import.meta.glob<Doc>('../../specs/*.md', { eager: true });
+  return Object.keys(all).map((path) => ({ params: { slug: path.split('/').pop()!.replace(/\.md$/, '') } }));
+}
+
+const { slug } = Astro.params;
+const doc = docs[`../../specs/${slug}.md`];
+const { title, source } = doc.frontmatter;
+const { Content } = doc;
+---
+
+<Base title={title} description={`${title}, from khensu-specs (${source}). Licensed CC BY 4.0.`}>
+  <p class="eyebrow">specification</p>
+  <p class="spec-src">
+    <a href={`https://github.com/elliott-wave-labs/khensu-specs/blob/main/${source}`}><code>{source}</code></a> in
+    <code>khensu-specs</code>, licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+  </p>
+  <article class="spec">
+    <Content />
+  </article>
+</Base>
+
+<style>
+  .spec-src {
+    font-size: 0.85rem;
+    color: var(--text-dim, rgba(255, 255, 255, 0.6));
+  }
+  .spec :global(table) {
+    display: block;
+    overflow-x: auto;
+  }
+  .spec :global(pre) {
+    overflow-x: auto;
+    padding: 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .spec :global(h1) {
+    margin-top: 0;
+  }
+</style>

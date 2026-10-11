@@ -13,27 +13,32 @@ interface Props {
   noindex?: boolean;
 }
 
-const SITE_NAME = 'khensu.nu developers';
+const SITE_NAME = 'khensu.ñü developers';
 const DEFAULT_DESC =
-  'Developer documentation for khensu.nu, the post-quantum private messenger on a network run by people: architecture, running a node, repositories, licences and security.';
+  'Developer documentation for khensu.ñü, the post-quantum private messenger on a network run by people: architecture, running a node, repositories, licences and security.';
 
 const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-// Link-preview cards are made and hosted by khensu.nu (src/data/og.ts there).
-const CARDS = ['index', 'architecture', 'security', 'webe', 'node', 'shell', 'repositories', 'contribute'];
-const page = Astro.url.pathname.replace(/^\/|\/$/g, '') || 'index';
-const ogImage = `https://khensu.nu/og/dev-${CARDS.includes(page) ? page : 'index'}.jpg`;
 
 const DOCS = [
   { href: '/', label: 'Overview' },
   { href: '/architecture', label: 'Architecture' },
-  { href: '/webe', label: 'webE' },
+  { href: '/webe', label: 'webË' },
+  { href: '/contracts', label: 'Contracts' },
+  { href: '/work', label: 'Earn with your node' },
   { href: '/node', label: 'Run a node' },
-  { href: '/shell', label: 'suñůlink shield' },
+  { href: '/shell', label: 'suñůlink.shield' },
+  { href: '/specs/protocol', label: 'Protocol' },
+  { href: '/specs/webe', label: 'webË specification' },
+  { href: '/specs/threat-model', label: 'Threat model' },
+  { href: '/specs/work', label: 'Network work' },
+  { href: '/specs/app-commerce', label: 'App commerce' },
+  { href: '/specs/nu-media', label: 'ñü-media design' },
   { href: '/repositories', label: 'Repositories and licences' },
   { href: '/contribute', label: 'Contribute' },
   { href: '/security', label: 'Security' },
+  { href: '/specs/compliance', label: 'Compliance' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
@@ -56,30 +61,28 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:secure_url" content={ogImage} />
-    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image" content="https://khensu.nu/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={fullTitle} />
+    <meta property="og:image:alt" content="The khensu.ñü logo in front of its relay network" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image" content="https://khensu.nu/og.png" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="wrap bar">
-        <a href="/" class="brand" aria-label="khensu.nu developers, home">
+        <a href="/" class="brand" aria-label="khensu.ñü developers, home">
           <Crescent size={26} />
-          <span>khensu.nu <small>developers</small></span>
+          <span>khensu.ñü <small>developers</small></span>
         </a>
         <nav aria-label="Primary">
           <ul>
             <li><a href="/node">Run a node</a></li>
             <li><a href="/security">Security</a></li>
-            <li><a href="https://khensu.nu">khensu.nu</a></li>
+            <li><a href="https://khensu.nu">khensu.ñü</a></li>
           </ul>
         </nav>
       </div>
@@ -104,7 +107,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       <div class="wrap legal">
         <p>
           © 2026 Elliott Wave LLC. Docs licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
-          khensu.nu™ is a trademark of Elliott Wave LLC. Patents pending.
+          khensu.ñü™ is a trademark of Elliott Wave LLC. Patents pending.
         </p>
       </div>
     </footer>

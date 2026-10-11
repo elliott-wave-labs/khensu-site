@@ -1,0 +1,111 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Contracts" description="Write post-quantum webË contracts: private, self-enforcing agreements for any work, proved with STARKs and settled in the shielded pool.">
+  <p class="eyebrow">contracts</p>
+  <h1>Agreements that enforce themselves</h1>
+  <p class="lede">
+    A webË contract runs on the parties’ own devices and proves every step with a STARK.<br />
+    The chain sees only the proof. Nobody sees who agreed to what.
+  </p>
+
+  <h2 id="how">How a contract works</h2>
+  <ol>
+    <li><strong>Write:</strong> a small, deterministic WebAssembly program, usually in Rust with the <code>khensu-contract</code> crate from <code>khensu-core</code>.</li>
+    <li><strong>Publish:</strong> sign it with ML-DSA-87 and publish it like a site. Its address is its hash, so everyone audits the same code.</li>
+    <li><strong>Open:</strong> the parties agree on terms in a private MLS group, each with a fresh key that is never linked to their account.</li>
+    <li><strong>Step:</strong> a party runs the next step on their phone or Mac. The khensu zkVM proves it ran correctly, and the update goes to the chain through the mixnet.</li>
+    <li><strong>Settle:</strong> payments come out as shielded notes; key releases, posts, credentials and group invitations go where the terms say.</li>
+  </ol>
+
+  <h2 id="any-work">Contracts for any work</h2>
+  <p>
+    A contract can commission any work whose result can be checked.<br />
+    The reward can be money, or something else entirely.
+  </p>
+  <table>
+    <thead><tr><th>Accepted by</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>The requester</td><td>A logo, a translation or a field report, approved by the person who asked</td></tr>
+      <tr><td>A reviewer both sides chose</td><td>A code review or an article, judged by an editor named in the terms</td></tr>
+      <tr><td>A test in the contract</td><td>A bug proof, a solved puzzle or data that matches a schema</td></tr>
+      <tr><td>A node’s work receipt</td><td>A year of archive storage for a site, or public renditions of a film (<a href="/work">network work</a>)</td></tr>
+    </tbody>
+  </table>
+  <p>Rewards: shielded notes, an anonymous credential, a reputation point, admission to a group, or nothing at all.</p>
+
+  <h2 id="ballot">Example: an anonymous ballot</h2>
+  <p>
+    A co-op votes on a proposal.<br />
+    Each member casts exactly one ballot, and nobody, including the organiser, learns who voted or how.
+  </p>
+  <pre><code>{`use khensu_contract::prelude::*;
+
+#[contract]
+pub struct Ballot {
+    roll: MemberRoot,          // members, each holding one blind-issued credential
+    options: u8,
+    tally: Vec<u32>,
+    seen: NullifierSet,        // one ballot per member
+    closes: Epoch,
+}
+
+#[contract]
+impl Ballot {
+    #[action]
+    pub fn cast(&mut self, ctx: &Ctx, vote: Sealed<u8>, member: MembershipProof) -> Result<()> {
+        ensure!(ctx.epoch() < self.closes, "closed");
+        let nullifier = member.verify(&self.roll, ctx.contract_id())?;
+        ensure!(self.seen.insert(nullifier), "already voted");
+        ctx.hold(vote)                       // sealed to the 3-of-5 holders until close
+    }
+
+    #[action(timeout)]
+    pub fn close(&mut self, ctx: &Ctx) -> Result<()> {
+        ensure!(ctx.epoch() >= self.closes, "still open");
+        for vote in ctx.open_held()? {       // opened inside the proof, never revealed
+            ensure!(vote < self.options, "bad ballot");
+            self.tally[vote as usize] += 1;
+        }
+        ctx.publish(Feed::terms(), &self.tally)?;
+        ctx.close()
+    }
+}`}</code></pre>
+  <p>Only the tally leaves the contract. Ranked choice, weighting and quorums are a few more lines.</p>
+
+  <h2 id="standard">Standard contracts</h2>
+  <p>Audited and ready to use, at <code>contracts.khensu.nu</code>:</p>
+  <table>
+    <thead><tr><th>Contract</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>ballot</code></td><td>Anonymous votes and polls</td></tr>
+      <tr><td><code>work-order</code></td><td>Commission work from people or nodes</td></tr>
+      <tr><td><code>escrow</code></td><td>Milestones released by both sides or a chosen arbiter</td></tr>
+      <tr><td><code>pledge</code></td><td>Pays only if enough hidden pledges arrive by a deadline</td></tr>
+      <tr><td><code>split</code></td><td>Pays collaborators their shares from every payment a work earns</td></tr>
+      <tr><td><code>ticket</code></td><td>Anonymous, unlinkable tickets and memberships</td></tr>
+      <tr><td><code>bounty</code></td><td>Pays the first submission that passes the check</td></tr>
+      <tr><td><code>timelock</code></td><td>Opens a file, key or message on a date, or when you stop checking in</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="build">Build and test</h2>
+  <pre><code>{`cargo add khensu-contract
+cargo build --target wasm32-unknown-unknown --release
+khensu contract test ./target/wasm32-unknown-unknown/release/ballot.wasm   # runs every action and proves it locally
+khensu contract publish ballot.wasm --name ballot.your-name.khensu.nu`}</code></pre>
+  <p>
+    <code>khensu-devnet</code> runs the chain, aggregators and beacon on one machine, so a full contract round trip
+    takes seconds.
+  </p>
+
+  <h2 id="rules">Rules every contract keeps</h2>
+  <ul>
+    <li>Code is public, signed and addressed by its hash; wallets show its author and audit labels before anyone signs.</li>
+    <li>Inputs and state stay private to the parties. A contract that needs public state says so and uses a feed or forum.</li>
+    <li>The only outside input is the epoch, so deadlines are deterministic. If a party disappears, the deadline lets anyone else time it out.</li>
+    <li>State expires with the shielded pool’s eras. Nothing sits on the chain forever.</li>
+  </ul>
+  <p>Full specification: <a href="/specs/webe#14-contracts">webË, section 14</a>.</p>
+</Base>
