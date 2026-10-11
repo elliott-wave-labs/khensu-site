@@ -10,6 +10,7 @@ import PatentNotice from '../components/khensu/PatentNotice.astro';
 import Net from '../components/khensu/Net.astro';
 import Orbit from '../components/khensu/Orbit.astro';
 import Icon from '../components/khensu/Icon.astro';
+import NuMedia from '../components/khensu/NuMedia.astro';
 
 const highlights = [
   { icon: 'lock', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
@@ -79,6 +80,61 @@ const specs = [
             </li>
           ))}
         </ul>
+      </div>
+    </section>
+
+    <section class="section net-host webe-sec" id="webe" aria-labelledby="webe-title">
+      <Net />
+      <div class="wrap">
+        <p class="eyebrow">The new internet</p>
+        <h2 id="webe-title" class="webe-name"><span class="name-case">webE</span></h2>
+        <p class="webe-sub">A new internet, alongside the one you use.</p>
+        <p class="lede webe-lede">
+          Same connection, same apps. Everything on it is post-quantum encrypted, hidden inside ordinary HTTPS and run
+          by the people who use it. Stealth is always on.
+        </p>
+        <ul class="webe" role="list">
+          <li><b>Alongside the internet</b><span>Works wherever the web does. Nothing to replace.</span></li>
+          <li><b>Looks like HTTPS</b><span>Post-quantum inside: ML-KEM-1024 and ML-DSA-87.</span></li>
+          <li><b>Always stealth</b><span>No setting, no visible mode. Nobody sees who reads what.</span></li>
+          <li><b>Messages and calls</b><span>One to one and in large groups.</span></li>
+          <li><b>Feeds and content</b><span>Posts, forums, videos, photos, reels and music.</span></li>
+          <li><b>Sites and live</b><span>Publish at your-name.khensu.nu. Stream to a room or a crowd.</span></li>
+        </ul>
+        <div class="btn-row webe-links">
+          <a class="btn primary" href="https://dev.khensu.nu/webe">webE specification</a>
+          <a class="btn" href="https://dev.khensu.nu/webe#build">Build an app on webE</a>
+          <a class="btn" href="https://dev.khensu.nu/webe#extend">Extend khensu.nu</a>
+        </div>
+      </div>
+    </section>
+
+    <NuMedia />
+
+    <section class="section" aria-labelledby="vpn-title">
+      <div class="wrap">
+        <p class="eyebrow">Replaces your VPN</p>
+        <h2 id="vpn-title" class="big webe-title">Better than a VPN. Nothing to switch on.</h2>
+        <p class="lede">
+          A VPN moves your trust from your internet provider to one VPN company, which then sees your address and
+          everything you open. On webE, nobody holds both.
+        </p>
+        <ul class="webe" role="list">
+          <li><b>No one sees both ends</b><span>The first relay knows who you are but not what you open. The last knows what, not who. They’re run by different operators in different countries.</span></li>
+          <li><b>Looks like a normal website</b><span>VPN protocols are easy to recognise and block. webE traffic is ordinary HTTPS.</span></li>
+          <li><b>Hides when, not just where</b><span>A VPN still shows when and how much you use it. khensu.nu keeps the same rhythm all day.</span></li>
+          <li><b>Nothing to log</b><span>“No logs” is a VPN’s promise. Relays never see your content or both ends, so there’s nothing to hand over.</span></li>
+          <li><b>Post-quantum only</b><span>ML-KEM-1024 and ML-DSA-87, so traffic recorded today can’t be decrypted later.</span></li>
+          <li><b>No off switch, no leaks</b><span>No kill switch needed: there is no unprotected mode to fall back to.</span></li>
+        </ul>
+        <p class="footnote">
+          This covers everything on webE today: messages, calls, payments, feeds, forums, sites and live streams. For the
+          rest of the internet, webE exit is planned: a VPN profile for iPhone, iPad and Mac that sends all your traffic
+          through two relays from different operators, under the same rules.
+        </p>
+        <div class="btn-row webe-links">
+          <a class="btn" href="https://dev.khensu.nu/webe#vpn">How it compares to a VPN</a>
+        </div>
       </div>
     </section>
 
@@ -236,74 +292,6 @@ const specs = [
         <PatentNotice />
       </div>
     </section>
-
-    <section class="section net-host" aria-labelledby="webe-title">
-      <Net />
-      <div class="wrap">
-        <p class="eyebrow"><span class="name-case">webE</span></p>
-        <h2 id="webe-title" class="big webe-title">A new network, alongside the internet.</h2>
-        <div class="webe-intro">
-          <p class="lede">
-            webE runs next to the internet you already use, not instead of it. Its traffic travels as ordinary HTTPS, so
-            it works wherever the web does and looks like any website to anyone watching. Inside, every connection is
-            post-quantum encrypted, and stealth is on by default and can’t be switched off: there is no setting for it,
-            for you, for us or for anyone running a node.
-          </p>
-          <p class="lede">
-            The same network that carries your messages carries feeds, forums, websites, videos, photos and live streams. Public posts
-            carry their author’s signature, so you know who said it. Reading leaves no trace, so nobody knows who read it.
-          </p>
-          <p class="lede">
-            webE isn’t the next version of web2 or web3. It doesn’t build on either, so it doesn’t take the next
-            number. We changed the letter instead: a different kind of web, run by the people who use it, private by
-            design.
-          </p>
-        </div>
-        <ul class="webe" role="list">
-          <li><b>Alongside the internet</b><span>Same connection, same apps. A second network that rides the first.</span></li>
-          <li><b>HTTPS outside, post-quantum inside</b><span>Looks like a normal website; sealed with ML-KEM-1024 and ML-DSA-87.</span></li>
-          <li><b>Stealth can’t be turned off</b><span>No setting, no faster visible mode. Every message, call and page is hidden.</span></li>
-          <li><b>Messages and calls</b><span>Private by default, one to one and in large groups.</span></li>
-          <li><b>Feeds and forums</b><span>Follow people and communities without an algorithm owning you.</span></li>
-          <li><b>Content</b><span>Videos, photos, reels and music to watch and follow, like YouTube or Instagram, served by the network.</span></li>
-          <li><b>Sites</b><span>Publish at your-name.khensu.nu, hosted by the network.</span></li>
-          <li><b>Live</b><span>Stream to a room or a crowd, with the route changing as you go.</span></li>
-        </ul>
-        <div class="btn-row webe-links">
-          <a class="btn primary" href="https://dev.khensu.nu/webe">webE specification</a>
-          <a class="btn" href="https://dev.khensu.nu/webe#build">Build an app on webE</a>
-          <a class="btn" href="https://dev.khensu.nu/webe#extend">Extend khensu.nu</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" aria-labelledby="vpn-title">
-      <div class="wrap">
-        <p class="eyebrow">Replaces your VPN</p>
-        <h2 id="vpn-title" class="big webe-title">Better than a VPN. Nothing to switch on.</h2>
-        <p class="lede">
-          A VPN moves your trust from your internet provider to one VPN company, which then sees your address and
-          everything you open. On webE, nobody holds both.
-        </p>
-        <ul class="webe" role="list">
-          <li><b>No one sees both ends</b><span>The first relay knows who you are but not what you open. The last knows what, not who. They’re run by different operators in different countries.</span></li>
-          <li><b>Looks like a normal website</b><span>VPN protocols are easy to recognise and block. webE traffic is ordinary HTTPS.</span></li>
-          <li><b>Hides when, not just where</b><span>A VPN still shows when and how much you use it. khensu.nu keeps the same rhythm all day.</span></li>
-          <li><b>Nothing to log</b><span>“No logs” is a VPN’s promise. Relays never see your content or both ends, so there’s nothing to hand over.</span></li>
-          <li><b>Post-quantum only</b><span>ML-KEM-1024 and ML-DSA-87, so traffic recorded today can’t be decrypted later.</span></li>
-          <li><b>No off switch, no leaks</b><span>No kill switch needed: there is no unprotected mode to fall back to.</span></li>
-        </ul>
-        <p class="footnote">
-          This covers everything on webE today: messages, calls, payments, feeds, forums, sites and live streams. For the
-          rest of the internet, webE exit is planned: a VPN profile for iPhone, iPad and Mac that sends all your traffic
-          through two relays from different operators, under the same rules.
-        </p>
-        <div class="btn-row webe-links">
-          <a class="btn" href="https://dev.khensu.nu/webe#vpn">How it compares to a VPN</a>
-        </div>
-      </div>
-    </section>
-
 
     <section class="section net-host" id="run-a-node">
       <Net />
@@ -560,13 +548,24 @@ const specs = [
   .webe-title {
     max-width: 22ch;
   }
-  .webe-intro {
-    columns: 2 340px;
-    column-gap: 2.5rem;
-    margin-top: 1.25rem;
+  .webe-name {
+    margin: 0.2rem 0 0;
+    font-size: clamp(4.5rem, 13vw, 10rem);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    background: linear-gradient(180deg, #fff 30%, rgba(255, 255, 255, 0.45));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
-  .webe-intro .lede {
-    margin-top: 0;
+  .webe-sub {
+    margin: 0.8rem 0 0;
+    font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+    font-weight: 500;
+  }
+  .webe-lede {
+    max-width: 44rem;
   }
   .webe {
     list-style: none;

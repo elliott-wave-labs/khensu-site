@@ -1,0 +1,348 @@
+---
+// nu-media charts. Figures from khensu-specs design/nu-media.md: baselines are typical ImageIO and
+// hardware encoder results, nu-media values are design targets until measured on iPhone 18 Pro.
+// Bars and tick grids draw from --e (scripts/scenes.ts, reveal); without the script they show complete.
+
+const photo = [
+  { name: 'JPEG', note: 'ImageIO', bits: '5.06 Mbit', size: '618 KB', w: 100 },
+  { name: 'HEIC', note: 'ImageIO, hardware HEVC', bits: '2.53 Mbit', size: '309 KB', w: 50 },
+  { name: 'nu-media', note: 'Neural Engine', bits: '0.33 Mbit', size: '40 KB', w: 6.5, ours: true },
+];
+
+const heicTicks = 52;
+const nuTicks = 7;
+
+const chips = [
+  { name: 'A13', cores: 8 },
+  { name: 'A14', cores: 16 },
+  { name: 'A15', cores: 16 },
+  { name: 'A16', cores: 16 },
+  { name: 'A17 Pro', cores: 16 },
+  { name: 'A18', cores: 16 },
+  { name: 'A19', cores: 16 },
+  { name: 'A20 Pro', cores: 32, ours: true },
+];
+---
+
+<section class="section numedia" data-scene="reveal" aria-labelledby="numedia-title">
+  <div class="wrap">
+    <p class="eyebrow">nu-media</p>
+    <h2 id="numedia-title" class="big">Less data. Same picture.</h2>
+    <p class="lede">
+      Our own image and video codec runs on your iPhone’s Neural Engine. Photos and video take a fraction of the data,
+      keep their resolution and HDR, and still travel inside the stealth rhythm.
+    </p>
+
+    <div class="charts">
+      <figure class="card wide">
+        <figcaption><b>One full-screen photo</b><span>Bits on the wire</span></figcaption>
+        <ul class="bars" role="list">
+          {photo.map((r, i) => (
+            <li class:list={[{ ours: r.ours }]} style={`--w:${r.w};--i:${i}`}>
+              <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
+              <span class="track"><span class="fill" /></span>
+              <span class="value"><b>{r.bits}</b> <small>{r.size}</small></span>
+            </li>
+          ))}
+        </ul>
+      </figure>
+
+      <figure class="card">
+        <figcaption><b>Time to arrive</b><span>Each square is one 2-second stealth tick</span></figcaption>
+        <div class="ticks-row">
+          <span class="label"><b>HEIC</b> <small>104 s</small></span>
+          <div class="ticks" aria-hidden="true">
+            {Array.from({ length: heicTicks }, (_, i) => <i style={`--i:${i}`} />)}
+          </div>
+        </div>
+        <div class="ticks-row ours">
+          <span class="label"><b>nu-media</b> <small>14 s</small></span>
+          <div class="ticks" aria-hidden="true">
+            {Array.from({ length: nuTicks }, (_, i) => <i style={`--i:${i}`} />)}
+          </div>
+        </div>
+        <p class="note">A preview lands in the first tick and sharpens as the rest arrive.</p>
+      </figure>
+
+      <figure class="card">
+        <figcaption><b>Progressive</b><span>Preview first, full detail in seconds</span></figcaption>
+        <svg class="scene" viewBox="0 0 320 180" role="img" aria-label="A photo of the Portara on Naxos at dawn, sharpening as it arrives">
+          <defs>
+            <linearGradient id="nm-sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2b1e4a" />
+              <stop offset="0.55" stop-color="#d9786a" />
+              <stop offset="1" stop-color="#f6c48a" />
+            </linearGradient>
+            <linearGradient id="nm-sea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#3a4f7a" />
+              <stop offset="1" stop-color="#121a33" />
+            </linearGradient>
+          </defs>
+          <g class="sharpen">
+            <rect width="320" height="120" fill="url(#nm-sky)" />
+            <circle cx="214" cy="112" r="22" fill="#ffe2a8" />
+            <rect y="112" width="320" height="68" fill="url(#nm-sea)" />
+            <path d="M0 124 L70 110 L130 118 L190 108 L250 120 L320 114 L320 132 L0 132 Z" fill="#1b2240" />
+            <path d="M96 132 V70 H164 V132 H150 V84 H110 V132 Z" fill="#0d1022" />
+            <path d="M206 136 h70 M190 146 h40 M240 152 h56" stroke="#ffd9a0" stroke-opacity="0.5" stroke-width="2" />
+          </g>
+        </svg>
+        <p class="note">1 slot: preview. 20 slots: full screen, in HDR.</p>
+      </figure>
+
+      <figure class="card">
+        <figcaption><b>Video calls, same data</b><span>What 500 kbit/s shows you</span></figcaption>
+        <div class="frames" aria-hidden="true">
+          <span class="frame f264"><small>H.264 · 640 × 360</small></span>
+          <span class="frame f265"><small>HEVC · 960 × 540</small></span>
+          <span class="frame fnu"><small>nu-media · 1920 × 1080</small></span>
+        </div>
+        <p class="note">Sent as HEVC; the Neural Engine on the receiving iPhone restores detail and smooths motion.</p>
+      </figure>
+
+      <figure class="card wide">
+        <figcaption><b>Runs on every iPhone with iOS 26</b><span>Neural Engine cores, A13 Bionic to A20 Pro</span></figcaption>
+        <ul class="chips" role="list">
+          {chips.map((c, i) => (
+            <li class:list={[{ ours: c.ours }]} style={`--h:${c.cores / 32};--i:${i}`}>
+              <span class="col"><span class="bar" /></span>
+              <b>{c.name}</b>
+              <small>{c.cores === 32 ? '2 × 16' : c.cores}</small>
+            </li>
+          ))}
+        </ul>
+        <p class="note">Tuned for A20 Pro’s dual 16-core Neural Engine: highest resolution and frame rate. Earlier chips run the same format, with less enhancement. Also on Apple silicon iPad and Mac.</p>
+      </figure>
+    </div>
+
+    <p class="footnote">
+      Photo sizes for one full-screen iPhone 18 Pro image (2622 × 1206). JPEG and HEIC are typical ImageIO results;
+      nu-media figures are design targets, to be replaced by measurements on iPhone 18 Pro. Neural Engine core counts
+      from Apple.
+    </p>
+  </div>
+</section>
+
+<style>
+  .charts {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    margin-top: 2.5rem;
+  }
+  .card {
+    margin: 0;
+    padding: 1.6rem;
+    display: grid;
+    align-content: start;
+    gap: 1.1rem;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 22px;
+  }
+  .card.wide {
+    grid-column: 1 / -1;
+  }
+  figcaption {
+    display: grid;
+    gap: 0.2rem;
+  }
+  figcaption b {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+  figcaption span,
+  .note,
+  small {
+    color: var(--text-dim);
+  }
+  .note {
+    margin: 0;
+    font-size: 0.92rem;
+  }
+  small {
+    font-size: 0.8rem;
+  }
+
+  /* Bars: each grows in turn as the section scrolls in. */
+  .bars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .bars li {
+    display: grid;
+    grid-template-columns: 11rem 1fr 9rem;
+    align-items: center;
+    gap: 1rem;
+  }
+  .track {
+    height: 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+  }
+  .fill {
+    display: block;
+    height: 100%;
+    width: calc(var(--w) * 1%);
+    min-width: 6px;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.35);
+    transform-origin: left;
+    transform: scaleX(clamp(0, calc((var(--e, 1) - var(--i) * 0.12) / 0.6), 1));
+  }
+  .ours .fill,
+  .ours .bar {
+    background: linear-gradient(90deg, #8b7bff, #4fd1c5);
+  }
+  .value {
+    text-align: right;
+  }
+  .ours b {
+    color: #b9b0ff;
+  }
+
+  /* Ticks: squares light up one per tick; nu-media finishes in 7 while HEIC needs 52. */
+  .ticks-row {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .ticks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .ticks i {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.55);
+    opacity: clamp(0.1, calc(var(--e, 1) * 52 - var(--i)), 1);
+  }
+  .ticks-row.ours .ticks i {
+    background: linear-gradient(135deg, #8b7bff, #4fd1c5);
+  }
+
+  /* Progressive: the photo sharpens in steps, like slots arriving. */
+  .scene {
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .sharpen {
+    animation: sharpen 6s steps(5, end) infinite;
+  }
+  @keyframes sharpen {
+    0% { filter: blur(9px); }
+    20% { filter: blur(6px); }
+    40% { filter: blur(3.5px); }
+    60% { filter: blur(1.5px); }
+    80%, 100% { filter: blur(0); }
+  }
+
+  /* Video frames, nested to scale; nu-media grows from its 960 × 540 base to full HD. */
+  .frames {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .frame {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-start;
+    padding: 0.4rem 0.55rem;
+    box-sizing: border-box;
+  }
+  .frame small {
+    white-space: nowrap;
+  }
+  .fnu {
+    width: calc(50% + 50% * var(--e, 1));
+    background: linear-gradient(135deg, rgba(139, 123, 255, 0.28), rgba(79, 209, 197, 0.22));
+    border: 1px solid rgba(139, 123, 255, 0.6);
+  }
+  .f265 {
+    width: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    z-index: 1;
+  }
+  .f264 {
+    width: 33.3%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    z-index: 2;
+    align-items: flex-end;
+  }
+  .f265 small {
+    margin-top: auto;
+    margin-left: auto;
+  }
+
+  /* Chips: Neural Engine cores as columns. */
+  .chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0.6rem;
+    align-items: end;
+  }
+  .chips li {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    text-align: center;
+  }
+  .col {
+    width: 100%;
+    max-width: 44px;
+    height: 120px;
+    display: flex;
+    align-items: flex-end;
+  }
+  .bar {
+    width: 100%;
+    height: calc(var(--h) * 100%);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    transform-origin: bottom;
+    transform: scaleY(clamp(0, calc((var(--e, 1) - var(--i) * 0.05) / 0.6), 1));
+  }
+  .chips b {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 640px) {
+    .bars li {
+      grid-template-columns: 1fr auto;
+    }
+    .bars .track {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+    .chips {
+      gap: 0.3rem;
+    }
+    .chips b {
+      font-size: 0.7rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sharpen {
+      animation: none;
+    }
+  }
+</style>
