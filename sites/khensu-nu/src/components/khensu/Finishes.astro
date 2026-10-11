@@ -39,7 +39,7 @@ const shells = [
             <img
               class:list={['shot', `shot-${f.id}-${s.id}`]}
               src={`/khensu/shell/assembled_${f.id}${s.suffix}.png`}
-              alt={`khensu shell in ${s.id === 'brass' ? 'bare brass' : `matte ${f.name} titanium`} on an iPhone 18 Pro in ${f.name}`}
+              alt={`NuLink in ${s.id === 'brass' ? 'bare brass' : `matte ${f.name} titanium`} on an iPhone 18 Pro in ${f.name}`}
               width="1600"
               height="1600"
               loading="lazy"
@@ -62,8 +62,8 @@ const shells = [
           </div>
         </div>
         <div class="group">
-          <p class="group-label">Shell</p>
-          <div class="swatches two" role="radiogroup" aria-label="Shell">
+          <p class="group-label">NuLink</p>
+          <div class="swatches two" role="radiogroup" aria-label="NuLink">
             {shells.map((s) => (
               <label for={`shell-${s.id}`} class={`sw sh-${s.id}`}>
                 <span class:list={['dot', `dot-${s.id}`]}></span>
