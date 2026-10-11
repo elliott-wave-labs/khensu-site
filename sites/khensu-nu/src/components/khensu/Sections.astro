@@ -17,12 +17,12 @@ import PerAnkh from './PerAnkh.astro';
 import StatStrip from './StatStrip.astro';
 
 const highlights = [
-  { icon: 'lock', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
-  { icon: 'shield', title: 'Full stealth mode, beyond a VPN', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not, and the relays carrying you keep switching, so none of them sees a whole conversation.' },
-  { icon: 'feed', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
-  { icon: 'wallet', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
-  { icon: 'sparkle', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
-  { icon: 'live', title: 'Runs on any connection', body: 'Fibre, cable, 5G, satellite. With no internet at all, phones reach each other at about 100 m, and suñůlink.shield stretches that to 600 m, or 2 km to a rooftop node.' },
+  { icon: 'lock', href: '/security#security-protections', go: 'How the encryption works', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
+  { icon: 'shield', href: '/webe', go: 'How stealth works', title: 'Full stealth mode, beyond a VPN', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not, and the relays carrying you keep switching, so none of them sees a whole conversation.' },
+  { icon: 'feed', href: '/webe', go: 'Explore webË', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
+  { icon: 'wallet', href: '/nufi', go: 'See ñüFi', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
+  { icon: 'sparkle', href: '/memory', go: 'How memory stays private', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
+  { icon: 'live', href: '/shield', go: 'See suñůlink.shield', title: 'Runs on any connection', body: 'Fibre, cable, 5G, satellite. With no internet at all, phones reach each other at about 100 m, and suñůlink.shield stretches that to 600 m, or 2 km to a rooftop node.' },
 ] as const;
 
 const screens = [
@@ -86,9 +86,13 @@ const { show } = Astro.props as { show: Key[] };
         <p class="eyebrow">Highlights</p>
         <ul class="highlights">
           {highlights.map((h) => (
-            <li class="hl">
-              <h3><Icon name={h.icon} size="1.35rem" /><span>{h.title}</span></h3>
-              <p>{h.body}</p>
+            <li>
+              <a class="hl" href={h.href}>
+                <span class="hl-icon"><Icon name={h.icon} size="1.25rem" /></span>
+                <h3>{h.title}</h3>
+                <p>{h.body}</p>
+                <span class="hl-go">{h.go} <span aria-hidden="true">→</span></span>
+              </a>
             </li>
           ))}
         </ul>
@@ -470,33 +474,76 @@ const { show } = Astro.props as { show: Key[] };
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 1px;
+    gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    overflow: hidden;
   }
+  .highlights li { display: grid; }
   .hl {
-    background: var(--bg-raised);
-    padding: 2rem;
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.7rem;
+    padding: 1.8rem 1.8rem 1.6rem;
+    border-radius: 24px;
+    color: inherit;
+    text-decoration: none;
+    overflow: hidden;
+    isolation: isolate;
+    background: radial-gradient(120% 90% at 0% 0%, rgba(30, 143, 255, 0.14), transparent 55%), rgba(255, 255, 255, 0.035);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.35s;
+  }
+  .hl::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    z-index: -1;
+    background: radial-gradient(40% 40% at 20% 20%, rgba(34, 245, 154, 0.22), transparent 70%), radial-gradient(40% 40% at 80% 70%, rgba(139, 92, 255, 0.24), transparent 70%), radial-gradient(35% 35% at 55% 40%, rgba(30, 143, 255, 0.22), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.45s;
+    animation: hl-drift 14s ease-in-out infinite alternate;
+  }
+  @keyframes hl-drift { to { transform: translate(8%, -6%) rotate(12deg); } }
+  .hl:hover, .hl:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: inset 0 0 0 1px rgba(143, 198, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 24px 60px -24px rgba(30, 143, 255, 0.45);
+  }
+  .hl:hover::before, .hl:focus-visible::before { opacity: 1; }
+  .hl-icon {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 14px;
+    color: #fff;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    box-shadow: 0 6px 20px -6px rgba(30, 143, 255, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.45);
   }
   .hl h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin: 0 0 0.6rem;
+    margin: 0.3rem 0 0;
     font-weight: 500;
-    white-space: nowrap;
-    font-size: clamp(1.05rem, 1.45vw, 1.3rem);
-  }
-  .hl h3 :global(svg) {
-    flex: none;
+    font-size: clamp(1.1rem, 1.5vw, 1.35rem);
   }
   .hl p {
-    color: var(--text-dim);
     margin: 0;
-    font-size: 0.95rem;
+    color: var(--text-dim);
+  }
+  .hl-go {
+    margin-top: 0.4rem;
+    width: fit-content;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: var(--aura);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hl, .hl::before { transition: none; animation: none; }
   }
 
   .gallery {
