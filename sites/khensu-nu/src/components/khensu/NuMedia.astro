@@ -1,71 +1,110 @@
 ---
 // nu-media charts. Photo figures from khensu-specs design/nu-media.md (nu-media values are design
-// targets). Video figures are measured: data/codec-bench.json is khensu-specs bench/results.json.
+// targets). Video figures are measured: data/iphone-*.json is khensu-specs bench/iphone-*.json, with
+// H.264 and HEVC encoded on an iPhone Air and AV1 on a Mac (the iPhone has no AV1 encoder).
 // Each card draws from its own --e (scripts/scenes.ts, reveal); without the script they show complete.
-import bench from '../../data/codec-bench.json';
+import reel from '../../data/iphone-reel.json';
+import aurora from '../../data/iphone-aurora.json';
 
 type Point = { actual_kbps: number; vmaf: number };
-const codecs = bench.codecs as Record<string, { points: Point[] }>;
-const grid = bench.grid.codecs as Record<string, { actual_kbps: number; vmaf: number }>;
+type Run = { codecs: Record<string, { points: Point[] }>; grid: { want_kbps: number; codecs: Record<string, Point> } };
+type P = { k: number; v: number };
 
-// Rate-quality chart: log bitrate across, VMAF up.
-const X0 = 150, X1 = 4500, L = 44, R = 628, T = 12, B = 292;
-const x = (k: number) => L + ((Math.log(k) - Math.log(X0)) / (Math.log(X1) - Math.log(X0))) * (R - L);
-const y = (v: number) => B - (v / 100) * (B - T);
-const pts = (key: string, scale = 1) => codecs[key].points.map((p) => ({ k: p.actual_kbps * scale, v: p.vmaf }));
-const path = (ps: { k: number; v: number }[]) =>
-  ps.map((p, i) => `${i ? 'L' : 'M'}${x(p.k).toFixed(1)} ${y(p.v).toFixed(1)}`).join(' ');
+const pts = (run: Run, key: string, scale = 1): P[] =>
+  run.codecs[key].points.map((p) => ({ k: p.actual_kbps * scale, v: p.vmaf })).sort((a, b) => a.k - b.k);
 
-// Published estimates, scaled from the measured offline AV1 curve (see the footnote).
-const AV2 = 0.7;
-const LEARNED = 0.65;
+// Targets and estimates, all scaled from measured curves (see the footnote).
+const NU_TARGET = 0.6; // nu-media design target: 40% fewer bits than hardware HEVC
+const AV2 = 0.7; // AOMedia: about 30% fewer bits than AV1
+const LEARNED = 0.65; // DCVC-RT, from its published gain over H.266
 
-const lines = [
-  { name: 'H.264, Apple hardware', cls: 'c264', ps: pts('h264-hw') },
-  { name: 'HEVC, Apple hardware', cls: 'c265', ps: pts('hevc-hw') },
-  { name: 'AV1 software, real time', cls: 'cav1rt', ps: pts('av1-svt-rt') },
-  { name: 'AV1 software, offline', cls: 'cav1', ps: pts('av1-svt') },
-  { name: 'nu-media base layer', cls: 'cnu', ps: pts('nu-base-av1') },
-  { name: 'AV2, published estimate', cls: 'cav2', ps: pts('av1-svt', AV2), est: true },
-  { name: 'Learned codec (DCVC-RT), published estimate', cls: 'cml', ps: pts('av1-svt', LEARNED), est: true },
+const series = (run: Run) => [
+  { name: 'H.264, iPhone hardware', cls: 'c264', ps: pts(run, 'h264-hw') },
+  { name: 'HEVC, iPhone hardware', cls: 'c265', ps: pts(run, 'hevc-hw') },
+  { name: 'AV1 software, real time', cls: 'cav1rt', ps: pts(run, 'av1-svt-rt') },
+  { name: 'nu-media base layer only', cls: 'cnub', ps: pts(run, 'nu-base') },
+  { name: 'nu-media target', cls: 'cnu', ps: pts(run, 'hevc-hw', NU_TARGET), est: true },
+  { name: 'AV2, published estimate', cls: 'cav2', ps: pts(run, 'av1-svt-rt', AV2), est: true },
+  { name: 'Learned codec (DCVC-RT), estimate', cls: 'cml', ps: pts(run, 'av1-svt-rt', LEARNED), est: true },
 ];
 
-// Bitrate each codec needs for VMAF 80, interpolated on log bitrate.
-const at80 = (key: string, scale = 1) => {
-  const p = pts(key, scale);
-  for (let i = 1; i < p.length; i++) {
-    if (p[i - 1].v <= 80 && p[i].v >= 80) {
-      const f = (80 - p[i - 1].v) / (p[i].v - p[i - 1].v);
-      return Math.round(Math.exp(Math.log(p[i - 1].k) + f * (Math.log(p[i].k) - Math.log(p[i - 1].k))));
+// Rate-quality chart geometry: log bitrate across, VMAF up.
+const W = 560, H = 300, L = 40, R = 548, T = 12, B = 262;
+const chart = (run: Run, x0: number, x1: number, y0: number, step: number, ticks: number[]) => {
+  const x = (k: number) => L + ((Math.log(k) - Math.log(x0)) / (Math.log(x1) - Math.log(x0))) * (R - L);
+  const y = (v: number) => B - ((v - y0) / (100 - y0)) * (B - T);
+  const lines = series(run).map((l) => ({
+    ...l,
+    d: l.ps.map((p, i) => `${i ? 'L' : 'M'}${x(p.k).toFixed(1)} ${y(p.v).toFixed(1)}`).join(' '),
+    dots: l.est ? [] : l.ps.map((p) => ({ cx: x(p.k), cy: y(p.v) })),
+  }));
+  const gy = Array.from({ length: Math.round((100 - y0) / step) + 1 }, (_, i) => y0 + step * i).map((v) => ({ v, y: y(v) }));
+  const gx = ticks.map((k) => ({ k, x: x(k), label: k < 1000 ? `${k}k` : `${k / 1000}M` }));
+  return { lines, gy, gx };
+};
+const charts = [
+  { title: '720p video, iPhone Air', sub: '720 × 1280 portrait, 30 fps', ...chart(reel as Run, 150, 2500, 20, 20, [250, 500, 1000, 2000]) },
+  { title: '4K video, iPhone Air', sub: '3840 × 2160, 30 fps, NASA aurora', ...chart(aurora as Run, 1000, 20000, 75, 5, [2000, 4000, 8000, 16000]) },
+];
+const key = series(reel as Run);
+
+// Bitrate each codec needs for VMAF 80 on the 720p clip, interpolated on log bitrate.
+const at = (ps: P[], target: number) => {
+  for (let i = 1; i < ps.length; i++) {
+    if (ps[i - 1].v <= target && ps[i].v >= target) {
+      const f = (target - ps[i - 1].v) / (ps[i].v - ps[i - 1].v);
+      return Math.round(Math.exp(Math.log(ps[i - 1].k) + f * (Math.log(ps[i].k) - Math.log(ps[i - 1].k))));
     }
   }
-  return Math.round(p[0].k);
+  return Math.round(ps[ps.length - 1].k);
 };
+const r = reel as Run;
 const need = [
-  { name: 'H.264', note: 'Apple hardware', kbps: at80('h264-hw'), rt: 'Yes, hardware' },
-  { name: 'HEVC', note: 'Apple hardware', kbps: at80('hevc-hw'), rt: 'Yes, hardware' },
-  { name: 'nu-media base layer', note: 'AV1 at 960 × 540, no enhancement', kbps: at80('nu-base-av1'), rt: 'Yes, CPU', ours: true },
-  { name: 'AV1, real time', note: 'SVT-AV1 at 1080p', kbps: at80('av1-svt-rt'), rt: 'CPU heavy at 1080p' },
-  { name: 'AV1, offline', note: 'SVT-AV1 preset 8', kbps: at80('av1-svt'), rt: 'No: needs lookahead' },
-  { name: 'nu-media target', note: 'With Neural Engine enhancement', kbps: at80('av1-svt'), rt: 'Yes, Neural Engine', ours: true, est: true },
-  { name: 'AV2', note: 'Published estimate', kbps: at80('av1-svt', AV2), rt: 'No: no hardware yet', est: true },
-  { name: 'Learned codec', note: 'DCVC-RT, published estimate', kbps: at80('av1-svt', LEARNED), rt: 'No: datacenter GPU', est: true },
-];
+  { name: 'H.264', note: 'iPhone hardware', kbps: at(pts(r, 'h264-hw'), 80), rt: 'Yes, hardware' },
+  { name: 'nu-media base layer', note: 'HEVC at half size, no enhancement', kbps: at(pts(r, 'nu-base'), 80), rt: 'Yes, hardware', ours: true },
+  { name: 'AV1, real time', note: 'SVT-AV1 on a Mac', kbps: at(pts(r, 'av1-svt-rt'), 80), rt: 'No AV1 encoder on iPhone' },
+  { name: 'HEVC', note: 'iPhone hardware', kbps: at(pts(r, 'hevc-hw'), 80), rt: 'Yes, hardware' },
+  { name: 'AV2', note: 'Published estimate', kbps: at(pts(r, 'av1-svt-rt', AV2), 80), rt: 'No: no hardware yet', est: true },
+  { name: 'Learned codec', note: 'DCVC-RT, estimate', kbps: at(pts(r, 'av1-svt-rt', LEARNED), 80), rt: 'No: datacenter GPU', est: true },
+  { name: 'nu-media target', note: 'With Neural Engine enhancement', kbps: at(pts(r, 'hevc-hw', NU_TARGET), 80), rt: 'Yes, Neural Engine', ours: true, est: true },
+].sort((a, b) => b.kbps - a.kbps);
 const needMax = Math.max(...need.map((n) => n.kbps));
 
+const rg = r.grid.codecs;
 const at500 = [
-  { name: 'H.264', note: 'Apple hardware', vmaf: grid['h264-hw'].vmaf },
-  { name: 'HEVC', note: 'Apple hardware', vmaf: grid['hevc-hw'].vmaf },
-  { name: 'nu-media', note: 'Base layer only', vmaf: grid['nu-base-av1'].vmaf, ours: true },
+  { name: 'H.264', note: 'iPhone hardware', vmaf: rg['h264-hw'].vmaf },
+  { name: 'HEVC', note: 'iPhone hardware', vmaf: rg['hevc-hw'].vmaf },
+  { name: 'AV1', note: 'Software, on a Mac', vmaf: rg['av1-svt-rt'].vmaf },
+  { name: 'nu-media', note: 'Base layer only, before the Neural Engine', vmaf: rg['nu-base'].vmaf, ours: true },
 ];
 
-const tiles = [
-  { name: 'Original', note: '1080p source' },
-  { name: 'H.264', note: `Apple hardware · VMAF ${grid['h264-hw'].vmaf.toFixed(0)}` },
-  { name: 'HEVC', note: `Apple hardware · VMAF ${grid['hevc-hw'].vmaf.toFixed(0)}` },
-  { name: 'AV1', note: `Software, real time · VMAF ${grid['av1-svt-rt'].vmaf.toFixed(0)}` },
-  { name: 'nu-media base, HEVC', note: `Hardware, 960 × 540 · VMAF ${grid['nu-base'].vmaf.toFixed(0)}`, ours: true },
-  { name: 'nu-media base, AV1', note: `CPU, 960 × 540 · VMAF ${grid['nu-base-av1'].vmaf.toFixed(0)}`, ours: true },
+const tileSet = (run: Run, src: string, half: string) => {
+  const g = run.grid.codecs;
+  const v = (k: string) => `VMAF ${g[k].vmaf.toFixed(0)}`;
+  return [
+    { name: 'Original', note: src },
+    { name: 'H.264', note: `iPhone hardware · ${v('h264-hw')}` },
+    { name: 'HEVC', note: `iPhone hardware · ${v('hevc-hw')}` },
+    { name: 'AV1', note: `Mac software · ${v('av1-svt-rt')}` },
+    { name: 'nu-media base', note: `HEVC at ${half} · ${v('nu-base')}`, ours: true },
+    { name: 'nu-media base, AV1', note: `${half} · ${v('nu-base-av1')}`, ours: true },
+  ];
+};
+const videos = [
+  {
+    title: '720p at 500 kbit/s, encoded on iPhone Air',
+    sub: '1:1 crops of 720 × 1280 frames, every codec at the same bitrate',
+    src: '/khensu/codec/compare-reel.mp4', poster: '/khensu/codec/compare-reel.jpg', w: 2160, h: 640, cols: 6,
+    tiles: tileSet(r, '720p source', '360 × 640'),
+    credit: 'Video: @deemsterhotline on Instagram, used with thanks.',
+  },
+  {
+    title: '4K at 4 Mbit/s, encoded on iPhone Air',
+    sub: '1:1 crops of 3840 × 2160 frames, every codec at the same bitrate',
+    src: '/khensu/codec/compare-aurora.mp4', poster: '/khensu/codec/compare-aurora.jpg', w: 2880, h: 1080, cols: 3,
+    tiles: tileSet(aurora as Run, '4K source', '1920 × 1080'),
+    credit: 'Aurora during the November 2025 geomagnetic storm, photographed from the International Space Station. NASA Scientific Visualization Studio.',
+  },
 ];
 
 const photo = [
@@ -156,7 +195,7 @@ const chips = [
       </figure>
 
       <figure class="card" data-scene="reveal">
-        <figcaption><b>Video calls, same data</b><span>Quality at 500 kbit/s, 1080p, measured</span></figcaption>
+        <figcaption><b>Video calls, same data</b><span>Quality at 500 kbit/s, 720p, encoded on iPhone Air</span></figcaption>
         <ul class="q500" role="list">
           {at500.map((r, i) => (
             <li class:list={[{ ours: r.ours }]} style={`--w:${r.vmaf};--i:${i}`}>
@@ -166,74 +205,72 @@ const chips = [
             </li>
           ))}
         </ul>
-        <p class="note">VMAF, 0 to 100. Above 70 looks good on a phone. The Neural Engine adds detail on top of the base layer.</p>
+        <p class="note">VMAF, 0 to 100. Above 70 looks good on a phone. nu-media sends a half-size base layer; the receiving iPhone’s Neural Engine restores the rest.</p>
       </figure>
 
       <figure class="card wide" data-scene="reveal">
-        <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. Solid lines measured, dashed lines estimated.</span></figcaption>
-        <svg class="rd" viewBox="0 0 640 320" role="img" aria-label="Rate-quality curves: VMAF against bitrate for H.264 and HEVC hardware, AV1 software, the nu-media base layer, and estimates for AV2 and a learned codec">
-          {[0, 20, 40, 60, 80, 100].map((v) => (
-            <g class="gy">
-              <line x1={L} x2={R} y1={y(v)} y2={y(v)} />
-              <text x={L - 8} y={y(v) + 4}>{v}</text>
-            </g>
+        <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. Solid lines measured, dashed lines are targets and estimates.</span></figcaption>
+        <div class="rds">
+          {charts.map((c, ci) => (
+            <div class="rdw">
+              <p class="rdt"><b>{c.title}</b> <small>{c.sub}</small></p>
+              <svg class="rd" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Rate-quality curves, ${c.title}`}>
+                {c.gy.map((g) => (
+                  <g class="gy">
+                    <line x1={L} x2={R} y1={g.y} y2={g.y} />
+                    <text x={L - 8} y={g.y + 4}>{g.v.toFixed(0)}</text>
+                  </g>
+                ))}
+                {c.gx.map((g) => (
+                  <g class="gx">
+                    <line x1={g.x} x2={g.x} y1={T} y2={B} />
+                    <text x={g.x} y={B + 18}>{g.label}</text>
+                  </g>
+                ))}
+                <clipPath id={`rdc${ci}`}><rect x={L} y={T - 4} width={R - L} height={B - T + 8} /></clipPath>
+                <g clip-path={`url(#rdc${ci})`}>
+                  <g class="plot">
+                    {c.lines.map((l) => (
+                      <g class:list={['line', l.cls, { est: l.est }]}>
+                        <path d={l.d} />
+                        {l.dots.map((d) => <circle cx={d.cx} cy={d.cy} r="3.2" />)}
+                      </g>
+                    ))}
+                  </g>
+                </g>
+                <text class="axis" x={(L + R) / 2} y={B + 36}>bits per second</text>
+              </svg>
+            </div>
           ))}
-          {[250, 500, 1000, 2000, 4000].map((k) => (
-            <g class="gx">
-              <line x1={x(k)} x2={x(k)} y1={T} y2={B} />
-              <text x={x(k)} y={B + 18}>{k < 1000 ? `${k}k` : `${k / 1000}M`}</text>
-            </g>
-          ))}
-          <g class="tier">
-            <line x1={x(500)} x2={x(500)} y1={T} y2={B} />
-            <text x={x(500) + 6} y={T + 12}>Low call tier</text>
-          </g>
-          <g class="plot">
-            {lines.map((l) => (
-              <g class:list={['line', l.cls, { est: l.est }]}>
-                <path d={path(l.ps)} />
-                {!l.est && l.ps.map((p) => <circle cx={x(p.k)} cy={y(p.v)} r="3.2" />)}
-              </g>
-            ))}
-          </g>
-          <text class="axis" x={(L + R) / 2} y={B + 26} dy="10">bits per second</text>
-        </svg>
+        </div>
         <ul class="key" role="list">
-          {lines.map((l) => (
+          {key.map((l) => (
             <li class:list={[l.cls, { est: l.est }]}><i />{l.name}</li>
           ))}
         </ul>
       </figure>
 
-      <figure class="card wide" data-scene="reveal">
-        <figcaption><b>The same 500 kbit/s, real video</b><span>1:1 crops of 1080p frames, every codec at the same bitrate</span></figcaption>
-        <div class="cmp">
-          <video
-            src="/khensu/codec/compare-500k.mp4"
-            poster="/khensu/codec/compare-500k.jpg"
-            width="1920"
-            height="720"
-            autoplay
-            muted
-            loop
-            playsinline
-            preload="auto"
-            aria-label="Six tiles of the same moving shot: the original, then H.264, HEVC, AV1 and two nu-media base layers, each at 500 kbit/s"
-          />
-          <ol class="tiles" role="list">
-            {tiles.map((t) => (
-              <li class:list={[{ ours: t.ours }]}><b>{t.name}</b> <small>{t.note}</small></li>
-            ))}
-          </ol>
-        </div>
-        <p class="note">
-          The nu-media tiles are the base layer only, upscaled with a plain filter. The Neural Engine enhancement that sits on
-          top isn’t in this video yet. <i>Tears of Steel</i> © Blender Foundation, mango.blender.org, CC BY 3.0.
-        </p>
-      </figure>
+      {videos.map((v) => (
+        <figure class="card wide" data-scene="reveal">
+          <figcaption><b>{v.title}</b><span>{v.sub}</span></figcaption>
+          <div class="cmp">
+            <video src={v.src} poster={v.poster} width={v.w} height={v.h} autoplay muted loop playsinline preload="auto"
+              aria-label={`${v.title}: the original and each codec side by side`} />
+            <ol class:list={['tiles', { many: v.cols > 3 }]} role="list" style={`--cols:${v.cols};--rows:${6 / v.cols}`}>
+              {v.tiles.map((t) => (
+                <li class:list={[{ ours: t.ours }]}><b>{t.name}</b> <small>{t.note}</small></li>
+              ))}
+            </ol>
+          </div>
+          <p class="note">
+            The nu-media tiles are the base layer only, upscaled with a plain filter; the Neural Engine enhancement isn’t in
+            this video yet. {v.credit}
+          </p>
+        </figure>
+      ))}
 
       <figure class="card wide" data-scene="reveal">
-        <figcaption><b>Bits for a good picture</b><span>Bitrate each codec needs to reach VMAF 80 at 1080p, and whether an iPhone can do it live</span></figcaption>
+        <figcaption><b>Bits for a good picture</b><span>Bitrate each codec needs to reach VMAF 80 on the 720p clip, and whether an iPhone can do it live</span></figcaption>
         <ul class="need" role="list">
           {need.map((r, i) => (
             <li class:list={[{ ours: r.ours, est: r.est }]} style={`--w:${(r.kbps / needMax) * 100};--i:${i}`}>
@@ -244,7 +281,7 @@ const chips = [
             </li>
           ))}
         </ul>
-        <p class="note">AV1 software compresses best of what’s measured, but on a phone it costs battery at 1080p and the offline mode can’t be used live. nu-media sends a small AV1 base layer the CPU encodes cheaply, then lets the Neural Engine restore the rest.</p>
+        <p class="note">On iPhone Air, Apple’s hardware HEVC matches real-time AV1 software at a fraction of the power, so it carries nu-media’s base layer. The Neural Engine has to beat it by 40% to meet our target.</p>
       </figure>
 
       <figure class="card wide" data-scene="reveal">
@@ -264,12 +301,13 @@ const chips = [
 
     <p class="footnote">
       Photo sizes for one full-screen iPhone 18 Pro image (2622 × 1206). JPEG and HEIC are typical ImageIO results;
-      nu-media photo figures are design targets. Video is measured with VMAF on 6 seconds of <i>Tears of Steel</i> at
-      1080p, encoded on an Apple M1 Pro: H.264 and HEVC on Apple’s hardware encoder, AV1 with SVT-AV1, nu-media as its
-      base layer without the Neural Engine. The nu-media target, AV2 (about 30% below AV1, per AOMedia) and DCVC-RT
-      (21% below H.266, per its authors, real time only on an NVIDIA A100) are estimates scaled from the measured AV1
-      curve, not measurements. iPhone results will replace these. Neural Engine core counts from Apple.
-      <a href="/khensu/codec/results.json">Raw results</a>.
+      nu-media photo figures are design targets. Video is measured with VMAF (4K model for 4K) on 6-second clips:
+      H.264 and HEVC encoded by the hardware encoder of an iPhone Air (iOS 26.6.1) at live-call settings; AV1 with
+      SVT-AV1 at real-time settings on an Apple M1 Pro, because iPhone has no AV1 encoder; nu-media as its half-size base
+      layer without the Neural Engine. The nu-media target (40% fewer bits than hardware HEVC), AV2 (about 30% fewer than
+      AV1, per AOMedia) and DCVC-RT (from its authors’ published gain over H.266; real time only on an NVIDIA A100) are
+      scaled from the measured curves, not measured. Neural Engine core counts from Apple.
+      <a href="/khensu/codec/results-reel.json">720p results</a> · <a href="/khensu/codec/results-aurora.json">4K results</a>.
     </p>
   </div>
 </section>
@@ -452,9 +490,16 @@ const chips = [
   .rd .axis {
     text-anchor: middle;
   }
-  .tier line {
-    stroke: rgba(255, 255, 255, 0.3);
-    stroke-dasharray: 2 4;
+  .rds {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    gap: 1.5rem;
+  }
+  .rdt {
+    margin: 0 0 0.4rem;
+  }
+  .rdt b {
+    font-weight: 500;
   }
   .plot {
     clip-path: inset(0 calc((1 - var(--e, 1)) * 100%) 0 0);
@@ -480,6 +525,7 @@ const chips = [
   .cav1rt { --c: #f5b56b; }
   .cav1 { --c: #ff7f66; }
   .cnu { --c: #a99bff; }
+  .cnub { --c: #6f66b8; }
   .cav2 { --c: #ffd98f; }
   .cml { --c: #e48bd0; }
   .key {
@@ -527,8 +573,8 @@ const chips = [
     padding: 0;
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
     pointer-events: none;
   }
   .tiles li {
@@ -545,6 +591,15 @@ const chips = [
   .tiles small {
     font-size: 0.72rem;
     color: rgba(255, 255, 255, 0.75);
+  }
+  .tiles.many li {
+    font-size: 0.7rem;
+    margin: 0.3rem;
+    padding: 0.15rem 0.4rem;
+  }
+  .tiles.many small {
+    display: block;
+    font-size: 0.64rem;
   }
   .tiles .ours b {
     color: #b9b0ff;
