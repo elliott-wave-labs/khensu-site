@@ -90,15 +90,14 @@ const chats = [
         </div>
         <p class="sys"><Icon name="lock" /> Post-quantum end-to-end encrypted</p>
         <div class="b them">You left your hoodie here. It’s mine now.</div>
-        <div class="b me reacted">Bail is dinner Friday.<small>9:31</small><span class="react" aria-label="Isis reacted with a heart on fire">❤️‍🔥</span></div>
         <div class="b them">Door code’s 4471. Try to be charming.<small><span class="moon" /> 2h left</small></div>
-        <div class="pay">
-          <span class="pay-k">Shielded payment</span>
+        <div class="pay them">
+          <span class="pay-k">Isis sent you a shielded payment</span>
           <span class="pay-v">42</span>
           <span class="pay-k dim">Hidden amount · no lasting record</span>
         </div>
-        <div class="b them">For the wine. Charm isn’t free.<small>9:38</small></div>
-        <p class="typing">Isis is typing…</p>
+        <div class="b them">For the wine. Pick something good.<small>9:38</small></div>
+        <div class="b me reacted">Can’t wait to eat out with you. Dinner tonight 💜<small>9:41</small><span class="react" aria-label="Isis reacted with a heart on fire">❤️‍🔥</span></div>
         <div class="composer">
           <span class="glass-circle lg"><Icon name="plus" /></span>
           <span class="field">Message <Icon name="mic" /></span>
@@ -121,7 +120,7 @@ const chats = [
         </article>
         <article class="post">
           <header><span class="live-dot">LIVE</span><b>Node operators</b><span class="dim">· 3.1k watching</span></header>
-          <div class="media stream"><span><Icon name="live" /> Ask us anything: running a node at home</span></div>
+          <div class="media stream"><span><Icon name="live" /> Ask us anything: running a Nu Shield transceiver node</span></div>
         </article>
         <article class="post">
           <header><span class="avatar sm">M</span><b>forum/makers</b><span class="dim">· Mara</span></header>
@@ -505,6 +504,9 @@ const chats = [
     border-radius: 5cqw;
     border: 1px solid var(--star);
     background: var(--fill);
+  }
+  .pay.them {
+    align-self: flex-start;
   }
   .pay-k {
     font-size: 3.1cqw;
