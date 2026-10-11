@@ -79,20 +79,21 @@ const at500 = [
   { name: 'nu-media', note: 'Base layer only, before the Neural Engine', vmaf: rg['nu-base'].vmaf, ours: true },
 ];
 
+const rate = (k: number) => (k < 1000 ? `${Math.round(k)} kbit/s` : `${(k / 1000).toFixed(1)} Mbit/s`);
 const tileSet = (run: Run, src: string, half: string) => {
   const g = run.grid.codecs;
-  const v = (k: string) => `VMAF ${g[k].vmaf.toFixed(0)}`;
+  const v = (k: string) => `${rate(g[k].actual_kbps)} · VMAF ${g[k].vmaf.toFixed(0)}`;
   return [
     { name: 'Original', note: src },
-    { name: 'H.264', note: `iPhone hardware · ${v('h264-hw')}` },
+    { name: 'nu-media base', note: `HEVC at ${half} · ${v('nu-base')}`, ours: true },
     { name: 'HEVC', note: `iPhone hardware · ${v('hevc-hw')}` },
     { name: 'AV1', note: `Mac software · ${v('av1-svt-rt')}` },
-    { name: 'nu-media base', note: `HEVC at ${half} · ${v('nu-base')}`, ours: true },
+    { name: 'H.264', note: `iPhone hardware · ${v('h264-hw')}` },
     { name: 'nu-media base, AV1', note: `${half} · ${v('nu-base-av1')}`, ours: true },
   ];
 };
 const t720 = g720.tiles as Record<string, { vmaf: number; actual_kbps: number }>;
-const v720 = (k: string) => `VMAF ${t720[k].vmaf.toFixed(0)}`;
+const v720 = (k: string) => `${rate(t720[k].actual_kbps)} · VMAF ${t720[k].vmaf.toFixed(0)}`;
 const videos = [
   {
     title: '5× smaller than Instagram’s own file',
@@ -105,14 +106,14 @@ const videos = [
     src: '/khensu/codec/compare-720p.mp4', poster: '/khensu/codec/compare-720p.jpg', w: 1440, h: 1280, cols: 4, rows: 2, maxw: '46rem',
     mobile: '/khensu/codec/compare-720p-m.mp4',
     tiles: [
-      { name: 'Original', note: 'Instagram, 2.44 Mbit/s' },
+      { name: 'Original', note: 'Instagram · 720 × 1280 · 2.44 Mbit/s · 30 fps' },
       { name: 'nu-media', note: `Neural Engine · ${v720('nu-media')}`, ours: true },
-      { name: 'H.264', note: `iPhone hardware · ${v720('h264-hw')}` },
       { name: 'HEVC (H.265)', note: `iPhone hardware · ${v720('hevc-hw')}` },
+      { name: 'HEVC (x265)', note: `Software, slow · ${v720('hevc-x265')}` },
       { name: 'AV1', note: `Real time · ${v720('av1-rt')}` },
       { name: 'AV1', note: `Best, not live · ${v720('av1-best')}` },
+      { name: 'H.264', note: `iPhone hardware · ${v720('h264-hw')}` },
       { name: 'VP9', note: `Real time · ${v720('vp9-rt')}` },
-      { name: 'HEVC (x265)', note: `Software, slow · ${v720('hevc-x265')}` },
     ],
     credit: `Source: @deemsterhotline on Instagram, used with thanks: H.264 High profile, 720 × 1280 at 30 fps, 2.44 Mbit/s video (2.51 Mbit/s with audio), so every tile here uses about a fifth of the bits Instagram serves. nu-media is the iPhone’s hardware HEVC at 360 × 640 plus Apple’s low-latency super resolution on the Neural Engine, our first prototype of the enhancement layer. It looks sharper but scores VMAF ${t720['nu-media'].vmaf.toFixed(0)}, below a plain upscale (${(g720.tiles as any)['nu-base-lanczos'].vmaf.toFixed(0)}), because it adds texture the original doesn’t have; nu-media’s own trained network replaces it.`,
   },
@@ -120,7 +121,7 @@ const videos = [
     title: '4K at 4 Mbit/s, encoded on iPhone Air',
     sub: '1:1 crops of 3840 × 2160 frames, every codec at the same bitrate',
     src: '/khensu/codec/compare-aurora.mp4', poster: '/khensu/codec/compare-aurora.jpg', w: 2880, h: 1080, cols: 3, rows: 2, maxw: 'none',
-    tiles: tileSet(aurora as Run, '4K source', '1920 × 1080'),
+    tiles: tileSet(aurora as Run, '3840 × 2160 · 180 Mbit/s · 30 fps', '1920 × 1080'),
     credit: 'The nu-media tiles are the base layer only, upscaled with a plain filter; the Neural Engine enhancement isn’t in this video yet. Aurora during the November 2025 geomagnetic storm, photographed from the International Space Station. NASA Scientific Visualization Studio.',
   },
 ];
@@ -248,7 +249,7 @@ const chips = [
       </figure>
 
       <figure class="card wide" data-scene="reveal">
-        <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. Solid lines measured, dashed lines are targets and estimates.</span></figcaption>
+        <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. nu-media in colour, everything else in grey. Solid lines measured, dashed lines are targets and estimates.</span></figcaption>
         <div class="rds">
           {charts.map((c, ci) => (
             <div class="rdw">
@@ -266,11 +267,16 @@ const chips = [
                     <text x={g.x} y={B + 18}>{g.label}</text>
                   </g>
                 ))}
+                <defs>
+                  <linearGradient id={`nug${ci}`} gradientUnits="userSpaceOnUse" x1={L} y1="0" x2={R} y2="0">
+                    <stop offset="0" stop-color="#8b7bff" /><stop offset="1" stop-color="#4fd1c5" />
+                  </linearGradient>
+                </defs>
                 <clipPath id={`rdc${ci}`}><rect x={L} y={T - 4} width={R - L} height={B - T + 8} /></clipPath>
                 <g clip-path={`url(#rdc${ci})`}>
                   <g class="plot">
                     {c.lines.map((l) => (
-                      <g class:list={['line', l.cls, { est: l.est }]}>
+                      <g class:list={['line', l.cls, { est: l.est }]} style={l.cls.startsWith('cnu') ? `--c:url(#nug${ci})` : undefined}>
                         <path d={l.d} />
                         {l.dots.map((d) => <circle cx={d.cx} cy={d.cy} r="3.2" />)}
                       </g>
@@ -596,14 +602,19 @@ const chips = [
   .line.cnu path {
     stroke-width: 3.6;
   }
-  .c264 { --c: rgba(255, 255, 255, 0.4); }
-  .c265 { --c: rgba(255, 255, 255, 0.75); }
-  .cav1rt { --c: #f5b56b; }
-  .cav1 { --c: #ff7f66; }
-  .cnu { --c: #a99bff; }
+  .c264 { --c: rgba(255, 255, 255, 0.22); }
+  .c265 { --c: rgba(255, 255, 255, 0.55); }
+  .cav1rt { --c: rgba(255, 255, 255, 0.38); }
+  .cav1 { --c: rgba(255, 255, 255, 0.3); }
+  .cnu { --c: #8b7bff; }
   .cnub { --c: #6f66b8; }
-  .cav2 { --c: #ffd98f; }
-  .cml { --c: #e48bd0; }
+  .cav2 { --c: rgba(255, 255, 255, 0.45); }
+  .cml { --c: rgba(255, 255, 255, 0.3); }
+  .line.cnub path { stroke-width: 3; opacity: 0.75; }
+  .line.cnu path, .line.cnub path { filter: drop-shadow(0 0 6px rgba(139, 123, 255, 0.45)); }
+  .key li.cnu, .key li.cnub { color: #c9c0ff; font-weight: 600; }
+  .key li.cnu i, .key li.cnub i { height: 3px; border-top: 0; background: linear-gradient(90deg, #8b7bff, #4fd1c5); }
+  .key li.cnu i { -webkit-mask: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 8px); mask: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 8px); }
   .key {
     list-style: none;
     margin: 0;
