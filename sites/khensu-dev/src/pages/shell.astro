@@ -1,5 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
+
+// "Patent pending" may only appear once an application is on file (35 U.S.C. 292). Fill in from the USPTO filing
+// receipt; keep in step with khensu-nu/src/components/khensu/PatentNotice.astro.
+const APPLICATION = '';
+const FILED = '';
 ---
 
 <Base title="khensu shell" description="Specifications for the khensu shell for iPhone 18 Pro: a battleproof titanium or brass shell that turns your iPhone into a node.">
@@ -49,9 +54,17 @@ import Base from '../layouts/Base.astro';
     Arm, Cortex, TrustZone, Wi-Fi HaLow and Bluetooth are trademarks of their respective owners.
   </p>
 
-  <h2>Design documents and patents</h2>
-  <p>
-    The full design document, CAD, drawings and patent assessment are published here once the patent assessment is
-    complete. See it on <a href="https://khensu.nu/#shell-title">khensu.nu</a>.
-  </p>
+  <h2 id="patents">Design documents and patents</h2>
+  {APPLICATION ? (
+    <p>
+      Patent pending: US application {APPLICATION}, filed {FILED}, covering the lens-level shell, its continuous edge
+      profile and the hardware network guard. The full design document, CAD and drawings are published here as the
+      applications proceed.
+    </p>
+  ) : (
+    <p>
+      The full design document, CAD and drawings are published here once the patent filings are complete.
+    </p>
+  )}
+  <p>See it on <a href="https://khensu.nu/#shell-title">khensu.nu</a>.</p>
 </Base>
