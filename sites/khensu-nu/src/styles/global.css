@@ -91,6 +91,14 @@ h3 em {
   font-style: normal;
   font-weight: inherit;
 }
+h1 em,
+h2 em {
+  display: block;
+}
+h1 em.run,
+h2 em.run {
+  display: inline;
+}
 h1 {
   font-size: clamp(2.6rem, 6.4vw, 5.4rem);
 }
