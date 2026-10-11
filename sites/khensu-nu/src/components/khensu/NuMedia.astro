@@ -93,10 +93,15 @@ const chips = [
       <figure class="card">
         <figcaption><b>Video calls, same data</b><span>What 500 kbit/s shows you</span></figcaption>
         <div class="frames" aria-hidden="true">
-          <span class="frame f264"><small>H.264 · 640 × 360</small></span>
-          <span class="frame f265"><small>HEVC · 960 × 540</small></span>
-          <span class="frame fnu"><small>nu-media · 1920 × 1080</small></span>
+          <span class="frame f264" />
+          <span class="frame f265" />
+          <span class="frame fnu" />
         </div>
+        <ul class="legend" role="list">
+          <li class="l264"><i />H.264 <small>640 × 360</small></li>
+          <li class="l265"><i />HEVC <small>960 × 540</small></li>
+          <li class="lnu"><i /><b>nu-media</b> <small>1920 × 1080</small></li>
+        </ul>
         <p class="note">Sent as HEVC; the Neural Engine on the receiving iPhone restores detail and smooths motion.</p>
       </figure>
 
@@ -127,7 +132,7 @@ const chips = [
   .charts {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
     margin-top: 2.5rem;
   }
   .card {
@@ -257,13 +262,41 @@ const chips = [
     bottom: 0;
     aspect-ratio: 16 / 9;
     border-radius: 10px;
-    display: flex;
-    align-items: flex-start;
-    padding: 0.4rem 0.55rem;
     box-sizing: border-box;
   }
-  .frame small {
-    white-space: nowrap;
+  .legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    font-size: 0.9rem;
+  }
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .legend i {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+  .l264 i {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .l265 i {
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .lnu i {
+    background: linear-gradient(135deg, #8b7bff, #4fd1c5);
+  }
+  .lnu b {
+    color: #b9b0ff;
+    font-weight: 500;
   }
   .fnu {
     width: calc(50% + 50% * var(--e, 1));
@@ -281,11 +314,6 @@ const chips = [
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(255, 255, 255, 0.08);
     z-index: 2;
-    align-items: flex-end;
-  }
-  .f265 small {
-    margin-top: auto;
-    margin-left: auto;
   }
 
   /* Chips: Neural Engine cores as columns. */
