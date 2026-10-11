@@ -1,22 +1,13 @@
 ---
-// Side view at the camera end, to scale from the CAD model (khensu-specs/hardware/shell/out/summary.json):
-// the iPhone alone, then with the shell, whose outer face finishes level with the lens tops.
-// SVG units are millimetres; z is height above the front glass. The shell drops on with --e from the
-// reveal scene in scripts/scenes.ts.
-const DEPTH = 8.75; // phone body
-const PLATEAU = 3.0; // camera plateau above the back
-const LENS = 4.2; // lens rings above the back
-const TOP = DEPTH + LENS;
-const LEN = 92; // length of phone shown, from the top edge
-const y = (z: number) => 17 - z;
-const lenses = [
-  [7.1, 22.3],
-  [15.9, 31.1],
-  [24.7, 39.9],
-];
+// Side view at the camera end, rendered live with three.js from the CAD dimensions
+// (khensu-specs/hardware/shell/shell.py, iPhone 18 Pro placeholder geometry): the iPhone alone, then with the
+// shell, whose outer face finishes level with the lens tops. Units are millimetres; z is height above the front
+// glass. The shell's lower edge starts where the phone's back edge ends and rounds over on top, so the two read
+// as one shape. It drops on with --e from the reveal scene in scripts/scenes.ts.
+const TOP = 8.75 + 4.2;
 const views = [
-  { id: 'alone', title: 'iPhone 18 Pro', note: `${TOP.toFixed(2)} mm at the camera`, shell: false },
-  { id: 'with-shell', title: 'With the khensu shell', note: `${TOP.toFixed(2)} mm. +0 mm at the thickest point`, shell: true },
+  { id: 'alone', title: 'iPhone 18 Pro', note: `${TOP.toFixed(2)} mm at the camera` },
+  { id: 'with-shell', title: 'With the khensu shell', note: `${TOP.toFixed(2)} mm. +0 mm at the thickest point` },
 ];
 ---
 
@@ -26,7 +17,7 @@ const views = [
     <h2 id="side-title" class="big">No thicker than your iPhone. <em>The camera already set the line.</em></h2>
     <p class="lede">
       Your iPhone is already as thick as its camera. The khensu shell finishes exactly level with the lenses and never
-      go past them, so the back turns flat and the phone is no thicker at its thickest point than before. The bump
+      goes past them, so the back turns flat and the phone is no thicker at its thickest point than before. The bump
       goes away; nothing is added on top.
     </p>
     <p class="lede">
@@ -36,36 +27,11 @@ const views = [
 
     <div class="views">
       {views.map((v) => (
-        <figure class:list={['view', v.id]}>
-          <svg viewBox={`-2 0 ${LEN + 30} 19`} role="img" aria-label={`${v.title}, side view: ${v.note}`}>
-            <line class="guide" x1="-2" x2={LEN + 6} y1={y(TOP)} y2={y(TOP)} />
-            {v.shell ? (
-              <path
-                class="body"
-                d={`M 0.4 ${y(DEPTH)} L ${LEN + 4} ${y(DEPTH)} L ${LEN + 4} ${y(0)} L 2.2 ${y(0)} Q 0 ${y(0)} 0 ${y(0) - 2.2} L 0 ${y(DEPTH) + 0.4} Q 0 ${y(DEPTH)} 0.4 ${y(DEPTH)} Z`}
-              />
-            ) : (
-              <rect class="body" x="0" y={y(DEPTH)} width={LEN + 4} height={DEPTH} rx="2.2" />
-            )}
-            <rect class="glass" x="0.6" y={y(0.5)} width={LEN + 4} height="0.5" rx="0.25" />
-            <rect class="plateau" x="3.5" y={y(DEPTH + PLATEAU)} width="40" height={PLATEAU + 0.4} rx="1.4" />
-            {lenses.map(([a, b]) => (
-              <rect class="lens" x={a} y={y(TOP)} width={b - a} height={LENS - PLATEAU + 0.3} rx="0.7" />
-            ))}
-            {v.shell && (
-              <g class="shell">
-                <path
-                  d={`M 0.4 ${y(DEPTH)} L 0.4 ${y(TOP) + 2.2} Q 0.4 ${y(TOP)} 2.6 ${y(TOP)} L ${LEN + 4} ${y(TOP)} L ${LEN + 4} ${y(DEPTH)} Z`}
-                />
-              </g>
-            )}
-            <g class="dim">
-              <line x1={LEN + 10} x2={LEN + 10} y1={y(0)} y2={y(TOP)} />
-              <line x1={LEN + 8.5} x2={LEN + 11.5} y1={y(0)} y2={y(0)} />
-              <line x1={LEN + 8.5} x2={LEN + 11.5} y1={y(TOP)} y2={y(TOP)} />
-              <text x={LEN + 13} y={y(TOP / 2) + 0.7}>{TOP.toFixed(2)} mm</text>
-            </g>
-          </svg>
+        <figure class="view">
+          <div class="render" data-side={v.id} role="img" aria-label={`${v.title}, side view: ${v.note}`}>
+            <canvas></canvas>
+            <span class="dim" aria-hidden="true">{TOP.toFixed(2)} mm</span>
+          </div>
           <figcaption><span>{v.title}</span>{v.note}</figcaption>
         </figure>
       ))}
@@ -75,11 +41,273 @@ const views = [
       <div><dt>+0 mm</dt><dd>at the iPhone’s thickest point. A flat back, with only the lenses showing.</dd></div>
     </dl>
     <p class="footnote">
-      To scale, from the CAD model on placeholder iPhone 18 Pro geometry until Apple’s accessory drawings are available.
-      Thickest point means the phone at its camera lenses. iPhone is a trademark of Apple Inc.
+      Rendered to scale from the CAD model on placeholder iPhone 18 Pro geometry until Apple’s accessory drawings are
+      available. Thickest point means the phone at its camera lenses. iPhone is a trademark of Apple Inc.
     </p>
   </div>
 </section>
+
+<script>
+  import {
+    ACESFilmicToneMapping,
+    BufferGeometry,
+    CircleGeometry,
+    Color,
+    CylinderGeometry,
+    DirectionalLight,
+    Float32BufferAttribute,
+    Group,
+    Line,
+    LineDashedMaterial,
+    Mesh,
+    MeshPhysicalMaterial,
+    PerspectiveCamera,
+    PMREMGenerator,
+    Scene,
+    SRGBColorSpace,
+    Vector3,
+    WebGLRenderer,
+  } from 'three';
+  import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+
+  // iPhone 18 Pro placeholder geometry from shell.py, in mm. Plan x is across the phone, y along it (camera end +y).
+  const W = 71.9;
+  const H = 150;
+  const R = 10;
+  const DEPTH = 8.75;
+  const PLATEAU = 3.0;
+  const LENS = 4.2;
+  const TOP = DEPTH + LENS;
+  const INSET = 0.4; // the shell never overhangs the phone's outline
+  const BUMP = { x0: 3.5, y0: 3.5, w: 64.9, h: 40, r: 8 };
+  const SENSORS: [number, number, number][] = [
+    // x, y from the plateau's top-left corner, ring radius
+    [11.2, 11.2, 7.6],
+    [11.2, 28.8, 7.6],
+    [26.4, 20.0, 7.6],
+  ];
+  const SMALL: [number, number, number][] = [
+    [54.5, 12.0, 2.8],
+    [54.5, 28.0, 3.6],
+  ];
+
+  // A point on a rounded rectangle's outline at parameter t (0..1), so rings at different insets line up.
+  function outline(w: number, h: number, r: number, t: number): [number, number] {
+    const sx = w - 2 * r;
+    const sy = h - 2 * r;
+    const arc = (Math.PI / 2) * r;
+    const per = 2 * sx + 2 * sy + 4 * arc;
+    let d = t * per;
+    const seg = (len: number) => {
+      if (d <= len) return true;
+      d -= len;
+      return false;
+    };
+    const hw = w / 2;
+    const hh = h / 2;
+    if (seg(sx)) return [-sx / 2 + d, -hh];
+    if (seg(arc)) return corner(sx / 2, -sy / 2, -Math.PI / 2 + d / r);
+    if (seg(sy)) return [hw, -sy / 2 + d];
+    if (seg(arc)) return corner(sx / 2, sy / 2, d / r);
+    if (seg(sx)) return [sx / 2 - d, hh];
+    if (seg(arc)) return corner(-sx / 2, sy / 2, Math.PI / 2 + d / r);
+    if (seg(sy)) return [-hw, sy / 2 - d];
+    return corner(-sx / 2, -sy / 2, Math.PI + Math.min(d, arc) / r);
+    function corner(cx: number, cy: number, a: number): [number, number] {
+      return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    }
+  }
+
+  // A slab whose edge follows a profile of (inset, z) pairs from bottom to top, capped flat at both ends.
+  function slab(w: number, h: number, r: number, profile: [number, number][], n = 240) {
+    const pos: number[] = [];
+    const idx: number[] = [];
+    for (const [o, z] of profile) {
+      for (let i = 0; i < n; i++) {
+        const [x, y] = outline(w - 2 * o, h - 2 * o, Math.max(0.01, r - o), i / n);
+        pos.push(x, y, z);
+      }
+    }
+    for (let k = 0; k < profile.length - 1; k++) {
+      for (let i = 0; i < n; i++) {
+        const a = k * n + i;
+        const b = k * n + ((i + 1) % n);
+        const c = a + n;
+        const d = b + n;
+        idx.push(a, b, d, a, d, c);
+      }
+    }
+    const cap = (k: number, up: boolean) => {
+      const z = profile[k][1];
+      const centre = pos.length / 3;
+      pos.push(0, 0, z);
+      for (let i = 0; i < n; i++) {
+        const a = k * n + i;
+        const b = k * n + ((i + 1) % n);
+        if (up) idx.push(centre, a, b);
+        else idx.push(centre, b, a);
+      }
+    };
+    cap(0, false);
+    cap(profile.length - 1, true);
+    const g = new BufferGeometry();
+    g.setAttribute('position', new Float32BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    return g;
+  }
+
+  // Quarter-round edges as (inset, z) profiles: the front edge rises from inset r at z 0 to the full outline at
+  // z r; a top edge leaves the full outline at z1 - r and ends at inset r on z1.
+  function front(r: number, steps = 10): [number, number][] {
+    return Array.from({ length: steps + 1 }, (_, i) => {
+      const a = (i / steps) * (Math.PI / 2);
+      return [r * (1 - Math.sin(a)), r * (1 - Math.cos(a))] as [number, number];
+    });
+  }
+  function top(r: number, z1: number, steps = 10): [number, number][] {
+    return Array.from({ length: steps + 1 }, (_, i) => {
+      const a = (i / steps) * (Math.PI / 2);
+      return [r * (1 - Math.cos(a)), z1 - r + r * Math.sin(a)] as [number, number];
+    });
+  }
+
+  const plateauCentre = new Vector3(-W / 2 + BUMP.x0 + BUMP.w / 2, H / 2 - BUMP.y0 - BUMP.h / 2, 0);
+  const sensorAt = (x: number, y: number) => new Vector3(-W / 2 + BUMP.x0 + x, H / 2 - BUMP.y0 - y, 0);
+
+  function build(withShell: boolean) {
+    const group = new Group();
+    const phoneMat = new MeshPhysicalMaterial({ color: new Color('#5c1c27'), metalness: 0.75, roughness: 0.32, clearcoat: 0.3 });
+    const shellMat = new MeshPhysicalMaterial({ color: new Color('#521823'), metalness: 0.35, roughness: 0.58 });
+    const ringMat = new MeshPhysicalMaterial({ color: new Color('#2a2224'), metalness: 1, roughness: 0.4, envMapIntensity: 0.6 });
+    const glassMat = new MeshPhysicalMaterial({ color: new Color('#020203'), metalness: 0, roughness: 0.2, envMapIntensity: 0.06 });
+    const frontMat = new MeshPhysicalMaterial({ color: new Color('#08090b'), metalness: 0.1, roughness: 0.08, clearcoat: 1 });
+
+    // Phone: rounded front edge, a slight round on the back edge that ends exactly at the shell's inset.
+    const phone = slab(W, H, R, [...front(1.6), ...top(INSET, DEPTH)]);
+    group.add(new Mesh(phone, phoneMat));
+    const glass = slab(W - 1.2, H - 1.2, R - 0.6, [[0, -0.05], [0, 0.3]]);
+    group.add(new Mesh(glass, frontMat));
+
+    const plateau = slab(BUMP.w, BUMP.h, BUMP.r, [[0, 0], ...top(0.8, PLATEAU)]);
+    const pm = new Mesh(plateau, phoneMat);
+    pm.position.set(plateauCentre.x, plateauCentre.y, DEPTH);
+    group.add(pm);
+
+    for (const [x, y, r] of SENSORS) {
+      const p = sensorAt(x, y);
+      const ring = new Mesh(new CylinderGeometry(r, r, LENS - PLATEAU, 64), ringMat);
+      ring.rotation.x = Math.PI / 2;
+      ring.position.set(p.x, p.y, DEPTH + PLATEAU + (LENS - PLATEAU) / 2);
+      group.add(ring);
+      const lens = new Mesh(new CircleGeometry(r * 0.72, 64), glassMat);
+      lens.position.set(p.x, p.y, TOP + 0.02);
+      group.add(lens);
+    }
+    for (const [x, y, r] of SMALL) {
+      const p = sensorAt(x, y);
+      const dot = new Mesh(new CircleGeometry(r, 48), glassMat);
+      dot.position.set(p.x, p.y, DEPTH + PLATEAU + 0.02);
+      group.add(dot);
+    }
+
+    let shell: Group | null = null;
+    if (withShell) {
+      shell = new Group();
+      const t = TOP - DEPTH;
+      const body = slab(W - 2 * INSET, H - 2 * INSET, R - INSET, [[0, 0], ...top(2.2, t)]);
+      shell.add(new Mesh(body, shellMat));
+      // The lens rings and glass show through the camera plate, flush with its face.
+      for (const [x, y, r] of SENSORS) {
+        const p = sensorAt(x, y);
+        const ring = new Mesh(new CircleGeometry(r, 64), ringMat);
+        ring.position.set(p.x, p.y, t + 0.01);
+        shell.add(ring);
+        const lens = new Mesh(new CircleGeometry(r * 0.72, 64), glassMat);
+        lens.position.set(p.x, p.y, t + 0.02);
+        shell.add(lens);
+      }
+      for (const [x, y, r] of SMALL) {
+        const p = sensorAt(x, y);
+        const dot = new Mesh(new CircleGeometry(r, 48), glassMat);
+        dot.position.set(p.x, p.y, t + 0.02);
+        shell.add(dot);
+      }
+      shell.position.z = DEPTH;
+      group.add(shell);
+    }
+
+    // The line both views share: the top of the lenses.
+    const guide = new BufferGeometry().setFromPoints([new Vector3(W / 2 + 0.5, -H / 2 - 30, TOP), new Vector3(W / 2 + 0.5, H / 2 + 12, TOP)]);
+    const line = new Line(guide, new LineDashedMaterial({ color: 0x18e0c8, dashSize: 2, gapSize: 1.4, transparent: true, opacity: 0.85 }));
+    line.computeLineDistances();
+    group.add(line);
+    return { group, shell };
+  }
+
+  function mount(root: HTMLElement) {
+    const canvas = root.querySelector('canvas')!;
+    const section = root.closest<HTMLElement>('.side')!;
+    let renderer: WebGLRenderer;
+    try {
+      renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
+    } catch {
+      return;
+    }
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.outputColorSpace = SRGBColorSpace;
+    renderer.toneMapping = ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+
+    const scene = new Scene();
+    const pmrem = new PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    const key = new DirectionalLight(0xffffff, 1.4);
+    key.position.set(120, 40, 160);
+    scene.add(key);
+
+    const { group, shell } = build(root.dataset.side === 'with-shell');
+    scene.add(group);
+
+    // Looking at the long edge from slightly above, so the flat top and the lenses both read.
+    const camera = new PerspectiveCamera(3.6, 1, 10, 4000);
+    camera.up.set(0, 0, 1);
+    const target = new Vector3(W / 2, 30, 6.5);
+    camera.position.set(W / 2 + 560, 22 + 80, 6.5 + 42);
+    camera.lookAt(target);
+
+    let visible = false;
+    let last = -1;
+    const draw = () => {
+      const e = Number(section.style.getPropertyValue('--e') || 1);
+      if (shell) shell.position.z = DEPTH + (1 - e) * 9;
+      renderer.render(scene, camera);
+      last = e;
+    };
+    const resize = () => {
+      const w = root.clientWidth;
+      const h = root.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      draw();
+    };
+    const loop = () => {
+      if (!visible) return;
+      const e = Number(section.style.getPropertyValue('--e') || 1);
+      if (e !== last) draw();
+      requestAnimationFrame(loop);
+    };
+    new ResizeObserver(resize).observe(root);
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) requestAnimationFrame(loop);
+    }).observe(root);
+    resize();
+  }
+
+  document.querySelectorAll<HTMLElement>('.side .render').forEach(mount);
+</script>
 
 <style>
   .side {
@@ -87,60 +315,32 @@ const views = [
   }
   .views {
     display: grid;
-    gap: 2.5rem;
+    gap: 2rem;
     margin-top: 3rem;
   }
   .view {
     margin: 0;
   }
-  svg {
+  .render {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 5;
+    border-radius: 22px;
+    overflow: hidden;
+    background: radial-gradient(ellipse 70% 90% at 50% 60%, rgba(255, 255, 255, 0.06), transparent 70%);
+  }
+  canvas {
     display: block;
     width: 100%;
-    height: auto;
-    overflow: visible;
+    height: 100%;
   }
-  .body {
-    fill: #2b2c31;
-    stroke: rgba(255, 255, 255, 0.18);
-    stroke-width: 0.15;
-  }
-  .glass {
-    fill: rgba(255, 255, 255, 0.12);
-  }
-  .plateau {
-    fill: #34363c;
-    stroke: rgba(255, 255, 255, 0.14);
-    stroke-width: 0.12;
-  }
-  .lens {
-    fill: #16171a;
-    stroke: rgba(255, 255, 255, 0.55);
-    stroke-width: 0.18;
-  }
-  .guide {
-    stroke: var(--accent);
-    stroke-width: 0.12;
-    stroke-dasharray: 0.8 0.6;
-    opacity: 0.8;
-  }
-  .shell {
-    translate: 0 calc((1 - var(--e)) * -9px);
-    opacity: clamp(0, calc(var(--e) * 1.5), 1);
-  }
-  /* Matched to the phone so the two read as one shape; the accent only marks the seam. */
-  .shell path {
-    fill: #303137;
-    stroke: color-mix(in srgb, var(--accent) 70%, transparent);
-    stroke-width: 0.16;
-  }
-  .dim line {
-    stroke: var(--text-dim);
-    stroke-width: 0.12;
-  }
-  .dim text {
-    fill: var(--text);
-    font-size: 1.9px;
+  .dim {
+    position: absolute;
+    right: 1.2rem;
+    bottom: 0.9rem;
     font-family: var(--mono, ui-monospace, monospace);
+    font-size: 0.78rem;
+    color: var(--accent);
   }
   figcaption {
     display: flex;

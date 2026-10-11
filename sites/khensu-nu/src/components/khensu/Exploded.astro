@@ -5,13 +5,13 @@
 // explodes it. --a (0 only the phone, 1 every layer arrived) and --e (0 assembled, 1 exploded) come from
 // scripts/scenes.ts.
 const layers = [
-  { file: 'phone', label: 'Your iPhone', short: 'iPhone' },
+  { file: 'phone', label: 'iPhone 18 Pro / Pro Max / 18', short: 'iPhone 18 Pro / Pro Max / 18' },
   { file: 'suction_film', label: 'Micro-suction film', short: 'Suction film' },
   { file: 'base', label: 'Base plate', short: 'Base' },
   { file: 'magnet_ring', label: 'MagSafe-compatible magnets', short: 'Magnets' },
-  { file: 'pcb', label: 'Node computer and network guard', short: 'Node board' },
-  { file: 'battery', label: 'Its own battery', short: 'Battery' },
-  { file: 'window_inserts', label: 'Antenna band in the edge', short: 'Antenna band' },
+  { file: 'pcb', label: 'Node board: NXP i.MX 93, STM32U5 guard', short: 'Node board' },
+  { file: 'battery', label: 'Battery: 6 Wh lithium-ion', short: 'Battery' },
+  { file: 'window_inserts', label: 'Antenna band: HaLow, Wi-Fi 6, Bluetooth', short: 'Antenna band' },
   { file: 'housing', label: 'Battleproof titanium shell', short: 'Battleproof titanium shell' },
 ];
 ---
@@ -23,7 +23,7 @@ const layers = [
         <p class="eyebrow">khensu shell</p>
         <h2 id="shell-title">Your phone becomes <em>part of the network.</em></h2>
         <p class="lede">
-          A battleproof titanium shell for iPhone 18 Pro, CNC-machined for a precise fit to the phone’s own curves and finished to match it, that turns the phone into a node. It carries traffic for the people around
+          A battleproof titanium shell for iPhone 18 Pro and iPhone 18 Pro Max, coming to iPhone 18 when it arrives, CNC-machined for a precise fit to the phone’s own curves and finished to match it, that turns the phone into a node. It carries traffic for the people around
           you, keeps your messages flowing when Apple’s push service can’t be trusted, and earns while it works.
         </p>
         <dl class="facts">
@@ -32,7 +32,7 @@ const layers = [
           <div><dt>USB-C</dt><dd>charges the shell and passes power to your iPhone</dd></div>
         </dl>
       </div>
-      <div class="stage" role="img" aria-label="The khensu shell for iPhone 18 Pro arriving in layers and clipping onto the phone: battleproof titanium shell, antenna band, battery, node board, magnets, base plate and suction film above an iPhone.">
+      <div class="stage" role="img" aria-label="The khensu shell for iPhone 18 Pro, Pro Max and 18 arriving in layers and clipping onto the phone: battleproof titanium shell, antenna band, battery, node board, magnets, base plate and suction film above an iPhone.">
         <img class="shadow" src="/khensu/shell/shadow.png" alt="" width="1600" height="1600" loading="lazy" decoding="async" />
         {layers.map((l, i) => (
           <img class:list={['layer', { phone: i === 0 }]} src={`/khensu/shell/${l.file}.png`} alt="" width="1600" height="1600" style={`--i:${i}`} loading="lazy" decoding="async" />
