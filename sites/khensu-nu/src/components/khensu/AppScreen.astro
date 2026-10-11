@@ -29,12 +29,12 @@ const tabs = [
 const active = tabFor[screen];
 
 const chats = [
-  { n: 'Ada', m: 'Lisbon moved to 12–19 May', t: '9:38', u: 3, v: true },
-  { n: 'Design crew', m: 'Mara: new icon set is up', t: '9:12', u: 12 },
-  { n: 'Dad', m: 'Voice note · 0:42', t: '8:50', v: true, timer: true },
-  { n: 'Node operators', m: 'New epoch signed', t: 'Thu' },
-  { n: 'Elliott', m: 'Sent you 25 · shielded', t: 'Wed', v: true },
-  { n: 'Book club', m: 'Sami: chapter 9 by Sunday?', t: 'Tue' },
+  { n: 'Isis', m: 'Reacted ❤️‍🔥 to “Bail is dinner Friday.”', t: '9:41', u: 1, v: true },
+  { n: 'Hathor', m: 'Bold of you to text first.', t: '9:38', u: 2, v: true },
+  { n: 'Ada', m: 'Lisbon moved to 12–19 May', t: '9:20', v: true },
+  { n: 'Ptah', m: 'New icon set is up. You’re welcome.', t: '9:12', u: 12 },
+  { n: 'Osiris', m: 'Voice note · 0:42', t: '8:50', v: true, timer: true },
+  { n: 'Elliott', m: 'Sent you 42 · shielded', t: 'Wed', v: true },
 ];
 ---
 
@@ -83,20 +83,20 @@ const chats = [
       <div class="body chat">
         <div class="chat-head">
           <span class="glass-circle"><Icon name="back" /></span>
-          <span class="capsule who"><span class="avatar sm">A</span><b>Ada</b><span class="check" /></span>
+          <span class="capsule who"><span class="avatar sm">I</span><b>Isis</b><span class="check" /></span>
           <span class="capsule"><Icon name="calls" /><Icon name="video" /></span>
         </div>
         <p class="sys"><Icon name="lock" /> Post-quantum end-to-end encrypted</p>
-        <div class="b them">Can we push Lisbon a week?</div>
-        <div class="b me">Yes, 12–19 May works<small>9:31</small></div>
-        <div class="b them">Gate code is 4471, delete after<small><span class="moon" /> 2h left</small></div>
+        <div class="b them">You left your hoodie here. It’s mine now.</div>
+        <div class="b me reacted">Bail is dinner Friday.<small>9:31</small><span class="react" aria-label="Isis reacted with a heart on fire">❤️‍🔥</span></div>
+        <div class="b them">Door code’s 4471. Try to be charming.<small><span class="moon" /> 2h left</small></div>
         <div class="pay">
           <span class="pay-k">Shielded payment</span>
-          <span class="pay-v">25</span>
+          <span class="pay-v">42</span>
           <span class="pay-k dim">Hidden amount · no lasting record</span>
         </div>
-        <div class="b them">Booked the flat<small>9:38</small></div>
-        <p class="typing">Ada is typing…</p>
+        <div class="b them">For the wine. Charm isn’t free.<small>9:38</small></div>
+        <p class="typing">Isis is typing…</p>
         <div class="composer">
           <span class="glass-circle lg"><Icon name="plus" /></span>
           <span class="field">Message <Icon name="mic" /></span>
@@ -179,7 +179,7 @@ const chats = [
           <span class="dim small"><Icon name="lock" /> Only you can see it</span>
         </div>
         <ul class="rows tx">
-          <li class="row"><span class="avatar">E</span><span class="row-main"><b>Elliott</b><span class="row-sub">Sent · shielded</span></span><span class="row-meta">25</span></li>
+          <li class="row"><span class="avatar">E</span><span class="row-main"><b>Elliott</b><span class="row-sub">Sent · shielded</span></span><span class="row-meta">42</span></li>
           <li class="row"><span class="avatar">A</span><span class="row-main"><b>Ada</b><span class="row-sub">Received · shielded</span></span><span class="row-meta">40</span></li>
         </ul>
         <div class="node-card">
@@ -478,6 +478,21 @@ const chats = [
     align-self: flex-end;
     background: var(--silver);
     color: var(--ink);
+  }
+  .b.reacted {
+    position: relative;
+    margin-bottom: 2.4cqw;
+  }
+  .react {
+    position: absolute;
+    left: -2.4cqw;
+    bottom: -3.2cqw;
+    font-size: 3.6cqw;
+    line-height: 1;
+    padding: 0.9cqw 1.2cqw;
+    border-radius: 99px;
+    background: #2a2c31;
+    border: 1px solid var(--stroke);
   }
   .pay {
     align-self: flex-end;

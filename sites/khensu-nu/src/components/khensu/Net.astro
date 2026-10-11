@@ -1,6 +1,6 @@
 ---
-/* The relay network as a slowly turning 3D web. Pulses travel along the lines and forward on arrival; on top of them,
-   sparks fade in at a node, fade out, and at once fade in at another node far away, like a portal rather than a wire.
+/* The relay network as a slowly turning 3D web. Each pulse fades in somewhere along a line, travels, vanishes partway
+   and at once reappears on a line somewhere else, the way relays switch mid-conversation; sparks do the same at nodes.
    Colours drift through the aurora palette and every node breathes brighter and dimmer on its own rhythm.
    Ported from MOQOM Cloud's IndrasNet, coloured like an aurora: green low, through teal and blue,
    to violet and magenta high, with the bands drifting slowly. Fills its positioned parent behind the content unless
@@ -46,7 +46,7 @@ const { contained = false, closeup = false, nodes = 96, label, class: cls } = As
   } from 'three';
 
   const NEIGHBOURS = 3;
-  const SPARKS = 22;
+  const SPARKS = 12;
   const PULSES = 36;
   const SPEED = 0.9;
 
@@ -207,12 +207,12 @@ const { contained = false, closeup = false, nodes = 96, label, class: cls } = As
     sparkGeo.setAttribute('col', new BufferAttribute(sparkCol, 3));
     net.add(new Points(sparkGeo, pointMaterial()));
 
-    type Pulse = { from: number; to: number; t: number; live: boolean };
-    const pulses: Pulse[] = Array.from({ length: PULSES }, () => ({ from: 0, to: 0, t: 0, live: false }));
+    type Pulse = { from: number; to: number; t: number; t0: number; t1: number };
+    const pulses: Pulse[] = Array.from({ length: PULSES }, () => ({ from: 0, to: 0, t: 0, t0: 0, t1: 1 }));
     const pulseGeo = new BufferGeometry();
     const pulsePos = new Float32Array(PULSES * 3);
     const pulseSize = new Float32Array(PULSES);
-    const pulseGlow = new Float32Array(PULSES).fill(0.6);
+    const pulseGlow = new Float32Array(PULSES);
     pulseGeo.setAttribute('position', new BufferAttribute(pulsePos, 3));
     pulseGeo.setAttribute('size', new BufferAttribute(pulseSize, 1));
     pulseGeo.setAttribute('glow', new BufferAttribute(pulseGlow, 1));
@@ -248,7 +248,7 @@ const { contained = false, closeup = false, nodes = 96, label, class: cls } = As
     };
     paint(0);
 
-    // A new node at least a few units away, so a spark visibly jumps rather than creeping along.
+    // A new node at least a few units away, so a light visibly jumps rather than creeping along.
     const elsewhere = (from: number) => {
       for (let k = 0; k < 8; k++) {
         const n = (Math.random() * NODES) | 0;
@@ -257,36 +257,33 @@ const { contained = false, closeup = false, nodes = 96, label, class: cls } = As
       return (from + 1 + ((Math.random() * (NODES - 1)) | 0)) % NODES;
     };
 
-    const fire = (from: number) => {
-      const slot = pulses.find((p) => !p.live);
+    // Put a pulse on a line that starts somewhere else in the network.
+    // Each visit covers a random stretch of its line: it may start partway along and vanish before the end.
+    const hop = (p: Pulse, warm = false) => {
+      const from = elsewhere(p.from);
       const next = adj[from];
-      if (!slot || next.length === 0) return;
-      slot.from = from;
-      slot.to = next[(Math.random() * next.length) | 0];
-      slot.t = 0;
-      slot.live = true;
+      p.from = from;
+      p.to = next.length ? next[(Math.random() * next.length) | 0] : from;
+      p.t0 = Math.random() < 0.5 ? 0 : Math.random() * 0.45;
+      p.t1 = Math.min(1, p.t0 + 0.3 + Math.random() * 0.6);
+      p.t = warm ? p.t0 + Math.random() * (p.t1 - p.t0) : p.t0;
     };
 
     const tmp = new Vector3();
     const step = (dt: number) => {
       for (let i = 0; i < NODES; i++) nodeGlow[i] *= Math.exp(-dt * 3);
-      for (const p of pulses) {
-        if (!p.live) continue;
-        p.t += (dt * SPEED) / Math.max(pos[p.from].distanceTo(pos[p.to]), 0.4);
-        if (p.t >= 1) {
-          p.live = false;
-          nodeGlow[p.to] = Math.max(nodeGlow[p.to], 0.6);
-          if (Math.random() < 0.72) fire(p.to);
-          if (Math.random() < 0.2) fire(p.to);
-        }
-      }
-      if (Math.random() < dt * 2) fire((Math.random() * NODES) | 0);
       pulses.forEach((p, i) => {
-        if (p.live) tmp.lerpVectors(pos[p.from], pos[p.to], p.t).toArray(pulsePos, i * 3);
-        pulseSize[i] = p.live ? 0.17 : 0;
+        p.t += (dt * SPEED) / Math.max(pos[p.from].distanceTo(pos[p.to]), 0.4);
+        if (p.t >= p.t1) hop(p);
+        const u = (p.t - p.t0) / (p.t1 - p.t0);
+        const a = Math.min(u / 0.2, 1) * Math.min((1 - u) / 0.25, 1);
+        tmp.lerpVectors(pos[p.from], pos[p.to], p.t).toArray(pulsePos, i * 3);
+        pulseSize[i] = 0.19 * a;
+        pulseGlow[i] = 0.7 * a;
       });
       pulseGeo.attributes.position.needsUpdate = true;
       pulseGeo.attributes.size.needsUpdate = true;
+      pulseGeo.attributes.glow.needsUpdate = true;
       sparks.forEach((p, i) => {
         p.t += dt / p.dur;
         if (p.t >= 1) {
@@ -317,7 +314,7 @@ const { contained = false, closeup = false, nodes = 96, label, class: cls } = As
     new ResizeObserver(resize).observe(root);
     resize();
 
-    for (let i = 0; i < 6; i++) fire((Math.random() * NODES) | 0);
+    pulses.forEach((p) => hop(p, true));
 
     const pointer = { x: 0, y: 0 };
     addEventListener(

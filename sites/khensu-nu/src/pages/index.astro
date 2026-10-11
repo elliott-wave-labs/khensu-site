@@ -10,7 +10,7 @@ import Icon from '../components/khensu/Icon.astro';
 
 const highlights = [
   { icon: 'lock', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
-  { icon: 'shield', title: 'Nobody sees who talks to whom', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not.' },
+  { icon: 'shield', title: 'Nobody sees who talks to whom', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not, and the relays carrying you keep switching, so none of them sees a whole conversation.' },
   { icon: 'feed', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
   { icon: 'wallet', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
   { icon: 'sparkle', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
@@ -114,6 +114,10 @@ const styles = [
             </div>
           ))}
         </div>
+        <p class="lede switch">
+          And the path keeps changing. The relays carrying your messages, calls and streams switch at random while you
+          use them, each on its own clock, so no relay and no one watching a few of them ever sees a whole conversation.
+        </p>
         <p class="footnote">There is no setting to turn this off. Privacy you can switch off is privacy someone can make you switch off.</p>
       </div>
     </section>
@@ -121,29 +125,30 @@ const styles = [
     <section class="section relays-sec" data-scene="reveal" aria-labelledby="relays-title">
       <div class="wrap split">
         <div>
-          <p class="eyebrow">A few relays. Millions of people.</p>
-          <h2 id="relays-title" class="big">One small computer carries <em>a town.</em></h2>
+          <p class="eyebrow">Built for 10 billion</p>
+          <h2 id="relays-title" class="big">Ten billion people a day. <em>And beyond.</em></h2>
           <p class="lede">
-            A single <a href="https://www.raspberrypi.com/products/raspberry-pi-5/">Raspberry Pi 5</a> on a home fibre
-            line, sharing half its connection, carries everyone in a town of 1,700 for a day. The network needs no data
-            centres and no hyperscaler. Just a small share of the people who use it.
+            khensu.nu is built to carry 10 billion people a day on about 6 million small computers, or 2 in every 100
+            people running a node on ordinary home broadband. There is no central server to outgrow: every node that
+            joins adds capacity, so the network keeps scaling past that without limit.
           </p>
           <p class="lede">
-            An old or unused phone runs a node even better, and more profitably: you already own it, so there’s nothing
-            to buy and what it earns is yours from day one. Your laptop or desktop can run one too, in the background
-            while you work.
+            A single <a href="https://www.raspberrypi.com/products/raspberry-pi-5/">Raspberry Pi 5</a> does its share.
+            An old or unused phone does it even better, and more profitably: you already own it, so there’s nothing to
+            buy and what it earns is yours from day one. Your laptop or desktop can run one too, in the background while you work, using 50% or less of its idle processing power.
           </p>
           <dl class="stats">
-            <div><dt>1,700</dt><dd>people a day, carried by one Raspberry Pi 5 on gigabit fibre</dd></div>
-            <div><dt>85 million</dt><dd>people a day, on 50,000 of them</dd></div>
-            <div><dt>2 in 100</dt><dd>people running a node on ordinary home broadband carry everyone</dd></div>
+            <div><dt>10 billion</dt><dd>people a day, on about 6 million nodes, and it keeps scaling as more join</dd></div>
+            <div><dt>1,700</dt><dd>people a day on one Raspberry Pi 5, sharing half of a gigabit fibre line</dd></div>
+            <div><dt>3,400</dt><dd>people a day on an old iPhone 15 Pro in node mode, sharing half of 2 Gbit fibre over Wi-Fi 6E, past where a Pi 5’s gigabit port tops out</dd></div>
           </dl>
           <p class="footnote">
-            Engineering estimates from the protocol design: 1 hour of app use per person per day, each node sharing half its
-            upload. Real capacity depends on connections and use, and is measured as the network grows.
+            Engineering estimates from the protocol design: 1 hour of app use per person per day, about 2.5 Mbit/s of node
+            capacity for each open phone at peak, each node sharing half its connection. Real capacity depends on
+            connections and use, and is measured as the network grows. iPhone is a trademark of Apple Inc.
           </p>
         </div>
-        <Net contained closeup nodes={150} label="A web of relay nodes passing messages between them: a few nodes carry everyone." />
+        <Net contained closeup nodes={150} label="A close-up of the relay network: messages move along links, vanish and reappear on other links as relays switch." />
       </div>
     </section>
 
@@ -259,14 +264,22 @@ const styles = [
 </script>
 
 <style>
+  /* One sentence per line: the emphasised second sentence always starts its own line. */
   .big {
-    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-size: clamp(1.9rem, 3.8vw, 3.5rem);
     font-weight: 500;
     letter-spacing: -0.04em;
-    max-width: 20ch;
+    max-width: none;
+  }
+  .big em,
+  .cta h2 em {
+    display: block;
   }
   .intro .big {
-    max-width: 22ch;
+    font-size: clamp(1.8rem, 3.2vw, 3rem);
+  }
+  .split .big {
+    font-size: clamp(1.8rem, 2.9vw, 2.7rem);
   }
   .highlights {
     list-style: none;
@@ -505,6 +518,6 @@ const styles = [
   }
 
   .cta h2 {
-    max-width: 18ch;
+    max-width: none;
   }
 </style>
