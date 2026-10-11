@@ -4,7 +4,7 @@
 // H.264 and HEVC encoded on an iPhone Air and AV1 on a Mac (the iPhone has no AV1 encoder).
 // Each card draws from its own --e (scripts/scenes.ts, reveal); without the script they show complete.
 import reel from '../../data/iphone-reel.json';
-import aurora from '../../data/iphone-aurora.json';
+import nasa4k from '../../data/iphone-nasa4k.json';
 import g720 from '../../data/iphone-720p.json';
 
 type Point = { actual_kbps: number; vmaf: number };
@@ -44,7 +44,7 @@ const chart = (run: Run, x0: number, x1: number, y0: number, step: number, ticks
 };
 const charts = [
   { title: '720p video, iPhone Air', sub: '720 × 1280 portrait, 30 fps', ...chart(reel as Run, 150, 2500, 20, 20, [250, 500, 1000, 2000]) },
-  { title: '4K video, iPhone Air', sub: '3840 × 2160, 30 fps, NASA aurora', ...chart(aurora as Run, 1000, 20000, 75, 5, [2000, 4000, 8000, 16000]) },
+  { title: '4K video, iPhone Air', sub: '3840 × 2160, 30 fps, NASA aurora from the ISS', ...chart(nasa4k as Run, 600, 10000, 30, 10, [1000, 2000, 4000, 8000]) },
 ];
 const key = series(reel as Run);
 
@@ -79,18 +79,6 @@ const at500 = [
 ];
 
 const rate = (k: number) => (k < 1000 ? `${Math.round(k)} kbit/s` : `${(k / 1000).toFixed(1)} Mbit/s`);
-const tileSet = (run: Run, src: string, half: string) => {
-  const g = run.grid.codecs;
-  const v = (k: string) => `${rate(g[k].actual_kbps)} · VMAF ${g[k].vmaf.toFixed(0)}`;
-  return [
-    { name: 'Original', note: src },
-    { name: 'nu-media base', note: `HEVC at ${half} · ${v('nu-base')}`, ours: true },
-    { name: 'HEVC', note: `iPhone hardware · ${v('hevc-hw')}` },
-    { name: 'AV1', note: `Mac software · ${v('av1-svt-rt')}` },
-    { name: 'H.264', note: `iPhone hardware · ${v('h264-hw')}` },
-    { name: 'nu-media base, AV1', note: `${half} · ${v('nu-base-av1')}`, ours: true },
-  ];
-};
 const t720 = g720.tiles as Record<string, { vmaf: number; actual_kbps: number }>;
 const v720 = (k: string) => `${rate(t720[k].actual_kbps)} · VMAF ${t720[k].vmaf.toFixed(0)}`;
 const videos = [
@@ -115,9 +103,14 @@ const videos = [
   {
     title: '4K at 4 Mbit/s, encoded on iPhone Air',
     sub: '1:1 crops of 3840 × 2160 frames, every codec at the same bitrate',
-    src: '/khensu/codec/compare-aurora.mp4', poster: '/khensu/codec/compare-aurora.jpg', w: 2880, h: 1080, cols: 3, rows: 2, maxw: 'none',
-    tiles: tileSet(aurora as Run, '3840 × 2160 · 180 Mbit/s · 30 fps', '1920 × 1080'),
-    credit: 'The nu-media tiles are the base layer only, upscaled with a plain filter; the Neural Engine enhancement isn’t in this video yet. Aurora during the November 2025 geomagnetic storm, photographed from the International Space Station. NASA Scientific Visualization Studio.',
+    src: '/khensu/codec/compare-nasa4k.mp4', poster: '/khensu/codec/compare-nasa4k.jpg', w: 3840, h: 540, cols: 4, rows: 1, maxw: 'none',
+    tiles: [
+      { name: 'Original', note: 'NASA · 3840 × 2160 · 16 Mbit/s · 30 fps' },
+      { name: 'H.264', note: `iPhone hardware · ${rate((nasa4k as Run).grid.codecs['h264-hw'].actual_kbps)} · VMAF ${(nasa4k as Run).grid.codecs['h264-hw'].vmaf.toFixed(0)}` },
+      { name: 'HEVC (H.265)', note: `iPhone hardware · ${rate((nasa4k as Run).grid.codecs['hevc-hw'].actual_kbps)} · VMAF ${(nasa4k as Run).grid.codecs['hevc-hw'].vmaf.toFixed(0)}` },
+      { name: 'nu-media', note: `Base layer at 1920 × 1080 · ${rate((nasa4k as Run).grid.codecs['nu-base'].actual_kbps)} · VMAF ${(nasa4k as Run).grid.codecs['nu-base'].vmaf.toFixed(0)}`, ours: true },
+    ],
+    credit: 'Stunning Aurora Borealis from Space in Ultra-High Definition (4K), NASA, filmed from the International Space Station; public domain. The source is YouTube’s best stream, VP9 at about 16 Mbit/s for this segment, so it carries some compression of its own. nu-media works at any resolution; at 4 Mbit/s its base layer was sent at 1920 × 1080 and is shown here with a plain upscale, because the Neural Engine enhancement isn’t in this video yet. Every codec, including AV1 on a Mac, is on <a href="/media">the measurements page</a>.',
   },
 ];
 
@@ -366,7 +359,7 @@ const { full = false } = Astro.props as { full?: boolean };
       layer, and end to end on the iPhone with Apple’s low-latency super resolution on the Neural Engine. AV2 (about 30% fewer than
       AV1, per AOMedia) and DCVC-RT (from its authors’ published gain over H.266; real time only on an NVIDIA A100) are
       scaled from the measured curves, not measured. Neural Engine core counts from Apple.
-      <a href="/khensu/codec/results-reel.json">720p results</a> · <a href="/khensu/codec/results-aurora.json">4K results</a>.
+      <a href="/khensu/codec/results-reel.json">720p results</a> · <a href="/khensu/codec/results-nasa4k.json">4K results</a>.
     </p>
   </div>
 </section>
