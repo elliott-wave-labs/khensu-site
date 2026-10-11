@@ -25,8 +25,8 @@ const screens = [
   { screen: 'chat', title: 'Conversation', body: 'Messages, voice, files and shielded payments in one thread.' },
   { screen: 'feed', title: 'Feed', body: 'People, forums, sites and live streams. Signed posts, anonymous readers.' },
   { screen: 'call', title: 'Calls', body: 'Post-quantum voice and video. The route changes as you talk.' },
-  { screen: 'ask', title: 'Akashic Link', body: 'Local private AI for you alone: recall anything you’ve been told, with sources. No AI servers ever see it.' },
-  { screen: 'wallet', title: 'Wallet and node', body: 'khensu.nu coin at coin.khensu.nu, shown in dollars, and the NuLink node that earns it.' },
+  { screen: 'ask', title: 'Ask khensu', body: 'Local private AI for you alone: recall anything you’ve been told, with sources. No AI servers ever see it.' },
+  { screen: 'wallet', title: 'Wallet and node', body: 'A private balance, and the node that carries traffic for people nearby.' },
 ] as const;
 
 const statement = 'Every phone keeps the same quiet rhythm, all day. Typing, idle or asleep, it looks identical from outside. Even connecting looks like visiting an ordinary website.'.split(' ');
@@ -100,7 +100,6 @@ const specs = [
           </li>
         ))}
       </ul>
-      <p class="wrap footnote">Screens are illustrative. Balances, prices and earnings shown are examples, not real figures or a forecast.</p>
     </section>
 
     <section class="statement" data-scene="reveal" aria-label="Stealth by default">
@@ -200,7 +199,7 @@ const specs = [
           <p class="lede">
             A boat, a castle, a farm estate, the city or the slums, a private lab, a plane, a spaceship or an ET base.
             A node needs a connection and a power socket, nothing more. One on satellite internet, such as Starlink, is
-            a full node: it relays, stores and earns like any other. Where there is no internet at all, nodes and NuLinks
+            a full node: it relays, stores and earns like any other. Where there is no internet at all, nodes and shells
             within a kilometre or so reach each other directly and carry messages hop by hop.
           </p>
           <ul class="links">
@@ -221,7 +220,7 @@ const specs = [
 
     <section class="section">
       <div class="wrap">
-        <p class="eyebrow">One NuLink</p>
+        <p class="eyebrow">One shell</p>
         <ul class="styles">
           {specs.map((s) => (
             <li class="card">
@@ -232,7 +231,7 @@ const specs = [
         </ul>
         <p class="footnote">One model for iPhone 18 Pro and Pro Max, coming to iPhone 18 when it arrives, in your iPhone’s colour, matte titanium or solid brass. Figures for iPhone 18 Pro from the current CAD model; production figures may change. It clears every lens, flash and sensor.</p>
         <div class="btn-row">
-          <a class="btn" href="https://dev.khensu.nu/shell">Full NuLink specifications</a>
+          <a class="btn" href="https://dev.khensu.nu/shell">Full shell specifications</a>
         </div>
         <PatentNotice />
       </div>
