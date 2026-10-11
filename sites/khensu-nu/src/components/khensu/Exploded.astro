@@ -23,7 +23,7 @@ const layers = [
         <p class="eyebrow">suñůlink.shield · post-quantum mesh transceiver</p>
         <h2 id="shell-title">Your phone becomes <em>part of the network.</em></h2>
         <p class="lede">
-          suñůlink.shield is a post-quantum mesh transceiver in a battleproof titanium shell for iPhone 18 Pro and iPhone 18 Pro Max, coming to iPhone 18 when it arrives, CNC-machined for a precise fit to the phone’s own curves and finished to match it. It turns the phone into a node. It carries traffic for the people around
+          suñůlink.shield is a post-quantum mesh transceiver in a battleproof titanium shell, CNC-machined for a precise fit to the phone’s own curves and finished to match it. It fits every iPhone back to iPhone X, and Google Pixel and Samsung Galaxy phones, with a case made for each model, flagship or everyday. It turns the phone into a node. It carries traffic for the people around
           you, keeps your messages flowing when Apple’s push service can’t be trusted, and earns while it works.
         </p>
         <dl class="facts">
@@ -31,8 +31,12 @@ const layers = [
           <div><dt>6 Wh</dt><dd>its own battery, about 5 hours as a node on its own</dd></div>
           <div><dt>USB-C</dt><dd>its own port, and your iPhone’s stays open</dd></div>
         </dl>
+        <p class="fits">
+          <span><b>Fits</b> iPhone X and later · Google Pixel · Samsung Galaxy S and A</span>
+          <small>The khensu.nu app needs iPhone 11 or later. On older iPhones and on Android, the shield runs as a node today; khensu.nu for Android is coming.</small>
+        </p>
       </div>
-      <div class="stage" role="img" aria-label="suñůlink.shield for iPhone 18 Pro, Pro Max and 18 arriving in layers and clipping onto the phone: battleproof titanium shell, antenna band, battery, node board, magnets, base plate and shock layer above an iPhone.">
+      <div class="stage" role="img" aria-label="suñůlink.shield, shown on iPhone 18 Pro, arriving in layers and clipping onto the phone: battleproof titanium shell, antenna band, battery, node board, magnets, base plate and shock layer above an iPhone.">
         <img class="shadow" src="/khensu/shell/shadow.png" alt="" width="1600" height="1600" loading="lazy" decoding="async" />
         {layers.map((l, i) => (
           <img class:list={['layer', { phone: i === 0 }]} src={`/khensu/shell/${l.file}.png`} alt="" width="1600" height="1600" style={`--i:${i}`} loading="lazy" decoding="async" />
@@ -73,6 +77,21 @@ const layers = [
     .scene-grid {
       grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     }
+  }
+  .fits {
+    margin: 1.2rem 0 0;
+    display: grid;
+    gap: 0.3rem;
+    max-width: 34rem;
+  }
+  .fits b {
+    font-weight: 600;
+    margin-right: 0.4rem;
+  }
+  .fits small {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.45;
   }
   .facts {
     display: flex;
