@@ -6,15 +6,14 @@ import ProductBar from '../components/khensu/ProductBar.astro';
 import Highlights from '../components/khensu/Highlights.astro';
 import RevealText from '../components/khensu/RevealText.astro';
 
-// Stripe Payment Links for the full price, one per tier (Stripe Dashboard > Payment Links).
-// Until a link is set, that tier's button is shown disabled.
+// No card processor: reservations are free and go by email, so no server handles them. Payment opens in the
+// khensu.nu app over the network's own shielded payments, and every reservation is invited to pay there first.
 const SHIPS = 'Q1 2027';
-const links = {
-  titanium: import.meta.env.PUBLIC_STRIPE_TITANIUM ?? '',
-  brass: import.meta.env.PUBLIC_STRIPE_BRASS ?? '',
-  moldavite: import.meta.env.PUBLIC_STRIPE_MOLDAVITE ?? '',
-  'brass-moldavite': import.meta.env.PUBLIC_STRIPE_BRASS_MOLDAVITE ?? '',
-};
+const RESERVE_TO = 'hello@elliottwave.studio';
+const reserveHref = (edition: string, finish: string, price: number) =>
+  `mailto:${RESERVE_TO}?subject=${encodeURIComponent(`Reserve suñůlink.shield: ${edition}, ${finish}`)}&body=${encodeURIComponent(
+    `Please reserve one suñůlink.shield.\n\nEdition: ${edition} ($${price})\nFinish: ${finish}\niPhone: 18 Pro or 18 Pro Max\n\nNo payment now. Invite me to pay in the khensu.nu app when it opens.`,
+  )}`;
 
 const titanium = [
   { id: 'maroon', name: 'Maroon', hex: '#5e1a24' },
@@ -70,9 +69,8 @@ const costs = editions.map((e, i) => {
   const unit = parts.reduce((s, p) => s + (p[i + 1] as number), 0);
   const shipping = 15;
   const warranty = unit * 0.05;
-  const card = e.price * 0.029 + 0.3;
-  const total = unit + shipping + warranty + card;
-  return { unit, shipping, warranty, card, total, profit: e.price - total };
+  const total = unit + shipping + warranty;
+  return { unit, shipping, warranty, total, profit: e.price - total };
 });
 const usd = (n: number) => `$${n.toFixed(2).replace(/\.00$/, '')}`;
 
@@ -87,12 +85,12 @@ const stones = [
 ];
 ---
 
-<Base title="Pre-order suñůlink.shield" description="Pre-order suñůlink.shield: a post-quantum node in titanium or brass, made in Morocco, with the khensu.nu mark inlaid flush in bloodstone, lapis, labradorite, onyx, kyanite and tourmaline, with platinum.">
+<Base title="Reserve suñůlink.shield" description="Reserve suñůlink.shield: a post-quantum node in titanium or brass, made in Morocco, with the khensu.nu mark inlaid flush in bloodstone, lapis, labradorite, onyx, kyanite and tourmaline, with platinum.">
   <Turntable frames={48} base="/khensu/renders/turn/" name="suñůlink.shield" alt="suñůlink.shield in solid brass, turning to show the khensu.nu mark inlaid in stone and platinum on the back">
     Made in Morocco.<br /><em>Inlaid with stone.</em>
   </Turntable>
 
-  <ProductBar name="suñůlink.shield" action="Pre-order" href="#order" explore="/shield" />
+  <ProductBar name="suñůlink.shield" action="Reserve" href="#order" explore="/shield" />
 
   <section class="price-band">
     <div class="wrap price-in" data-reveal>
@@ -102,7 +100,7 @@ const stones = [
       </p>
       <div class="price-cta">
         <span><b>From ${Math.min(...editions.map((e) => e.price))}</b> · Expected to ship {SHIPS}</span>
-        <a class="btn primary" href="#order">Pre-order</a>
+        <a class="btn primary" href="#order">Reserve</a>
       </div>
     </div>
   </section>
@@ -147,18 +145,15 @@ const stones = [
               ))}
             </div>
             <p class="opt-note">Platinum crescent line</p>
-            {links[e.id as keyof typeof links] ? (
-              <a class="btn primary reserve" href={links[e.id as keyof typeof links]}>Pre-order · ${e.price}</a>
-            ) : (
-              <span class="btn primary reserve" aria-disabled="true">Pre-order · ${e.price}</span>
-            )}
+            <a class="btn primary reserve" data-edition-name={e.name} data-price={e.price} href={reserveHref(e.name, e.finishes[0].name, e.price)}>Reserve · ${e.price}</a>
             <p class="ships">Expected to ship {SHIPS}</p>
           </div>
         ))}
 
         <p class="fine">
-          Pay in full today, securely through Stripe. Your shield is expected to ship in {SHIPS}. You can cancel for a
-          full refund at any time before it ships, and we’ll email you if the date moves.
+          Reserving is free and takes nothing but an email. When payment opens in the khensu.nu app, over our own
+          network with no card processor, reservations are invited to pay first, in the order they came in. Your shield
+          is expected to ship in {SHIPS}; you can cancel for a full refund at any time before it ships.
         </p>
         <p class="more-phones">
           This first shield fits iPhone 18 Pro and Pro Max. More shields follow in {SHIPS}: every iPhone back to
@@ -248,7 +243,7 @@ const stones = [
             <tr class="sub"><th scope="row">Cost to make</th>{costs.map((c) => <td>{usd(c.unit)}</td>)}</tr>
             <tr><th scope="row">Shipping to you</th>{costs.map((c) => <td>{usd(c.shipping)}</td>)}</tr>
             <tr><th scope="row">Warranty reserve (5%)</th>{costs.map((c) => <td>{usd(c.warranty)}</td>)}</tr>
-            <tr><th scope="row">Card processing (Stripe)</th>{costs.map((c) => <td>{usd(c.card)}</td>)}</tr>
+            <tr><th scope="row">Payment processing</th>{costs.map(() => <td>$0</td>)}</tr>
             <tr class="sub"><th scope="row">Total expected cost</th>{costs.map((c) => <td>{usd(c.total)}</td>)}</tr>
             <tr><th scope="row">Price</th>{editions.map((e) => <td>{usd(e.price)}</td>)}</tr>
             <tr class="profit">
@@ -259,7 +254,9 @@ const stones = [
         </table>
       </div>
       <p class="fine cost-note">
-        Prices include shipping. Sales tax and import duty, where they apply, are shown at checkout.
+        Prices include shipping. Payment goes over khensu.nu’s own network: no card fee, only a network fee of a fraction
+        of a cent (design target), paid to the people who run the nodes. Sales tax and import duty, where they apply, are
+        shown before you pay.
       </p>
     </div>
   </section>
@@ -271,8 +268,7 @@ const stones = [
         they are softer than the metal around them: sealed, but they may show fine wear over years, like a watch dial.
         Stone photographs are illustrative; every inlay is cut from its own stones. Chakras and meanings are traditional beliefs, shared for their history, not as claims. Moldavite is certified genuine. Sources are traceable, and our lapis does not come from Afghanistan. Battery
         and charge times are targets; production figures may change. The 3D view and AR use the current CAD model, and
-        the inlay is composed from stone photographs to show the design, not a specific shield. iPhone is a trademark of Apple Inc. Payments are
-        handled by Stripe.
+        the inlay is composed from stone photographs to show the design, not a specific shield. iPhone is a trademark of Apple Inc.
       </p>
       <p><a href="/shield">Full suñůlink.shield details</a></p>
     </div>
@@ -299,6 +295,13 @@ const stones = [
   const sync = (opts: HTMLElement) => {
     const sw = opts.querySelector<HTMLElement>('.swatch.on')!;
     state.finish = sw.dataset.finish!;
+    const a = opts.querySelector<HTMLAnchorElement>('.reserve');
+    if (a) {
+      const subject = `Reserve suñůlink.shield: ${a.dataset.editionName}, ${sw.title}`;
+      const url = new URL(a.href);
+      const body = (url.searchParams.get('body') ?? '').replace(/Finish: .*/, `Finish: ${sw.title}`);
+      a.href = `mailto:${url.pathname}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
     send();
   };
   for (const b of document.querySelectorAll<HTMLElement>('.edition')) {
