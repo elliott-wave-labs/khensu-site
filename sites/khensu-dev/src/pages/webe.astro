@@ -39,6 +39,39 @@ import Base from '../layouts/Base.astro';
     repository opens with its design review; until then, <a href="mailto:hello@elliottwave.studio?subject=webE%20specification">ask for access</a>.
   </p>
 
+  <h2 id="vpn">How webE replaces a VPN</h2>
+  <p>
+    A VPN hides your traffic from your internet provider by handing all of it to one company instead. webE splits that
+    trust so no single party ever holds it.
+  </p>
+  <table>
+    <thead><tr><th></th><th>Typical VPN</th><th>webE</th></tr></thead>
+    <tbody>
+      <tr><td>Who sees your IP and what you open</td><td>The VPN company sees both</td><td>Nobody: the entry relay knows who, the exit relay or cache knows what, run by different operators, networks and jurisdictions</td></tr>
+      <tr><td>Messages</td><td>One tunnel; the VPN sees when you talk to which service</td><td>Mix network: five hops with cover traffic, so no relay or outside observer can link sender and receiver</td></tr>
+      <tr><td>Recognisable on the wire</td><td>WireGuard, OpenVPN and IPsec are easy to fingerprint and block</td><td>Ordinary HTTPS (WebTransport over QUIC, falling back to TCP)</td></tr>
+      <tr><td>Timing and volume</td><td>Visible: bursts show when you’re active</td><td>Constant bursts every 2 s while the app is open, padded packets, size-bucketed responses; suñůlink.shield and nodes keep the cover going around the clock</td></tr>
+      <tr><td>Logs</td><td>A policy you have to trust</td><td>Nothing to log: no relay sees content or both ends</td></tr>
+      <tr><td>Encryption</td><td>Mostly classical key exchange; some offer hybrid post-quantum</td><td>ML-KEM-1024 and ML-DSA-87 only, with no classical fallback</td></tr>
+      <tr><td>Off switch</td><td>Can drop, leak or be turned off; needs a kill switch</td><td>No unprotected mode exists</td></tr>
+      <tr><td>Who runs it</td><td>One company, one subscription</td><td>Independent operators paid by the protocol for proven work</td></tr>
+    </tbody>
+  </table>
+  <h3>Today: everything on webE</h3>
+  <p>
+    Messages, calls, payments, feeds, forums, sites and live streams all travel this way, in the khensu.nu app and in
+    any webE app built on <code>khensu-core</code>. No VPN is needed for any of them, and a VPN would add nothing.
+  </p>
+  <h3>Planned: webE exit, for the rest of the internet</h3>
+  <ul>
+    <li><strong>On the device:</strong> a Network Extension packet tunnel on iPhone, iPad and Mac sends all the device’s traffic into webE, so ordinary apps and websites are covered too. It is part of the khensu.nu app, with no separate VPN account.</li>
+    <li><strong>Two relays:</strong> each connection goes through an entry relay and an exit relay from different operators, the same split as webE fetches. The exit relay opens the connection to the website; HTTPS to the website stays end to end, so the exit sees only the site’s name and traffic size.</li>
+    <li><strong>Stealth stays on:</strong> the tunnel looks like ordinary HTTPS and uses padded trunks and size buckets. Bulk browsing can’t fit inside the 2-second ticks, so timing cover for the open web is weaker than for messages; we will say so in the app.</li>
+    <li><strong>Exit operators:</strong> exit duty is opt-in, needs extra stake, and runs only where the operator chooses, because exit relays receive abuse complaints for other people’s traffic, as Tor exits do.</li>
+    <li><strong>DNS:</strong> resolved at the exit relay inside the tunnel, never by your internet provider.</li>
+    <li><strong>Nothing processed on servers:</strong> relays only forward. There is no filtering, ad blocking or inspection at the exit.</li>
+  </ul>
+
   <h2 id="build">Build an app on webE</h2>
   <ul>
     <li><strong>Sites:</strong> a site is a signed manifest plus static files and optional WebAssembly, published at <code>your-name.khensu.nu</code> and hosted by the network. There is no server-side code. A site can embed feeds, forums and live tracks by reference.</li>
