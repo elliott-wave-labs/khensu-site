@@ -1,12 +1,11 @@
 ---
 // Side view at the camera end, to scale from the CAD model (khensu-specs/hardware/shell/out/summary.json):
-// the iPhone alone, then with the Wrap, whose outer face finishes level with the lens tops.
+// the iPhone alone, then with the shell, whose outer face finishes level with the lens tops.
 // SVG units are millimetres; z is height above the front glass. The shell drops on with --e from the
 // reveal scene in scripts/scenes.ts.
 const DEPTH = 8.75; // phone body
 const PLATEAU = 3.0; // camera plateau above the back
 const LENS = 4.2; // lens rings above the back
-const WRAP = 4.2; // Wrap and Fill thickness
 const TOP = DEPTH + LENS;
 const LEN = 92; // length of phone shown, from the top edge
 const y = (z: number) => 17 - z;
@@ -17,7 +16,7 @@ const lenses = [
 ];
 const views = [
   { id: 'alone', title: 'iPhone 18 Pro', note: `${TOP.toFixed(2)} mm at the camera`, shell: false },
-  { id: 'with-shell', title: 'With the khensu Wrap', note: `${TOP.toFixed(2)} mm. +0 mm at the thickest point`, shell: true },
+  { id: 'with-shell', title: 'With the khensu shell', note: `${TOP.toFixed(2)} mm. +0 mm at the thickest point`, shell: true },
 ];
 ---
 
@@ -26,9 +25,13 @@ const views = [
     <p class="eyebrow">Side view</p>
     <h2 id="side-title" class="big">No thicker than your iPhone. <em>The camera already set the line.</em></h2>
     <p class="lede">
-      Your iPhone is already as thick as its camera. The Wrap and Fill finish exactly level with the lenses and never
+      Your iPhone is already as thick as its camera. The khensu shell finishes exactly level with the lenses and never
       go past them, so the back turns flat and the phone is no thicker at its thickest point than before. The bump
       goes away; nothing is added on top.
+    </p>
+    <p class="lede">
+      Each shell is CNC-machined from titanium for a precise fit, following the iPhone 18 Pro’s own edge curve, so
+      the shell picks up where the phone’s edge leaves off. No step, no lip, one seamless shape.
     </p>
 
     <div class="views">
@@ -36,7 +39,14 @@ const views = [
         <figure class:list={['view', v.id]}>
           <svg viewBox={`-2 0 ${LEN + 30} 19`} role="img" aria-label={`${v.title}, side view: ${v.note}`}>
             <line class="guide" x1="-2" x2={LEN + 6} y1={y(TOP)} y2={y(TOP)} />
-            <rect class="body" x="0" y={y(DEPTH)} width={LEN + 4} height={DEPTH} rx="2.2" />
+            {v.shell ? (
+              <path
+                class="body"
+                d={`M 0.4 ${y(DEPTH)} L ${LEN + 4} ${y(DEPTH)} L ${LEN + 4} ${y(0)} L 2.2 ${y(0)} Q 0 ${y(0)} 0 ${y(0) - 2.2} L 0 ${y(DEPTH) + 0.4} Q 0 ${y(DEPTH)} 0.4 ${y(DEPTH)} Z`}
+              />
+            ) : (
+              <rect class="body" x="0" y={y(DEPTH)} width={LEN + 4} height={DEPTH} rx="2.2" />
+            )}
             <rect class="glass" x="0.6" y={y(0.5)} width={LEN + 4} height="0.5" rx="0.25" />
             <rect class="plateau" x="3.5" y={y(DEPTH + PLATEAU)} width="40" height={PLATEAU + 0.4} rx="1.4" />
             {lenses.map(([a, b]) => (
@@ -45,7 +55,7 @@ const views = [
             {v.shell && (
               <g class="shell">
                 <path
-                  d={`M 0.4 ${y(DEPTH)} L 0.4 ${y(TOP) + 1.6} Q 0.4 ${y(TOP)} 2 ${y(TOP)} L ${LEN + 4} ${y(TOP)} L ${LEN + 4} ${y(DEPTH)} Z`}
+                  d={`M 0.4 ${y(DEPTH)} L 0.4 ${y(TOP) + 2.2} Q 0.4 ${y(TOP)} 2.6 ${y(TOP)} L ${LEN + 4} ${y(TOP)} L ${LEN + 4} ${y(DEPTH)} Z`}
                 />
               </g>
             )}
@@ -62,9 +72,7 @@ const views = [
     </div>
 
     <dl class="stats">
-      <div><dt>+0 mm</dt><dd>Wrap and Fill: level with the lens tops, a flat back with only the lenses showing</dd></div>
-      <div><dt>+1 mm</dt><dd>Card: sits on MagSafe below the camera, 1 mm past the lens tops</dd></div>
-      <div><dt>+3 mm</dt><dd>Wrap XL: past the lenses on purpose, for twice the battery (13 Wh)</dd></div>
+      <div><dt>+0 mm</dt><dd>at the iPhone’s thickest point. A flat back, with only the lenses showing.</dd></div>
     </dl>
     <p class="footnote">
       To scale, from the CAD model on placeholder iPhone 18 Pro geometry until Apple’s accessory drawings are available.
@@ -119,11 +127,11 @@ const views = [
     translate: 0 calc((1 - var(--e)) * -9px);
     opacity: clamp(0, calc(var(--e) * 1.5), 1);
   }
+  /* Matched to the phone so the two read as one shape; the accent only marks the seam. */
   .shell path {
-    fill: color-mix(in srgb, var(--accent) 22%, #1b1c20);
-    fill-opacity: 0.88;
-    stroke: var(--accent);
-    stroke-width: 0.18;
+    fill: #303137;
+    stroke: color-mix(in srgb, var(--accent) 70%, transparent);
+    stroke-width: 0.16;
   }
   .dim line {
     stroke: var(--text-dim);
@@ -150,13 +158,8 @@ const views = [
     gap: 1.5rem 2.5rem;
     margin: 3rem 0 0;
   }
-  @media (min-width: 760px) {
-    .stats {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
   .stats dt {
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-size: clamp(3rem, 7vw, 6rem);
     font-weight: 500;
     letter-spacing: -0.03em;
     color: var(--text);

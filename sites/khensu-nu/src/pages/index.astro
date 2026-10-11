@@ -29,11 +29,11 @@ const screens = [
 
 const statement = 'Every phone keeps the same quiet rhythm, all day. Typing, idle or asleep, it looks identical from outside. Even connecting looks like visiting an ordinary website.'.split(' ');
 
-const styles = [
-  { name: 'Card', body: 'Pocket-size, on MagSafe.', spec: '5.2 mm · 4 Wh' },
-  { name: 'Fill', body: 'Inset from the edges. A flat back, only the lenses showing.', spec: '4.2 mm · 5 Wh' },
-  { name: 'Wrap', body: 'The whole back, flat. No camera bump, only the lenses showing.', spec: '4.2 mm · 6 Wh' },
-  { name: 'Wrap XL', body: 'About 11 hours as a node on its own battery.', spec: '7.2 mm · 13 Wh' },
+const specs = [
+  { name: '+0 mm', body: 'Level with the lens tops, so your iPhone is no thicker at its thickest point.' },
+  { name: '6 Wh', body: 'Its own battery: about 5 hours as a node on its own, and it charges with your iPhone.' },
+  { name: '87 g', body: 'In titanium. Solid brass is about 126 g.' },
+  { name: 'USB-C', body: 'Charges the shell and passes power to your iPhone.' },
 ];
 
 ---
@@ -217,17 +217,16 @@ const styles = [
 
     <section class="section">
       <div class="wrap">
-        <p class="eyebrow">Four ways to wear it</p>
+        <p class="eyebrow">One shell</p>
         <ul class="styles">
-          {styles.map((s) => (
+          {specs.map((s) => (
             <li class="card">
               <h3>{s.name}</h3>
               <p>{s.body}</p>
-              <span class="mono">{s.spec}</span>
             </li>
           ))}
         </ul>
-        <p class="footnote">Figures for iPhone 18 Pro from the current CAD model; production figures may change. Every style comes in matte titanium matched to your iPhone or in bare brass, and clears every lens, flash and sensor.</p>
+        <p class="footnote">One model for iPhone 18 Pro, in your iPhone’s colour, matte titanium or solid brass. Figures from the current CAD model; production figures may change. It clears every lens, flash and sensor.</p>
       </div>
     </section>
 
