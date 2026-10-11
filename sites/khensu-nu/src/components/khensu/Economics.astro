@@ -8,6 +8,18 @@ const rows = [
   { name: 'Paid to the creator', note: '5% of viewers subscribed', vals: ['$0.06', '$64', '$64k', '$64M'], ours: true },
   { name: 'Paid to the creator', note: 'every viewer subscribed', vals: ['$1.27', '$1,270', '$1.27M', '$1.27B'], ours: true },
 ];
+// Other platforms' terms as published or widely reported in 2025; they change, so check each one.
+const compare = {
+  cols: ['Platform keeps from tips and subscriptions', 'Pays you per 1,000 views', 'Ads on your work'],
+  rows: [
+    { name: 'khensu.nu', vals: ['0%', '$0.06–1.27, estimate', 'None'], ours: true },
+    { name: 'TikTok', vals: ['About half of LIVE gifts', '$0.40–1.00, videos over 1 minute', 'Yes'] },
+    { name: 'Instagram', vals: ['Up to 10% of subscriptions, plus app store fees', 'No general pay per view', 'Yes'] },
+    { name: 'Facebook', vals: ['Keeps the markup on Stars; you get $0.01 a Star', 'Varies with ad revenue', 'Yes'] },
+    { name: 'Patreon', vals: ['10% plus payment fees, new creators', 'None', 'No'] },
+    { name: 'OnlyFans', vals: ['20%', 'None', 'No'] },
+  ],
+};
 const points = [
   { t: 'No owner takes a cut', b: 'Tips and subscriptions go straight to creators. The network fee goes to the people running the nodes.' },
   { t: 'One rate, worldwide', b: 'A node in Tangier earns the same per gigabyte as one in Berlin, and that money goes about 2.5× further.' },
@@ -58,6 +70,31 @@ const points = [
         views is a whole platform’s traffic, not one video. Rates, pool share and prices aren’t final.
       </p>
     </figure>
+
+    <figure class="card econ-card">
+      <figcaption><b>Compared with where creators are now</b><span>For your own content, live or posted</span></figcaption>
+      <div class="econ-scroll" tabindex="0">
+        <table class="cmp">
+          <thead>
+            <tr><th scope="col"><span class="sr">Platform</span></th>{compare.cols.map((c) => <th scope="col">{c}</th>)}</tr>
+          </thead>
+          <tbody>
+            {compare.rows.map((r) => (
+              <tr class:list={[{ ours: r.ours }]}>
+                <th scope="row"><b>{r.name}</b></th>
+                {r.vals.map((v) => <td>{v}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        Other platforms’ terms as they published them or as creators widely reported them in 2025, before Apple’s and
+        Google’s fees on in-app purchases where those apply; programmes vary by country and change often. khensu.nu’s
+        figure is the estimate above. TikTok, Instagram, Facebook, Patreon and OnlyFans are trademarks of their owners;
+        no affiliation.
+      </p>
+    </figure>
   </div>
 </section>
 
@@ -100,5 +137,8 @@ const points = [
   tbody th small { color: var(--muted, rgba(255, 255, 255, 0.5)); font-size: 0.75rem; }
   tr.ours td { color: #fff; font-weight: 600; }
   tr:not(.ours) td { color: var(--muted, rgba(255, 255, 255, 0.55)); }
+  .cmp th, .cmp td { white-space: normal; }
+  .cmp thead th { max-width: 14rem; }
+  .cmp tbody th { min-width: 7rem; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 </style>

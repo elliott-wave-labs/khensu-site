@@ -71,7 +71,7 @@
     // Labradorite field, with its blue and gold flash
     g.save(); g.clip(new Path2D(RING));
     g.fillStyle = '#4b5660'; g.fillRect(-10, -10, 120, 120);
-    streaks(g, 40, ['#2f8cff', '#36d1c4', '#8fd0ff', '#c9a64a', '#1b2a38'], -0.7, 11, 0.7);
+    streaks(g, 34, ['#2f8cff', '#36d1c4', '#8fd0ff', '#c9a64a', '#1b2a38'], -0.7, 11, 0.5);
     // Lapis crescent, with pyrite and calcite
     const cres = new Path2D(CRESCENT);
     g.save(); g.clip(cres);
@@ -87,23 +87,35 @@
       g.beginPath(); g.arc(x, y, 6.5, 0, Math.PI * 2); g.clip();
       g.fillStyle = base; g.fillRect(x - 7, y - 7, 14, 14);
       g.translate(x - 50, y - 50);
-      speckle(g, 160, flecks, [0.25, 0.9], seed);
+      speckle(g, 5000, flecks, [0.25, 0.9], seed);
       g.restore();
     };
-    stone(73, f.moldavite ? 36 : 50, '#1f3d2b', ['#b32a2a', '#7e1e1e', '#2d5a3e'], 13);
-    if (f.moldavite) stone(73, 64, '#3f6f22', ['#5d9431', '#2c4f17', '#79b043'], 17);
+    if (f.moldavite) stone(73, 50, '#3f6f22', ['#5d9431', '#2c4f17', '#79b043'], 17);
 
-    // Metal accents: the ring and the crescent's inner line, as in the mark
+    // The mark's ring in bloodstone: green with red flecks.
+    const blood = document.createElement('canvas');
+    blood.width = blood.height = 240;
+    const b = blood.getContext('2d')!;
+    b.setTransform(2, 0, 0, 2, 20, 20);
+    b.fillStyle = '#1d3a28'; b.fillRect(-10, -10, 120, 120);
+    speckle(b, 900, ['#2a5238', '#14291c'], [0.3, 1.2], 19);
+    speckle(b, 1600, ['#b0262a', '#d63c3c', '#8a1d1f', '#e04a3f'], [0.25, 0.9], 23);
+    g.strokeStyle = g.createPattern(blood, 'repeat')!;
+    g.lineWidth = 7; g.stroke(new Path2D(RING));
+
+    // Metal: the crescent's inner line and a thin bezel round the onyx.
     const gold = '#e3b553', plat = '#e7e7e4';
-    const ringC = f.accents === 'gold' ? gold : plat, arcC = f.accents === 'platinum' ? plat : gold;
-    for (const [d, c] of [[RING, ringC], [ARC, arcC]] as const) {
-      g.strokeStyle = c; g.lineWidth = 5; g.lineCap = 'round'; g.stroke(new Path2D(d));
-    }
-    // Stones are dielectric and polished; metal lines are metal and a touch rougher.
+    const arcC = f.accents === 'platinum' ? plat : gold, bezelC = f.accents === 'gold' ? gold : plat;
+    g.lineCap = 'round';
+    g.strokeStyle = arcC; g.lineWidth = 5; g.stroke(new Path2D(ARC));
+    g.strokeStyle = bezelC; g.lineWidth = 2; g.beginPath(); g.arc(50, 50, 59, 0, Math.PI * 2); g.stroke();
+
+    // Stones are dielectric and polished; metal is metal and a touch rougher.
     o.fillStyle = 'rgb(0, 30, 0)';
     o.beginPath(); o.arc(50, 50, 60, 0, Math.PI * 2); o.fill();
-    o.strokeStyle = 'rgb(0, 70, 255)'; o.lineWidth = 5; o.lineCap = 'round';
-    o.stroke(new Path2D(RING)); o.stroke(new Path2D(ARC));
+    o.strokeStyle = 'rgb(0, 70, 255)'; o.lineCap = 'round';
+    o.lineWidth = 5; o.stroke(new Path2D(ARC));
+    o.lineWidth = 2; o.beginPath(); o.arc(50, 50, 59, 0, Math.PI * 2); o.stroke();
 
     const map = new THREE.CanvasTexture(color);
     map.colorSpace = THREE.SRGBColorSpace;
@@ -151,6 +163,14 @@
       inlayMat.map?.dispose(); inlayMat.metalnessMap?.dispose();
       inlayMat.map = map; inlayMat.metalnessMap = orm; inlayMat.roughnessMap = orm;
       inlayMat.needsUpdate = true;
+      for (const c of document.querySelectorAll<HTMLCanvasElement>('canvas.inlay-closeup')) {
+        const src = map.image as HTMLCanvasElement;
+        c.width = c.height = src.width;
+        const cg = c.getContext('2d')!;
+        cg.clearRect(0, 0, c.width, c.height);
+        cg.save(); cg.beginPath(); cg.arc(c.width / 2, c.height / 2, c.width / 2, 0, Math.PI * 2); cg.clip();
+        cg.drawImage(src, 0, 0); cg.restore();
+      }
     };
     apply({ housing: '#5e1a24', brass: false, accents: 'gold', moldavite: false });
     addEventListener('shield:finish', (e) => apply((e as CustomEvent<Finish>).detail));

@@ -17,7 +17,7 @@ const editions = [
     id: 'titanium',
     name: 'Titanium',
     price: 399,
-    body: 'Ceramic-coated titanium in your iPhone’s colour. The stone inlay with a gold or platinum line.',
+    body: 'Ceramic-coated titanium in your iPhone’s colour. The stone inlay with gold or platinum.',
     finishes: [
       { name: 'Burgundy', hex: '#5e1a24' },
       { name: 'Glacier', hex: '#b9c8d4' },
@@ -38,7 +38,7 @@ const editions = [
     id: 'limited',
     name: 'Limited edition',
     price: 999,
-    body: 'Adds moldavite to the inlay, with both a platinum ring and a gold crescent. 500 made, each numbered.',
+    body: 'Adds moldavite to the inlay, with a platinum bezel and a gold crescent. 500 made, each numbered.',
     finishes: [
       { name: 'Black titanium', hex: '#232427' },
       { name: 'Burgundy titanium', hex: '#5e1a24' },
@@ -52,8 +52,8 @@ const stones = [
   { name: 'Lapis lazuli', where: 'The crescent', note: 'Deep blue with flecks of pyrite. From Chile.', color: '#1f3a93' },
   { name: 'Labradorite', where: 'The disc', note: 'Grey that flashes blue and gold as it turns. From Madagascar.', color: '#4b6a80' },
   { name: 'Black onyx', where: 'The surround', note: 'A ring of black around the mark.', color: '#121214' },
-  { name: 'Bloodstone', where: 'A node point', note: 'Green with red flecks, in every edition. From India.', color: '#1f3d2b' },
-  { name: 'Moldavite', where: 'A second node point', note: 'Green glass from a meteorite strike, found only in Czechia. Limited edition.', color: '#4a7a2a' },
+  { name: 'Bloodstone', where: 'The ring', note: 'Green with red flecks, in every edition. From India.', color: '#1f3d2b' },
+  { name: 'Moldavite', where: 'A node point in the disc', note: 'Green glass from a meteorite strike, found only in Czechia. Limited edition.', color: '#4a7a2a' },
 ];
 ---
 
@@ -98,7 +98,7 @@ const stones = [
             </div>
             {e.accents.length > 1 ? (
               <>
-                <p class="opt-label">Metal line</p>
+                <p class="opt-label">Crescent and bezel</p>
                 <div class="accents">
                   {e.accents.map((a, j) => (
                     <button class:list={['accent', { on: j === 0 }]} data-accent={a}>{a === 'gold' ? '18k gold' : 'Platinum'}</button>
@@ -106,7 +106,7 @@ const stones = [
                 </div>
               </>
             ) : (
-              <p class="opt-note">Platinum ring, 18k gold crescent</p>
+              <p class="opt-note">Platinum bezel, 18k gold crescent</p>
             )}
             <a class="btn primary reserve" href={links[e.id as keyof typeof links] || mail(e.name)}>
               {links[e.id as keyof typeof links] ? `Reserve with a $${DEPOSIT} deposit` : 'Reserve by email'}
@@ -124,6 +124,8 @@ const stones = [
 
   <section class="section">
     <div class="wrap">
+      <div class="inlay-head">
+        <div>
       <p class="eyebrow">The inlay</p>
       <h2 class="big">The mark, in stone. <em>Flush to the metal.</em></h2>
       <p class="lede narrow">
@@ -131,6 +133,9 @@ const stones = [
         lapped down with the metal until the surface is one smooth plane you can’t feel with a fingernail. The gold or
         platinum line is laid in by hand, in the way Meknes craftspeople have inlaid silver into steel for centuries.
       </p>
+        </div>
+        <canvas class="inlay-closeup" width="1024" height="1024" role="img" aria-label="Close-up of the inlay: the khensu.nu mark with a bloodstone ring, a lapis crescent and a labradorite disc, in a black onyx surround with a metal bezel."></canvas>
+      </div>
       <ul class="stones" role="list">
         {stones.map((s) => (
           <li>
@@ -222,6 +227,9 @@ const stones = [
 
 <style>
   .narrow { max-width: 46rem; }
+  .inlay-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
+  .inlay-closeup { width: min(360px, 80vw); height: auto; aspect-ratio: 1; border-radius: 50%; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08); }
+  @media (max-width: 900px) { .inlay-head { grid-template-columns: 1fr; justify-items: center; } }
   .buy-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
