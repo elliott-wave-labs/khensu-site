@@ -25,7 +25,7 @@ swaps = [
   title="khensu.nu"
   description="khensu.nu is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device."
 >
-  <Hero eyebrow="elliottwave.studio lab · Flagship 01" cta={false} />"""),
+  <Hero eyebrow="elliottwave.studio lab · Flagship 00000000" cta={false} />"""),
     ("""<a class="btn primary" href="#run-a-node">Run a node</a>
           <a class="btn" href="https://dev.khensu.nu">Developer docs</a>""",
      """<a class="btn primary" href="https://khensu.nu">Visit khensu.nu</a>

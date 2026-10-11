@@ -1,17 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
-
-// "Patent pending" may only appear once an application is on file (35 U.S.C. 292). Fill in from the USPTO filing
-// receipt; keep in step with khensu-nu/src/components/khensu/PatentNotice.astro.
-const APPLICATION = '';
-const FILED = '';
 ---
 
 <Base title="khensu shell" description="Specifications for the khensu shell for iPhone 18 Pro: a battleproof titanium or brass shell that turns your iPhone into a node.">
   <p class="eyebrow">khensu shell</p>
   <h1>Your phone becomes part of the network</h1>
   <p class="lede">
-    One shell for iPhone 18 Pro, Pro Max and 18, in your iPhone’s colour, matte titanium or solid brass. It turns the phone into a
+    One shell for iPhone 18 Pro, in your iPhone’s colour, matte titanium or solid brass. It turns the phone into a
     node with its own battery, and finishes level with the lenses, so your iPhone is no thicker at its thickest point.
   </p>
 
@@ -19,12 +14,12 @@ const FILED = '';
   <table>
     <thead><tr><th>Item</th><th>Specification</th></tr></thead>
     <tbody>
-      <tr><td>Fits</td><td>iPhone 18 Pro and iPhone 18 Pro Max. Coming to iPhone 18 when it arrives.</td></tr>
+      <tr><td>Fits</td><td>iPhone 18 Pro</td></tr>
       <tr><td>Thickness</td><td>4.2 mm on the back, level with the lens tops: +0 mm at the iPhone’s thickest point. A flat back, with only the lenses showing.</td></tr>
       <tr><td>Footprint</td><td>71.1 × 149.2 mm, inset from the phone’s outline and following its edge curve, so it never overhangs</td></tr>
       <tr><td>Shell</td><td>CNC-machined grade 5 titanium for a precise fit, matte powder coat in Burgundy, Glacier, Silver or Black. Or bare solid brass (C26000), which darkens to a natural patina.</td></tr>
       <tr><td>Weight</td><td>About 87 g in titanium, 126 g in brass</td></tr>
-      <tr><td>Battery life</td><td>About 5 hours as a node on its own battery, then it runs from your iPhone over USB-C</td></tr>
+      <tr><td>Battery</td><td>6 Wh, about 5 hours as a node on its own</td></tr>
       <tr><td>Charging</td><td>USB-C. Charges the shell and passes power to your iPhone.</td></tr>
       <tr><td>Attachment</td><td>Micro-suction film and MagSafe-compatible magnets</td></tr>
       <tr><td>Antennas</td><td>A band in the edge, so nearby nodes reach each other directly where there’s no internet</td></tr>
@@ -32,39 +27,13 @@ const FILED = '';
     </tbody>
   </table>
   <p class="footnote">
-    Figures for iPhone 18 Pro, from the current CAD model on placeholder geometry, until Apple’s accessory drawings are
+    Figures from the current CAD model on placeholder iPhone 18 Pro geometry, until Apple’s accessory drawings are
     available; production figures may change. iPhone and MagSafe are trademarks of Apple Inc.
   </p>
 
-  <h2>Inside</h2>
-  <table>
-    <thead><tr><th>Part</th><th>Hardware</th></tr></thead>
-    <tbody>
-      <tr><td>Node computer</td><td>NXP i.MX 93 system-on-module (Arm Cortex-A55), 2 GB LPDDR4X, 32 GB eMMC</td></tr>
-      <tr><td>Network guard</td><td>STMicroelectronics STM32U5 (Arm Cortex-M33 with TrustZone), running open Rust firmware with post-quantum secure boot</td></tr>
-      <tr><td>Mesh radio</td><td>Wi-Fi HaLow (802.11ah) module based on the Morse Micro MM6108</td></tr>
-      <tr><td>Wi-Fi and Bluetooth</td><td>Wi-Fi 6 and Bluetooth LE 5.3</td></tr>
-      <tr><td>Battery</td><td>6 Wh single-cell lithium-ion pouch, 3.85 V, shaped to the shell, with on-board protection and temperature sensing</td></tr>
-      <tr><td>Power</td><td>USB-C Power Delivery, dual role, with power-path charging and a fuel gauge</td></tr>
-      <tr><td>Board</td><td>34 × 14 × 1.6 mm</td></tr>
-    </tbody>
-  </table>
-  <p class="footnote">
-    Current design choices; parts may change before production. NXP, i.MX, STMicroelectronics, STM32, Morse Micro,
-    Arm, Cortex, TrustZone, Wi-Fi HaLow and Bluetooth are trademarks of their respective owners.
+  <h2>Design documents and patents</h2>
+  <p>
+    The full design document, CAD, drawings and patent assessment are published here once the patent assessment is
+    complete. See it on <a href="https://khensu.nu/#shell-title">khensu.nu</a>.
   </p>
-
-  <h2 id="patents">Design documents and patents</h2>
-  {APPLICATION ? (
-    <p>
-      Patent pending: US application {APPLICATION}, filed {FILED}, covering the lens-level shell, its continuous edge
-      profile and the hardware network guard. The full design document, CAD and drawings are published here as the
-      applications proceed.
-    </p>
-  ) : (
-    <p>
-      The full design document, CAD and drawings are published here once the patent filings are complete.
-    </p>
-  )}
-  <p>See it on <a href="https://khensu.nu/#shell-title">khensu.nu</a>.</p>
 </Base>
