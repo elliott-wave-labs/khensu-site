@@ -130,6 +130,11 @@ const photo = [
   { name: 'nu-media', note: 'Neural Engine', bits: '0.33 Mbit', size: '40 KB', w: 6.5, ours: true },
 ];
 
+const live = [
+  { name: 'HEIC + HEVC', note: 'Apple’s Live Photo pair', bits: '11.2 Mbit', size: '1.4 MB', w: 100 },
+  { name: 'nu-media Live', note: 'Neural Engine, motion from the still', bits: '1.6 Mbit', size: '200 KB', w: 14, ours: true },
+];
+
 const heicTicks = 52;
 const nuTicks = 7;
 
@@ -156,13 +161,23 @@ const chips = [
 
     <div class="charts">
       <figure class="card wide" data-scene="reveal">
-        <figcaption><b>One full-screen photo</b><span>Bits on the wire</span></figcaption>
+        <figcaption><b>One full-screen photo</b><span>Size on the wire</span></figcaption>
         <ul class="bars" role="list">
           {photo.map((r, i) => (
             <li class:list={[{ ours: r.ours }]} style={`--w:${r.w};--i:${i}`}>
               <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
               <span class="track"><span class="fill" /></span>
-              <span class="value"><b>{r.bits}</b> <small>{r.size}</small></span>
+              <span class="value"><b>{r.size}</b> <small>{r.bits}</small></span>
+            </li>
+          ))}
+        </ul>
+        <figcaption class="sub-cap"><b>One Live Photo</b><span>The still plus 3 seconds of motion and sound</span></figcaption>
+        <ul class="bars" role="list">
+          {live.map((r, i) => (
+            <li class:list={[{ ours: r.ours }]} style={`--w:${r.w};--i:${i + 3}`}>
+              <span class="label"><b>{r.name}</b> <small>{r.note}</small></span>
+              <span class="track"><span class="fill" /></span>
+              <span class="value"><b>{r.size}</b> <small>{r.bits}</small></span>
             </li>
           ))}
         </ul>
@@ -171,18 +186,18 @@ const chips = [
       <figure class="card" data-scene="reveal">
         <figcaption><b>Time to arrive</b><span>Each square is one 2-second stealth tick</span></figcaption>
         <div class="ticks-row">
-          <span class="label"><b>HEIC</b> <small>104 s</small></span>
+          <span class="label"><b>HEIC</b> <small>309 KB · 104 s</small></span>
           <div class="ticks" aria-hidden="true">
             {Array.from({ length: heicTicks }, (_, i) => <i style={`--i:${i}`} />)}
           </div>
         </div>
         <div class="ticks-row ours">
-          <span class="label"><b>nu-media</b> <small>14 s</small></span>
+          <span class="label"><b>nu-media</b> <small>40 KB · 14 s</small></span>
           <div class="ticks" aria-hidden="true">
             {Array.from({ length: nuTicks }, (_, i) => <i style={`--i:${i}`} />)}
           </div>
         </div>
-        <p class="note">A preview lands in the first tick and sharpens as the rest arrive.</p>
+        <p class="note">A preview lands in the first tick and sharpens as the rest arrive. A nu-media Live Photo (200 KB) shows its still in 14 s and starts moving at about 70 s, all inside the ticks.</p>
       </figure>
 
       <figure class="card">
@@ -323,7 +338,8 @@ const chips = [
 
     <p class="footnote">
       Photo sizes for one full-screen iPhone 18 Pro image (2622 × 1206). JPEG and HEIC are typical ImageIO results;
-      nu-media photo figures are design targets. Video is measured with VMAF (4K model for 4K) on 6-second clips:
+      nu-media photo figures are design targets. Live Photo sizes are at the same screen size: the HEIC + HEVC pair is a
+      typical estimate for 3 s of motion with sound, and the nu-media Live Photo is a design target. Video is measured with VMAF (4K model for 4K) on 6-second clips:
       H.264 and HEVC encoded by the hardware encoder of an iPhone Air (iOS 26.6.1) at live-call settings; AV1 with
       SVT-AV1 at real-time settings on an Apple M1 Pro, because iPhone has no AV1 encoder; nu-media as its half-size base
       layer without the Neural Engine. The nu-media target (40% fewer bits than hardware HEVC), AV2 (about 30% fewer than
@@ -358,6 +374,9 @@ const chips = [
   }
   .card.wide {
     grid-column: 1 / -1;
+  }
+  .sub-cap {
+    margin-top: 0.6rem;
   }
   figcaption {
     display: grid;
