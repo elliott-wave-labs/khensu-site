@@ -1,0 +1,48 @@
+3D Viewer (working name), by elliottwave.studio lab
+Copyright (c) 2026 Elliott Wave LLC (https://elliottwave.studio)
+
+Required Notice: Copyright (c) 2026 Elliott Wave LLC (https://elliottwave.studio)
+
+The <ew-viewer> element and bundle, the hosting tools, the snippets and the iframe embed are
+licensed under the Apache License 2.0 (the LICENSE file at the root of the source repository).
+The paid platform plugins (WordPress, Shopify, Wix, Framer, HubSpot, React, Vue) and the licence
+server are under the Elliott Wave Plugin Licence or their own terms; see the LICENSE file in each
+of their folders. Prices and licence keys: https://viewer.elliottwave.studio/pricing/
+
+The third-party software below is not covered by either licence; each part stays under its own
+licence. Full licence texts ship in packages/core/dist/third-party-licenses/ and next to every
+copy of ew-viewer.min.js.
+
+--------------------------------------------------------------------------------------------------
+<model-viewer> (@google/model-viewer 4.3.1)
+https://github.com/google/model-viewer
+Copyright Google LLC
+Licensed under the Apache License, Version 2.0. You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+3D Viewer uses <model-viewer> unmodified, as a dependency. It is bundled into ew-viewer.min.js.
+3D Viewer is not made or endorsed by Google.
+
+--------------------------------------------------------------------------------------------------
+three.js (three 0.183.2)
+https://github.com/mrdoob/three.js
+Copyright (c) 2010-2026 three.js authors
+Licensed under the MIT License.
+
+--------------------------------------------------------------------------------------------------
+fflate 0.8.2, included in three.js (examples/jsm/libs/fflate.module.js)
+https://github.com/101arrowz/fflate
+Copyright (c) Arjun Barrett
+Licensed under the MIT License.
+
+--------------------------------------------------------------------------------------------------
+Lit (lit, lit-html, lit-element, @lit/reactive-element), a dependency of <model-viewer>
+https://github.com/lit/lit
+Copyright (c) 2017 Google LLC. All rights reserved.
+Licensed under the BSD 3-Clause License.
+
+--------------------------------------------------------------------------------------------------
+gainmap-js (@monogrid/gainmap-js), a dependency of <model-viewer>
+https://github.com/MONOGRID/gainmap-js
+Copyright (c) 2023 MONOGRID
+Licensed under the MIT License.

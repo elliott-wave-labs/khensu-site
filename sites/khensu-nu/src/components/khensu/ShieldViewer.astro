@@ -1,207 +1,58 @@
 ---
-// suñůlink.shield in 3D: the housing is the CAD model's own STL (khensu-specs/hardware/sunu/out/iphone-18-pro/wrap),
-// with the khensu.nu stone inlay drawn on the back as a flush roundel. The page sets the finish with a
-// `shield:finish` event; see pages/buy.astro.
+// suñůlink.shield in <ew-viewer> (elliottwave.studio lab's viewer, on Google's <model-viewer>): auto-rotate,
+// drag to turn and "View in your space" AR on by default. The GLBs come from tools/shield/glb.py, one per
+// finish, inlay tier and mode (shield alone or on the iPhone). The page picks one with a `shield:finish`
+// event { finish, tier }; see pages/buy.astro.
+const GLB = '/khensu/shell/3d/glb';
+const first = `${GLB}/burgundy-standard-shield.glb`;
 ---
 
-<div class="viewer">
-  <canvas aria-hidden="true"></canvas>
-  <p class="hint">Drag to turn</p>
+<div class="viewer" data-glb={GLB}>
+  <ew-viewer
+    src={first}
+    alt="suñůlink.shield, a burgundy titanium shield for iPhone with the khensu.nu mark inlaid in stone and platinum on the back"
+    ar
+    ar-label="View in your space"
+    camera-controls
+    auto-rotate
+    rotation-per-second="18deg"
+    shadow-intensity="1.2"
+    exposure="1.1"
+    camera-orbit="25deg 78deg auto"
+    loading="eager"
+    height="100%"
+  ></ew-viewer>
+  <div class="modes" role="group" aria-label="Show">
+    <button type="button" class="on" data-mode="shield" aria-pressed="true">Shield</button>
+    <button type="button" data-mode="phone" aria-pressed="false">On iPhone</button>
+  </div>
 </div>
 
+<script is:inline type="module" src="/vendor/ew-viewer/ew-viewer.min.js"></script>
+
 <script>
-  import * as THREE from 'three';
-  import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+  type Finish = { finish: string; tier: 'standard' | 'moldavite' };
+  const host = document.querySelector<HTMLElement>('.viewer')!;
+  const viewer = host.querySelector('ew-viewer')!;
+  const state = { finish: 'burgundy', tier: 'standard', mode: 'shield' };
 
-  type Finish = { housing: string; brass: boolean; moldavite: boolean };
-
-  // Inlay in the mark's own 100-unit box, drawn on a 120-unit canvas (24 mm on the shield) and transparent outside the ring.
-  const RING = 'M50 2.5 a47.5 47.5 0 1 0 0.001 0';
-  const ARC = 'M50 2.5 A49.5 49.5 0 0 0 50 97.5';
-  const CRESCENT = 'M50 2.5 A49.5 49.5 0 0 0 50 97.5 A47.5 47.5 0 0 1 50 2.5 Z';
-
-  const rand = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-
-  function speckle(g: CanvasRenderingContext2D, n: number, colors: string[], r: [number, number], seed: number) {
-    const rnd = rand(seed);
-    for (let i = 0; i < n; i++) {
-      g.fillStyle = colors[Math.floor(rnd() * colors.length)];
-      g.globalAlpha = 0.25 + rnd() * 0.6;
-      g.beginPath();
-      g.arc(rnd() * 120 - 10, rnd() * 120 - 10, r[0] + rnd() * (r[1] - r[0]), 0, Math.PI * 2);
-      g.fill();
-    }
-    g.globalAlpha = 1;
-  }
-
-  function streaks(g: CanvasRenderingContext2D, n: number, colors: string[], angle: number, seed: number, alpha = 0.5) {
-    const rnd = rand(seed);
-    g.save();
-    g.translate(50, 50);
-    g.rotate(angle);
-    for (let i = 0; i < n; i++) {
-      const y = rnd() * 120 - 60, h = 1 + rnd() * 7;
-      const grad = g.createLinearGradient(-60, 0, 60, 0);
-      const c = colors[Math.floor(rnd() * colors.length)];
-      grad.addColorStop(0, 'transparent');
-      grad.addColorStop(0.3 + rnd() * 0.3, c);
-      grad.addColorStop(1, 'transparent');
-      g.globalAlpha = alpha * (0.3 + rnd() * 0.7);
-      g.fillStyle = grad;
-      g.fillRect(-60, y, 120, h);
-    }
-    g.restore();
-    g.globalAlpha = 1;
-  }
-
-  function drawInlay(f: Finish) {
-    const S = 1024, k = S / 120;
-    const color = document.createElement('canvas');
-    const orm = document.createElement('canvas');
-    color.width = color.height = orm.width = orm.height = S;
-    const g = color.getContext('2d')!, o = orm.getContext('2d')!;
-    for (const c of [g, o]) c.setTransform(k, 0, 0, k, 10 * k, 10 * k);
-
-    // Labradorite field, with its blue and gold flash
-    g.save(); g.clip(new Path2D(RING));
-    g.fillStyle = '#4b5660'; g.fillRect(-10, -10, 120, 120);
-    streaks(g, 34, ['#2f8cff', '#36d1c4', '#8fd0ff', '#c9a64a', '#1b2a38'], -0.7, 11, 0.5);
-    // Lapis crescent, with pyrite and calcite
-    const cres = new Path2D(CRESCENT);
-    g.save(); g.clip(cres);
-    g.fillStyle = '#1c348c'; g.fillRect(-10, -10, 120, 120);
-    speckle(g, 260, ['#13266b', '#2a49b8'], [0.6, 2.2], 3);
-    speckle(g, 70, ['#e2bd55', '#f3d27a'], [0.2, 0.55], 5);
-    streaks(g, 4, ['#c9d3ea'], 1.2, 9, 0.25);
-    g.restore(); g.restore();
-
-    // Bloodstone in every edition, moldavite in the limited edition
-    const stone = (x: number, y: number, base: string, flecks: string[], seed: number) => {
-      g.save();
-      g.beginPath(); g.arc(x, y, 6.5, 0, Math.PI * 2); g.clip();
-      g.fillStyle = base; g.fillRect(x - 7, y - 7, 14, 14);
-      g.translate(x - 50, y - 50);
-      speckle(g, 5000, flecks, [0.25, 0.9], seed);
-      g.restore();
-    };
-    // Blue kyanite and black onyx in every edition; moldavite in the limited edition.
-    const pts = f.moldavite ? [32, 50, 68] : [40, 60];
-    stone(73, pts[0], '#2c5aa8', ['#4f86d9', '#1d3f7a', '#9bbdf0'], 29);
-    stone(73, pts[1], '#0c0c0e', ['#2a2a30', '#1a1a1e'], 31);
-    if (f.moldavite) stone(73, pts[2], '#3f6f22', ['#5d9431', '#2c4f17', '#79b043'], 17);
-
-    // The mark's ring in bloodstone: green with red flecks.
-    const blood = document.createElement('canvas');
-    blood.width = blood.height = 240;
-    const b = blood.getContext('2d')!;
-    b.setTransform(2, 0, 0, 2, 20, 20);
-    b.fillStyle = '#1d3a28'; b.fillRect(-10, -10, 120, 120);
-    speckle(b, 900, ['#2a5238', '#14291c'], [0.3, 1.2], 19);
-    speckle(b, 1600, ['#b0262a', '#d63c3c', '#8a1d1f', '#e04a3f'], [0.25, 0.9], 23);
-    g.strokeStyle = g.createPattern(blood, 'repeat')!;
-    g.lineWidth = 7; g.stroke(new Path2D(RING));
-
-    // Tourmaline in the bloodstone ring, like a watch's hour markers: its top colours, with Paraíba in the limited edition.
-    const tourmaline = ['#d6336c', '#2f9e44', '#1c7ed6', 'watermelon', '#f2c94c', f.moldavite ? '#19d3c5' : '#8e44ad'];
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2 - Math.PI / 2, x = 50 + Math.cos(a) * 47.5, y = 50 + Math.sin(a) * 47.5;
-      const c = tourmaline[i % tourmaline.length];
-      g.beginPath(); g.arc(x, y, 2.4, 0, Math.PI * 2);
-      if (c === 'watermelon') {
-        g.fillStyle = '#2f9e44'; g.fill();
-        g.beginPath(); g.arc(x, y, 1.5, 0, Math.PI * 2); g.fillStyle = '#e8590c'; g.fill();
-        g.beginPath(); g.arc(x, y, 1.2, 0, Math.PI * 2); g.fillStyle = '#f06595'; g.fill();
-      } else {
-        const gr = g.createRadialGradient(x - 0.8, y - 0.8, 0.2, x, y, 2.6);
-        gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.25, c); gr.addColorStop(1, c);
-        g.fillStyle = gr; g.fill();
+  const show = () => {
+    viewer.setAttribute('src', `${host.dataset.glb}/${state.finish}-${state.tier}-${state.mode}.glb`);
+  };
+  addEventListener('shield:finish', (e) => {
+    const d = (e as CustomEvent<Finish>).detail;
+    state.finish = d.finish;
+    state.tier = d.tier;
+    show();
+  });
+  for (const b of host.querySelectorAll<HTMLButtonElement>('.modes button')) {
+    b.addEventListener('click', () => {
+      for (const x of host.querySelectorAll('.modes button')) {
+        x.classList.toggle('on', x === b);
+        x.setAttribute('aria-pressed', String(x === b));
       }
-    }
-
-    // Platinum: the crescent's inner line.
-    const plat = '#e7e7e4';
-    g.lineCap = 'round';
-    g.strokeStyle = plat; g.lineWidth = 5; g.stroke(new Path2D(ARC));
-
-    // Stones are dielectric and polished; metal is metal and a touch rougher.
-    o.fillStyle = 'rgb(0, 30, 0)';
-    o.beginPath(); o.arc(50, 50, 51, 0, Math.PI * 2); o.fill();
-    o.strokeStyle = 'rgb(0, 70, 255)'; o.lineCap = 'round';
-    o.lineWidth = 5; o.stroke(new Path2D(ARC));
-
-    const map = new THREE.CanvasTexture(color);
-    map.colorSpace = THREE.SRGBColorSpace;
-    map.anisotropy = 8;
-    return { map, orm: new THREE.CanvasTexture(orm) };
-  }
-
-  for (const host of document.querySelectorAll<HTMLElement>('.viewer')) {
-    const canvas = host.querySelector('canvas')!;
-    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    const scene = new THREE.Scene();
-    scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
-    const camera = new THREE.PerspectiveCamera(28, 1, 1, 2000);
-    camera.position.set(170, -110, 300);
-
-    const controls = new OrbitControls(camera, canvas);
-    controls.enableDamping = true;
-    controls.enableZoom = false;
-    controls.enablePan = false;
-    controls.autoRotate = !still;
-    controls.autoRotateSpeed = 1.2;
-
-    const shield = new THREE.Group();
-    scene.add(shield);
-    const body = new THREE.MeshPhysicalMaterial({ color: 0x5e1a24, metalness: 0.55, roughness: 0.42, clearcoat: 0.3 });
-    const inlayMat = new THREE.MeshPhysicalMaterial({ metalness: 1, roughness: 1, clearcoat: 1, clearcoatRoughness: 0.06, transparent: true, alphaTest: 0.5 });
-    const inlay = new THREE.Mesh(new THREE.CircleGeometry(12, 96), inlayMat);
-    inlay.position.set(0, 0, 4.21);
-    shield.add(inlay);
-
-    new STLLoader().load('/khensu/shell/3d/housing.stl', (geo) => {
-      geo.center();
-      geo.translate(0, 0, 2.35);
-      shield.add(new THREE.Mesh(geo, body));
-    });
-
-    const apply = (f: Finish) => {
-      body.color.set(f.housing);
-      body.metalness = f.brass ? 1 : 0.55;
-      body.roughness = f.brass ? 0.28 : 0.42;
-      const { map, orm } = drawInlay(f);
-      inlayMat.map?.dispose(); inlayMat.metalnessMap?.dispose();
-      inlayMat.map = map; inlayMat.metalnessMap = orm; inlayMat.roughnessMap = orm;
-      inlayMat.needsUpdate = true;
-      for (const c of document.querySelectorAll<HTMLCanvasElement>('canvas.inlay-closeup')) {
-        const src = map.image as HTMLCanvasElement;
-        c.width = c.height = src.width;
-        const cg = c.getContext('2d')!;
-        cg.clearRect(0, 0, c.width, c.height);
-        cg.drawImage(src, 0, 0);
-      }
-    };
-    apply({ housing: '#5e1a24', brass: false, moldavite: false });
-    addEventListener('shield:finish', (e) => apply((e as CustomEvent<Finish>).detail));
-
-    const resize = () => {
-      const w = host.clientWidth, h = host.clientHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    };
-    new ResizeObserver(resize).observe(host);
-    resize();
-    let visible = false;
-    new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(host);
-    renderer.setAnimationLoop(() => {
-      if (!visible) return;
-      controls.update();
-      renderer.render(scene, camera);
+      state.mode = b.dataset.mode!;
+      show();
     });
   }
 </script>
@@ -214,23 +65,30 @@
     background: radial-gradient(70% 60% at 50% 40%, rgba(139, 123, 255, 0.14), transparent 70%), #060608;
     border: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
-    touch-action: pan-y;
   }
-  .viewer canvas { display: block; width: 100%; height: 100%; cursor: grab; }
-  .viewer canvas:active { cursor: grabbing; }
-  .hint {
+  ew-viewer { display: block; width: 100%; height: 100%; }
+  .modes {
     position: absolute;
+    top: 14px;
     left: 50%;
-    bottom: 14px;
     translate: -50% 0;
-    margin: 0;
-    padding: 0.3rem 0.8rem;
+    display: flex;
+    gap: 2px;
+    padding: 3px;
     border-radius: 999px;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.7);
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(16px) saturate(160%);
-    pointer-events: none;
   }
+  .modes button {
+    padding: 0.35rem 0.9rem;
+    border: 0;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.75);
+    background: none;
+    cursor: pointer;
+  }
+  .modes button.on { color: #fff; background: rgba(255, 255, 255, 0.16); }
 </style>
