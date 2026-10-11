@@ -149,6 +149,8 @@ const chips = [
   { name: 'A19', cores: 16 },
   { name: 'A20 Pro', cores: 32, ours: true },
 ];
+
+const { full = false } = Astro.props as { full?: boolean };
 ---
 
 <section class="section numedia" aria-labelledby="numedia-title">
@@ -172,7 +174,7 @@ const chips = [
             </li>
           ))}
         </ul>
-        <div class="saves" data-parallax><div class="sv" data-speed="-0.05"><b>15×</b><span>smaller than JPEG</span></div><div class="sv" data-speed="0.04"><b>94%</b><span>less data</span></div><div class="sv" data-speed="0.12"><b>$49</b><span>saved per million views</span></div></div>
+        <div class="saves" data-parallax><p class="target">Design targets</p><div class="sv" data-speed="-0.05"><b>15×</b><span>smaller than JPEG</span></div><div class="sv" data-speed="0.04"><b>94%</b><span>less data</span></div><div class="sv" data-speed="0.12"><b>$49</b><span>saved per million views</span></div></div>
         <figcaption class="sub-cap"><b>One Live Photo</b><span>The still plus 3 seconds of motion and sound</span></figcaption>
         <ul class="bars" role="list">
           {live.map((r, i) => (
@@ -183,7 +185,7 @@ const chips = [
             </li>
           ))}
         </ul>
-        <div class="saves" data-parallax><div class="sv" data-speed="-0.05"><b>7×</b><span>smaller than Apple’s Live Photo pair</span></div><div class="sv" data-speed="0.04"><b>86%</b><span>less data</span></div><div class="sv" data-speed="0.12"><b>$102</b><span>saved per million views</span></div></div>
+        <div class="saves" data-parallax><p class="target">Design targets</p><div class="sv" data-speed="-0.05"><b>7×</b><span>smaller than Apple’s Live Photo pair</span></div><div class="sv" data-speed="0.04"><b>86%</b><span>less data</span></div><div class="sv" data-speed="0.12"><b>$102</b><span>saved per million views</span></div></div>
         <p class="saves-note">Bandwidth priced at $0.085 per GB, Amazon CloudFront’s US list price for the first 10 TB a month. Against HEIC, a nu-media photo is 7.7× smaller, 87% less, $23 saved per million views.</p>
       </figure>
 
@@ -233,6 +235,7 @@ const chips = [
         <p class="note">1 slot: preview. 20 slots, 7 ticks, 14 s: full screen, in HDR.</p>
       </figure>
 
+      {full && (<>
       <figure class="card" data-scene="reveal">
         <figcaption><b>Video calls, same data</b><span>Quality at 500 kbit/s, 720p, encoded on iPhone Air</span></figcaption>
         <ul class="q500" role="list">
@@ -294,6 +297,8 @@ const chips = [
         </ul>
       </figure>
 
+      </>)}
+
       {videos.map((v) => (
         <figure class="card wide" data-scene="reveal">
           <figcaption><b>{v.title}</b><span>{v.sub}</span></figcaption>
@@ -318,6 +323,7 @@ const chips = [
         </figure>
       ))}
 
+      {full ? (
       <figure class="card wide" data-scene="reveal">
         <figcaption><b>Bits for a good picture</b><span>Bitrate each codec needs to reach VMAF 80 on the 720p clip, and whether an iPhone can do it live</span></figcaption>
         <ul class="need" role="list">
@@ -332,6 +338,13 @@ const chips = [
         </ul>
         <p class="note">Measured on iPhone Air. Apple’s hardware HEVC matches real-time AV1 software at a fraction of the power, so it carries nu-media’s base layer. Apple’s super resolution runs at 459 fps on the Neural Engine, but adds texture the original doesn’t have, so it scores below a plain upscale and never reaches VMAF 80 up to 1.4 Mbit/s. nu-media’s own trained network replaces it.</p>
       </figure>
+      ) : (
+        <a class="card wide more" href="/media">
+          <b>How nu-media video measures today</b>
+          <span>Quality scores against H.264, HEVC and AV1, what the prototype does and doesn’t do yet, and how we test.</span>
+          <span class="go">See the measurements →</span>
+        </a>
+      )}
 
       <figure class="card wide" data-scene="reveal">
         <figcaption><b>Runs on every iPhone with iOS 26</b><span>Neural Engine cores, A13 Bionic to A20 Pro</span></figcaption>
@@ -435,6 +448,11 @@ const chips = [
     color: transparent;
   }
   .sv span { font-size: 1.05rem; color: rgba(255, 255, 255, 0.72); }
+  .saves .target { grid-column: 1 / -1; margin: 0 0 -0.4rem; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+  .more { display: grid; gap: 0.4rem; text-decoration: none; color: inherit; }
+  .more b { font-size: 1.2rem; font-weight: 500; }
+  .more span { color: var(--text-dim); }
+  .more .go { color: #c9c0ff; }
   .saves-note { margin: 0.8rem 0 0; font-size: 0.72rem; color: var(--muted, rgba(255, 255, 255, 0.5)); }
   .sub-cap {
     margin-top: 0.6rem;
