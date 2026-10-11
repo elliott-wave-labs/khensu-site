@@ -9,7 +9,6 @@ import Burst from '../components/creators/Burst.astro';
 import Payouts from '../components/creators/Payouts.astro';
 import FansSee from '../components/creators/FansSee.astro';
 import DataSaving from '../components/creators/DataSaving.astro';
-import Sounds from '../components/creators/Sounds.astro';
 import OwnIt from '../components/creators/OwnIt.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 import data from '../data/creator-pay.json';
@@ -66,6 +65,8 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
 
     <Burst />
 
+    <OwnIt />
+
     <CreatorPay page />
 
     <Payouts />
@@ -74,9 +75,14 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
 
     <DataSaving />
 
-    <Sounds />
-
-    <OwnIt />
+    <section class="sounds-link" id="sounds-section" aria-labelledby="sl-title">
+      <div class="wrap">
+        <p class="eyebrow">ñü.sounds</p>
+        <h2 id="sl-title">Music and healing, in spatial audio.</h2>
+        <p>Artists upload their own music and every play pays 1¢ with no cut. Put on AirPods and hear a song placed all around you.</p>
+        <a class="btn primary" href="/sounds">Listen on ñü.sounds</a>
+      </div>
+    </section>
 
     <section class="section old" id="old-deal-section" aria-labelledby="old-title">
       <div class="wrap">
@@ -229,6 +235,22 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
 </script>
 
 <style>
+  .sounds-link {
+    padding: clamp(5rem, 10vw, 8rem) 0;
+    text-align: center;
+    background: radial-gradient(50rem 24rem at 50% 50%, rgba(79, 176, 255, 0.12), transparent 70%), #000;
+  }
+  .sounds-link h2 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    letter-spacing: -0.03em;
+    margin: 0.4rem 0 1rem;
+  }
+  .sounds-link p:not(.eyebrow) {
+    color: var(--muted, #9aa0a6);
+    max-width: 36rem;
+    margin: 0 auto 1.8rem;
+    line-height: 1.55;
+  }
   .cr {
     background: #000;
   }

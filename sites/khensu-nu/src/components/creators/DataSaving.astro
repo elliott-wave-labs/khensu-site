@@ -11,18 +11,9 @@ const h264 = at['h264-hw'];
 const hevc = at['hevc-hw'];
 const r1 = (v: number) => Math.round(v);
 
-// Bits ñü.media needs for the picture H.264 gives at its top rung.
-const top = [...codecs['h264-hw'].points].sort((a, b) => b.actual_kbps - a.actual_kbps)[0];
-const pts = [...codecs['nu-media'].points].sort((a, b) => a.actual_kbps - b.actual_kbps);
-let need = top.actual_kbps;
-for (let i = 1; i < pts.length; i++) {
-  const [a, b] = [pts[i - 1], pts[i]];
-  if (a.vmaf <= top.vmaf && b.vmaf >= top.vmaf) {
-    need = a.actual_kbps + ((top.vmaf - a.vmaf) / (b.vmaf - a.vmaf)) * (b.actual_kbps - a.actual_kbps);
-    break;
-  }
-}
-const less = Math.round((1 - need / top.actual_kbps) * 100);
+// Video bitrate of the 720p source file from Instagram, measured with ffprobe.
+const ORIGINAL_KBPS = 2438;
+const less = Math.round((1 - nu.actual_kbps / ORIGINAL_KBPS) * 100);
 
 const SERIES = [
   { k: 'nu-media', name: 'ñü.media', cls: 'nu' },
@@ -30,7 +21,7 @@ const SERIES = [
   { k: 'h264-hw', name: 'H.264, iPhone hardware', cls: 'h264' },
   { k: 'av1-svt-rt', name: 'AV1, software on a Mac', cls: 'av1' },
 ];
-const W = 720, H = 360, L = 40, R = 700, T = 16, B = 310;
+const W = 720, H = 360, L = 58, R = 700, T = 16, B = 310;
 const kmin = 40, kmax = 2400;
 const x = (k: number) => L + ((Math.log(k) - Math.log(kmin)) / (Math.log(kmax) - Math.log(kmin))) * (R - L);
 const y = (v: number) => B - (v / 100) * (B - T);
@@ -44,7 +35,7 @@ const lines = SERIES.map((s) => {
   };
 });
 const ticks = [64, 125, 250, 500, 1000, 2000];
-const tl = (k: number) => (k < 1000 ? `${k}k` : `${k / 1000}M`);
+const tl = (k: number) => (k < 1000 ? `${k} kbit/s` : `${k / 1000} Mbit/s`);
 const bars = [
   { name: 'ñü.media', v: nu.vmaf, cls: 'nu' },
   { name: 'HEVC', v: hevc.vmaf, cls: 'hevc' },
@@ -67,8 +58,8 @@ const chartLabel =
 
     <figure class="wipe" data-wipe style="--x:50%">
       <video class="wv a" src={`${V}/compare-nu.mp4`} poster={`${V}/compare-nu.webp`} muted loop playsinline preload="none" data-loop width="540" height="960" aria-label="ñü.media at 351 kbit/s"></video>
-      <video class="wv b" src={`${V}/compare-h264.mp4`} poster={`${V}/compare-h264.webp`} muted loop playsinline preload="none" width="540" height="960" aria-label="H.264 at 351 kbit/s"></video>
-      <span class="wl l" aria-hidden="true"><b>H.264</b>{r1(h264.actual_kbps)} kbit/s · VMAF {r1(h264.vmaf)}</span>
+      <video class="wv b" src={`${V}/compare-h264.mp4`} poster={`${V}/compare-h264.webp`} muted loop playsinline preload="none" width="540" height="960" aria-label="H.264 at 351 kbit/s, 720p with no ñü upscaling"></video>
+      <span class="wl l" aria-hidden="true"><b>H.264 · 720p</b><span>no ñü upscaling</span><span>{r1(h264.actual_kbps)} kbit/s · VMAF {r1(h264.vmaf)}</span></span>
       <span class="wl r" aria-hidden="true"><b>ñü.media</b>{r1(nu.actual_kbps)} kbit/s · VMAF {r1(nu.vmaf)}</span>
       <span class="wbar" aria-hidden="true"><i></i></span>
       <label class="wrange">
@@ -93,16 +84,16 @@ const chartLabel =
       </figure>
       <div class="ds-card big">
         <b class="ds-big" data-count data-to={less} data-suf="%">{less}%</b>
-        <span>less data than H.264 for the same picture</span>
+        <span>less data than the 720p original</span>
         <small>
-          ñü.media reaches H.264’s best here, VMAF {r1(top.vmaf)} at {(top.actual_kbps / 1000).toFixed(1)} Mbit/s, at about {r1(need)} kbit/s.
-          Benchmark
+          Instagram’s 720p file of this reel carries {(ORIGINAL_KBPS / 1000).toFixed(1)} Mbit/s of video. ñü.media sends
+          {r1(nu.actual_kbps)} kbit/s, and the fan’s device rebuilds the picture. Benchmark
         </small>
       </div>
     </div>
 
     <figure class="ds-card chart" data-scene="reveal">
-      <figcaption><b>How the picture holds up as the data drops</b><span>The whole {Math.round((run as any).seconds)}-second reel, 720 × 1280, encoded on iPhone Air. Benchmark</span></figcaption>
+      <figcaption><b>A sharper picture from less data</b><span>Higher means a sharper picture. Further left means less data sent. Each line is one way of sending the whole {Math.round((run as any).seconds)}-second reel from an iPhone Air, and ñü.media’s is highest at almost every point. Benchmark</span></figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={chartLabel}>
         {[0, 25, 50, 75, 100].map((v) => (
           <g class="gy"><line x1={L} x2={R} y1={y(v)} y2={y(v)} /><text x={L - 8} y={y(v) + 4}>{v}</text></g>
@@ -116,7 +107,8 @@ const chartLabel =
             {l.dots.map((d, j) => <circle cx={d.cx} cy={d.cy} r="4" style={`--j:${j}`} />)}
           </g>
         ))}
-        <text class="axis" x={(L + R) / 2} y={B + 44}>bits per second, actual (log scale)</text>
+        <text class="axis" x={(L + R) / 2} y={B + 44}>data sent per second</text>
+        <text class="axis" transform={`translate(14 ${(T + B) / 2}) rotate(-90)`}>picture quality, 0 to 100</text>
       </svg>
       <ul class="key" role="list">
         {SERIES.map((s) => <li class={s.cls}><i></i>{s.name}</li>)}
@@ -199,6 +191,7 @@ const chartLabel =
     -webkit-backdrop-filter: blur(14px) saturate(170%);
     font-variant-numeric: tabular-nums;
   }
+  .wl > span { display: block; }
   .wl b {
     font-size: 0.92rem;
     color: #fff;

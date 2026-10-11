@@ -531,3 +531,28 @@ input[type='range']::-webkit-slider-thumb {
 }
 input[type='range']::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(30, 143, 255, 0.35), 0 0 16px rgba(30, 143, 255, 0.7); }
 input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgba(34, 245, 154, 0.55), 0 0 18px rgba(30, 143, 255, 0.8); }
+
+/* Sound toggle on the creator reels */
+.sound-btn {
+  position: absolute;
+  z-index: 5;
+  left: 4cqw;
+  top: 26cqw;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.45em 0.8em 0.45em 0.6em;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 20, 24, 0.42);
+  backdrop-filter: blur(14px) saturate(1.6);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  color: #fff;
+  font: 600 max(11px, 3.4cqw) / 1 var(--font-sans, system-ui);
+  cursor: pointer;
+}
+.sound-btn svg { width: 1.3em; height: 1.3em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sound-btn svg path:first-child { fill: currentColor; }
+.sound-btn .on, .sound-btn[aria-pressed='true'] .off { display: none; }
+.sound-btn[aria-pressed='true'] .on { display: inline; }
+.sound-btn:focus-visible { outline: 2px solid #4fb0ff; outline-offset: 2px; }

@@ -45,7 +45,7 @@ const floats = [
       <p class="crh-lede">Paid straight to your wallet, and every right to your work stays yours, like nowhere else.</p>
       <div class="crh-cta">
         <a class="btn primary" href="#creator-pay-section">See what you keep</a>
-        <a class="btn" href="#sounds-section">Hear Sounds</a>
+        <a class="btn" href="/sounds">Hear ñü.sounds</a>
       </div>
     </div>
 
@@ -53,11 +53,12 @@ const floats = [
       <div class="crh-phone">
         <Phone label="A creator’s reel playing in the khensu.ñü app, with a Tip button">
           <div class="hwipe" data-wipe style="--x:50%">
-            <video class="reel" src={`${V}/hero-4k.mp4`} poster={`${V}/hero-4k.webp`} muted loop playsinline autoplay preload="auto" data-loop width="1206" height="2622" aria-label="4K, upscaled from 720p by ñü.media on the Neural Engine, shown at iPhone 18 Pro resolution"></video>
+            <video class="reel" src={`${V}/hero-4k.mp4`} poster={`${V}/hero-4k.webp`} muted loop playsinline autoplay preload="auto" data-loop data-audio width="1206" height="2622" aria-label="4K, upscaled from 720p by ñü.media on the Neural Engine, shown at iPhone 18 Pro resolution"></video>
             <video class="reel b" src={`${V}/hero-720.mp4`} poster={`${V}/hero-720.webp`} muted loop playsinline autoplay preload="auto" width="1206" height="2622" aria-label="The 720p original"></video>
             <span class="hw-l l" aria-hidden="true"><b>720p</b>original</span>
             <span class="hw-l r" aria-hidden="true"><b>4K</b>ñü upscale</span>
             <span class="hw-bar" aria-hidden="true"><i></i></span>
+            <button class="sound-btn" type="button" data-sound aria-pressed="false" title="5.1 sound, spatial with AirPods and AirPods Max"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" /><path class="on" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" /><path class="off" d="m16.5 9.5 5 5m0-5-5 5" /></svg><span>Sound</span></button>
             <label class="hw-range">
               <span class="sr">Compare the 720p original with the 4K ñü upscale</span>
               <input type="range" min="0" max="100" value="50" step="1" />
@@ -78,7 +79,7 @@ const floats = [
       ))}
     </div>
   </div>
-  <p class="wrap crh-credit">Video: @deemsterhotline on Instagram, used with thanks. The phone compares the 720p original with its 4K ñü.media upscale, made on the Neural Engine, at iPhone 18 Pro resolution.</p>
+  <p class="wrap crh-credit">Video: @deemsterhotline on Instagram, used with thanks. The phone compares the 720p original with its 4K ñü.media upscale, made on the Neural Engine, at iPhone 18 Pro resolution. Tap Sound to listen; it plays in 5.1, upmixed from the stereo original, so AirPods Pro, AirPods 3 and later, and AirPods Max render it as spatial audio.</p>
 </section>
 
 <style>

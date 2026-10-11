@@ -12,7 +12,7 @@ for f in "$STUDIO"/src/components/khensu/*.astro; do
 done
 cp "$K"/scripts/*.ts "$STUDIO/src/scripts/"
 mkdir -p "$STUDIO/src/data" && cp "$K"/data/*.ts "$K"/data/*.json "$STUDIO/src/data/"
-for d in shell codec; do
+for d in shell codec hero; do
   rsync -a --delete "$HERE/sites/khensu-nu/public/khensu/$d/" "$STUDIO/public/khensu/$d/"
 done
 sed 's/--accent: #18e0c8;/--accent: #f59e0b;/' "$K/styles/global.css" > "$STUDIO/src/styles/global.css"

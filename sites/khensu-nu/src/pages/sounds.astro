@@ -1,0 +1,646 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import Sounds from '../components/creators/Sounds.astro';
+import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
+import levels from '../data/first-attempt-levels.json';
+
+const S = '/khensu/sounds';
+const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
+// Speaker positions in degrees clockwise from straight ahead, in the order of the 5.1 channels.
+const spk = [
+  { c: 'FL', a: -30 },
+  { c: 'FR', a: 30 },
+  { c: 'FC', a: 0 },
+  { c: 'BL', a: -110 },
+  { c: 'BR', a: 110 },
+];
+const R = 132;
+const pos = (a: number) => {
+  const r = (a * Math.PI) / 180;
+  return { x: 160 + R * Math.sin(r), y: 160 - R * Math.cos(r) };
+};
+---
+
+<Base
+  title="ñü.sounds"
+  description="ñü.sounds: music and healing sounds straight from the artist, in spatial audio. Every play pays the artist 1¢ with no cut, and it all plays privately. Listen to First Attempt (Demo) by khensu.ñü in 5.1 with AirPods."
+>
+  <div class="khensu sp">
+    <section class="sp-hero" aria-labelledby="sp-title">
+      <div class="wrap sp-head">
+        <p class="eyebrow">ñü.sounds</p>
+        <h1 id="sp-title">Hear it all around you.<em>Music and healing, straight from the artist.</em></h1>
+        <p class="sp-lede">
+          <strong>Put on AirPods and press play.</strong> Songs on ñü.sounds can carry a spatial mix, so the music sits
+          around you instead of between your ears, and stays put when you turn your head.
+        </p>
+      </div>
+
+      <div class="wrap sp-player" data-spatial>
+        <div class="sp-glass">
+          <img class="sp-bloom" src={`${S}/first-attempt.webp`} alt="" aria-hidden="true" width="273" height="466" />
+          <div class="sp-card">
+            <img class="sp-art" src={`${S}/first-attempt.webp`} alt="Cover of More Of The Same by khensu.ñü" width="273" height="466" />
+            <div class="sp-meta">
+              <p class="sp-k">Now playing</p>
+              <p class="sp-t">First Attempt (Demo)</p>
+              <p class="sp-by">khensu.ñü · More Of The Same · 2008</p>
+              <div class="sp-ctl">
+                <button class="sp-play" type="button" data-play data-state="play" aria-label="Play">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path class="i-play" d="M8 5.5v13l10.5-6.5z" />
+                    <path class="i-pause" d="M7.5 5h3v14h-3zM13.5 5h3v14h-3z" />
+                    <path class="i-replay" d="M12 5V2L7.5 6 12 10V7a5.5 5.5 0 1 1-5.5 5.5H4.5A7.5 7.5 0 1 0 12 5z" />
+                  </svg>
+                </button>
+                <div class="sp-time">
+                  <label class="sr" for="sp-seek">Position in the song</label>
+                  <input id="sp-seek" type="range" min="0" max="400" step="0.1" value="0" data-seek style="--p:0%" />
+                  <span><span data-cur>0:00</span><span data-dur>6:40</span></span>
+                </div>
+                <button class="sp-loop" type="button" data-loop aria-pressed="false" aria-label="Loop">
+                  <i aria-hidden="true"></i>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4" /></svg>
+                </button>
+              </div>
+              <p class="sp-fmt">nu-audio · Opus 5.1 · 48 kHz · 12 MB for 6:40</p>
+            </div>
+            <audio preload="none" data-audio>
+              <source src={`${S}/first-attempt-51.mp4`} type='audio/mp4; codecs="opus"' />
+              <source src={`${S}/first-attempt-51.m4a`} type='audio/mp4; codecs="mp4a.40.2"' />
+            </audio>
+          </div>
+        </div>
+
+        <figure class="sp-room">
+          <svg viewBox="0 0 320 320" role="img" aria-label="Where the sound comes from: five speakers around your head, lighting up with the music">
+            <defs>
+              <radialGradient id="sp-glow">
+                <stop offset="0" stop-color="#6dffbf" />
+                <stop offset="0.5" stop-color="#4fb0ff" stop-opacity="0.55" />
+                <stop offset="1" stop-color="#8b5cff" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <circle class="ring" cx="160" cy="160" r={R} />
+            <circle class="ring in" cx="160" cy="160" r={R * 0.55} />
+            <circle class="lfe" cx="160" cy="160" r="62" fill="url(#sp-glow)" data-ch="3" />
+            {spk.map((s) => {
+              const p = pos(s.a);
+              return (
+                <g class="spk" transform={`translate(${p.x} ${p.y})`}>
+                  <circle class="halo" r="26" fill="url(#sp-glow)" data-ch={['FL', 'FR', 'FC', 'LFE', 'BL', 'BR'].indexOf(s.c)} />
+                  <circle class="dot" r="5" />
+                  <text y={s.a === 0 ? -14 : Math.abs(s.a) > 90 ? 22 : -14}>{({ FL: 'L', FR: 'R', FC: 'C', BL: 'SL', BR: 'SR' } as Record<string, string>)[s.c]}</text>
+                </g>
+              );
+            })}
+            <g class="head" transform="translate(160 160)">
+              <ellipse rx="17" ry="20" />
+              <path d="M-5 -19 0 -27 5 -19" />
+              <rect x="-22" y="-6" width="6" height="13" rx="3" />
+              <rect x="16" y="-6" width="6" height="13" rx="3" />
+            </g>
+          </svg>
+          <figcaption>
+            Left, centre and right in front, two surrounds behind, and the low end all around. Each light follows that
+            channel’s level as the song plays.
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="wrap sp-how">
+        <div>
+          <b>How to hear it</b>
+          <p>
+            Use AirPods Pro, AirPods (3rd generation or later) or AirPods Max on an iPhone, iPad or Mac, in Safari. Turn
+            on Spatial Audio from Control Centre if it’s off, and choose Head Tracked to keep the music fixed in the room.
+          </p>
+        </div>
+        <div>
+          <b>What you’re hearing</b>
+          <p>
+            A 5.1 mix coded in nu-audio, the Opus-based audio of ñü.media: the whole 6:40 song in 12 MB. It was
+            recorded in GarageBand in stereo in 2008, and this demo spreads it to six channels with a simple matrix
+            upmix. Artists who mix in 5.1, 7.1.4 or ambisonics upload those mixes as they are.
+          </p>
+        </div>
+        <div>
+          <b>Without AirPods</b>
+          <p>
+            Any headphones or speakers play it too: your device folds the six channels down to stereo. Browsers that
+            can’t play Opus get the same mix in AAC.
+          </p>
+        </div>
+      </div>
+
+      <div class="wrap sp-auto" aria-labelledby="sp-auto-title">
+        <p class="eyebrow">auto spatial · akashic</p>
+        <h2 id="sp-auto-title">Every stereo song, placed in the room it belongs in.</h2>
+        <p class="sp-auto-lede">
+          For Akashic members, songs without a spatial mix get one on your own iPhone, iPad or Mac. Nothing is sent
+          anywhere. In development: the design is published.
+        </p>
+        <ul class="sp-venues" role="list">
+          <li><b>Concert hall</b><span>Strings and choir across the stage, two seconds of hall around you</span></li>
+          <li><b>Small room</b><span>A voice and a guitar an arm’s length away</span></li>
+          <li><b>Rock club</b><span>Guitars left and right, the drums wide, the crowd behind you</span></li>
+          <li><b>EDM festival</b><span>Kick and sub dead centre, synths wrapping all the way round</span></li>
+        </ul>
+        <div class="sp-auto-grid">
+          <div>
+            <b>It listens first</b>
+            <p>Apple’s sound classifier and our room model run on the Neural Engine. On-device Apple Intelligence reads what they found and picks the venue, and tells you why. Never Private Cloud Compute.</p>
+          </div>
+          <div>
+            <b>Every instrument, every frequency</b>
+            <p>The song is separated into vocals, drums, bass, instruments and ambience. Bass stays centred, mids sit where each instrument plays, and the air above 6 kHz opens up and rises, the way your ears expect.</p>
+          </div>
+          <div>
+            <b>Nothing added, nothing lost</b>
+            <p>The parts always add back up to the original, so folding it to stereo gives you the artist’s master. One tap plays the original, and artists can switch auto spatial off for their songs.</p>
+          </div>
+          <div>
+            <b>Rated by what you hear</b>
+            <p>We’re retiring kbit/s as a measure of quality. ñü.fidelity scores how close a file sounds to the master, from 0 to 100, and our Neural Engine codec aims for the same score as the best Opus in half the size.</p>
+          </div>
+        </div>
+        <a class="btn" href="https://github.com/elliott-wave-labs/khensu-specs/blob/main/design/nu-spatial.md">Read the design</a>
+      </div>
+    </section>
+
+    <ProductBar name="ñü.sounds" action={appLabel} href={APP_STORE_URL} />
+    <Sounds />
+
+    <section class="sp-close">
+      <div class="wrap">
+        <p>
+          Every play pays the artist 1¢ with no cut, and what you buy is yours to keep offline.
+          <a href="/creators">See what creators keep</a>
+        </p>
+      </div>
+    </section>
+  </div>
+  <script type="application/json" id="sp-levels" set:html={JSON.stringify(levels)} />
+</Base>
+
+<script>
+  import '../scripts/creators.ts';
+  import '../scripts/spatial.ts';
+</script>
+
+<style>
+  .sp {
+    background: #000;
+  }
+  .sp-hero {
+    padding: clamp(8rem, 16vw, 11rem) 0 clamp(4rem, 8vw, 6rem);
+    background:
+      radial-gradient(60rem 30rem at 50% 30%, rgba(79, 176, 255, 0.12), transparent 70%),
+      radial-gradient(40rem 24rem at 80% 70%, rgba(139, 92, 255, 0.1), transparent 70%),
+      #000;
+  }
+  .sp-head {
+    text-align: center;
+    max-width: 52rem;
+  }
+  .sp-head h1 {
+    font-size: clamp(2.6rem, 7vw, 5.4rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    margin: 0.4rem 0 1.4rem;
+  }
+  .sp-head h1 em {
+    display: block;
+    font-style: normal;
+    background: linear-gradient(90deg, #22f59a, #1e8fff 50%, #8b5cff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sp-lede {
+    color: var(--muted, #9aa0a6);
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    line-height: 1.55;
+    max-width: 40rem;
+    margin: 0 auto;
+  }
+  .sp-lede strong {
+    color: #fff;
+  }
+  .sp-player {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+  }
+  .sp-glass {
+    position: relative;
+    isolation: isolate;
+  }
+  .sp-bloom {
+    position: absolute;
+    inset: 8% 4% 8% 10%;
+    width: 86%;
+    height: 84%;
+    object-fit: cover;
+    border-radius: 50%;
+    filter: blur(48px) saturate(1.6);
+    opacity: 0.55;
+    z-index: -1;
+  }
+  .sp-glass::before {
+    content: '';
+    position: absolute;
+    inset: 20% -6% -8% 40%;
+    border-radius: 50%;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    filter: blur(60px);
+    opacity: 0.35;
+    z-index: -1;
+  }
+  .sp-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 1.4rem;
+    align-items: center;
+    padding: 1.4rem;
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.07)),
+      rgba(30, 32, 40, 0.18);
+    backdrop-filter: blur(28px) saturate(1.9) brightness(1.08);
+    -webkit-backdrop-filter: blur(28px) saturate(1.9) brightness(1.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 0 40px rgba(255, 255, 255, 0.05),
+      0 30px 80px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+  }
+  .sp-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(120% 60% at 20% 0%, rgba(255, 255, 255, 0.14), transparent 55%);
+    pointer-events: none;
+  }
+  .sp-art {
+    width: 100%;
+    aspect-ratio: 273 / 466;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  .sp-k {
+    font-size: 0.78rem;
+    margin: 0;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sp-t {
+    font-size: 1.45rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    margin: 0.25rem 0 0.2rem;
+  }
+  .sp-by {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+  .sp-ctl {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin: 1.3rem 0 0.9rem;
+  }
+  .sp-play,
+  .sp-loop {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #fff;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sp-play {
+    width: 3.6rem;
+    height: 3.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -8px 16px rgba(0, 0, 0, 0.18),
+      0 10px 30px rgba(30, 143, 255, 0.45),
+      0 0 40px rgba(139, 92, 255, 0.3);
+    transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.3s, background-color 0.3s;
+  }
+  .sp-play[data-state='pause'],
+  .sp-play[data-state='replay'] {
+    animation: none;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04) 55%, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(16px) saturate(1.8);
+    -webkit-backdrop-filter: blur(16px) saturate(1.8);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+      inset 0 0 18px rgba(255, 255, 255, 0.08),
+      0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  .sp-play:hover {
+    transform: scale(1.06);
+  }
+  .sp-play:active {
+    transform: scale(0.94);
+  }
+  .sp-play:focus-visible,
+  .sp-loop:focus-visible {
+    outline: 2px solid #4fb0ff;
+    outline-offset: 3px;
+  }
+  .sp-play svg {
+    width: 1.45rem;
+    height: 1.45rem;
+    fill: currentColor;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+  }
+  .sp-play path {
+    display: none;
+  }
+  .sp-play[data-state='play'] .i-play,
+  .sp-play[data-state='pause'] .i-pause,
+  .sp-play[data-state='replay'] .i-replay {
+    display: inline;
+  }
+  .sp-loop {
+    width: 2.6rem;
+    height: 2.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.55);
+    transition: color 0.2s;
+  }
+  .sp-loop svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .sp-loop i {
+    position: absolute;
+    top: 0.3rem;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--aura-blue);
+    box-shadow: 0 0 6px var(--aura-blue);
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .sp-loop[aria-pressed='true'] {
+    color: #fff;
+  }
+  .sp-loop[aria-pressed='true'] i {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .sp-time {
+    flex: 1;
+    min-width: 0;
+  }
+  .sp-time input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    margin: 0;
+    border-radius: 999px;
+    background:
+      linear-gradient(90deg, var(--aura-green), var(--aura-blue) 50%, var(--aura-purple)) 0 / var(--p) 100% no-repeat,
+      rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+  }
+  .sp-time input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4), inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+  }
+  .sp-time input::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .sp-time > span {
+    display: flex;
+    justify-content: space-between;
+    font: 500 0.78rem/1 var(--font-mono);
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 0.5rem;
+  }
+  .sp-fmt {
+    font: 500 0.75rem/1.4 var(--font-mono);
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sp-play,
+    .sp-k,
+    .sp-glass::before {
+      animation: none;
+    }
+  }
+  .sp-room {
+    margin: 0;
+    text-align: center;
+  }
+  .sp-room svg {
+    width: min(100%, 26rem);
+    overflow: visible;
+  }
+  .sp-room figcaption {
+    color: var(--muted, #9aa0a6);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    max-width: 24rem;
+    margin: 0.6rem auto 0;
+  }
+  .ring {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.12);
+    stroke-dasharray: 2 5;
+  }
+  .ring.in {
+    stroke: rgba(255, 255, 255, 0.06);
+  }
+  .halo,
+  .lfe {
+    opacity: 0.15;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 0.2s linear, transform 0.2s linear;
+  }
+  .dot {
+    fill: #fff;
+  }
+  .spk text {
+    fill: rgba(255, 255, 255, 0.6);
+    font: 600 10px var(--font-mono);
+    text-anchor: middle;
+  }
+  .head ellipse,
+  .head rect {
+    fill: rgba(255, 255, 255, 0.1);
+    stroke: rgba(255, 255, 255, 0.55);
+  }
+  .head path {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.55);
+    stroke-linejoin: round;
+  }
+  .sp-how {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
+  }
+  .sp-how b {
+    display: block;
+    font-size: 1.02rem;
+    margin-bottom: 0.4rem;
+  }
+  .sp-how p {
+    color: var(--muted, #9aa0a6);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .sp-auto {
+    margin-top: clamp(5rem, 10vw, 8rem);
+    text-align: center;
+  }
+  .sp-auto h2 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    max-width: 48rem;
+    margin: 0.4rem auto 1rem;
+  }
+  .sp-auto-lede {
+    color: var(--muted, #9aa0a6);
+    max-width: 38rem;
+    margin: 0 auto 2.4rem;
+    line-height: 1.55;
+  }
+  .sp-venues {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2.6rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+  .sp-venues li {
+    padding: 1.2rem 1.1rem;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    text-align: left;
+  }
+  .sp-venues b {
+    display: block;
+    margin-bottom: 0.35rem;
+    background: var(--aura);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sp-venues span {
+    color: var(--muted, #9aa0a6);
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  .sp-auto-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.6rem 2.4rem;
+    text-align: left;
+    max-width: 60rem;
+    margin: 0 auto 2.4rem;
+  }
+  .sp-auto-grid b {
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .sp-auto-grid p {
+    color: var(--muted, #9aa0a6);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+  @media (max-width: 860px) {
+    .sp-venues {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .sp-auto-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .sp-close {
+    padding: clamp(4rem, 8vw, 6rem) 0;
+    text-align: center;
+    color: var(--muted, #9aa0a6);
+  }
+  .sp-close a {
+    color: #fff;
+    margin-left: 0.4em;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  @media (max-width: 860px) {
+    .sp-player,
+    .sp-how {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .sp-card {
+      grid-template-columns: 6rem minmax(0, 1fr);
+      padding: 1rem;
+    }
+  }
+</style>

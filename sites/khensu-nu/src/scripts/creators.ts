@@ -84,6 +84,25 @@ for (const v of vids) {
   io.observe(v);
 }
 
+// Sound: one reel at a time, only after a tap. The tracks are 5.1, so Safari spatialises them on AirPods.
+const sounds = [...document.querySelectorAll<HTMLButtonElement>('[data-sound]')];
+const loud = (v: HTMLVideoElement | null) => {
+  for (const b of sounds) {
+    const own = b.parentElement!.querySelector<HTMLVideoElement>('video[data-audio]')!;
+    own.muted = own !== v;
+    b.setAttribute('aria-pressed', String(own === v));
+  }
+};
+for (const b of sounds) {
+  b.addEventListener('click', () => {
+    const v = b.parentElement!.querySelector<HTMLVideoElement>('video[data-audio]')!;
+    if (!v.muted) return loud(null);
+    loud(v);
+    if (v.preload === 'none') v.preload = 'auto';
+    v.play().catch(() => {});
+  });
+}
+
 // Wipe: ñü.media over H.264 at the same bitrate. The divider eases in with scroll until someone drags it.
 for (const wipe of document.querySelectorAll<HTMLElement>('[data-wipe]')) {
   const input = wipe.querySelector<HTMLInputElement>('input[type=range]')!;
