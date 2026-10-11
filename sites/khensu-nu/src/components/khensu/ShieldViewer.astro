@@ -4,13 +4,13 @@
 // finish, inlay tier and mode (shield alone or on the iPhone). The page picks one with a `shield:finish`
 // event { finish, tier }; see pages/buy.astro.
 const GLB = '/khensu/shell/3d/glb';
-const first = `${GLB}/burgundy-standard-shield.glb`;
+const first = `${GLB}/maroon-standard-shield.glb`;
 ---
 
 <div class="viewer" data-glb={GLB}>
   <ew-viewer
     src={first}
-    alt="suñůlink.shield, a burgundy titanium shield for iPhone with the khensu.nu mark inlaid in stone and platinum on the back"
+    alt="suñůlink.shield, a maroon titanium shield for iPhone with the khensu.nu mark inlaid in stone and platinum on the back"
     ar
     ar-label="View in your space"
     camera-controls
@@ -34,7 +34,7 @@ const first = `${GLB}/burgundy-standard-shield.glb`;
   type Finish = { finish: string; tier: 'standard' | 'moldavite' };
   const host = document.querySelector<HTMLElement>('.viewer')!;
   const viewer = host.querySelector('ew-viewer')!;
-  const state = { finish: 'burgundy', tier: 'standard', mode: 'shield' };
+  const state = { finish: 'maroon', tier: 'standard', mode: 'shield' };
 
   const show = () => {
     viewer.setAttribute('src', `${host.dataset.glb}/${state.finish}-${state.tier}-${state.mode}.glb`);

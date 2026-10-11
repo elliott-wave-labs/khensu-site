@@ -19,16 +19,14 @@ D3 = ROOT / "sites/khensu-nu/public/khensu/shell/3d"
 OUT = D3 / "glb"
 
 FINISHES = {
-    "burgundy": ("#5e1a24", "titanium"),
-    "glacier": ("#b9c8d4", "titanium"),
-    "silver": ("#cfd0cf", "titanium"),
+    "maroon": ("#5e1a24", "titanium"),
+    "gold": ("#c9a564", "titanium"),
     "black": ("#232427", "titanium"),
     "brass": ("#ecd59c", "brass"),
 }
 MODELS = [
-    ("burgundy", "standard"), ("glacier", "standard"), ("silver", "standard"), ("black", "standard"),
-    ("brass", "standard"),
-    ("burgundy", "moldavite"), ("glacier", "moldavite"), ("silver", "moldavite"), ("black", "moldavite"),
+    ("maroon", "standard"), ("gold", "standard"), ("black", "standard"), ("brass", "standard"),
+    ("maroon", "moldavite"), ("gold", "moldavite"), ("black", "moldavite"),
 ]
 INLAY_R = 10.2  # mm: the ring's outer edge (51 of the mark's 60-unit radius on a 24 mm square)
 INLAY_LIFT = 0.08  # mm above the back, so the inlay never z-fights with the metal
@@ -128,6 +126,8 @@ def main():
     # Ceramic powder coat: an even, non-metallic satin with a soft sheen and no grain. Bare brass keeps a fine brush.
     body_mats = {
         f: material(f, linear(h), "brass-orm.jpg") if kind == "brass"
+        # Gold ceramic carries metallic pigment; without it the coat reads as yellow paint.
+        else material(f, linear(h), metallic=0.75, roughness=0.36, coat=0.25, coat_rough=0.35) if f == "gold"
         else material(f, linear(h), metallic=0.0, roughness=0.42, coat=0.25, coat_rough=0.35)
         for f, (h, kind) in FINISHES.items()
     }

@@ -12,9 +12,8 @@ const links = {
 };
 
 const titanium = [
-  { id: 'burgundy', name: 'Burgundy', hex: '#5e1a24' },
-  { id: 'glacier', name: 'Glacier', hex: '#b9c8d4' },
-  { id: 'silver', name: 'Silver', hex: '#cfd0cf' },
+  { id: 'maroon', name: 'Maroon', hex: '#5e1a24' },
+  { id: 'gold', name: 'Gold', hex: '#b8955a' },
   { id: 'black', name: 'Black', hex: '#232427' },
 ];
 const editions = [
@@ -239,7 +238,7 @@ const stones = [
 </Base>
 
 <script>
-  const state = { finish: 'burgundy', tier: 'standard' };
+  const state = { finish: 'maroon', tier: 'standard' };
   const closeup = document.querySelector<HTMLImageElement>('.inlay-closeup');
   const send = () => {
     dispatchEvent(new CustomEvent('shield:finish', { detail: { ...state } }));
