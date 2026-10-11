@@ -9,14 +9,14 @@ const stats = [
   { n: 1024, label: 'ML-KEM-1024 on every key exchange, the strongest post-quantum level' },
   { n: 5, label: 'Hops through the mixnet, across operators, networks and countries' },
   { n: 0, label: 'Servers that can read a message, a contact or a payment' },
-  { n: 24, unit: 'h', label: 'At most before every device rotates its keys and heals' },
+  { n: 5, unit: 'min', label: 'Longest any key lives: a new key for every message, every device refreshed at least this often' },
 ];
 
 const guards = [
   { t: 'Only your group can read it', text: 'Messages, calls, photos, files, names, avatars, typing and read receipts are end-to-end encrypted with MLS. Nodes, Apple and we see ciphertext only.' },
   { t: 'Safe from quantum computers', text: 'Every key exchange is ML-KEM-1024 and every signature ML-DSA-87, exactly the NSA’s CNSA 2.0 suite. Nothing recorded today can be opened later.' },
   { t: 'Nobody sees who talks to whom', text: 'Every message crosses five hops. No packet carries a sender, each hop knows only the next one, and fixed-size packets with cover traffic hide when you’re talking.' },
-  { t: 'Heals after a break-in', text: 'Message keys are deleted after use, and every device refreshes its keys at least every 24 hours or 1,000 messages. A device that was compromised and recovered is safe again at its next update.' },
+  { t: 'Heals after a break-in', text: 'Every message is sealed with its own key, deleted after use, and every device refreshes all its keys at least every 5 minutes or 1,000 messages. A device that was compromised and recovered is safe again within 5 minutes.' },
   { t: 'Your phone, locked down', text: 'Keys live in the Secure Enclave and history is unreadable while the phone is locked. App lock, a duress passcode, hidden profiles and panic wipe are built in.' },
   { t: 'Private money', text: 'Shielded payments hide the amount, the sender and the recipient, and are sent through the mixnet. The wallet is yours; we never hold keys or funds.' },
 ];

@@ -163,7 +163,7 @@ Shown as six groups of five digits plus a QR code; the four-word check phrase is
 - Credentials: `KhensuCredential` only.
 - Groups: at most 1,000 leaves. Wire format `mls_private_message` only for application data; handshake messages as `PrivateMessage` too, except external commits.
 - Extensions: `required_capabilities` lists `0xF0B0` and the khensu extensions below. `ratchet_tree` is never sent in Welcome; the tree is fetched by content address (6.5).
-- Update policy: every member commits with a full path at least every 24 h or 1,000 sent messages, and immediately after any add or remove it didn't make.
+- Update policy: every member commits with a full path at least every 5 minutes or 1,000 sent messages, and immediately after any add or remove it didn't make.
 - Skipped keys: at most 1,000 generations per sender, kept at most 7 days. Messages from up to 3 earlier epochs accepted within 7 days.
 - Padding: `PrivateMessage` content padded so that the full fragment set fills a bucket (5.3).
 - Commit size: a full-path commit is about 20 KB in a filled tree but up to about N × 1.6 KB right after bulk adds (813 KB measured at 1,000 devices, `spikes/mls-suite.md`). Commits larger than bucket 8 go on the bulk lane as chunks (6.4) with a small notification message. Groups above 100 devices add at most 50 members per commit, and the committer sends a full-path update after each batch.

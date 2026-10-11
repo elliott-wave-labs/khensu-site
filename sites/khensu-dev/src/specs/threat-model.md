@@ -51,7 +51,7 @@ Each adversary is described by what it can do. "Covered" means the guarantees in
 
 - **C1.** Only the devices that are members of an MLS group in a given epoch can decrypt that epoch's messages. Nodes, us, Apple and the log see ciphertext only.
 - **C2.** Forward secrecy within an epoch: each message key is derived from a per-sender ratchet and deleted after use. Compromising a device reveals no message whose key has already been deleted.
-- **C3.** Post-compromise security: every device commits a full update path at least every 24 hours or 1,000 messages. A compromised device that is no longer under attacker control heals at its next update.
+- **C3.** Post-compromise security: every device commits a full update path at least every 5 minutes or 1,000 messages. A compromised device that is no longer under attacker control heals at its next update.
 - **C4.** New members can't read history from before they joined; removed members can't read anything after the commit that removes them.
 - **C5.** Attachments, profile names, avatars, group names, typing events, read receipts, backups and channel posts are encrypted under keys only members hold.
 - **C6.** All of the above holds against A12.
@@ -60,7 +60,7 @@ Each adversary is described by what it can do. "Covered" means the guarantees in
 
 - **I1.** Every application message is signed by the sender device's ML-DSA-87 key inside the ciphertext. A recipient knows which device and which account sent it, and that it wasn't changed.
 - **I2.** No node can see or verify those signatures, because they are inside the encryption.
-- **I3.** Signature keys rotate with every update commit (24 hours or 1,000 messages) and are erased on rotation. A later device seizure can't produce signatures valid for earlier periods.
+- **I3.** Signature keys rotate with every update commit (5 minutes or 1,000 messages) and are erased on rotation. A later device seizure can't produce signatures valid for earlier periods.
 - **I4.** Retired signature keys are revealed to the group 7 days after rotation, once the late-message window has closed. After that, a saved transcript proves nothing to an outsider. Messages signed with a retired key after its window are rejected. (Subject to the formal model; see 6.)
 - **I5.** Device credentials are bound to the account through the transparency log. Accepting a device requires a valid log entry, an inclusion proof and a quorum of witness cosignatures.
 - **I6.** No one, including us and a malicious log operator, can attach a new device to your account without one of your identity devices (with a 72-hour cancel window when removing your other devices) or your recovery kit.
