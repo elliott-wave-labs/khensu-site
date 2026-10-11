@@ -1,4 +1,5 @@
 ---
+import { APP_STORE_URL } from '../data/app';
 import Base from '../layouts/Base.astro';
 import Hero from '../components/khensu/Hero.astro';
 import AppScreen from '../components/khensu/AppScreen.astro';
@@ -33,8 +34,8 @@ const statement = 'Every phone keeps the same quiet rhythm, all day. Typing, idl
 const specs = [
   { name: '+0 mm', body: 'Level with the lens tops, so your iPhone is no thicker at its thickest point.' },
   { name: '6 Wh', body: 'Its own battery: about 5 hours as a node on its own.' },
-  { name: '87 g', body: 'In titanium. Solid brass is about 126 g.' },
-  { name: 'USB-C', body: 'Charges the shell and passes power to your iPhone.' },
+  { name: '83 g', body: 'In titanium. Solid brass is about 118 g.' },
+  { name: 'USB-C', body: 'Its own port. Your iPhone’s USB-C stays open for charging and accessories.' },
 ];
 
 ---
@@ -43,6 +44,7 @@ const specs = [
   <Hero
     eyebrow="The first app on webE"
     links={[
+      { href: APP_STORE_URL, label: 'App Store · Coming soon' },
       { href: '#run-a-node', label: 'Run a node' },
       { href: 'https://dev.khensu.nu', label: 'Developer docs' },
     ]}

@@ -1,39 +1,145 @@
 ---
 import Base from '../layouts/Base.astro';
+
+// "Patent pending" may only appear once an application is on file (35 U.S.C. 292). Fill in from the USPTO filing
+// receipt; keep in step with khensu-nu/src/components/khensu/PatentNotice.astro.
+const APPLICATION = '';
+const FILED = '';
+
+// Drop physics, from first principles (see the table below for the inputs).
+const g = 9.81;
+const h = 1.5;
+const v = Math.sqrt(2 * g * h);
+const phone = 0.2;
+const shell = 0.083;
+const rigid = 0.1e-3;
+const stroke = 0.3e-3;
+const decel = (d: number) => (v * v) / (2 * d) / g;
+const fmt = (n: number, digits = 0) => n.toLocaleString('en-US', { maximumFractionDigits: digits, minimumFractionDigits: digits });
 ---
 
-<Base title="khensu shell" description="Specifications for the khensu shell for iPhone 18 Pro: a battleproof titanium or brass shell that turns your iPhone into a node.">
+<Base title="khensu shell" description="Specifications for the khensu shell for iPhone 18 Pro: a ceramic-coated titanium node that finishes level with the lenses, paired to your iPhone's Secure Enclave.">
   <p class="eyebrow">khensu shell</p>
   <h1>Your phone becomes part of the network</h1>
   <p class="lede">
-    One shell for iPhone 18 Pro, in your iPhone’s colour, matte titanium or solid brass. It turns the phone into a
-    node with its own battery, and finishes level with the lenses, so your iPhone is no thicker at its thickest point.
+    One shell for iPhone 18 Pro and iPhone 18 Pro Max, coming to iPhone 18 when it arrives. Ceramic-coated titanium in
+    your iPhone’s colour, or solid brass. It turns the phone into a node with its own battery, finishes level with the
+    lenses so your iPhone is no thicker at its thickest point, and leaves the iPhone’s own USB-C port open.
   </p>
 
   <h2>Specifications</h2>
   <table>
     <thead><tr><th>Item</th><th>Specification</th></tr></thead>
     <tbody>
-      <tr><td>Fits</td><td>iPhone 18 Pro</td></tr>
+      <tr><td>Fits</td><td>iPhone 18 Pro and iPhone 18 Pro Max. Coming to iPhone 18 when it arrives.</td></tr>
       <tr><td>Thickness</td><td>4.2 mm on the back, level with the lens tops: +0 mm at the iPhone’s thickest point. A flat back, with only the lenses showing.</td></tr>
-      <tr><td>Footprint</td><td>71.1 × 149.2 mm, inset from the phone’s outline and following its edge curve, so it never overhangs</td></tr>
-      <tr><td>Shell</td><td>CNC-machined grade 5 titanium for a precise fit, matte powder coat in Burgundy, Glacier, Silver or Black. Or bare solid brass (C26000), which darkens to a natural patina.</td></tr>
-      <tr><td>Weight</td><td>About 87 g in titanium, 126 g in brass</td></tr>
-      <tr><td>Battery</td><td>6 Wh, about 5 hours as a node on its own</td></tr>
-      <tr><td>Charging</td><td>USB-C. Charges the shell and passes power to your iPhone.</td></tr>
-      <tr><td>Attachment</td><td>Micro-suction film and MagSafe-compatible magnets</td></tr>
-      <tr><td>Antennas</td><td>A band in the edge, so nearby nodes reach each other directly where there’s no internet</td></tr>
-      <tr><td>Camera</td><td>Clears every lens, flash and sensor</td></tr>
+      <tr><td>Footprint</td><td>71.1 × 149.2 mm, inset 0.4 mm from the phone’s outline and following its edge curve, so it never overhangs</td></tr>
+      <tr><td>Shell</td><td>CNC-machined Grade 5 titanium (Ti-6Al-4V), with a ceramic finish: a plasma electrolytic oxide layer grown from the titanium itself, sealed with a colour-matched ceramic topcoat in Burgundy, Glacier, Silver or Black. Or bare solid brass (C26000), which darkens to a natural patina.</td></tr>
+      <tr><td>Weight</td><td>About 83 g in titanium, 118 g in brass</td></tr>
+      <tr><td>Battery</td><td>6.2 Wh, about 5 hours as a node on its own</td></tr>
+      <tr><td>USB-C</td><td>The shell has its own USB-C port in its bottom edge, above the iPhone’s. The iPhone’s port stays open: charge both at once, from two cables or one dual USB-C cable, and keep using the iPhone’s port for drives, displays, audio and CarPlay.</td></tr>
+      <tr><td>Attachment</td><td>MagSafe-compatible magnet ring and a 0.5 mm micro-suction urethane layer that is also the shock isolator</td></tr>
+      <tr><td>Antennas</td><td>A band in the bottom edge, so nearby nodes reach each other directly where there’s no internet</td></tr>
+      <tr><td>Camera</td><td>Clears every lens, flash and sensor, outside each one’s field of view</td></tr>
     </tbody>
   </table>
   <p class="footnote">
-    Figures from the current CAD model on placeholder iPhone 18 Pro geometry, until Apple’s accessory drawings are
-    available; production figures may change. iPhone and MagSafe are trademarks of Apple Inc.
+    Figures for iPhone 18 Pro, from the current CAD model on placeholder geometry, until Apple’s accessory drawings are
+    available; production figures may change. iPhone, MagSafe and CarPlay are trademarks of Apple Inc.
   </p>
 
-  <h2>Design documents and patents</h2>
-  <p>
-    The full design document, CAD, drawings and patent assessment are published here once the patent assessment is
-    complete. See it on <a href="https://khensu.nu/#shell-title">khensu.nu</a>.
+  <h2>Inside</h2>
+  <table>
+    <thead><tr><th>Part</th><th>Hardware</th></tr></thead>
+    <tbody>
+      <tr><td>Node computer</td><td><a href="https://www.nxp.com/products/i.MX93">NXP i.MX 93</a> (2× Arm Cortex-A55, Cortex-M33, EdgeLock Secure Enclave), 2 GB LPDDR4X, 32 GB eMMC</td></tr>
+      <tr><td>Network guard</td><td><a href="https://www.st.com/en/microcontrollers-microprocessors/stm32u5-series.html">STMicroelectronics STM32U5</a> (Arm Cortex-M33 with TrustZone), running open Rust firmware with post-quantum secure boot. It owns every radio.</td></tr>
+      <tr><td>Mesh radio</td><td>Wi-Fi HaLow (802.11ah), <a href="https://www.morsemicro.com/products/chips/mm6108">Morse Micro MM6108</a></td></tr>
+      <tr><td>Wi-Fi and Bluetooth</td><td><a href="https://www.nxp.com/products/IW612">NXP IW612</a>: Wi-Fi 6, Bluetooth LE, 802.15.4</td></tr>
+      <tr><td>Battery</td><td>Single-cell lithium-ion pouch, 3.85 V, about 1,610 mAh (6.2 Wh), shaped to the shell, with protection and temperature sensing. Certified to IEC 62133-2 and UN 38.3.</td></tr>
+      <tr><td>USB-C Power Delivery</td><td><a href="https://www.ti.com/product/TPS25750">Texas Instruments TPS25750</a> controller</td></tr>
+      <tr><td>Charger</td><td><a href="https://www.ti.com/product/BQ25895">Texas Instruments BQ25895</a>, single cell, with power path</td></tr>
+      <tr><td>Fuel gauge</td><td><a href="https://www.ti.com/product/BQ27427">Texas Instruments BQ27427</a></td></tr>
+      <tr><td>Shock layer</td><td>Microcellular urethane, <a href="https://www.rogerscorp.com/elastomeric-material-solutions">Rogers PORON XRD</a> class, 0.5 mm, with a micro-suction face</td></tr>
+      <tr><td>Board</td><td>34 × 14 × 1.6 mm</td></tr>
+    </tbody>
+  </table>
+  <p class="footnote">
+    Current design choices; parts may change before production. NXP, i.MX, EdgeLock, STMicroelectronics, STM32, Morse
+    Micro, Texas Instruments, Rogers, PORON, Arm, Cortex, TrustZone, Wi-Fi HaLow and Bluetooth are trademarks of their
+    respective owners.
   </p>
+
+  <h2 id="strength">Stronger than the phone</h2>
+  <p>
+    iPhone 18 Pro is an aluminium unibody with a Ceramic Shield back. The shell is Grade 5 titanium, which is stronger
+    and harder than any aluminium alloy used in phones, so on the back it is a shield, not just a cover.
+  </p>
+  <table>
+    <thead><tr><th>Material</th><th>Yield strength</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Grade 5 titanium, Ti-6Al-4V (the shell)</td><td>at least 828 MPa (ASTM B348)</td><td>About 1.6× high-strength aluminium</td></tr>
+      <tr><td>7075-T6 aluminium</td><td>about 500 MPa</td><td>The strongest common 7000-series alloy. Apple doesn’t publish the iPhone 18 Pro alloy.</td></tr>
+      <tr><td>C26000 brass, half hard (the brass shell)</td><td>about 360 MPa</td><td>Softer than titanium; chosen for its antimicrobial surface</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="shock">Drops: the physics</h2>
+  <p>
+    A phone dropped from {h} m hits the ground at √(2gh) ≈ {fmt(v, 1)} m/s. What breaks glass is how fast that speed
+    goes to zero: stopping over a distance d means an average deceleration of v²/2d. A hard metal shell pressed
+    straight onto the phone would pass its own {shell * 1000} g into the phone in a rigid contact that stops within about
+    0.1 mm, around {fmt(decel(rigid))} g.
+  </p>
+  <p>
+    The shell is held on by a 0.5 mm microcellular urethane layer instead. In a back or edge impact the shell stops
+    first and the layer lets the phone decelerate over about 0.3 mm of usable stroke, around {fmt(decel(stroke))} g on
+    average: about a third of the rigid case. The layer firms up at impact speeds and returns to shape after each hit.
+  </p>
+  <table>
+    <thead><tr><th>Input</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Drop height</td><td>{h} m, the usual test height</td></tr>
+      <tr><td>Impact speed</td><td>{fmt(v, 2)} m/s</td></tr>
+      <tr><td>Phone mass</td><td>about {phone * 1000} g</td></tr>
+      <tr><td>Energy at impact</td><td>{fmt(0.5 * phone * v * v, 1)} J for the phone alone, {fmt(0.5 * (phone + shell) * v * v, 1)} J with the shell</td></tr>
+      <tr><td>Rigid stop</td><td>about 0.1 mm: {fmt(decel(rigid))} g average</td></tr>
+      <tr><td>Through the shock layer</td><td>about 0.3 mm of 0.5 mm: {fmt(decel(stroke))} g average</td></tr>
+    </tbody>
+  </table>
+  <p>
+    The shell covers the back and frames the camera. It doesn’t cover the screen, so a drop flat onto the glass is still
+    the iPhone’s Ceramic Shield 2 against the ground. These are first-order estimates; production shells are tested to
+    MIL-STD-810H Method 516.8 drops at 1.2 m and 1.5 m onto steel-backed plywood, with the results published here.
+  </p>
+
+  <h2 id="pairing">Paired to your iPhone’s Secure Enclave</h2>
+  <p>
+    At setup, the khensu app creates a post-quantum ML-DSA-87 key inside your iPhone’s Secure Enclave
+    (<a href="https://developer.apple.com/documentation/cryptokit/enhancing-your-app-s-privacy-and-security-with-quantum-secure-workflows">CryptoKit, iOS 26</a>),
+    usable only with Face ID, and signs the shell’s own identity key with it. The shell keeps its keys sealed in the
+    i.MX 93’s EdgeLock Secure Enclave and takes instructions only from the paired key. It carries only sealed,
+    fixed-size packets on a constant schedule, so it never holds a readable message or learns who is talking to whom.
+    If you lose it, revoke it from your iPhone; there’s nothing on it for the finder to read.
+  </p>
+  <p>
+    No device can honestly be called unhackable. The design goal is narrower and testable: no single compromised part,
+    whether the radio, the node computer or the network, can reveal content, metadata or your identity. The guard
+    chip owns every radio, so even a compromised node computer can’t break the cover pattern. Firmware is open and
+    reproducibly built.
+  </p>
+
+  <h2 id="patents">Design documents and patents</h2>
+  {APPLICATION ? (
+    <p>
+      Patent pending: US application {APPLICATION}, filed {FILED}, covering the lens-level shell, its continuous edge
+      profile, the shock-isolating attachment layer, Secure Enclave pairing and the hardware network guard. The full
+      design document, CAD and drawings are published here as the applications proceed.
+    </p>
+  ) : (
+    <p>
+      The full design document, CAD and drawings are published here once the patent filings are complete.
+    </p>
+  )}
+  <p>See it on <a href="https://khensu.nu/#shell-title">khensu.nu</a>.</p>
 </Base>

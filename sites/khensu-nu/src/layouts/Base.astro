@@ -71,6 +71,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
         publisher: { '@type': 'Organization', name: 'Elliott Wave LLC', url: 'https://elliottwave.studio' },
       })}
     />
+    <slot name="head" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>

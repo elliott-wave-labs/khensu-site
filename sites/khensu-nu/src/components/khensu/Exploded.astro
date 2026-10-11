@@ -6,13 +6,13 @@
 // scripts/scenes.ts.
 const layers = [
   { file: 'phone', label: 'iPhone 18 Pro / Pro Max / 18', short: 'iPhone 18 Pro / Pro Max / 18' },
-  { file: 'suction_film', label: 'Micro-suction film', short: 'Suction film' },
+  { file: 'suction_film', label: 'Shock layer: micro-suction urethane', short: 'Shock layer' },
   { file: 'base', label: 'Base plate', short: 'Base' },
   { file: 'magnet_ring', label: 'MagSafe-compatible magnets', short: 'Magnets' },
   { file: 'pcb', label: 'Node board: NXP i.MX 93, STM32U5 guard', short: 'Node board' },
   { file: 'battery', label: 'Battery: 6 Wh lithium-ion', short: 'Battery' },
   { file: 'window_inserts', label: 'Antenna band: HaLow, Wi-Fi 6, Bluetooth', short: 'Antenna band' },
-  { file: 'housing', label: 'Battleproof titanium shell', short: 'Battleproof titanium shell' },
+  { file: 'housing', label: 'Battleproof ceramic-coated titanium', short: 'Ceramic titanium' },
 ];
 ---
 
@@ -29,10 +29,10 @@ const layers = [
         <dl class="facts">
           <div><dt>Flat</dt><dd>one flat back, no camera bump, only the lenses showing</dd></div>
           <div><dt>6 Wh</dt><dd>its own battery, about 5 hours as a node on its own</dd></div>
-          <div><dt>USB-C</dt><dd>charges the shell and passes power to your iPhone</dd></div>
+          <div><dt>USB-C</dt><dd>its own port, and your iPhone’s stays open</dd></div>
         </dl>
       </div>
-      <div class="stage" role="img" aria-label="The khensu shell for iPhone 18 Pro, Pro Max and 18 arriving in layers and clipping onto the phone: battleproof titanium shell, antenna band, battery, node board, magnets, base plate and suction film above an iPhone.">
+      <div class="stage" role="img" aria-label="The khensu shell for iPhone 18 Pro, Pro Max and 18 arriving in layers and clipping onto the phone: battleproof titanium shell, antenna band, battery, node board, magnets, base plate and shock layer above an iPhone.">
         <img class="shadow" src="/khensu/shell/shadow.png" alt="" width="1600" height="1600" loading="lazy" decoding="async" />
         {layers.map((l, i) => (
           <img class:list={['layer', { phone: i === 0 }]} src={`/khensu/shell/${l.file}.png`} alt="" width="1600" height="1600" style={`--i:${i}`} loading="lazy" decoding="async" />

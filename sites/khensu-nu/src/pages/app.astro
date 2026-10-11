@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
+---
+
+<Base title="khensu.nu on the App Store" description="khensu.nu for iPhone, iPad and Mac is coming soon to the App Store.">
+  {APP_STORE_ID && <meta http-equiv="refresh" content={`0; url=${APP_STORE_URL}`} slot="head" />}
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow">App Store</p>
+      <h1>Coming soon to the App Store.</h1>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap prose">
+      <p>
+        khensu.nu for iPhone, iPad and Mac is on its way to the App Store. This page becomes the App Store link the
+        moment it is live, so it is safe to share now.
+      </p>
+      <p>
+        It needs iOS, iPadOS or macOS 26. Everything runs on your device: no iCloud, no Siri, no server-side
+        processing of any kind.
+      </p>
+      <p><a class="btn primary" href="/#run-a-node">Run a node while you wait</a></p>
+    </div>
+  </section>
+</Base>
