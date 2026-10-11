@@ -19,7 +19,7 @@ const DEFAULT_DESC =
   'khensu.nu is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device.';
 
 const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
-const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — Private by design. Post-quantum. Run by people.`;
+const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — webE, private by design. Post-quantum. Run profitably by the people.`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL('/og.png', Astro.site);
 
@@ -107,6 +107,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
           <li><a href="/#shell-title">Shell</a></li>
           <li><a href="/privacy">Privacy</a></li>
           <li><a href="https://dev.khensu.nu">Developers</a></li>
+          <li><a href="https://dev.khensu.nu/shell">Shell specs</a></li>
           <li><a href="https://dev.khensu.nu/security">Security</a></li>
           <li><a href="https://elliottwave.studio">elliottwave.studio lab</a></li>
         </ul>

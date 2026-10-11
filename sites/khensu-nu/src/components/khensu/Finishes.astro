@@ -90,8 +90,11 @@ const shells = [
     letter-spacing: -0.04em;
     max-width: 20ch;
   }
+  /* Fixed inside the viewport, so focusing a radio when its label is clicked never scrolls the page. */
   .sr {
-    position: absolute;
+    position: fixed;
+    top: 50%;
+    left: 0;
     opacity: 0;
     width: 1px;
     height: 1px;
