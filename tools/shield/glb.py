@@ -20,13 +20,13 @@ OUT = D3 / "glb"
 
 FINISHES = {
     "maroon": ("#5e1a24", "titanium"),
-    "gold": ("#c9a564", "titanium"),
+    "gold": ("#bfa06a", "titanium"),
     "black": ("#232427", "titanium"),
     "brass": ("#ecd59c", "brass"),
 }
 MODELS = [
     ("maroon", "standard"), ("gold", "standard"), ("black", "standard"), ("brass", "standard"),
-    ("maroon", "moldavite"), ("gold", "moldavite"), ("black", "moldavite"),
+    ("maroon", "moldavite"), ("gold", "moldavite"), ("black", "moldavite"), ("brass", "moldavite"),
 ]
 INLAY_R = 10.2  # mm: the ring's outer edge (51 of the mark's 60-unit radius on a 24 mm square)
 INLAY_LIFT = 0.08  # mm above the back, so the inlay never z-fights with the metal

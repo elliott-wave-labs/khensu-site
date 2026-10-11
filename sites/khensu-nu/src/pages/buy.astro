@@ -1,6 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import ShieldViewer from '../components/khensu/ShieldViewer.astro';
+import Turntable from '../components/khensu/Turntable.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import Highlights from '../components/khensu/Highlights.astro';
+import RevealText from '../components/khensu/RevealText.astro';
 
 // Stripe Payment Links for the full price, one per tier (Stripe Dashboard > Payment Links).
 // Until a link is set, that tier's button is shown disabled.
@@ -9,6 +13,7 @@ const links = {
   titanium: import.meta.env.PUBLIC_STRIPE_TITANIUM ?? '',
   brass: import.meta.env.PUBLIC_STRIPE_BRASS ?? '',
   moldavite: import.meta.env.PUBLIC_STRIPE_MOLDAVITE ?? '',
+  'brass-moldavite': import.meta.env.PUBLIC_STRIPE_BRASS_MOLDAVITE ?? '',
 };
 
 const titanium = [
@@ -41,17 +46,25 @@ const editions = [
     body: 'Adds a moldavite node point and Paraíba tourmaline markers to the inlay. Priced for the stones, not for rarity.',
     finishes: titanium,
   },
+  {
+    id: 'brass-moldavite',
+    tier: 'moldavite',
+    name: 'Brass with moldavite',
+    price: 359,
+    body: 'Solid brass with the full inlay: a moldavite node point and Paraíba tourmaline markers.',
+    finishes: [{ id: 'brass', name: 'Brass', hex: '#b8914a' }],
+  },
 ];
 
 // Expected cost per shield at the first production run, in US dollars. Prices sit a few percent above it.
 const parts = [
-  ['Electronics and battery', 78, 78, 78],
-  ['Machined housing', 87, 62, 87],
-  ['Stone inlay, cut and set', 45, 45, 125],
-  ['Platinum line, laid by hand', 15, 15, 15],
-  ['Assembly and testing', 12, 12, 12],
-  ['Packaging and USB-C cable', 8, 8, 8],
-  ['Certification, per unit', 5, 5, 5],
+  ['Electronics and battery', 78, 78, 78, 78],
+  ['Machined housing', 87, 62, 87, 62],
+  ['Stone inlay, cut and set', 45, 45, 125, 125],
+  ['Platinum line, laid by hand', 15, 15, 15, 15],
+  ['Assembly and testing', 12, 12, 12, 12],
+  ['Packaging and USB-C cable', 8, 8, 8, 8],
+  ['Certification, per unit', 5, 5, 5, 5],
 ] as const;
 const costs = editions.map((e, i) => {
   const unit = parts.reduce((s, p) => s + (p[i + 1] as number), 0);
@@ -69,25 +82,45 @@ const stones = [
   { name: 'Black onyx', img: 'onyx', where: 'A node point in the disc', note: 'Deep, polished black. From Brazil.', chakra: 'Root', meaning: 'Strength and grounding. A shield that keeps what is yours, yours.' },
   { name: 'Bloodstone', img: 'bloodstone', where: 'The ring', note: 'Green with red flecks, in every shield. From India.', chakra: 'Root and heart', meaning: 'Courage and vitality. Carried by warriors for endurance.' },
   { name: 'Blue kyanite', img: 'kyanite', where: 'A node point in the disc', note: 'Bladed blue that shifts with the light, in every shield. From Brazil.', chakra: 'Throat', meaning: 'Clear communication and alignment. Said never to hold on to negative energy.' },
-  { name: 'Tourmaline', img: 'tourmaline', where: 'Twelve markers in the ring', note: 'Pink, green, blue, canary and watermelon, with neon Paraíba in titanium with moldavite. From Brazil and Mozambique.', chakra: 'All seven, by colour; Paraíba for throat and heart', meaning: 'Balance and protection. Watermelon tourmaline joins the heart’s pink and green.' },
-  { name: 'Moldavite', img: 'moldavite', where: 'A second node point in the disc', note: 'Green glass from a meteorite strike, found only in Czechia. In titanium with moldavite.', chakra: 'Heart and crown', meaning: 'Rapid change and awakening. Born of a meteorite strike 15 million years ago.' },
+  { name: 'Tourmaline', img: 'tourmaline', where: 'Twelve markers in the ring', note: 'Pink, green, blue, canary and watermelon, with neon Paraíba in the moldavite tiers. From Brazil and Mozambique.', chakra: 'All seven, by colour; Paraíba for throat and heart', meaning: 'Balance and protection. Watermelon tourmaline joins the heart’s pink and green.' },
+  { name: 'Moldavite', img: 'moldavite', where: 'A second node point in the disc', note: 'Green glass from a meteorite strike, found only in Czechia. In the moldavite tiers.', chakra: 'Heart and crown', meaning: 'Rapid change and awakening. Born of a meteorite strike 15 million years ago.' },
 ];
 ---
 
 <Base title="Pre-order suñůlink.shield" description="Pre-order suñůlink.shield: a post-quantum node in titanium or brass, made in Morocco, with the khensu.nu mark inlaid flush in bloodstone, lapis, labradorite, onyx, kyanite and tourmaline, with platinum.">
-  <section class="page-head">
-    <div class="wrap">
-      <p class="eyebrow">suñůlink.shield · pre-order</p>
-      <h1>Made in Morocco. <em>Inlaid with stone.</em></h1>
-      <p class="lede">
-        A post-quantum node for your iPhone, machined from titanium or brass, with the khensu.nu mark set flush into
-        the back in natural stone with a line of platinum. Every inlay is cut from its own stones, so no two are
-        the same.
+  <Turntable frames={48} base="/khensu/renders/turn/" name="suñůlink.shield" alt="suñůlink.shield in solid brass, turning to show the khensu.nu mark inlaid in stone and platinum on the back">
+    Made in Morocco.<br /><em>Inlaid with stone.</em>
+  </Turntable>
+
+  <ProductBar name="suñůlink.shield" action="Pre-order" href="#order" explore="/shield" />
+
+  <section class="price-band">
+    <div class="wrap price-in" data-reveal>
+      <p>
+        A post-quantum node for your iPhone in titanium or brass, with the khensu.nu mark set flush into the back
+        in natural stone and platinum.
       </p>
+      <div class="price-cta">
+        <span><b>From ${Math.min(...editions.map((e) => e.price))}</b> · Expected to ship {SHIPS}</span>
+        <a class="btn primary" href="#order">Pre-order</a>
+      </div>
     </div>
   </section>
 
-  <section class="section buy">
+  <Highlights
+    title="Get the highlights."
+    cards={[
+      { img: '/khensu/renders/macro.webp', alt: 'Macro of the inlay: labradorite, a lapis crescent, a bloodstone ring with tourmaline markers, kyanite and onyx points, set into brushed brass', text: 'The khensu.nu mark in natural stone, lapped flush with the metal.', fit: 'cover' },
+      { img: '/khensu/renders/hero.webp', alt: 'suñůlink.shield in maroon ceramic-coated titanium, angled', text: 'Ceramic-coated titanium in maroon, gold or black.' },
+      { img: '/khensu/renders/lineup.webp', alt: 'Four shields side by side: maroon, gold and black titanium, and solid brass', text: 'Four finishes. One inlay, cut from its own stones.' },
+      { img: '/khensu/renders/phone.webp', alt: 'suñůlink.shield in maroon on the back of an iPhone 18 Pro', text: 'Made for iPhone 18 Pro and Pro Max.' },
+    ]}
+  />
+
+  <section class="section buy" id="order">
+    <div class="wrap order-head" data-reveal>
+      <h2 class="big">Choose yours.</h2>
+    </div>
     <div class="wrap buy-grid">
       <ShieldViewer />
 
@@ -135,20 +168,29 @@ const stones = [
     </div>
   </section>
 
+  <section class="story">
+    <div class="wrap story-head" data-reveal>
+      <p class="story-eyebrow">The inlay</p>
+      <h2 class="story-title">The mark, in stone.<br />Flush to the metal.</h2>
+    </div>
+    <img class="story-render" src="/khensu/renders/macro.webp" width="1600" height="1200" loading="lazy" decoding="async" alt="Macro of the inlay: a labradorite disc, a lapis crescent with its platinum line, a bloodstone ring with tourmaline markers, and kyanite and onyx points, set flush into brushed brass." />
+    <div class="wrap">
+      <RevealText
+        parts={[
+          ['Each stone is '],
+          ['cut by machine to the shape of its part of the mark', true],
+          [', set into a pocket milled in the back and lapped down with the metal until '],
+          ['the surface is one smooth plane you can’t feel with a fingernail', true],
+          ['. The platinum line is laid in by hand, '],
+          ['the way Meknes craftspeople have inlaid silver into steel for centuries', true],
+          ['.'],
+        ]}
+      />
+    </div>
+  </section>
+
   <section class="section">
     <div class="wrap">
-      <div class="inlay-head">
-        <div>
-      <p class="eyebrow">The inlay</p>
-      <h2 class="big">The mark, in stone. <em>Flush to the metal.</em></h2>
-      <p class="lede narrow">
-        Each stone is cut by machine to the shape of its part of the mark, set into a pocket milled in the back and
-        lapped down with the metal until the surface is one smooth plane you can’t feel with a fingernail. The platinum
-        line is laid in by hand, in the way Meknes craftspeople have inlaid silver into steel for centuries.
-      </p>
-        </div>
-        <img class="inlay-closeup" src="/khensu/stones/inlay-standard.png" width="1024" height="1024" loading="lazy" decoding="async" alt="Close-up of the inlay: the khensu.nu mark with a bloodstone ring, a lapis crescent and a labradorite disc, tourmaline markers in the ring and kyanite and onyx points in the disc." />
-      </div>
       <ul class="stones" role="list">
         {stones.map((s) => (
           <li>
@@ -238,6 +280,12 @@ const stones = [
 </Base>
 
 <script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
+    items.forEach((el) => { if (el.getBoundingClientRect().top > innerHeight) io.observe(el); else el.classList.add('in'); });
+    document.documentElement.classList.add('reveal-ready');
+  }
   const state = { finish: 'maroon', tier: 'standard' };
   const closeup = document.querySelector<HTMLImageElement>('.inlay-closeup');
   const send = () => {
@@ -274,6 +322,27 @@ const stones = [
 
 <style>
   .narrow { max-width: 46rem; }
+  .price-band { background: #000; padding: clamp(2.5rem, 6vw, 4rem) 0; border-bottom: 1px solid var(--line); }
+  .price-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.2rem 3rem; }
+  .price-in p { margin: 0; max-width: 40rem; color: var(--text-dim); font-size: clamp(1.05rem, 1.6vw, 1.25rem); }
+  .price-cta { display: flex; align-items: center; gap: 1.2rem; }
+  .price-cta b { color: var(--text); font-weight: 600; }
+  .order-head { margin-bottom: 2rem; }
+  .story { background: #000; padding: clamp(5rem, 12vw, 10rem) 0; }
+  .story-head { text-align: center; }
+  .story-eyebrow { margin: 0 0 0.8rem; color: var(--text-dim); font-size: clamp(1.05rem, 1.8vw, 1.4rem); font-weight: 500; }
+  .story-title { margin: 0; font-size: clamp(2.6rem, 6.5vw, 5.5rem); font-weight: 600; letter-spacing: -0.035em; line-height: 1.04; }
+  .story-render {
+    display: block;
+    width: min(100%, 1400px);
+    height: auto;
+    margin: clamp(2rem, 6vw, 4rem) auto;
+    -webkit-mask-image: radial-gradient(75% 70% at 50% 50%, #000 55%, transparent 100%);
+    mask-image: radial-gradient(75% 70% at 50% 50%, #000 55%, transparent 100%);
+  }
+  [data-reveal] { transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), translate 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  :global(.reveal-ready) [data-reveal]:not(.in) { opacity: 0; translate: 0 40px; }
+  @media (prefers-reduced-motion: reduce) { [data-reveal] { transition: none; } }
   .inlay-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
   .inlay-closeup { width: min(420px, 80vw); height: auto; aspect-ratio: 1; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.6)); }
   @media (max-width: 900px) { .inlay-head { grid-template-columns: 1fr; justify-items: center; } }
