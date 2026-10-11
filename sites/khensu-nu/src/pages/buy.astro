@@ -2,15 +2,14 @@
 import Base from '../layouts/Base.astro';
 import ShieldViewer from '../components/khensu/ShieldViewer.astro';
 
-// Stripe Payment Links for the refundable deposit, one per edition (Stripe Dashboard > Payment Links).
+// Stripe Payment Links for the full price, one per edition (Stripe Dashboard > Payment Links).
 // Until a link is set, that edition's button reserves by email instead.
-const DEPOSIT = 49;
+const SHIPS = 'Q1 2027';
 const links = {
   titanium: import.meta.env.PUBLIC_STRIPE_TITANIUM ?? '',
   brass: import.meta.env.PUBLIC_STRIPE_BRASS ?? '',
   limited: import.meta.env.PUBLIC_STRIPE_LIMITED ?? '',
 };
-const mail = (e: string) => `mailto:hello@elliottwave.studio?subject=${encodeURIComponent(`Reserve suñůlink.shield, ${e}`)}`;
 
 const editions = [
   {
@@ -96,15 +95,18 @@ const stones = [
               ))}
             </div>
             <p class="opt-note">Platinum crescent line</p>
-            <a class="btn primary reserve" href={links[e.id as keyof typeof links] || mail(e.name)}>
-              {links[e.id as keyof typeof links] ? `Reserve with a $${DEPOSIT} deposit` : 'Reserve by email'}
-            </a>
+            {links[e.id as keyof typeof links] ? (
+              <a class="btn primary reserve" href={links[e.id as keyof typeof links]}>Pre-order · ${e.price}</a>
+            ) : (
+              <span class="btn primary reserve" aria-disabled="true">Pre-order · ${e.price}</span>
+            )}
+            <p class="ships">Expected to ship {SHIPS}</p>
           </div>
         ))}
 
         <p class="fine">
-          Prices are targets and are confirmed before anything more is charged. The ${DEPOSIT} deposit holds your place in
-          line, comes off the price, and is refunded in full whenever you ask before your shield ships.
+          Pay in full today, securely through Stripe. Your shield is expected to ship in {SHIPS}. You can cancel for a
+          full refund at any time before it ships, and we’ll email you if the date moves.
         </p>
       </div>
     </div>
@@ -274,6 +276,8 @@ const stones = [
   }
   .accent.on { border-color: #fff; background: rgba(255, 255, 255, 0.12); }
   .reserve { margin-top: 0.6rem; justify-self: start; }
+  .reserve[aria-disabled] { opacity: 0.6; cursor: default; }
+  .ships { margin: 0.2rem 0 0; font-size: 0.85rem; color: var(--text-dim); }
   .fine { margin: 0; font-size: 0.8rem; color: var(--text-dim); }
   .stones {
     list-style: none;
