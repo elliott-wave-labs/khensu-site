@@ -12,14 +12,13 @@ const lines = [
 let wi = 0;
 const head = lines.map((l) => ({ ...l, words: l.words.map((w) => ({ w, i: wi++ })) }));
 const stats = [
-  { n: 0, unit: '%', label: 'platform cut on creator subscriptions, tickets and sales' },
+  { n: 0, unit: '%', label: 'platform cut on views, gifts, tickets and sales' },
   { n: 100, unit: '%', label: 'of every view and tip, gift or payment, to you' },
   { n: '0.42', pre: '$', label: 'minimum payout, paid out instantly' },
   { n: 10, pre: '$', label: 'per 1,000 plays, all of it to you' },
 ];
 const floats = [
   { cls: 'f1', k: 'Tip', v: '+$20.00', s: '100% to you' },
-  { cls: 'f2', k: 'New subscriber', v: '$4.99 a month', s: 'No platform cut' },
   { cls: 'f3', k: 'Paid out', v: 'Instantly', s: '42¢ minimum' },
   { cls: 'f4', k: 'Your work', v: 'All rights yours', s: 'No licence taken' },
 ];
@@ -52,7 +51,7 @@ const floats = [
 
     <div class="crh-stage">
       <div class="crh-phone">
-        <Phone label="A creator’s reel playing in the khensu.ñü app, with Subscribe and Tip buttons">
+        <Phone label="A creator’s reel playing in the khensu.ñü app, with a Tip button">
           <div class="hwipe" data-wipe style="--x:50%">
             <video class="reel" src={`${V}/hero-4k.mp4`} poster={`${V}/hero-4k.webp`} muted loop playsinline autoplay preload="auto" data-loop width="1206" height="2622" aria-label="4K, upscaled from 720p by ñü.media on the Neural Engine, shown at iPhone 18 Pro resolution"></video>
             <video class="reel b" src={`${V}/hero-720.mp4`} poster={`${V}/hero-720.webp`} muted loop playsinline autoplay preload="auto" width="1206" height="2622" aria-label="The 720p original"></video>
@@ -71,7 +70,6 @@ const floats = [
               <span class="rb tip">$<small>Tip</small></span>
               <span class="rb"><svg viewBox="0 0 24 24"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8M5 12v8h14v-8" /></svg><small>Share</small></span>
             </span>
-            <span class="reel-sub">Subscribe · $4.99 a month</span>
           </div>
         </Phone>
       </div>
@@ -333,7 +331,7 @@ const floats = [
   .reel-who {
     position: absolute;
     left: 5cqw;
-    bottom: 22cqw;
+    bottom: 9cqw;
     display: flex;
     align-items: center;
     gap: 2cqw;
@@ -355,7 +353,7 @@ const floats = [
   .reel-rail {
     position: absolute;
     right: 3.5cqw;
-    bottom: 34cqw;
+    bottom: 22cqw;
     display: grid;
     gap: 4cqw;
     justify-items: center;
@@ -394,22 +392,6 @@ const floats = [
     position: absolute;
     translate: 0 9.5cqw;
   }
-  .reel-sub {
-    position: absolute;
-    left: 5cqw;
-    right: 5cqw;
-    bottom: 8cqw;
-    display: grid;
-    place-items: center;
-    height: 10.5cqw;
-    border-radius: 6cqw;
-    font-weight: 600;
-    font-size: 3.8cqw;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(16px) saturate(170%);
-  }
 
   .float {
     --d: 1;
@@ -444,9 +426,8 @@ const floats = [
     color: #b9b0ff;
   }
   .f1 { --d: 1.6; --n: 0; top: 12%; left: 0; }
-  .f2 { --d: 0.9; --n: 1; top: 30%; right: -2%; }
   .f3 { --d: 2.1; --n: 2; bottom: 24%; left: -4%; }
-  .f4 { --d: 1.2; --n: 3; bottom: 8%; right: 2%; }
+  .f4 { --d: 1.2; --n: 1; top: 30%; right: -2%; }
   .f4 span { color: #18e0c8; }
   @keyframes float-in {
     from { opacity: 0; transform: translateY(24px) scale(0.96); }
@@ -466,7 +447,7 @@ const floats = [
     .float b { font-size: 1rem; }
     .f1 { left: 0; }
     .f3 { left: 0; }
-    .f2, .f4 { right: 0; }
+    .f4 { right: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
     .float, .w { animation: none; }
