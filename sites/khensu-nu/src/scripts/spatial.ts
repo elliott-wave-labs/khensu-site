@@ -175,7 +175,7 @@ if (root) {
     for (const b of presetBtns) b.setAttribute('aria-pressed', String(b.dataset.preset === name));
   };
 
-  /** Keeps ñü.wæve at the original's loudness: both play in step all the time, so their levels can be compared live. */
+  /** Keeps ñü.wẽævẽß at the original's loudness: both play in step all the time, so their levels can be compared live. */
   const level = (a: AnalyserNode) => {
     a.getFloatTimeDomainData(meterBuf);
     let s = 0;
