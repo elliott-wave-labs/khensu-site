@@ -11,6 +11,8 @@ import NufiPhone from '../components/khensu/NufiPhone.astro';
 import NufiPledgeGraph from '../components/khensu/NufiPledgeGraph.astro';
 import NufiBurst from '../components/khensu/NufiBurst.astro';
 import Burst from '../components/creators/Burst.astro';
+import AnimatedBars from '../components/khensu/AnimatedBars.astro';
+import pay from '../data/creator-pay.json';
 import { BACKERS, DAILY_MET, total, usd } from '../data/nufi-campaign';
 
 const products = [
@@ -96,6 +98,20 @@ const contracts = [
   { n: 'bounty', b: 'Pays the first submission that passes the check.' },
 ];
 
+const srcOf = (rows: { sources: { name: string; url: string }[] }[]) =>
+  [...new Map(rows.flatMap((r) => r.sources).map((x) => [x.url, x])).values()].filter((x) => !x.url.includes('khensu.nu'));
+const cutRows = [...pay.cut.rows]
+  .map((r) => ({ name: r.name, value: r.platform[1] + ('middle' in r && r.middle ? r.middle[1] : 0), display: r.display, ours: 'ours' in r && r.ours }))
+  .sort((a, b) => b.value - a.value);
+const playRows = pay.perThousand.rows.map((r) => ({ name: r.name, value: r.artist[1], display: r.display, ours: 'ours' in r && r.ours }));
+const sendRows = [
+  { name: 'Through a bank', value: 29.98, display: '$29.98' },
+  { name: 'World average', value: 12.72, display: '$12.72' },
+  { name: 'Digital services', value: 9.18, display: '$9.18' },
+  { name: 'Cheapest three per corridor', value: 6.58, display: '$6.58' },
+  { name: 'ñüFi', note: 'Network fee, estimate', value: 0.01, display: 'under 1¢', ours: true },
+];
+
 const sum = total(DAILY_MET);
 const feeCap = Math.ceil(BACKERS / 100);
 ---
@@ -133,6 +149,25 @@ const feeCap = Math.ceil(BACKERS / 100);
             ['with nobody taking a cut.', true],
           ]}
         />
+      </div>
+    </section>
+
+    <section class="section nf-compare" id="nufi-compare-section" aria-labelledby="nufi-compare-title">
+      <div class="wrap">
+        <p class="eyebrow">ñüFi against everyone else</p>
+        <h2 id="nufi-compare-title" class="big">Everyone else takes a cut.<br /><em>ñüFi doesn’t.</em></h2>
+        <div class="nf-charts">
+          <AnimatedBars title={pay.cut.title} unit={pay.cut.unit} rows={cutRows} max={100} sources={srcOf(pay.cut.rows)} note="Ranges shown at their upper end." />
+          <AnimatedBars title={pay.perThousand.title} unit={pay.perThousand.unit} rows={playRows} max={pay.perThousand.scaleMax} sources={srcOf(pay.perThousand.rows)} note="Estimates for other platforms shown at their upper end." />
+          <AnimatedBars
+            title="Cost of sending $200 to another country"
+            unit="US dollars · Q3 2025"
+            rows={sendRows}
+            note="Average total cost including exchange-rate margins; the ñüFi fee is an estimate, and a bank may charge its own fee to cash out."
+            sources={[{ name: 'World Bank, Remittance Prices Worldwide, issue 54', url: 'https://remittanceprices.worldbank.org/' }]}
+          />
+        </div>
+        <p class="nf-fine">Platform terms checked {pay.checked}; they change. Spotify, Apple Music, YouTube, Twitch, Patreon, OnlyFans, Kickstarter and the App Store are trademarks of their owners; no affiliation.</p>
       </div>
     </section>
 
@@ -510,6 +545,16 @@ const feeCap = Math.ceil(BACKERS / 100);
   }
 
   /* Intro */
+  .nf-charts {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .nf-fine {
+    color: var(--text-faint, #71717a);
+    font-size: 0.78rem;
+    margin: 0.6rem 0 0;
+  }
   .nf-intro {
     padding: clamp(5rem, 12vw, 9rem) 0;
     background: #000;
