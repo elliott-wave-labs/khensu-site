@@ -3,37 +3,39 @@ import Base from '../layouts/Base.astro';
 import ProductBar from '../components/khensu/ProductBar.astro';
 import Sounds from '../components/creators/Sounds.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
-import levels from '../data/first-attempt-levels.json';
 
 const S = '/khensu/sounds';
 const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
-// Speaker positions in degrees clockwise from straight ahead, in the order of the 5.1 channels.
-const spk = [
-  { c: 'FL', a: -30 },
-  { c: 'FR', a: 30 },
-  { c: 'FC', a: 0 },
-  { c: 'BL', a: -110 },
-  { c: 'BR', a: 110 },
+const instruments = [
+  { id: 'drums', label: 'Drums' },
+  { id: 'piano', label: 'Piano' },
+  { id: 'synths', label: 'Synths' },
+  { id: 'guitar', label: 'Guitar' },
+  { id: 'bass', label: 'Bass' },
 ];
-const R = 132;
-const pos = (a: number) => {
-  const r = (a * Math.PI) / 180;
-  return { x: 160 + R * Math.sin(r), y: 160 - R * Math.cos(r) };
-};
+const venues = [
+  { id: 'room', label: 'Private room' },
+  { id: 'club', label: 'Club' },
+  { id: 'hall', label: 'Concert hall' },
+  { id: 'stadium', label: 'Stadium' },
+  { id: 'festival', label: 'Festival' },
+];
 ---
 
 <Base
   title="ñü.sounds"
-  description="ñü.sounds: music and healing sounds straight from the artist, in spatial audio. Every play pays the artist 1¢ with no cut, and it all plays privately. Listen to First Attempt (Demo) by khensu.ñü in 5.1 with AirPods."
+  description="A 2008 demo saved as a small stereo file, split into its instruments and placed around you in spatial audio by ñü.wæve. Switch to the original, pick the room, and drag every instrument where you want it."
 >
   <div class="khensu sp">
     <section class="sp-hero" aria-labelledby="sp-title">
       <div class="wrap sp-head">
-        <p class="eyebrow">ñü.sounds</p>
-        <h1 id="sp-title">Hear it all around you.<em>Music and healing, straight from the artist.</em></h1>
+        <p class="eyebrow">ñü.sounds · ñü.wæve</p>
+        <h1 id="sp-title">A 2008 demo, rebuilt in space.<em>Every instrument, where it belongs.</em></h1>
         <p class="sp-lede">
-          <strong>Put on AirPods and press play.</strong> Songs on ñü.sounds can carry a spatial mix, so the music sits
-          around you instead of between your ears, and stays put when you turn your head.
+          First Attempt was made in GarageBand in 2008 and all that survived is a small stereo AAC file.
+          <strong>ñü.wæve picked out each instrument, split it from the others and set it in the room the song was made
+          for.</strong> Put on headphones, press play, switch to the original to hear where it started, then drag the
+          instruments anywhere around you.
         </p>
       </div>
 
@@ -43,7 +45,7 @@ const pos = (a: number) => {
           <div class="sp-card">
             <img class="sp-art" src={`${S}/first-attempt.webp`} alt="Cover of More Of The Same by khensu.ñü" width="273" height="466" />
             <div class="sp-meta">
-              <p class="sp-k">Now playing</p>
+              <p class="sp-k" data-label aria-live="polite">Next up</p>
               <p class="sp-t">First Attempt (Demo)</p>
               <p class="sp-by">khensu.ñü · More Of The Same · 2008</p>
               <div class="sp-ctl">
@@ -64,105 +66,129 @@ const pos = (a: number) => {
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4" /></svg>
                 </button>
               </div>
-              <p class="sp-fmt">nu-audio · Opus 5.1 · 48 kHz · 12 MB for 6:40</p>
+              <div class="sp-mode" role="group" aria-label="What to play">
+                <button type="button" data-mode="orig" aria-pressed="false">Original 2008</button>
+                <button type="button" data-mode="wave" aria-pressed="true">ñü.wæve</button>
+              </div>
+              <p class="sp-fmt">ñü.wæve · 5 instruments · 9.1 MB for 6:40<br />Original stereo file: 9.6 MB</p>
             </div>
-            <audio preload="none" data-audio>
-              <source src={`${S}/first-attempt-51.mp4`} type='audio/mp4; codecs="opus"' />
-              <source src={`${S}/first-attempt-51.m4a`} type='audio/mp4; codecs="mp4a.40.2"' />
-            </audio>
+            <audio preload="none" crossorigin="anonymous" data-orig src={`${S}/first-attempt-original.m4a`}></audio>
+            {instruments.map((i) => <audio preload="none" crossorigin="anonymous" data-stem={i.id} src={`${S}/stems/${i.id}.mp4`} />)}
           </div>
         </div>
 
         <figure class="sp-room">
-          <svg viewBox="0 0 320 320" role="img" aria-label="Where the sound comes from: five speakers around your head, lighting up with the music">
-            <defs>
-              <radialGradient id="sp-glow">
-                <stop offset="0" stop-color="#6dffbf" />
-                <stop offset="0.5" stop-color="#4fb0ff" stop-opacity="0.55" />
-                <stop offset="1" stop-color="#8b5cff" stop-opacity="0" />
-              </radialGradient>
-            </defs>
-            <circle class="ring" cx="160" cy="160" r={R} />
-            <circle class="ring in" cx="160" cy="160" r={R * 0.55} />
-            <circle class="lfe" cx="160" cy="160" r="62" fill="url(#sp-glow)" data-ch="3" />
-            {spk.map((s) => {
-              const p = pos(s.a);
-              return (
-                <g class="spk" transform={`translate(${p.x} ${p.y})`}>
-                  <circle class="halo" r="26" fill="url(#sp-glow)" data-ch={['FL', 'FR', 'FC', 'LFE', 'BL', 'BR'].indexOf(s.c)} />
-                  <circle class="dot" r="5" />
-                  <text y={s.a === 0 ? -14 : Math.abs(s.a) > 90 ? 22 : -14}>{({ FL: 'L', FR: 'R', FC: 'C', BL: 'SL', BR: 'SR' } as Record<string, string>)[s.c]}</text>
-                </g>
-              );
-            })}
-            <g class="head" transform="translate(160 160)">
-              <ellipse rx="17" ry="20" />
-              <path d="M-5 -19 0 -27 5 -19" />
-              <rect x="-22" y="-6" width="6" height="13" rx="3" />
-              <rect x="16" y="-6" width="6" height="13" rx="3" />
-            </g>
-          </svg>
+          <div class="sp-venues-pick" role="group" aria-label="Room">
+            {venues.map((v) => (
+              <button type="button" data-venue={v.id} aria-pressed={String(v.id === 'club')}>{v.label}</button>
+            ))}
+          </div>
+          <p class="sp-picked" data-picked>Picked for this song: a club, the room a 2008 demo like this was made for.</p>
+          <div class="sp-ring" data-ring>
+            <svg viewBox="0 0 400 400" aria-hidden="true">
+              <defs>
+                <radialGradient id="sp-floor">
+                  <stop offset="0" stop-color="#4fb0ff" stop-opacity="0.16" />
+                  <stop offset="0.7" stop-color="#8b5cff" stop-opacity="0.06" />
+                  <stop offset="1" stop-color="#000" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+              <circle cx="200" cy="200" r="190" fill="url(#sp-floor)" />
+              <circle class="ring" cx="200" cy="200" r="190" />
+              <circle class="ring std" cx="200" cy="200" r="95" />
+              <circle class="ring in" cx="200" cy="200" r="47.5" />
+              <text class="ring-k" x="200" y="248">1 m</text>
+              <text class="ring-k" x="200" y="306">2 m</text>
+              <text class="ring-k" x="200" y="402">4 m</text>
+              <text class="ring-k ahead" x="200" y="-8">ahead</text>
+              <g class="head" transform="translate(200 200)">
+                <ellipse rx="15" ry="18" />
+                <path d="M-5 -17 0 -25 5 -17" />
+                <rect x="-20" y="-6" width="6" height="12" rx="3" />
+                <rect x="14" y="-6" width="6" height="12" rx="3" />
+              </g>
+            </svg>
+            {instruments.map((i) => (
+              <button type="button" class="sp-node" data-node={i.id} data-label={i.label} aria-pressed="false">
+                <i aria-hidden="true"></i>
+                <span>{i.label}</span>
+              </button>
+            ))}
+          </div>
+          <div class="sp-height">
+            <label for="sp-height">Height</label>
+            <input id="sp-height" type="range" min="-1.5" max="3" step="0.1" value="0" data-height />
+            <output for="sp-height" data-height-out>Drums · +0.0 m</output>
+          </div>
           <figcaption>
-            Left, centre and right in front, two surrounds behind, and the low end all around. Each light follows that
-            channel’s level as the song plays.
+            Drag an instrument round the ring to move it, towards you or away up to 4 m, and set its height below. With a
+            keyboard, use the arrow keys, and Page Up and Page Down for height. Each glows with its own level.
           </figcaption>
         </figure>
       </div>
 
       <div class="wrap sp-how">
         <div>
+          <b>What we did to the 2008 file</b>
+          <p>
+            The source is a 6:40 stereo AAC from 2008. Demucs, an open-source separation model, ran on a Mac and found
+            five instruments in it: drums, piano, synths, guitar and bass. It stands in for ñü.wæve’s own on-device
+            model, which is still being built. Nothing was re-recorded and nothing was added: each instrument became its
+            own sound, set in the room and stored as a ñü.wæve object.
+          </p>
+        </div>
+        <div>
+          <b>Fewer bits</b>
+          <p>
+            Five instruments you can move anywhere take 9.1 MB, less than the 9.6 MB original stereo file and 30% less
+            than the fixed 5.1 mix this page used to play. Each instrument is one sound at one point, so it needs one
+            channel, not six.
+          </p>
+        </div>
+        <div>
           <b>How to hear it</b>
           <p>
-            Use AirPods Pro, AirPods (3rd generation or later) or AirPods Max on an iPhone, iPad or Mac, in Safari. Turn
-            on Spatial Audio from Control Centre if it’s off, and choose Head Tracked to keep the music fixed in the room.
-          </p>
-        </div>
-        <div>
-          <b>What you’re hearing</b>
-          <p>
-            A 5.1 mix coded in nu-audio, the Opus-based audio of ñü.media: the whole 6:40 song in 12 MB. It was
-            recorded in GarageBand in stereo in 2008, and this demo spreads it to six channels with a simple matrix
-            upmix. Artists who mix in 5.1, 7.1.4 or ambisonics upload those mixes as they are.
-          </p>
-        </div>
-        <div>
-          <b>Without AirPods</b>
-          <p>
-            Any headphones or speakers play it too: your device folds the six channels down to stereo. Browsers that
-            can’t play Opus get the same mix in AAC.
+            Any headphones. This page renders the room for your two ears in the browser, with no head tracking. In the
+            khensu.ñü app, ñü.wæve hands the same objects to Apple’s spatial audio on AirPods, so they stay put when you
+            turn your head.
           </p>
         </div>
       </div>
 
       <div class="wrap sp-auto" aria-labelledby="sp-auto-title">
-        <p class="eyebrow">auto spatial · akashic</p>
-        <h2 id="sp-auto-title">Every stereo song, placed in the room it belongs in.</h2>
+        <p class="eyebrow">auto spatial · Akashic</p>
+        <h2 id="sp-auto-title">All audio, placed in the room it was meant for.</h2>
         <p class="sp-auto-lede">
-          For Akashic members, songs without a spatial mix get one on your own iPhone, iPad or Mac. Nothing is sent
-          anywhere. In development: the design is published.
+          What you just heard, done for every song, talk and film without a spatial mix of its own. ñü.wæve listens,
+          picks out every instrument and voice, works out the room, and places each one there, on your own iPhone, iPad
+          or Mac. Nothing is sent anywhere. For Akashic members; in development, with the design published.
         </p>
         <ul class="sp-venues" role="list">
           <li><b>Concert hall</b><span>Strings and choir across the stage, two seconds of hall around you</span></li>
-          <li><b>Small room</b><span>A voice and a guitar an arm’s length away</span></li>
-          <li><b>Rock club</b><span>Guitars left and right, the drums wide, the crowd behind you</span></li>
-          <li><b>EDM festival</b><span>Kick and sub dead centre, synths wrapping all the way round</span></li>
+          <li><b>Stadium</b><span>The band far ahead and high, the crowd and the echo all the way round</span></li>
+          <li><b>Festival</b><span>Kick and bass dead centre, synths wrapping around and above you</span></li>
+          <li><b>Club</b><span>Drums a few steps away, keys and guitar either side</span></li>
+          <li><b>Private room</b><span>A voice and a guitar an arm’s length away</span></li>
+          <li><b>Book reading</b><span>One voice across a quiet table, the room barely there</span></li>
+          <li><b>Interview</b><span>Two voices facing each other, the host on one side, the guest on the other</span></li>
+          <li><b>Film</b><span>Dialogue on the screen, music around you, effects where they happen</span></li>
         </ul>
         <div class="sp-auto-grid">
           <div>
             <b>It listens first</b>
-            <p>Apple’s sound classifier and our room model run on the Neural Engine. On-device Apple Intelligence reads what they found and picks the venue, and tells you why. Never Private Cloud Compute.</p>
+            <p>Sound recognition on the Neural Engine hears what is playing: which instruments, which voices, music or speech, and how big the room was. That decides the venue, and it tells you why. Never Private Cloud Compute.</p>
           </div>
           <div>
             <b>Every instrument, every frequency</b>
-            <p>The song is separated into vocals, drums, bass, instruments and ambience. Bass stays centred, mids sit where each instrument plays, and the air above 6 kHz opens up and rises, the way your ears expect.</p>
+            <p>Each instrument and voice becomes its own object you can move, like the ring above. Bass stays close and centred, and the air above 6 kHz opens up and rises, the way your ears expect.</p>
           </div>
           <div>
             <b>Nothing added, nothing lost</b>
-            <p>The parts always add back up to the original, so folding it to stereo gives you the artist’s master. One tap plays the original, and artists can switch auto spatial off for their songs.</p>
+            <p>The parts always add back up to the original, so folding it to stereo gives you the artist’s master. One tap plays the original, and artists can switch auto spatial off for their work.</p>
           </div>
           <div>
-            <b>Rated by what you hear</b>
-            <p>We’re retiring kbit/s as a measure of quality. ñü.fidelity scores how close a file sounds to the master, from 0 to 100, and our Neural Engine codec aims for the same score as the best Opus in half the size.</p>
+            <b>Locked to khensu.ñü</b>
+            <p>ñü.wæve files use the .nu container: the header saying what is inside is encrypted along with the sound, so a file looks like random bytes to anything except the app. Video works the same way.</p>
           </div>
         </div>
         <a class="btn" href="https://github.com/elliott-wave-labs/khensu-specs/blob/main/design/nu-spatial.md">Read the design</a>
@@ -181,7 +207,6 @@ const pos = (a: number) => {
       </div>
     </section>
   </div>
-  <script type="application/json" id="sp-levels" set:html={JSON.stringify(levels)} />
 </Base>
 
 <script>
@@ -473,6 +498,7 @@ const pos = (a: number) => {
   @media (prefers-reduced-motion: reduce) {
     .sp-play,
     .sp-k,
+    .sp-mode button,
     .sp-glass::before {
       animation: none;
     }
@@ -481,39 +507,188 @@ const pos = (a: number) => {
     margin: 0;
     text-align: center;
   }
-  .sp-room svg {
-    width: min(100%, 26rem);
-    overflow: visible;
-  }
   .sp-room figcaption {
     color: var(--muted, #9aa0a6);
     font-size: 0.85rem;
     line-height: 1.5;
-    max-width: 24rem;
-    margin: 0.6rem auto 0;
+    max-width: 26rem;
+    margin: 0.8rem auto 0;
+  }
+  .sp-mode,
+  .sp-venues-pick {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  }
+  .sp-mode {
+    display: flex;
+    flex-wrap: nowrap;
+    max-width: 20rem;
+    margin: 0 0 0.8rem;
+  }
+  .sp-mode button {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    padding-inline: 0.5rem;
+  }
+  @media (max-width: 560px) {
+    .sp-mode button {
+      font-size: 0.7rem;
+      padding-inline: 0.3rem;
+    }
+  }
+  .sp-venues-pick {
+    border-radius: 22px;
+  }
+  .sp-mode button,
+  .sp-venues-pick button {
+    font: 600 0.8rem/1 var(--font, inherit);
+    color: rgba(255, 255, 255, 0.62);
+    background: none;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.55rem 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sp-mode button[aria-pressed='true'],
+  .sp-venues-pick button[aria-pressed='true'] {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  .sp-mode button[data-mode='wave'][aria-pressed='true'] {
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+  }
+  .sp-mode button:focus-visible,
+  .sp-venues-pick button:focus-visible,
+  .sp-node:focus-visible {
+    outline: 2px solid #4fb0ff;
+    outline-offset: 2px;
+  }
+  .sp-picked {
+    color: var(--muted, #9aa0a6);
+    font-size: 0.82rem;
+    margin: 0.7rem 0 0;
+  }
+  .sp-ring {
+    position: relative;
+    width: min(100%, 26rem);
+    aspect-ratio: 1;
+    margin: 1.6rem auto 0;
+    touch-action: none;
+  }
+  .sp-ring svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  [data-mode='orig'] .sp-ring {
+    opacity: 0.45;
+    filter: saturate(0.3);
+    transition: opacity 0.3s, filter 0.3s;
   }
   .ring {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.12);
+    stroke: rgba(255, 255, 255, 0.14);
     stroke-dasharray: 2 5;
   }
+  .ring.std {
+    stroke: rgba(79, 176, 255, 0.4);
+    stroke-dasharray: none;
+  }
   .ring.in {
-    stroke: rgba(255, 255, 255, 0.06);
+    stroke: rgba(255, 255, 255, 0.07);
   }
-  .halo,
-  .lfe {
-    opacity: 0.15;
-    transform-box: fill-box;
-    transform-origin: center;
-    transition: opacity 0.2s linear, transform 0.2s linear;
-  }
-  .dot {
-    fill: #fff;
-  }
-  .spk text {
-    fill: rgba(255, 255, 255, 0.6);
-    font: 600 10px var(--font-mono);
+  .ring-k {
+    fill: rgba(255, 255, 255, 0.4);
+    font: 500 9px var(--font-mono);
     text-anchor: middle;
+  }
+  .ring-k.ahead {
+    fill: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sp-node {
+    --z: 0;
+    --lvl: 0;
+    --s: calc(1.5rem + var(--z) * 0.22rem);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, calc(var(--s) / -2));
+    display: grid;
+    justify-items: center;
+    gap: 0.3rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 12px;
+    color: #fff;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 1;
+  }
+  .sp-node.drag {
+    cursor: grabbing;
+    z-index: 2;
+  }
+  .sp-node i {
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: radial-gradient(circle at 35% 30%, #fff, #6dffbf 30%, #4fb0ff 65%, #8b5cff);
+    box-shadow:
+      0 0 calc(6px + var(--lvl) * 30px) calc(var(--lvl) * 8px) rgba(79, 176, 255, calc(0.35 + var(--lvl) * 0.5)),
+      0 calc(4px + var(--z) * 4px) calc(8px + var(--z) * 4px) rgba(0, 0, 0, 0.5);
+    transform: scale(calc(1 + var(--lvl) * 0.25));
+    transition: transform 0.08s linear;
+  }
+  .sp-node span {
+    font: 600 0.72rem/1 var(--font-mono);
+    padding: 0.25rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    white-space: nowrap;
+  }
+  .sp-node[aria-pressed='true'] span {
+    border-color: rgba(79, 176, 255, 0.8);
+  }
+  .sp-height {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    max-width: 22rem;
+    margin: 1.2rem auto 0;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .sp-height input {
+    flex: 1;
+    accent-color: #4fb0ff;
+  }
+  .sp-height output {
+    font: 500 0.75rem var(--font-mono);
+    min-width: 8.5rem;
+    text-align: right;
   }
   .head ellipse,
   .head rect {

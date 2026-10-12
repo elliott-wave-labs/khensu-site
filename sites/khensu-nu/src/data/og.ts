@@ -4,10 +4,10 @@
 export type Card = { title: string; em?: string; line: string; bg?: string; product?: string; alt: string };
 
 const EARTH = '/khensu/hero/earth.jpg';
-const SHIELD_ALT = 'suñůlink.shield in solid brass on an iPhone 18 Pro, the khensu.ñü mark inlaid in stone and platinum, over Earth wrapped in the khensu.ñü network';
+const SHIELD_ALT = 'suñůlink.shield in solid brass on an iPhone 18 Pro, the ñü.isheru in stone and platinum, over Earth wrapped in the khensu.ñü network';
 
 export const CARDS: Record<string, Card> = {
-  home: { title: 'khensu.ñü', em: 'webË, private by design.', line: 'Post-quantum. Run profitably by the people.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
+  home: { title: 'khensu.ñü', em: 'webË, private by design.', line: 'Post-quantum. Run by the people. suñůlink.shield, set with the ñü.isheru.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
   webe: { title: 'webË', em: 'A people-run internet.', line: 'Names, sites, feeds, payments and contracts, post-quantum and run by the people.', bg: EARTH, alt: 'The webË network wrapped around Earth at night' },
   media: { title: 'ñü.media', em: 'Same look, a fraction of the bits.', line: 'Photos and video measured against JPEG, HEIC, H.264, HEVC and AV1.', bg: '/khensu/codec/compare-720p.jpg', screen: '/khensu/creators/compare-nu.webp', alt: 'ñü.media against H.264 at the same bitrate' },
   quality: { title: 'How we measure', em: 'Check every number.', line: 'The tests behind ñü.media, with public tools you can run yourself.', bg: '/khensu/codec/compare-aurora.jpg', alt: 'An aurora clip compared across codecs' },
@@ -17,7 +17,7 @@ export const CARDS: Record<string, Card> = {
   bi: { title: 'ñü.bi', em: 'A basic income, paid by the network.', line: 'Node operators paid for real work at one worldwide rate, and an equal share for every person next.', bg: EARTH, alt: 'ñü.bi, the ñü basic income, over Earth wrapped in the khensu.ñü network' },
   network: { title: 'The network', em: 'A gift to everyone.', line: 'Freedom, privacy and a basic income. Contracts for any work and nodes paid for real jobs.', bg: EARTH, alt: 'The khensu.ñü network wrapped around Earth at night' },
   shield: { title: 'suñůlink.shield', em: '0 mm. The whole back.', line: 'khensu.ñü’s network-profitable, post-quantum encrypted stealth transceiver.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
-  buy: { title: 'suñůlink.shield', em: 'Made in Morocco.', line: 'Titanium or solid brass, with the khensu.ñü mark inlaid flush in stone and platinum.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
+  buy: { title: 'suñůlink.shield', em: 'Made in Morocco.', line: 'Titanium or solid brass, set with the ñü.isheru: stone and platinum, flush to the metal.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
   transfer: { title: 'Private transfer', em: 'Send 4K privately, free.', line: 'Native resolution, end to end. Against Dropbox and Aspera.', bg: '/khensu/codec/compare-nasa4k.jpg', alt: 'A 4K clip sent with khensu.ñü private transfer' },
   app: { title: 'khensu.ñü', em: 'For iPhone, iPad and Mac.', line: 'Messages, calls, feeds and payments, post-quantum.', bg: EARTH, product: '/khensu/renders/og-maroon.png', alt: 'khensu.ñü on iPhone with suñůlink.shield' },
   privacy: { title: 'Privacy', em: 'Nothing to collect.', line: 'No accounts on servers, no cookies, no tracking, no data to sell.', bg: EARTH, alt: 'The khensu.ñü mark over Earth at night' },
