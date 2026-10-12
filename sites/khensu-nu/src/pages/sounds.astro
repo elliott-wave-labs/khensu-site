@@ -139,6 +139,21 @@ const venues = [
             <input id="sp-height" type="range" min="-1.5" max="3" step="0.1" value="0" data-height />
             <output for="sp-height" data-height-out>Drums · +0.0 m</output>
           </div>
+          <fieldset class="sp-fx" data-fx>
+            <legend>ñü.wæve sound</legend>
+            <div class="sp-fx-presets" role="group" aria-label="Sound presets">
+              <button type="button" data-preset="original" aria-pressed="true">Match original</button>
+              <button type="button" data-preset="clean" aria-pressed="false">Clean</button>
+            </div>
+            <label>Gain <input type="range" min="-12" max="12" step="0.5" value="0" data-fx-gain /><output data-fx-out="gain">0 dB</output></label>
+            <label>Reverb <input type="range" min="0" max="100" step="1" value="45" data-fx-wet /><output data-fx-out="wet">45%</output></label>
+            <label>Echo length <input type="range" min="0.2" max="6" step="0.1" value="1.8" data-fx-rt /><output data-fx-out="rt">1.8 s</output></label>
+            <label>Delay <input type="range" min="0" max="250" step="1" value="25" data-fx-pre /><output data-fx-out="pre">25 ms</output></label>
+            <p class="sp-fx-note">
+              Gain 0 dB keeps ñü.wæve as loud as the original 2008 file, measured as you listen. The reverb is added on top
+              of the clean instruments and tuned by ear to the original’s room. Clean takes it off.
+            </p>
+          </fieldset>
           <figcaption>
             Drag an instrument round the ring to move it, towards you or away up to 4 m, and set its height below. With a
             keyboard, use the arrow keys, and Page Up and Page Down for height. Each glows with its own level.
@@ -744,6 +759,60 @@ const venues = [
     font: 500 0.75rem var(--font-mono);
     min-width: 8.5rem;
     text-align: right;
+  }
+  .sp-fx {
+    max-width: 22rem;
+    margin: 1.4rem auto 0;
+    padding: 0.9rem 1rem 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 1rem;
+    display: grid;
+    gap: 0.55rem;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .sp-fx legend {
+    padding: 0 0.4rem;
+    font-weight: 650;
+    color: #fff;
+  }
+  .sp-fx label {
+    display: grid;
+    grid-template-columns: 6.2rem 1fr 4rem;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .sp-fx input {
+    accent-color: #4fb0ff;
+    min-width: 0;
+  }
+  .sp-fx output {
+    font: 500 0.75rem var(--font-mono);
+    text-align: right;
+  }
+  .sp-fx-presets {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .sp-fx-presets button {
+    flex: 1;
+    padding: 0.4rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.75);
+    font: inherit;
+    cursor: pointer;
+  }
+  .sp-fx-presets button[aria-pressed='true'] {
+    background: #fff;
+    color: #000;
+  }
+  .sp-fx-note {
+    margin: 0.2rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.5);
   }
   .head ellipse,
   .head rect {

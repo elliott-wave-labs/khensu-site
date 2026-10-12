@@ -31,19 +31,22 @@ const MAX_R = 4; // metres to the edge of the ring
 const RING_PX = 190; // ring radius in the SVG's 400-unit box
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-/** A room impulse: a few early reflections, then decaying noise, slightly different in each ear. */
-function impulse(ctx: BaseAudioContext, v: Venue) {
-  const len = Math.ceil((v.rt + v.pre) * ctx.sampleRate);
+/** Room sound added on top of the clean instruments. "Match original" is tuned by ear to the 2008 file's room. */
+type Fx = { gain: number; wet: number; rt: number; pre: number }; // dB, 0–100 %, seconds, milliseconds
+const PRESETS: Record<string, Fx> = {
+  original: { gain: 0, wet: 45, rt: 1.8, pre: 25 },
+  clean: { gain: 0, wet: 0, rt: 1.8, pre: 0 },
+};
+
+/** A room impulse: a few early reflections, then decaying noise, slightly different in each ear. Pre-delay is a separate node. */
+function impulse(ctx: BaseAudioContext, rt: number) {
+  const len = Math.ceil(rt * ctx.sampleRate);
   const buf = ctx.createBuffer(2, len, ctx.sampleRate);
   for (let c = 0; c < 2; c++) {
     const d = buf.getChannelData(c);
-    const p = Math.floor(v.pre * ctx.sampleRate);
-    for (let i = p; i < len; i++) {
-      const t = (i - p) / ctx.sampleRate;
-      d[i] = (Math.random() * 2 - 1) * Math.exp((-6.9 * t) / v.rt);
-    }
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp((-6.9 * i) / ctx.sampleRate / rt);
     for (let k = 1; k <= 6; k++) {
-      const i = p + Math.floor(ctx.sampleRate * 0.007 * k * (1 + 0.13 * c));
+      const i = Math.floor(ctx.sampleRate * 0.007 * k * (1 + 0.13 * c));
       if (i < len) d[i] += (c ? -0.6 : 0.6) / k;
     }
   }
@@ -75,8 +78,23 @@ if (root) {
   let selected = nodes[0];
   const pos: Record<string, Pos> = structuredClone(VENUES[venue].pos);
 
+  const fxBox = root.querySelector<HTMLElement>('[data-fx]')!;
+  const fxIn = {
+    gain: fxBox.querySelector<HTMLInputElement>('[data-fx-gain]')!,
+    wet: fxBox.querySelector<HTMLInputElement>('[data-fx-wet]')!,
+    rt: fxBox.querySelector<HTMLInputElement>('[data-fx-rt]')!,
+    pre: fxBox.querySelector<HTMLInputElement>('[data-fx-pre]')!,
+  };
+  const presetBtns = [...fxBox.querySelectorAll<HTMLButtonElement>('[data-preset]')];
+  const fx: Fx = { ...PRESETS.original };
+
   let ctx: AudioContext | null = null;
   let origGain: GainNode, waveGain: GainNode, dry: GainNode, wet: GainNode, verb: ConvolverNode;
+  let bus: GainNode, sum: GainNode, makeup: GainNode, user: GainNode, preDelay: DelayNode;
+  let origMeter: AnalyserNode, waveMeter: AnalyserNode;
+  let origPow = 0;
+  let wavePow = 0;
+  let builtRt = 0;
   const panners: Record<string, PannerNode> = {};
   const meters: Record<string, AnalyserNode> = {};
   const meterBuf = new Float32Array(1024);
@@ -89,16 +107,29 @@ if (root) {
     dry = ctx.createGain();
     wet = ctx.createGain();
     verb = ctx.createConvolver();
-    ctx.createMediaElementSource(orig).connect(origGain).connect(ctx.destination);
-    waveGain.connect(dry).connect(ctx.destination);
-    waveGain.connect(verb).connect(wet).connect(ctx.destination);
+    bus = ctx.createGain();
+    sum = ctx.createGain();
+    makeup = ctx.createGain();
+    user = ctx.createGain();
+    preDelay = ctx.createDelay(0.5);
+    origMeter = ctx.createAnalyser();
+    waveMeter = ctx.createAnalyser();
+    origMeter.fftSize = waveMeter.fftSize = 2048;
+    const o = ctx.createMediaElementSource(orig);
+    o.connect(origGain).connect(ctx.destination);
+    o.connect(origMeter);
+    // Instruments → room (dry + pre-delay → reverb) → loudness match → your gain → mode crossfade.
+    bus.connect(dry).connect(sum);
+    bus.connect(preDelay).connect(verb).connect(wet).connect(sum);
+    sum.connect(waveMeter);
+    sum.connect(makeup).connect(user).connect(waveGain).connect(ctx.destination);
     for (const el of stems) {
       const name = el.dataset.stem!;
       const p = new PannerNode(ctx, { panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 1.5, rolloffFactor: 0.7 });
       const m = ctx.createAnalyser();
       m.fftSize = 1024;
       const src = ctx.createMediaElementSource(el);
-      src.connect(p).connect(waveGain);
+      src.connect(p).connect(bus);
       src.connect(m);
       panners[name] = p;
       meters[name] = m;
@@ -109,13 +140,57 @@ if (root) {
     return ctx;
   };
 
+  const fxText = () => {
+    const out = (k: string, v: string) => (fxBox.querySelector<HTMLElement>(`[data-fx-out="${k}"]`)!.textContent = v);
+    out('gain', `${fx.gain > 0 ? '+' : ''}${fx.gain} dB`);
+    out('wet', `${Math.round(fx.wet)}%`);
+    out('rt', `${fx.rt.toFixed(1)} s`);
+    out('pre', `${Math.round(fx.pre)} ms`);
+    fxIn.gain.value = String(fx.gain);
+    fxIn.wet.value = String(fx.wet);
+    fxIn.rt.value = String(fx.rt);
+    fxIn.pre.value = String(fx.pre);
+  };
+
+  let rtTimer = 0;
   const room = () => {
-    const v = VENUES[venue];
+    fxText();
     if (!ctx) return;
-    verb.buffer = impulse(ctx, v);
     const t = ctx.currentTime;
-    wet.gain.setTargetAtTime(v.wet, t, 0.1);
-    dry.gain.setTargetAtTime(1 - v.wet * 0.5, t, 0.1);
+    const w = (fx.wet / 100) * 0.8;
+    wet.gain.setTargetAtTime(w, t, 0.08);
+    dry.gain.setTargetAtTime(1 - w * 0.5, t, 0.08);
+    preDelay.delayTime.setTargetAtTime(fx.pre / 1000, t, 0.03);
+    user.gain.setTargetAtTime(10 ** (fx.gain / 20), t, 0.05);
+    if (fx.rt !== builtRt) {
+      clearTimeout(rtTimer);
+      rtTimer = window.setTimeout(() => {
+        builtRt = fx.rt;
+        verb.buffer = impulse(ctx!, fx.rt);
+      }, builtRt ? 120 : 0);
+    }
+  };
+
+  const preset = (name: string | null) => {
+    for (const b of presetBtns) b.setAttribute('aria-pressed', String(b.dataset.preset === name));
+  };
+
+  /** Keeps ñü.wæve at the original's loudness: both play in step all the time, so their levels can be compared live. */
+  const level = (a: AnalyserNode) => {
+    a.getFloatTimeDomainData(meterBuf);
+    let s = 0;
+    for (let i = 0; i < meterBuf.length; i++) s += meterBuf[i] * meterBuf[i];
+    return s / meterBuf.length;
+  };
+  const matchLoudness = () => {
+    if (!ctx || master().paused) return;
+    const po = level(origMeter);
+    const pw = level(waveMeter);
+    if (po < 1e-6 || pw < 1e-6) return;
+    origPow = origPow ? origPow * 0.98 + po * 0.02 : po;
+    wavePow = wavePow ? wavePow * 0.98 + pw * 0.02 : pw;
+    const k = Math.min(8, Math.max(0.25, Math.sqrt(origPow / wavePow)));
+    makeup.gain.setTargetAtTime(k, ctx.currentTime, 0.4);
   };
 
   const mix = (now = false) => {
@@ -180,6 +255,7 @@ if (root) {
     const m = master();
     if (!dragging) bar(m.currentTime);
     cur.textContent = mmss(m.currentTime);
+    matchLoudness();
     if (now - lastSync > 500) {
       lastSync = now;
       for (const el of stems) if (Math.abs(el.currentTime - m.currentTime) > 0.05) el.currentTime = m.currentTime;
@@ -262,6 +338,9 @@ if (root) {
       for (const n of nodes) place(n.dataset.node!);
       select(selected);
       picked.hidden = venue !== 'club';
+      const v = VENUES[venue];
+      Object.assign(fx, { wet: Math.round((v.wet / 0.8) * 100), rt: v.rt, pre: Math.round(v.pre * 1000) });
+      preset(null);
       room();
     });
 
@@ -326,7 +405,21 @@ if (root) {
     select(selected);
   });
 
+  for (const [k, el] of Object.entries(fxIn))
+    el.addEventListener('input', () => {
+      fx[k as keyof Fx] = Number(el.value);
+      preset(null);
+      room();
+    });
+  for (const b of presetBtns)
+    b.addEventListener('click', () => {
+      Object.assign(fx, PRESETS[b.dataset.preset!]);
+      preset(b.dataset.preset!);
+      room();
+    });
+
   for (const n of nodes) place(n.dataset.node!);
   select(nodes[0]);
+  fxText();
   state();
 }
