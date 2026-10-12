@@ -274,7 +274,40 @@ const abilities = [
           </p>
         </div>
       </div>
-      <div class="wrap sp-room-copy">
+      <div class="wrap sp-room-copy" id="codec-section">
+          <h2 id="sp-codec-title">One sound, then where it sits.</h2>
+          <p>
+            nu.waves stores each instrument once. Where it sits, how high, how far, and the room around it, is a list of
+            numbers beside the sound. Moving it, or scheduling a move, does not encode the audio again and does not add
+            channels.
+          </p>
+          <p>
+            Opus 5.1 on this page is the same song folded into six fixed speakers: 258 kbit/s, 13.0 MB, measured. Opus at
+            48 kbit/s is a stereo rate used when a song should still sound whole. A 5.1 mix packed into that same 48
+            kbit/s has about 8 kbit/s for each speaker. nu.waves on this page is 174 kbit/s, measured, because each
+            instrument here is still an Opus stem. The listening score is nu.fidelity, scored by ear, and it is separate
+            from that rate.
+          </p>
+          <p>
+            The aim is a much lower packing rate at the same listening score. That aim is an estimate until the listening
+            test is run. What is already true: a path through the room is lossless next to the samples. An artist can
+            schedule the move. A listener can schedule their own. The person stays put, the sound moves, and the samples
+            do not change, so the path costs a few numbers, not another mix.
+          </p>
+          <h2 id="sp-ears-title">In the ear.</h2>
+          <p>
+            nu.ears are in-ear. No camera. Voice access stays on the device. A call goes out through two relays run by
+            different operators, the same rule as every khensu.ñü call, and those relays carry voice and audio.
+          </p>
+          <p>
+            They play a nu.waves object in each ear, so height and distance are rendered there instead of folded into a
+            stereo mix first. The spec is louder than AirPods Pro 2, and a longer charge than its 6 hours of listening
+            with noise control on.
+          </p>
+          <p>
+            AirPods Pro 2 listening time is Apple’s published figure. Loudness and hours for nu.ears are the product
+            spec; measured figures replace them when a pair is tested. AirPods is a trademark of Apple Inc.
+          </p>
           <h2>In the room.</h2>
           <p>
             Every sound has its own height, above or below your ears as well as all the way round. Pick a track and
@@ -443,21 +476,20 @@ const abilities = [
   }
   .sp-hero {
     --p: 0;
-    min-height: 100vh;
-    padding-bottom: 14vh;
+    min-height: 0;
+    padding-bottom: 2.5rem;
     background:
       radial-gradient(60rem 30rem at 50% 30%, rgba(79, 176, 255, 0.12), transparent 70%),
       radial-gradient(40rem 24rem at 80% 70%, rgba(139, 92, 255, 0.1), transparent 70%),
       #000;
   }
   .sp-stage {
-    position: sticky;
-    top: 48px;
+    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    min-height: calc(100vh - 64px);
-    padding-top: 1.25rem;
+    justify-content: flex-start;
+    min-height: 0;
+    padding-top: 5.5rem;
   }
   .sp-head {
     text-align: center;
@@ -546,18 +578,16 @@ const abilities = [
   @media (max-width: 860px) {
     .sp-hero { padding-bottom: 0; }
     .sp-stage {
-      position: relative;
-      top: auto;
-      min-height: 0;
-      padding-top: 6.5rem;
+      padding-top: 5.5rem;
     }
   }
   .sp-player {
-    margin-top: 1.25rem;
+    margin-top: 0.35rem;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(1.5rem, 4vw, 3rem);
-    align-items: center;
+    grid-template-columns: minmax(16rem, 28rem) minmax(18rem, 24rem);
+    justify-content: center;
+    gap: clamp(1.2rem, 3vw, 2.4rem);
+    align-items: start;
   }
   .sp-glass {
     position: relative;
@@ -594,7 +624,7 @@ const abilities = [
     align-items: center;
     transform-style: preserve-3d;
     transform-origin: 50% 55%;
-    transform: rotateX(26deg) rotateY(-38deg) rotateZ(-7deg) translateZ(-90px) scale(0.72);
+    transform: rotateX(14deg) rotateY(34deg) rotateZ(7deg) translateZ(-40px) scale(0.88);
     padding: 1.4rem;
     border-radius: 32px;
     border: 1px solid rgba(255, 255, 255, 0.16);
@@ -1007,7 +1037,7 @@ const abilities = [
   }
   .sp-ring {
     position: relative;
-    width: min(100%, 26rem);
+    width: min(100%, 24rem);
     aspect-ratio: 1;
     margin: 0.55rem auto 0;
     touch-action: none;

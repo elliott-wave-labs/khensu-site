@@ -1,5 +1,5 @@
 ---
-// ñüFi: giving, crowdfunding, lending and investing on khensu.ñü. Sources: khensu-specs design/nufi.md (products,
+// nu.Fi: giving, crowdfunding, lending and investing on khensu.ñü. Sources: khensu-specs design/nufi.md (products,
 // network use, economics, regulation by product), design/app-commerce.md (flat 10% on in-app purchases, tips at 100%),
 // WEBE.md 14 (contracts: pledge, escrow, split, ticket, bounty; shielded settlement), PROTOCOL.md 13 and COMPLIANCE.md 9.
 // Lend and Invest are regulated: always "where licensed", never a promised return. Every amount is an example.
@@ -109,7 +109,7 @@ const sendRows = [
   { name: 'World average', value: 12.72, display: '$12.72' },
   { name: 'Digital services', value: 9.18, display: '$9.18' },
   { name: 'Cheapest three per corridor', value: 6.58, display: '$6.58' },
-  { name: 'ñüFi', note: 'Network fee, estimate', value: 0.01, display: 'under 1¢', ours: true },
+  { name: 'nu.Fi', note: 'Network fee, estimate', value: 0.01, display: 'under 1¢', ours: true },
 ];
 
 const sum = total(DAILY_MET);
@@ -117,8 +117,8 @@ const feeCap = Math.ceil(BACKERS / 100);
 ---
 
 <Base
-  title="ñüFi"
-  description="ñüFi, the khensu.ñü finance platform: a basic income first, creators paid 1¢ a view, nodes paid for their work, subscriptions that fund the network with no shareholders, private payments and tickets, and give, back, invest and lend person to person."
+  title="nu.Fi"
+  description="nufi, the khensu.ñü finance platform: a basic income first, creators paid 1¢ a view, nodes paid for their work, subscriptions that fund the network with no shareholders, private payments and tickets, and give, back, invest and lend person to person."
 >
   <meta slot="head" name="color-scheme" content="dark" />
 
@@ -126,7 +126,7 @@ const feeCap = Math.ceil(BACKERS / 100);
     <NufiHero />
     <Burst
       id="nufi-numbers-section"
-      eyebrow="ñüFi by the numbers"
+      eyebrow="nu.Fi by the numbers"
       title="Pay anyone for under a cent."
       em="Artists keep every tip and every view."
       items={[
@@ -135,13 +135,13 @@ const feeCap = Math.ceil(BACKERS / 100);
         { g: '1¢', t: 'A view, all of it to the artist', s: 'Artists keep 100% of their view revenue: $10 per 1,000 plays' },
       ]}
     />
-    <ProductBar name="ñüFi" action="Get the app" href="/app" explore="#nufi-platform-section" />
+    <ProductBar name="nu.Fi" action="Get the app" href="/app" explore="#nufi-platform-section" />
 
-    <section class="nf-intro" id="nufi-intro-section" aria-label="What ñüFi is">
+    <section class="nf-intro" id="nufi-intro-section" aria-label="What nu.Fi is">
       <div class="wrap">
         <RevealText
           parts={[
-            ['ñüFi is all the money on khensu.ñü. '],
+            ['nu.Fi is all the money on khensu.ñü. '],
             ['First, a basic income', true],
             [' for the people who run the network. Then '],
             ['creators paid for every view, nodes paid for every job,', true],
@@ -154,8 +154,8 @@ const feeCap = Math.ceil(BACKERS / 100);
 
     <section class="section nf-compare" id="nufi-compare-section" aria-labelledby="nufi-compare-title">
       <div class="wrap">
-        <p class="eyebrow">ñüFi against everyone else</p>
-        <h2 id="nufi-compare-title" class="big">Everyone else takes a cut.<br /><em>ñüFi doesn’t.</em></h2>
+        <p class="eyebrow">nu.Fi against everyone else</p>
+        <h2 id="nufi-compare-title" class="big">Everyone else takes a cut.<br /><em>nu.Fi doesn’t.</em></h2>
         <div class="nf-charts">
           <AnimatedBars title={pay.cut.title} unit={pay.cut.unit} rows={cutRows} max={100} sources={srcOf(pay.cut.rows)} note="Ranges shown at their upper end." />
           <AnimatedBars title={pay.perThousand.title} unit={pay.perThousand.unit} rows={playRows} max={pay.perThousand.scaleMax} sources={srcOf(pay.perThousand.rows)} note="Estimates for other platforms shown at their upper end." />
@@ -163,7 +163,7 @@ const feeCap = Math.ceil(BACKERS / 100);
             title="Cost of sending $200 to another country"
             unit="US dollars · Q3 2025"
             rows={sendRows}
-            note="Average total cost including exchange-rate margins; the ñüFi fee is an estimate, and a bank may charge its own fee to cash out."
+            note="Average total cost including exchange-rate margins; the nufi fee is an estimate, and a bank may charge its own fee to cash out."
             sources={[{ name: 'World Bank, Remittance Prices Worldwide, issue 54', url: 'https://remittanceprices.worldbank.org/' }]}
           />
         </div>
@@ -221,7 +221,7 @@ const feeCap = Math.ceil(BACKERS / 100);
                 )}
               </svg>
               <p class="nf-pname">
-                ñüFi {p.name}
+                nu.Fi {p.name}
                 {p.licensed && <a class="nf-tag" href="#nufi-notes">where licensed<sup>1</sup></a>}
               </p>
               <p class="nf-pline">{p.line}</p>
@@ -235,7 +235,7 @@ const feeCap = Math.ceil(BACKERS / 100);
     <section class="section nf-back" id="nufi-back-section" aria-labelledby="nufi-back-title">
       <div class="wrap nf-split">
         <div data-reveal>
-          <p class="eyebrow"><span class="name-case">ñüFi</span> back</p>
+          <p class="eyebrow"><span class="name-case">nu.Fi</span> back</p>
           <h2 id="nufi-back-title" class="big">Fund the film before it’s made.<br /><em>Backers pay only if the goal is met.</em></h2>
           <p class="lede">
             Ask the people who want the work, not a studio or a label. Set a goal, a deadline and the rewards. Backers
@@ -322,7 +322,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           <p class="eyebrow">verification</p>
           <h2 id="nufi-verify-title" class="big">Check every byte.<br /><em>Then try to break it.</em></h2>
           <p class="lede">
-            The full specification is public, like the ñü.media codecs: wire formats, the exact proof statement, error
+            The full specification is public, like the nu.media codecs: wire formats, the exact proof statement, error
             codes and registries, so anyone can build a wallet that interoperates or attack the one we ship.
           </p>
         </div>
@@ -347,7 +347,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           <p class="eyebrow"><span class="name-case">webË</span> contracts</p>
           <h2 id="nufi-contracts-title" class="big">Terms that enforce themselves.<br /><em>Code anyone can read.</em></h2>
           <p class="lede">
-            Every campaign runs on a standard, audited webË contract. Its code is public and signed; its inputs stay
+            Every campaign runs on a standard, audited webe contract. Its code is public and signed; its inputs stay
             private to the people in it. Each step is proved on the device that takes it, and the chain keeps only the
             proof.
           </p>
@@ -374,7 +374,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           <h2 id="nufi-fees-title" class="big">No platform cut.<br /><em>The network fee is the only charge.</em></h2>
         </div>
         <ul class="nf-nums" role="list">
-          <li data-reveal style="--i:0"><b>0%</b><span>Platform cut on ñüFi Give and ñüFi Back.</span></li>
+          <li data-reveal style="--i:0"><b>0%</b><span>Platform cut on nufi Give and nufi Back.</span></li>
           <li data-reveal style="--i:1"><b>100%</b><span>Of every view and tip, gift or payment reaches the person.</span></li>
           <li data-reveal style="--i:2"><b>&lt;1¢</b><span>Network fee per transfer, paid to the people who run the nodes. Estimate.</span></li>
           <li data-reveal style="--i:3"><b>0</b><span>Spread on loans or carry on investments for khensu.ñü. Licensed partners’ fees are shown before you commit.</span></li>
@@ -388,7 +388,7 @@ const feeCap = Math.ceil(BACKERS / 100);
         </div>
         <p class="nf-fine">
           Apps and sites that sell things on khensu.ñü pay a flat 10% of in-app purchases and subscriptions, never scaled up
-          or down. ñüFi isn’t a store: giving and pledging carry no cut.
+          or down. nufi isn’t a store: giving and pledging carry no cut.
         </p>
       </div>
     </section>
@@ -410,7 +410,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           </li>
           <li class="nf-glass" data-reveal style="--i:2">
             <b>Investing, on your terms</b>
-            <span>If you choose to offer shares or a revenue share through ñüFi Invest, investors get exactly what the filed offering says, and nothing more.</span>
+            <span>If you choose to offer shares or a revenue share through nufi Invest, investors get exactly what the filed offering says, and nothing more.</span>
           </li>
         </ul>
       </div>
@@ -422,7 +422,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           <p class="eyebrow">lending and investing</p>
           <h2 id="nufi-licensed-title" class="big">Regulated products.<br /><em>Offered where licensed.</em></h2>
           <p class="lede">
-            Lending and investing are regulated activities, so ñüFi Lend and ñüFi Invest run through licensed partners,
+            Lending and investing are regulated activities, so nufi Lend and nufi Invest run through licensed partners,
             and only in countries where those partners are licensed or the law permits them.
           </p>
         </div>
@@ -454,7 +454,7 @@ const feeCap = Math.ceil(BACKERS / 100);
             <dt>No conflicts</dt>
             <dd>
               A funding portal can’t host offerings it has a financial interest in, so raises by khensu.ñü or Elliott Wave
-              never run on ñüFi Invest.
+              never run on nufi Invest.
             </dd>
           </div>
         </dl>
@@ -472,13 +472,13 @@ const feeCap = Math.ceil(BACKERS / 100);
 
         <ol class="nf-notes" id="nufi-notes" role="list">
           <li>
-            <sup>1</sup> ñüFi Lend and ñüFi Invest are offered only through licensed partners, in countries where they are
+            <sup>1</sup> nufi Lend and nufi Invest are offered only through licensed partners, in countries where they are
             licensed or the law permits. Investing involves risk, including loss of principal. Not investment advice.
             Availability varies by country. Loans can go unrepaid, and lenders can lose what they lend. khensu.ñü never
             promises a return.
           </li>
-          <li>ñüFi Back pledges aren’t investments: backers receive the rewards or pre-orders a campaign offers, not equity, interest or a return.</li>
-          <li>Gifts through ñüFi Give are tax-deductible only where the recipient is a registered charity or uses a fiscal sponsor, and only as local tax law allows.</li>
+          <li>nufi Back pledges aren’t investments: backers receive the rewards or pre-orders a campaign offers, not equity, interest or a return.</li>
+          <li>Gifts through nufi Give are tax-deductible only where the recipient is a registered charity or uses a fiscal sponsor, and only as local tax law allows.</li>
           <li>Payments are self-custodied: khensu.ñü never holds your funds or keys. See <a href="/compliance">Compliance</a>.</li>
           <li>Amounts on this page are examples. Network fees are estimates.</li>
         </ol>

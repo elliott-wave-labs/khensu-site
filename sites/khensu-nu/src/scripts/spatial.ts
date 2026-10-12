@@ -883,11 +883,11 @@ if (root) {
       const idleY = Math.cos(t * 0.5) * 3.6;
       const idleZ = Math.sin(t * 0.38) * 1.4;
       const live = trackId === 'attempt' ? !orig.paused : playing;
-      const rx = (1 - ease) * 26 + ease * (6 + idleX + (0.42 - tiltY) * 18);
-      const ry = (1 - ease) * -38 + ease * (-12 + idleY + (tiltX - 0.38) * 24) + cardKick * 22;
-      const rz = (1 - ease) * -7 + ease * (idleZ + (tiltX - 0.5) * 6);
-      const sc = 0.72 + ease * 0.28 + Math.sin(t * 0.9) * 0.012 + cardKick * 0.07 + (live ? 0.045 : 0);
-      const tz = (1 - ease) * -90 + cardKick * 36;
+      const rx = (1 - ease) * 14 + ease * (6 + idleX + (0.42 - tiltY) * 18);
+      const ry = (1 - ease) * 34 + ease * (14 + idleY + (0.62 - tiltX) * 24) - cardKick * 22;
+      const rz = (1 - ease) * 7 + ease * (-idleZ + (0.5 - tiltX) * 6);
+      const sc = 0.88 + ease * 0.12 + Math.sin(t * 0.9) * 0.012 + cardKick * 0.07 + (live ? 0.045 : 0);
+      const tz = (1 - ease) * -40 + cardKick * 36;
       card.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) translateZ(${tz.toFixed(1)}px) scale(${sc.toFixed(3)})`;
     }
     requestAnimationFrame(frame);

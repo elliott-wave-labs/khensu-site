@@ -16,6 +16,7 @@ policy.styleDirective.hashes = release.styleHashes;
 
 export default defineConfig({
   site: 'https://khensu.nu',
+  redirects: { '/sounds': '/waves' },
   output: 'static',
   trailingSlash: 'ignore',
   build: { format: 'directory' },

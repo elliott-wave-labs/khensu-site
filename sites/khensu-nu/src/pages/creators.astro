@@ -17,7 +17,7 @@ type Src = { name: string; url: string; checked: string };
 const film = data.film;
 const filmLabel =
   `${film.title}: ` + film.rows.map((r) => `${r.name} ${r.display}`).join('; ') +
-  '. The same $100 pledged to a film on ñüFi Back goes to the filmmaker, less a network fee estimated at a fraction of a cent.';
+  '. The same $100 pledged to a film on nufi Back goes to the filmmaker, less a network fee estimated at a fraction of a cent.';
 
 const sourceRows: { figure: string; value: string; kind: string; sources: Src[] }[] = [
   ...data.cut.rows.map((r) => ({ figure: `Taken before the artist is paid: ${r.name}`, value: r.display, kind: r.kind, sources: r.sources })),
@@ -42,7 +42,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
 
 <Base
   title="For creators"
-  description="Creators on khensu.ñü keep everything: no platform cut on views, gifts, tickets or sales, tips 100% to you, a 42¢ minimum payout, instant payouts, and every right to your work. Plus Sounds, ñü.media video at less data, and ñüFi funding."
+  description="Creators on khensu.ñü keep everything: no platform cut on views, gifts, tickets or sales, tips 100% to you, a 42¢ minimum payout, instant payouts, and every right to your work. Plus Sounds, nu.media video at less data, and nufi funding."
 >
   <div class="khensu cr">
     <CrHero />
@@ -77,10 +77,10 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
 
     <section class="sounds-link" id="sounds-section" aria-labelledby="sl-title">
       <div class="wrap">
-        <p class="eyebrow">ñü.sounds</p>
+        <p class="eyebrow">ñü.ŵævẽš</p>
         <h2 id="sl-title">Music and healing, in spatial audio.</h2>
         <p>Artists upload their own music and every play pays 1¢ with no cut. Put on AirPods and hear a song placed all around you.</p>
-        <a class="btn primary" href="/sounds">Listen on ñü.sounds</a>
+        <a class="btn primary" href="/waves">Listen on ñü.ŵævẽš</a>
       </div>
     </section>
 
@@ -100,7 +100,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
         </ul>
 
         <figure class="card film" data-scene="reveal">
-          <figcaption><b>{film.title}</b><span>Against the same $100 pledged to a film on ñüFi Back</span></figcaption>
+          <figcaption><b>{film.title}</b><span>Against the same $100 pledged to a film on nufi Back</span></figcaption>
           <div role="img" aria-label={filmLabel}>
             <ul class="stack" role="list" aria-hidden="true">
               <li>
@@ -110,7 +110,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
                 </span>
               </li>
               <li class="ours">
-                <span class="label"><b>ñüFi Back</b> <small>no cut</small></span>
+                <span class="label"><b>nu.Fi Back</b> <small>no cut</small></span>
                 <span class="track"><span class="seg s-ours" style="--w:100;--i:0"><span>$100 to the film, less a network fee under 1¢</span></span></span>
               </li>
             </ul>
@@ -129,11 +129,11 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
 
     <section class="section fund" id="nufi-back-section" data-par aria-labelledby="fund-title">
       <div class="wrap">
-        <p class="eyebrow">ñüFi back</p>
+        <p class="eyebrow">nu.Fi back</p>
         <h2 id="fund-title" class="cr-h">Fund the next film, album or tour.<br /><span class="dim">From the people who want it.</span></h2>
         <p class="cr-lede">
-          Instead of asking a studio or a label for an advance, ask your fans. <strong>ñüFi Back works like Kickstarter,
-          with no platform cut.</strong> ñüFi Give is for gifts of any size; lending and investment run through licensed
+          Instead of asking a studio or a label for an advance, ask your fans. <strong>nufi Back works like Kickstarter,
+          with no platform cut.</strong> nufi Give is for gifts of any size; lending and investment run through licensed
           partners, whose fees are shown before anyone commits.
         </p>
         <ul class="fund-cards" role="list">
@@ -184,7 +184,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
         <h2 id="fine-title">Where the network fee goes</h2>
         <p>
           The network fee pays the people who run khensu.ñü’s nodes for carrying your payments and your work. If you run a
-          node, or carry a suñůlink.shield, the network also pays it for the relay work it can prove it did, into the same
+          node, or carry a sunulink.shield, the network also pays it for the relay work it can prove it did, into the same
           wallet. What a node earns depends on the work it does; this is not a promise of earnings.
         </p>
         <p>
@@ -195,7 +195,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
         <h2>What is measured and what isn’t</h2>
         <p>
           khensu.ñü’s 0% cut and 42¢ minimum payout are rules of how payments work. Its network fee is an estimate and its
-          per-play figure an example. ñü.media figures are benchmarks, measured on the reel shown on this page. Other
+          per-play figure an example. nu.media figures are benchmarks, measured on the reel shown on this page. Other
           platforms’ figures are their published terms, or estimates where they don’t publish one, and each is labelled.
           Payments are offered region by region, following legal review in each, and paid digital content bought inside
           the iPhone app follows Apple’s purchase rules.
