@@ -1,0 +1,74 @@
+{
+ "family": "nu Font",
+ "glyphs": 160,
+ "masters": 12,
+ "weights": [
+  "Ultralight",
+  "Light",
+  "Medium",
+  "Bold",
+  "Heavy",
+  "Blackout"
+ ],
+ "axes": {
+  "wght": [
+   100,
+   900
+  ],
+  "slnt": [
+   -11.0,
+   0
+  ]
+ },
+ "upm": 1000,
+ "capHeight": 700,
+ "xHeight": 350,
+ "descender": -216,
+ "pointsPerMasterAvg": 10388,
+ "sizes": {
+  "nuFont-Blackout.ttf": 35932,
+  "nuFont-Blackout.woff2": 8228,
+  "nuFont-BlackoutItalic.ttf": 37000,
+  "nuFont-BlackoutItalic.woff2": 8708,
+  "nuFont-Bold.ttf": 35916,
+  "nuFont-Bold.woff2": 8272,
+  "nuFont-BoldItalic.ttf": 36984,
+  "nuFont-BoldItalic.woff2": 8872,
+  "nuFont-Heavy.ttf": 35960,
+  "nuFont-Heavy.woff2": 8264,
+  "nuFont-HeavyItalic.ttf": 36976,
+  "nuFont-HeavyItalic.woff2": 8816,
+  "nuFont-Light.ttf": 35768,
+  "nuFont-Light.woff2": 8184,
+  "nuFont-LightItalic.ttf": 36888,
+  "nuFont-LightItalic.woff2": 8556,
+  "nuFont-Medium.ttf": 35872,
+  "nuFont-Medium.woff2": 8216,
+  "nuFont-MediumItalic.ttf": 36920,
+  "nuFont-MediumItalic.woff2": 8660,
+  "nuFont-Ultralight.ttf": 35824,
+  "nuFont-Ultralight.woff2": 8076,
+  "nuFont-UltralightItalic.ttf": 36880,
+  "nuFont-UltralightItalic.woff2": 8552,
+  "nuFont-Variable.ttf": 224844,
+  "nuFont-Variable.woff2": 71304
+ },
+ "stems": {
+  "h": "the top half of a stem: it comes down to the x-height and squiggles back into the shoulder, so the left side never reaches the baseline",
+  "b": "a short stem from the ascender to half the x-height; the bubble floats above the baseline",
+  "d": "mirror of b: a short stem on the right, the bubble floats",
+  "p": "a stem from the x-height into the descender; the bowl sits on the baseline",
+  "q": "mirror of p",
+  "a": "single-storey: a bowl and a right stroke from the x-height to the baseline",
+  "f": "a stem from the hook to the baseline, with a crossbar at the x-height",
+  "g": "single-storey: a bowl and a right stroke that descends and hooks left",
+  "i": "a short stem of x-height under its dot",
+  "dotlessi": "a short stem of x-height",
+  "j": "a stem from the x-height that descends and hooks left",
+  "k": "a full stem; both arms meet it at 42% of the x-height",
+  "l": "a full stem that curls right at the baseline",
+  "t": "a stem above and below the crossbar, curling right at the baseline",
+  "y": "the right arm continues below the baseline and hooks left",
+  "lslash": "a full stem that curls right at the baseline, with the bar across it"
+ }
+}

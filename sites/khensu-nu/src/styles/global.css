@@ -1,3 +1,12 @@
+/* ñü.Føňt: one variable file carries six weights and the italic (wght 100–900, slnt 0 to -11). tools/font/build.sh */
+@font-face {
+  font-family: 'nu Font';
+  src: url('/fonts/nufont/nuFont-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: oblique 0deg 11deg;
+  font-display: swap;
+}
+
 :root {
   --bg: #0a0b0d;
   --bg-raised: #111317;
@@ -15,7 +24,9 @@
   --khensu-soft: color-mix(in srgb, var(--khensu) 10%, transparent);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans Hebrew', 'Noto Sans Devanagari', 'Noto Sans Thai', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans', sans-serif;
-  --font-display: var(--font-sans);
+  /* ñü.Føňt (code: nu Font) sets every display role: headings, the wordmark, navigation, buttons and labels.
+     Running text stays on the sans until the font has kerning and hinting; switch it by setting --font-sans. */
+  --font-display: 'nu Font', var(--font-sans);
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --measure: 64ch;
@@ -479,7 +490,7 @@ h2:hover > .sec-link,
 }
 
 /* ñü.aura: the house gradient, green, electric blue and purple, drifting slowly. Used for every highlight: chart fills,
-   khensu.ñü's own rows, emphasised text, sliders and primary buttons. */
+   khėnsu.ñü's own rows, emphasised text, sliders and primary buttons. */
 :root {
   --aura-green: #22f59a;
   --aura-blue: #1e8fff;
@@ -506,6 +517,57 @@ h2:hover > .sec-link,
 }
 @media (prefers-reduced-motion: reduce) {
   .aura-fill, .aura-text { animation: none; }
+}
+
+/* Display roles beyond the headings take ñü.Føňt too. */
+.btn,
+.pill,
+.chips a,
+.site-header nav a,
+.pbar b,
+.stat-strip b {
+  font-family: var(--font-display);
+}
+
+/* ñü.Føňt wordmarks (NuMark.astro): inline SVG, one path per stroke. Letters inherit the text colour or take the
+   aura gradient; the ė dot pulses and phases through the aura on its own. Every other stroke keeps its own look. */
+.nf-word {
+  display: inline-block;
+  line-height: 0;
+  vertical-align: -0.04em;
+}
+.nf-word svg {
+  height: 1em;
+  width: auto;
+  overflow: visible;
+  fill: currentColor;
+}
+.nf-word .mark.dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nf-dot-pulse 2.8s ease-in-out infinite, nf-dot-aura 9s linear infinite;
+}
+@keyframes nf-dot-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+  50% { transform: scale(1.28); filter: drop-shadow(0 0 0.35em currentColor); }
+}
+@keyframes nf-dot-aura {
+  0% { fill: var(--aura-green); color: var(--aura-green); }
+  33% { fill: var(--aura-blue); color: var(--aura-blue); }
+  66% { fill: var(--aura-purple); color: var(--aura-purple); }
+  100% { fill: var(--aura-green); color: var(--aura-green); }
+}
+.nf-word.still .mark.dot { animation: none; fill: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  .nf-word .mark.dot { animation: none; fill: var(--accent); }
+}
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 input[type='range'] {
   -webkit-appearance: none;

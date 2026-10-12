@@ -1,5 +1,5 @@
 ---
-// nu.Fi: giving, crowdfunding, lending and investing on khensu.ñü. Sources: khensu-specs design/nufi.md (products,
+// nu.Fi: giving, crowdfunding, lending and investing on khėnsu.ñü. Sources: khensu-specs design/nufi.md (products,
 // network use, economics, regulation by product), design/app-commerce.md (flat 10% on in-app purchases, tips at 100%),
 // WEBE.md 14 (contracts: pledge, escrow, split, ticket, bounty; shielded settlement), PROTOCOL.md 13 and COMPLIANCE.md 9.
 // Lend and Invest are regulated: always "where licensed", never a promised return. Every amount is an example.
@@ -47,8 +47,8 @@ const products = [
 ];
 
 const platform = [
-  { t: 'ñü.bi, the basic income', b: 'First, and the reason the network exists. Everyone who runs a node is paid in khensu.ñü coin for verified work, at one worldwide rate, turned into USDC in Apple Pay the moment it lands. An equal share for every person is in research.', href: '/bi', link: 'How ñü.bi works' },
-  { t: 'Creators keep it all', b: 'Every view or play pays the creator 1¢, $10 per 1,000, with no cut. Tips, subscriptions and sales reach them whole, in khensu.ñü coin that turns into USDC in Apple Pay the moment it hits the wallet.', href: '/creators', link: 'What creators keep' },
+  { t: 'ñü.bi, the basic income', b: 'First, and the reason the network exists. Everyone who runs a node is paid in khėnsu.ñü coin for verified work, at one worldwide rate, turned into USDC in Apple Pay the moment it lands. An equal share for every person is in research.', href: '/bi', link: 'How ñü.bi works' },
+  { t: 'Creators keep it all', b: 'Every view or play pays the creator 1¢, $10 per 1,000, with no cut. Tips, subscriptions and sales reach them whole, in khėnsu.ñü coin that turns into USDC in Apple Pay the moment it hits the wallet.', href: '/creators', link: 'What creators keep' },
   { t: 'Node contributors', b: 'A Mac or a Raspberry Pi 5 on an ordinary connection is a node, and a suñůlink.shield joins the mesh. Each is paid every epoch for the work it proves, never by where it is.', href: '/network', link: 'Run a node' },
   { t: 'Subscriptions fund the network', b: 'After Apple’s share, half of every Pro, Ultra and Akashic subscription goes to the network and half to the founder’s company. No shareholders. The network is paid more than it costs, and that surplus is what funds ñü.bi.', href: '/bi#bi-how', link: 'Follow the money' },
   { t: 'Payments and tickets', b: 'Pay anyone privately, tap to pay at the till, and buy tickets for festivals, shows and retreats that nobody can link to you. Scan them at the door with ñü.code.', href: '#nufi-contracts-section', link: 'Tickets and contracts' },
@@ -57,7 +57,7 @@ const platform = [
 
 const steps = [
   { t: 'Publish the terms', b: 'Your goal, deadline and rewards are signed with your key and logged in public before anyone pays, so they can’t change afterwards. Updates are new signed versions, with the history in the open.' },
-  { t: 'Pledges wait in escrow', b: 'Each pledge is locked into a pledge contract on the network. No company holds it, khensu.ñü included.' },
+  { t: 'Pledges wait in escrow', b: 'Each pledge is locked into a pledge contract on the network. No company holds it, khėnsu.ñü included.' },
   { t: 'The deadline decides', b: 'Goal met: the escrow releases to your wallet. Goal missed: every pledge goes back to the backer who made it.' },
 ];
 
@@ -72,7 +72,7 @@ const privacy = [
 
 const walletSpec = [
   { n: 'keys', b: '24-word recovery phrase, Argon2id seed, spend and viewing keys wrapped by the Secure Enclave. Face ID for every spend.' },
-  { n: 'notes', b: 'USDC and the khensu token in 1-2-5 denominations, committed with Poseidon2. Nullifiers only your key can make.' },
+  { n: 'notes', b: 'USDC and the khėnsu token in 1-2-5 denominations, committed with Poseidon2. Nullifiers only your key can make.' },
   { n: 'spends', b: 'Always 4 notes in, 4 out, padded to the same size, so 1¢ and $10,000 look identical. Sent through the mixnet.' },
   { n: 'proof', b: 'A hash-based STARK proves ownership, membership and that value balances. It is also the spend authorisation.' },
   { n: 'delivery', b: 'Each new note is sealed to the recipient with ML-KEM-1024 and AES-256-GCM, and arrives in your chat.' },
@@ -117,8 +117,8 @@ const feeCap = Math.ceil(BACKERS / 100);
 ---
 
 <Base
-  title="nu.Fi"
-  description="nufi, the khensu.ñü finance platform: a basic income first, creators paid 1¢ a view, nodes paid for their work, subscriptions that fund the network with no shareholders, private payments and tickets, and give, back, invest and lend person to person."
+  title="ñũ.Fî"
+  description="nufi, the khėnsu.ñü finance platform: a basic income first, creators paid 1¢ a view, nodes paid for their work, subscriptions that fund the network with no shareholders, private payments and tickets, and give, back, invest and lend person to person."
 >
   <meta slot="head" name="color-scheme" content="dark" />
 
@@ -126,7 +126,7 @@ const feeCap = Math.ceil(BACKERS / 100);
     <NufiHero />
     <Burst
       id="nufi-numbers-section"
-      eyebrow="nu.Fi by the numbers"
+      eyebrow="ñũ.Fî by the numbers"
       title="Pay anyone for under a cent."
       em="Artists keep every tip and every view."
       items={[
@@ -135,13 +135,13 @@ const feeCap = Math.ceil(BACKERS / 100);
         { g: '1¢', t: 'A view, all of it to the artist', s: 'Artists keep 100% of their view revenue: $10 per 1,000 plays' },
       ]}
     />
-    <ProductBar name="nu.Fi" action="Get the app" href="/app" explore="#nufi-platform-section" />
+    <ProductBar name="ñũ.Fî" action="Get the app" href="/app" explore="#nufi-platform-section" />
 
     <section class="nf-intro" id="nufi-intro-section" aria-label="What nu.Fi is">
       <div class="wrap">
         <RevealText
           parts={[
-            ['nu.Fi is all the money on khensu.ñü. '],
+            ['nu.Fi is all the money on khėnsu.ñü. '],
             ['First, a basic income', true],
             [' for the people who run the network. Then '],
             ['creators paid for every view, nodes paid for every job,', true],
@@ -154,8 +154,8 @@ const feeCap = Math.ceil(BACKERS / 100);
 
     <section class="section nf-compare" id="nufi-compare-section" aria-labelledby="nufi-compare-title">
       <div class="wrap">
-        <p class="eyebrow">nu.Fi against everyone else</p>
-        <h2 id="nufi-compare-title" class="big">Everyone else takes a cut.<br /><em>nu.Fi doesn’t.</em></h2>
+        <p class="eyebrow">ñũ.Fî against everyone else</p>
+        <h2 id="nufi-compare-title" class="big">Everyone else takes a cut.<br /><em>ñũ.Fî doesn’t.</em></h2>
         <div class="nf-charts">
           <AnimatedBars title={pay.cut.title} unit={pay.cut.unit} rows={cutRows} max={100} sources={srcOf(pay.cut.rows)} note="Ranges shown at their upper end." />
           <AnimatedBars title={pay.perThousand.title} unit={pay.perThousand.unit} rows={playRows} max={pay.perThousand.scaleMax} sources={srcOf(pay.perThousand.rows)} note="Estimates for other platforms shown at their upper end." />
@@ -235,7 +235,7 @@ const feeCap = Math.ceil(BACKERS / 100);
     <section class="section nf-back" id="nufi-back-section" aria-labelledby="nufi-back-title">
       <div class="wrap nf-split">
         <div data-reveal>
-          <p class="eyebrow"><span class="name-case">nu.Fi</span> back</p>
+          <p class="eyebrow"><span class="name-case">ñũ.Fî</span> back</p>
           <h2 id="nufi-back-title" class="big">Fund the film before it’s made.<br /><em>Backers pay only if the goal is met.</em></h2>
           <p class="lede">
             Ask the people who want the work, not a studio or a label. Set a goal, a deadline and the rewards. Backers
@@ -296,7 +296,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           <p class="eyebrow"><span class="name-case">ñü.wallet</span></p>
           <h2 id="nufi-wallet-title" class="big">Money that stays private.<br /><em>Post-quantum from the ground up.</em></h2>
           <p class="lede">
-            ñü.wallet holds USDC and the khensu token in a shielded pool. It never touches elliptic curves or RSA:
+            ñü.wallet holds USDC and the khėnsu token in a shielded pool. It never touches elliptic curves or RSA:
             notes are hash commitments, spends are STARK proofs and every secret is sealed with ML-KEM-1024. Only you hold
             the keys, and nobody can freeze a note.
           </p>
@@ -377,7 +377,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           <li data-reveal style="--i:0"><b>0%</b><span>Platform cut on nufi Give and nufi Back.</span></li>
           <li data-reveal style="--i:1"><b>100%</b><span>Of every view and tip, gift or payment reaches the person.</span></li>
           <li data-reveal style="--i:2"><b>&lt;1¢</b><span>Network fee per transfer, paid to the people who run the nodes. Estimate.</span></li>
-          <li data-reveal style="--i:3"><b>0</b><span>Spread on loans or carry on investments for khensu.ñü. Licensed partners’ fees are shown before you commit.</span></li>
+          <li data-reveal style="--i:3"><b>0</b><span>Spread on loans or carry on investments for khėnsu.ñü. Licensed partners’ fees are shown before you commit.</span></li>
         </ul>
         <div class="nf-example nf-glass" data-reveal>
           <p class="nf-ex-k">example</p>
@@ -387,7 +387,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           </p>
         </div>
         <p class="nf-fine">
-          Apps and sites that sell things on khensu.ñü pay a flat 10% of in-app purchases and subscriptions, never scaled up
+          Apps and sites that sell things on khėnsu.ñü pay a flat 10% of in-app purchases and subscriptions, never scaled up
           or down. nufi isn’t a store: giving and pledging carry no cut.
         </p>
       </div>
@@ -406,7 +406,7 @@ const feeCap = Math.ceil(BACKERS / 100);
           </li>
           <li class="nf-glass" data-reveal style="--i:1">
             <b>Your rights and IP stay yours</b>
-            <span>Backers don’t get your film, your masters or a share of your income, and neither does khensu.ñü.</span>
+            <span>Backers don’t get your film, your masters or a share of your income, and neither does khėnsu.ñü.</span>
           </li>
           <li class="nf-glass" data-reveal style="--i:2">
             <b>Investing, on your terms</b>
@@ -446,14 +446,14 @@ const feeCap = Math.ceil(BACKERS / 100);
           <div data-reveal>
             <dt>Identity</dt>
             <dd>
-              Where the law requires identity checks, the licensed partner does them and holds the records. khensu.ñü
+              Where the law requires identity checks, the licensed partner does them and holds the records. khėnsu.ñü
               doesn’t, and the network never links them to your messages.
             </dd>
           </div>
           <div data-reveal>
             <dt>No conflicts</dt>
             <dd>
-              A funding portal can’t host offerings it has a financial interest in, so raises by khensu.ñü or Elliott Wave
+              A funding portal can’t host offerings it has a financial interest in, so raises by khėnsu.ñü or Elliott Wave
               never run on nufi Invest.
             </dd>
           </div>
@@ -474,12 +474,12 @@ const feeCap = Math.ceil(BACKERS / 100);
           <li>
             <sup>1</sup> nufi Lend and nufi Invest are offered only through licensed partners, in countries where they are
             licensed or the law permits. Investing involves risk, including loss of principal. Not investment advice.
-            Availability varies by country. Loans can go unrepaid, and lenders can lose what they lend. khensu.ñü never
+            Availability varies by country. Loans can go unrepaid, and lenders can lose what they lend. khėnsu.ñü never
             promises a return.
           </li>
           <li>nufi Back pledges aren’t investments: backers receive the rewards or pre-orders a campaign offers, not equity, interest or a return.</li>
           <li>Gifts through nufi Give are tax-deductible only where the recipient is a registered charity or uses a fiscal sponsor, and only as local tax law allows.</li>
-          <li>Payments are self-custodied: khensu.ñü never holds your funds or keys. See <a href="/compliance">Compliance</a>.</li>
+          <li>Payments are self-custodied: khėnsu.ñü never holds your funds or keys. See <a href="/compliance">Compliance</a>.</li>
           <li>Amounts on this page are examples. Network fees are estimates.</li>
         </ol>
       </div>

@@ -8,7 +8,7 @@ import RevealText from '../components/khensu/RevealText.astro';
 import StatStrip from '../components/khensu/StatStrip.astro';
 
 // No card processor: reservations are free and go by email, so no server handles them. Payment opens in the
-// khensu.ñü app over the network's own shielded payments, and every reservation is invited to pay there first.
+// khėnsu.ñü app over the network's own shielded payments, and every reservation is invited to pay there first.
 const SHIPS = 'Q1 2027';
 // The only shipping option: overnight priority with Saturday delivery (FedEx Priority Overnight in the US; International
 // Priority elsewhere, 1–3 business days). Charged at cost on top of the price. Estimate from carrier list rates for a
@@ -47,7 +47,7 @@ const editions = [
 type Model = 'pro' | 'max';
 const reserveHref = (edition: string, model: string, colour: string, price: number) =>
   `mailto:${RESERVE_TO}?subject=${encodeURIComponent(`Buy suñůlink.shield: ${edition}, ${model}, ${colour}`)}&body=${encodeURIComponent(
-    `I’d like to buy one suñůlink.shield.\n\nEdition: ${edition}\niPhone: ${model}\nFinish: ${colour}\nPrice: $${price} including tax, plus $${SHIPPING} overnight shipping, $${price + SHIPPING} total\n\nNo payment now. Invite me to pay in the khensu.ñü app when payment opens.`,
+    `I’d like to buy one sunulink.shield.\n\nEdition: ${edition}\niPhone: ${model}\nFinish: ${colour}\nPrice: $${price} including tax, plus $${SHIPPING} overnight shipping, $${price + SHIPPING} total\n\nNo payment now. Invite me to pay in the khėnsu.ñü app when payment opens.`,
   )}`;
 
 // Expected cost per shield at the first production run, in US dollars: [Ti Pro, Ti Pro Max, brass Pro, brass Pro Max].
@@ -101,7 +101,7 @@ const chakras = [
 
 ---
 
-<Base title="Buy suñůlink.shield" description="Buy suñůlink.shield: a post-quantum node in titanium or brass, made in Morocco, with the ñü.isheru set flush in bloodstone, lapis, labradorite, onyx, kyanite and tourmaline, with platinum.">
+<Base title="Buy suñůlink.shield" description="Buy sunulink.shield: a post-quantum node in titanium or brass, made in Morocco, with the ñü.isheru set flush in bloodstone, lapis, labradorite, onyx, kyanite and tourmaline, with platinum.">
   <ArHero src="/khensu/shell/3d/glb/brass-moldavite-phone.glb" name="suñůlink.shield" alt="suñůlink.shield in solid brass on an iPhone 18 Pro, at real size, turning to show the ñü.isheru in stone and platinum on the back">
     Made in Morocco.<br /><em>Set with the ñü.isheru.</em>
   </ArHero>
@@ -133,7 +133,7 @@ const chakras = [
   <Highlights
     title="Get the highlights."
     cards={[
-      { img: '/khensu/renders/macro.webp', alt: 'Macro of the ñü.isheru: black and white labradorite, a lapis crescent, a bloodstone ring with tourmaline markers, kyanite and onyx points, set into brushed brass', text: 'The khensu.ñü mark in natural stone, lapped flush with the metal.', fit: 'cover' },
+      { img: '/khensu/renders/macro.webp', alt: 'Macro of the ñü.isheru: black and white labradorite, a lapis crescent, a bloodstone ring with tourmaline markers, kyanite and onyx points, set into brushed brass', text: 'The khėnsu.ñü mark in natural stone, lapped flush with the metal.', fit: 'cover' },
       { img: '/khensu/renders/hero.webp', alt: 'suñůlink.shield in Burgundy ceramic-coated titanium, angled', text: 'Ceramic-coated titanium in your iPhone’s colour: Burgundy, Glacier, Silver or Black.' },
       { img: '/khensu/renders/lineup.webp', alt: 'Four shields side by side: maroon, gold and black titanium, and solid brass', text: 'Four finishes. One ñü.isheru, each cut from its own stones.' },
       { img: '/khensu/renders/phone.webp', alt: 'suñůlink.shield in maroon on the back of an iPhone 18 Pro', text: 'Made for iPhone 18 Pro and Pro Max.' },
@@ -188,7 +188,7 @@ const chakras = [
 
         <p class="fine">
           Buying starts with an email and costs nothing up front: your order holds your place in line. Orders pay in the
-          khensu.ñü app, in the order they came in, over our own network with no card processor. Your shield ships in {SHIPS}; you can cancel
+          khėnsu.ñü app, in the order they came in, over our own network with no card processor. Your shield ships in {SHIPS}; you can cancel
           for a full refund at any time before it ships.
         </p>
         <p class="more-phones">
@@ -203,7 +203,7 @@ const chakras = [
     <div class="wrap story-head" data-reveal>
       <p class="story-eyebrow">ñü.isheru</p>
       <h2 class="story-title">The mark, in stone.<br />Flush to the metal.</h2>
-      <p class="story-lede">The ñü.isheru is the khensu.ñü mark as a stone inlay: each stone cut to its part of the mark, set into the shield with a platinum line and lapped flush.</p>
+      <p class="story-lede">The ñü.isheru is the khėnsu.ñü mark as a stone inlay: each stone cut to its part of the mark, set into the shield with a platinum line and lapped flush.</p>
     </div>
     <img class="story-render" src="/khensu/renders/macro.webp" width="1600" height="1200" loading="lazy" decoding="async" alt="Macro of the ñü.isheru: black and white labradorite disc, a lapis crescent with its platinum line, a bloodstone ring with tourmaline markers, and kyanite and onyx points, set flush into brushed brass." />
     <div class="wrap">
@@ -319,7 +319,7 @@ const chakras = [
         Prices include sales tax or VAT; the rate depends on where you live, so the tax line and the profit shift a
         little by country and state. Shipping is extra and charged at cost: overnight priority with Saturday delivery,
         the only option (FedEx Priority Overnight in the US; International Priority elsewhere, 1–3 business days),
-        ${SHIPPING} (estimate). Payment goes over khensu.ñü’s own network: no card fee, only a network fee of a fraction
+        ${SHIPPING} (estimate). Payment goes over khėnsu.ñü’s own network: no card fee, only a network fee of a fraction
         of a cent (estimate), paid to the people who run the nodes. Import duty, where it applies, is shown before you pay.
       </p>
     </div>
@@ -334,7 +334,7 @@ const chakras = [
         life and charge time vary with use and settings. The 3D view and AR use the CAD model, and
         the ñü.isheru is composed from stone photographs to show the design, not a specific shield. iPhone is a trademark of Apple Inc.
       </p>
-      <p><a href="/shield">Full suñůlink.shield details</a></p>
+      <p><a href="/shield">Full sunulink.shield details</a></p>
     </div>
   </section>
 </Base>
@@ -367,7 +367,7 @@ const chakras = [
     document.querySelector('[data-out="total"]')!.textContent = `$${price + ship}`;
     a.textContent = `Buy · $${price + ship} total`;
     const subject = `Buy suñůlink.shield: ${ed.dataset.name}, ${model.textContent}, ${colour}`;
-    const body = `I’d like to buy one suñůlink.shield.\n\nEdition: ${ed.dataset.name}\niPhone: ${model.textContent}\nFinish: ${colour}\nPrice: $${price} including tax, plus $${ship} overnight shipping, $${price + ship} total\n\nNo payment now. Invite me to pay in the khensu.ñü app when payment opens.`;
+    const body = `I’d like to buy one sunulink.shield.\n\nEdition: ${ed.dataset.name}\niPhone: ${model.textContent}\nFinish: ${colour}\nPrice: $${price} including tax, plus $${ship} overnight shipping, $${price + ship} total\n\nNo payment now. Invite me to pay in the khėnsu.ñü app when payment opens.`;
     a.href = `mailto:${new URL(a.href).pathname}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     const finish = state.edition === 'brass' ? 'brass' : state.finish;
     dispatchEvent(new CustomEvent('shield:finish', { detail: { finish, tier: state.tier, phone: state.finish } }));

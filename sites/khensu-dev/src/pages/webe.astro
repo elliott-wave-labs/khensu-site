@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
-<Base title="webË" description="The webË specification, how to build apps and sites on webË, and how to extend khensu.ñü through code and consensus.">
+<Base title="webË" description="The webË specification, how to build apps and sites on webË, and how to extend khėnsu.ñü through code and consensus.">
   <p class="eyebrow">webË · specification</p>
   <h1>webË: a new network, alongside the internet</h1>
   <StatStrip
@@ -17,7 +17,7 @@ import StatStrip from '../components/khensu/StatStrip.astro';
   <p class="lede">An open protocol for names, sites, feeds, forums and live media over a post-quantum stealth network.</p>
   <p>
     Nodes only relay, cache and count; encoding, encryption, ranking, moderation and rendering happen on devices.
-    khensu.ñü is the first webË app. Anyone can build another.
+    khėnsu.ñü is the first webË app. Anyone can build another.
   </p>
 
   <h2 id="spec">Specification</h2>
@@ -25,11 +25,11 @@ import StatStrip from '../components/khensu/StatStrip.astro';
     <thead><tr><th>Layer</th><th>What it does</th></tr></thead>
     <tbody>
       <tr><td>Transport</td><td>Outfox mix network with ML-KEM-1024, constant stealth ticks, two-relay MOQ paths over padded trunks, all carried as ordinary HTTPS</td></tr>
-      <tr><td>Names</td><td><code>name.khensu.nu</code>, resolved from the key transparency log through private lookups, never from DNS or certificate authorities</td></tr>
+      <tr><td>Names</td><td><code>name.khensu.nu</code>, any NFC string, resolved from the key transparency log through private lookups, never from DNS or certificate authorities. Æ and æ are different names. <a href="/specs/webe#36-characters">Character rules</a></td></tr>
       <tr><td>Objects</td><td>Content-addressed chunks, signed site manifests and roots, erasure-coded across operators</td></tr>
       <tr><td>Fetch and publish</td><td>Two-relay stealth fetch; publishing through the ticks or the owner’s node, never as a visible burst</td></tr>
       <tr><td>Applications</td><td>Sites, feeds, forums, labels and live tracks</td></tr>
-      <tr><td>Clients</td><td>The khensu.ñü app’s viewer for <code>webe://</code>, a Chromium extension, then a Chromium patch</td></tr>
+      <tr><td>Clients</td><td>The khėnsu.ñü app’s viewer for <code>webe://</code>, a Chromium extension, then a Chromium patch</td></tr>
     </tbody>
   </table>
   <p>The full documents, in <code>khensu-specs</code>:</p>
@@ -68,12 +68,12 @@ import StatStrip from '../components/khensu/StatStrip.astro';
   </table>
   <h3>Today: everything on webË</h3>
   <p>
-    Messages, calls, payments, feeds, forums, sites and live streams all travel this way, in the khensu.ñü app and in
+    Messages, calls, payments, feeds, forums, sites and live streams all travel this way, in the khėnsu.ñü app and in
     any webË app built on <code>khensu-core</code>. No VPN is needed for any of them, and a VPN would add nothing.
   </p>
   <h3>Planned: webË exit, for the rest of the internet</h3>
   <ul>
-    <li><strong>On the device:</strong> a Network Extension packet tunnel on iPhone, iPad and Mac sends all the device’s traffic into webË, so ordinary apps and websites are covered too. It is part of the khensu.ñü app, with no separate VPN account.</li>
+    <li><strong>On the device:</strong> a Network Extension packet tunnel on iPhone, iPad and Mac sends all the device’s traffic into webË, so ordinary apps and websites are covered too. It is part of the khėnsu.ñü app, with no separate VPN account.</li>
     <li><strong>Two relays:</strong> each connection goes through an entry relay and an exit relay from different operators, the same split as webË fetches. The exit relay opens the connection to the website; HTTPS to the website stays end to end, so the exit sees only the site’s name and traffic size.</li>
     <li><strong>Stealth stays on:</strong> the tunnel looks like ordinary HTTPS and uses padded trunks and size buckets. Bulk browsing can’t fit inside the 2-second ticks, so timing cover for the open web is weaker than for messages; we will say so in the app.</li>
     <li><strong>Exit operators:</strong> exit duty is opt-in, needs extra stake, and runs only where the operator chooses, because exit relays receive abuse complaints for other people’s traffic, as Tor exits do.</li>
@@ -84,7 +84,7 @@ import StatStrip from '../components/khensu/StatStrip.astro';
   <h2 id="build">Build an app on webË</h2>
   <ul>
     <li><strong>Sites:</strong> a site is a signed manifest plus static files and optional WebAssembly, published at <code>your-name.khensu.nu</code> and hosted by the network. There is no server-side code. A site can embed feeds, forums and live tracks by reference.</li>
-    <li><strong>Apps:</strong> <code>khensu-core</code> (Apache-2.0, Rust) gives you the transport, MLS groups, names and objects, with Swift bindings as an XCFramework for iPhone, iPad and Mac. Your app gets the same stealth and post-quantum encryption as khensu.ñü, with no extra work.</li>
+    <li><strong>Apps:</strong> <code>khensu-core</code> (Apache-2.0, Rust) gives you the transport, MLS groups, names and objects, with Swift bindings as an XCFramework for iPhone, iPad and Mac. Your app gets the same stealth and post-quantum encryption as khėnsu.ñü, with no extra work.</li>
     <li><strong>Browsers:</strong> the Chromium extension resolves <code>webe://</code> and <code>https://*.khensu.nu</code> through a local daemon, so webË pages open in an ordinary browser.</li>
     <li><strong>Develop locally:</strong> <code>khensu-devnet</code> runs a node, the mix network, the chain and the push gateway on one machine.</li>
   </ul>
@@ -137,8 +137,8 @@ import StatStrip from '../components/khensu/StatStrip.astro';
     <li><strong>Mesh and satellite bridging:</strong> nodes and suñůlink.shield units carry mixnet traffic between places with no internet and the rest of the network.</li>
   </ul>
 
-  <h2 id="extend">Extend khensu.ñü</h2>
-  <p>There are two ways to change khensu.ñü: pull requests for code, and consensus for the network’s rules.</p>
+  <h2 id="extend">Extend khėnsu.ñü</h2>
+  <p>There are two ways to change khėnsu.ñü: pull requests for code, and consensus for the network’s rules.</p>
   <h3>Code: pull requests</h3>
   <ul>
     <li>Send pull requests to any repository once it opens. Outside contributors sign a contributor licence agreement once, through a bot on the first pull request.</li>

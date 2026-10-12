@@ -1,0 +1,490 @@
+---
+// ñü.Føňt (code: nu Font): the house typeface. Built by tools/font/nufont.py; the files it links live in
+// public/fonts/nufont/. Every figure on this page is read from the build's nufont.json.
+import Base from '../layouts/Base.astro';
+import NuMark from '../components/khensu/NuMark.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
+import info from '../../public/fonts/nufont/nufont.json';
+
+const kb = (n: number) => `${(n / 1024).toFixed(n < 10240 ? 1 : 0)} KB`;
+const sizes = info.sizes as Record<string, number>;
+const variableWoff2 = sizes['nuFont-Variable.woff2'];
+const variableTtf = sizes['nuFont-Variable.ttf'];
+const staticTtf = sizes['nuFont-Medium.ttf'];
+const weights = [
+  ['Ultralight', 100],
+  ['Light', 300],
+  ['Medium', 500],
+  ['Bold', 700],
+  ['Heavy', 800],
+  ['Blackout', 900],
+] as const;
+const stems = Object.entries(info.stems as Record<string, string>);
+const shapes = [
+  { g: 'n u m', t: 'Horseshoes, not stems', text: 'n is an upside-down horseshoe, u a horseshoe, m two of them. The legs are the same height on both sides; nothing stands on a stem.' },
+  { g: 'h', t: 'h squiggles back', text: 'The stem stops at the x-height, half the letter’s height, and bends into the shoulder, so the left side never touches the baseline.' },
+  { g: 'b d', t: 'Bubbles float', text: 'b and d keep a short stem that ends halfway down the bowl, and the bubble sits a little above the baseline.' },
+  { g: 'r', t: 'A bit more than half a curve', text: 'r rises from the baseline as a tall quarter-ellipse and bends just past the top. No stem, no joint.' },
+  { g: 'H b', t: 'Capitals are twice the bowl', text: 'Cap height 700, x-height 350, descender 350 ÷ φ. Widths follow the golden ratio: H is 700 ÷ φ wide.' },
+  { g: 'ė.', t: 'Capsule ends', text: 'Every stroke ends in a superellipse: rounder than a square, squarer than a circle. The dots are the same shape.' },
+];
+---
+
+<Base
+  title="ñü.Føňt: the typeface where the dot is E"
+  description="ñü.Føňt is the khėnsu.ñü typeface: a stroke font on the golden ratio with capsule ends and no stems where a letter can live without one. Six weights and the italic in one variable file, free to install on Mac, Windows, Linux and phones, and the ė dot pulses with the ñü.aura."
+>
+  <div class="khensu font-page">
+    <ProductBar name="ñü.Føňt" explore="#font-shapes" action="Download" href="#font-install" />
+
+    <section class="page-head">
+      <div class="wrap">
+        <p class="eyebrow"><span class="name-case">ñü.Føňt</span> · the house typeface</p>
+        <h1 class="mark"><NuMark name="nufont" aura /></h1>
+        <p class="lede">A stroke font drawn on the golden ratio. Capsule ends, no sharp corners, and no stems where a letter can live without one. Six weights and the italic travel in one small file, and every letter can animate on its own, starting with the dot on the ė.</p>
+        <StatStrip
+          items={[
+            { n: weights.length, label: 'Weights, ultralight to blackout, plus the italic of each' },
+            { n: info.glyphs, label: 'Glyphs: Latin, digits, punctuation and every mark the names use' },
+            { n: Math.round(variableWoff2 / 1024), unit: 'KB', label: 'The whole family as one variable WOFF2' },
+            { n: 2, label: 'Axes: weight 100 to 900, slant 0 to −11°' },
+          ]}
+        />
+        <nav class="chips" aria-label="On this page">
+          <a href="#font-dot">The dot is E</a>
+          <a href="#font-shapes">Shapes</a>
+          <a href="#font-weights">Weights</a>
+          <a href="#font-stems">Stems</a>
+          <a href="#font-install">Install</a>
+          <a href="#font-next">Next</a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="section band" id="font-dot">
+      <div class="wrap">
+        <p class="eyebrow">the dot is E</p>
+        <h2>One path per stroke.<br /><span class="dim">So the ė can breathe.</span></h2>
+        <div class="dot-stage">
+          <NuMark name="khensu" aura class="big" />
+        </div>
+        <div class="grid two">
+          <article class="glass">
+            <h3>Animated as a path, not a picture</h3>
+            <p>A wordmark in ñü.Føňt is written into the page as vector paths, one for each stroke of each letter. The dot above the ė is its own path, so it pulses and phases through the ñü.aura, green to blue to purple, while every other stroke, tilde and dieresis included, keeps exactly the look it has now. Nothing is an image and nothing crossfades.</p>
+          </article>
+          <article class="glass">
+            <h3>Every letter can act alone</h3>
+            <p>This is the rule for the whole face: any letter or mark can join the aura shift or take its own fade, pulse, drift or burst, with CSS alone. The ė dot is the first to move. The page honours reduced-motion settings and holds the dot still in the accent colour.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="font-shapes">
+      <div class="wrap">
+        <p class="eyebrow">shapes</p>
+        <h2>Sleek, rounded, never fully round.</h2>
+        <p class="intro">Every glyph begins as a centreline, a few lines and arcs on a grid of 1000 units per em, and is given its weight by stroking that skeleton. The same skeletons carry every weight, which is why they interpolate into one variable font.</p>
+        <div class="grid three shapes">
+          {shapes.map((s) => (
+            <article class="glass">
+              <p class="sample" aria-hidden="true">{s.g}</p>
+              <h3>{s.t}</h3>
+              <p>{s.text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section band" id="font-weights">
+      <div class="wrap">
+        <p class="eyebrow">weights</p>
+        <h2>Ultralight to blackout.<br /><span class="dim">One file.</span></h2>
+        <div class="tester glass">
+          <p class="tester-text" id="font-tester" contenteditable="true" spellcheck="false" aria-label="Type to try ñü.Føňt">khėnsu.ñü webË ñü.vœîð ñü.ẽřåł ñü.ċřêæțẽ ñü.ŵævẽš ñũ.Fî ñũ.Bî</p>
+          <div class="controls">
+            <label class="ctl">
+              <span>Weight <b id="font-wght-label">500 · Medium</b></span>
+              <input id="font-wght" type="range" min="100" max="900" step="1" value="500" />
+            </label>
+            <label class="ctl">
+              <span>Size <b id="font-size-label">64 px</b></span>
+              <input id="font-size" type="range" min="18" max="160" step="1" value="64" />
+            </label>
+            <label class="ctl toggle">
+              <input id="font-italic" type="checkbox" />
+              <span>Italic</span>
+            </label>
+          </div>
+          <div class="weight-pills" role="group" aria-label="Named weights">
+            {weights.map(([name, w]) => (
+              <button type="button" class="pill ghost" data-wght={w}>{name}</button>
+            ))}
+          </div>
+        </div>
+        <div class="ladder" aria-hidden="true">
+          {weights.map(([name, w]) => (
+            <p style={`font-weight:${w}`}>{name} khėnsu.ñü 0123456789</p>
+          ))}
+          <p style="font-weight:500;font-style:oblique 11deg">Italic khėnsu.ñü 0123456789</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="font-stems">
+      <div class="wrap">
+        <p class="eyebrow">stems</p>
+        <h2>The letters that still stand on one.</h2>
+        <p class="intro">n, m, u, r, o, c, e, s, v, w, x and z have no stem at all. h, b and d keep only the top half of theirs. These are the glyphs that still have a stem in this release, and how each one uses it.</p>
+        <ul class="stems">
+          {stems.map(([g, note]) => (
+            <li>
+              <span class="g" aria-hidden="true">{g.length === 1 ? g : g === 'dotlessi' ? 'ı' : g === 'lslash' ? 'ł' : g}</span>
+              <span><b>{g.length === 1 ? g : g === 'dotlessi' ? 'dotless i' : g === 'lslash' ? 'l with stroke' : g}</b> {note}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section band" id="font-install">
+      <div class="wrap">
+        <p class="eyebrow">install</p>
+        <h2>Free, for every screen.</h2>
+        <p class="intro">ñü.Føňt is published under the SIL Open Font License, so it installs on any computer or phone and ships inside any app or site, including yours.</p>
+        <div class="grid three">
+          <article class="glass">
+            <h3>Everything</h3>
+            <p>The variable TTF, the twelve static TTFs and the metrics file in one archive.</p>
+            <p><a class="btn primary" href="/fonts/nufont/nufont.zip" download>Download nufont.zip · {kb(sizes['nufont.zip'])}</a></p>
+          </article>
+          <article class="glass">
+            <h3>One variable file</h3>
+            <p>Every weight and the italic as one font. For Font Book, Windows, Linux and app bundles.</p>
+            <p><a class="btn" href="/fonts/nufont/nuFont-Variable.ttf" download>nuFont-Variable.ttf · {kb(variableTtf)}</a></p>
+            <p><a class="btn" href="/fonts/nufont/nuFont-Variable.woff2" download>nuFont-Variable.woff2 · {kb(variableWoff2)}</a></p>
+          </article>
+          <article class="glass">
+            <h3>Static weights</h3>
+            <p>About {kb(staticTtf)} each, for tools that don’t read variable fonts yet.</p>
+            <p class="statics">
+              {weights.map(([name]) => (
+                <>
+                  <a href={`/fonts/nufont/nuFont-${name}.ttf`} download>{name}</a>
+                  <a href={`/fonts/nufont/nuFont-${name}Italic.ttf`} download>{name} Italic</a>
+                </>
+              ))}
+            </p>
+          </article>
+        </div>
+        <div class="grid two howto">
+          <article class="glass">
+            <h3>On a computer</h3>
+            <p><b>Mac:</b> double-click the TTF and choose Install Font, or drop it on Font Book. <b>Windows:</b> right-click the TTF and choose Install, or Install for all users. <b>Linux:</b> copy it to <code>~/.local/share/fonts</code> and run <code>fc-cache -f</code>. It appears in every app as “nu Font”.</p>
+          </article>
+          <article class="glass">
+            <h3>On a phone and in apps</h3>
+            <p><b>iPhone and iPad:</b> install through a font-installer app, or add the TTF to your own app’s bundle and list it under <code>UIAppFonts</code>. <b>Android:</b> put the TTF in <code>res/font</code> and reference it as a font family. <b>Web:</b> one <code>@font-face</code> with <code>font-weight: 100 900</code> and <code>font-style: oblique 0deg 11deg</code> pointing at the WOFF2.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="font-next">
+      <div class="wrap">
+        <p class="eyebrow">next</p>
+        <h2>Where ñü.Føňt goes from here.</h2>
+        <div class="grid three">
+          <article class="glass">
+            <h3>Written styles</h3>
+            <p>A hand-drawn italic and a sharpie style that stays close to the typed letterforms, as their own masters in the same file.</p>
+          </article>
+          <article class="glass">
+            <h3>Letters that float</h3>
+            <p>Text as mylar balloons, each glyph a ñü.3d shell with soft creases and highlights, drifting and settling in the page.</p>
+          </article>
+          <article class="glass">
+            <h3>Emoji in the same voice</h3>
+            <p>Colour and animated emoji drawn with the same strokes and capsule ends, so a message reads as one hand.</p>
+          </article>
+          <article class="glass">
+            <h3>Kerning and hinting</h3>
+            <p>Pair spacing for every name on this site, then hinting for small text, so ñü.Føňt can take over running text as well.</p>
+          </article>
+          <article class="glass">
+            <h3>Capsule rendering</h3>
+            <p>Glyphs rendered from their strokes with a built-in alpha mask, tuned for the neural engines and TPUs that phones ship with.</p>
+          </article>
+          <article class="glass">
+            <h3>Every letter, its own cue</h3>
+            <p>Per-letter fades, pulses and bursts as named presets, chosen in CSS, for every wordmark on khėnsu.ñü.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  const tester = document.getElementById('font-tester') as HTMLElement | null;
+  const wght = document.getElementById('font-wght') as HTMLInputElement | null;
+  const size = document.getElementById('font-size') as HTMLInputElement | null;
+  const italic = document.getElementById('font-italic') as HTMLInputElement | null;
+  const wghtLabel = document.getElementById('font-wght-label');
+  const sizeLabel = document.getElementById('font-size-label');
+  const names: [number, string][] = [[100, 'Ultralight'], [300, 'Light'], [500, 'Medium'], [700, 'Bold'], [800, 'Heavy'], [900, 'Blackout']];
+  const nameFor = (w: number) => names.reduce((best, n) => (Math.abs(n[0] - w) < Math.abs(best[0] - w) ? n : best))[1];
+  const apply = () => {
+    if (!tester || !wght || !size || !italic) return;
+    const w = Number(wght.value);
+    tester.style.fontVariationSettings = `'wght' ${w}, 'slnt' ${italic.checked ? -11 : 0}`;
+    tester.style.fontSize = `${size.value}px`;
+    if (wghtLabel) wghtLabel.textContent = `${w} · ${nameFor(w)}`;
+    if (sizeLabel) sizeLabel.textContent = `${size.value} px`;
+  };
+  wght?.addEventListener('input', apply);
+  size?.addEventListener('input', apply);
+  italic?.addEventListener('change', apply);
+  document.querySelectorAll<HTMLButtonElement>('.weight-pills [data-wght]').forEach((b) =>
+    b.addEventListener('click', () => {
+      if (wght) wght.value = b.dataset.wght ?? '500';
+      apply();
+    }),
+  );
+  apply();
+</script>
+
+<style>
+  .mark {
+    font-size: clamp(3.2rem, 11vw, 9rem);
+    line-height: 1;
+    margin: 0 0 1rem;
+  }
+  .mark :global(svg) {
+    height: 1.1em;
+    max-width: 94vw;
+  }
+  .intro {
+    color: var(--text-dim);
+    max-width: 52rem;
+    margin-bottom: 2rem;
+  }
+  .page-head .lede {
+    margin: 0 0 clamp(1.6rem, 4vw, 2.4rem);
+    max-width: 48rem;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+  .chips a {
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    text-decoration: none;
+  }
+  .chips a:hover {
+    color: var(--text);
+  }
+  .dim {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .band {
+    background: #000;
+  }
+  h2 {
+    margin-bottom: 1.2rem;
+  }
+  .glass {
+    padding: 1.4rem 1.5rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .glass h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
+    font-weight: 500;
+  }
+  .glass p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .glass p + p {
+    margin-top: 0.8rem;
+  }
+  .glass a {
+    color: var(--text);
+  }
+  .glass code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--text);
+  }
+  .grid.three {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+  .grid.two {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    margin-top: 2.5rem;
+  }
+  .howto {
+    margin-top: 1.5rem;
+  }
+  .dot-stage {
+    display: grid;
+    place-items: center;
+    padding: clamp(2rem, 6vw, 4rem) 0 clamp(1rem, 3vw, 2rem);
+    font-size: clamp(3.4rem, 12vw, 10rem);
+    line-height: 1;
+  }
+  .dot-stage :global(svg) {
+    height: 1.1em;
+    max-width: 92vw;
+  }
+  .shapes .sample {
+    font-family: var(--font-display);
+    font-size: clamp(3.6rem, 7vw, 5.4rem);
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin: 0 0 0.6rem;
+  }
+  .tester {
+    margin-top: 1rem;
+  }
+  .tester-text {
+    font-family: var(--font-display);
+    font-size: 64px;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin: 0 0 1.4rem;
+    min-height: 1.4em;
+    outline: none;
+    overflow-wrap: anywhere;
+  }
+  .tester-text:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent-soft);
+    border-radius: 12px;
+  }
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1.5rem;
+    align-items: end;
+  }
+  .ctl {
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .ctl b {
+    color: var(--text);
+    font-weight: 500;
+    margin-left: 0.3em;
+  }
+  .ctl input[type='range'] {
+    width: 100%;
+  }
+  .toggle {
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.1rem;
+  }
+  .toggle input {
+    accent-color: var(--accent);
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  .weight-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.4rem;
+  }
+  .weight-pills .pill {
+    cursor: pointer;
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    font-size: 0.88rem;
+  }
+  .weight-pills .pill:hover {
+    color: var(--text);
+  }
+  .ladder {
+    margin-top: 2.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+  .ladder p {
+    margin: 0;
+  }
+  .stems {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 0.6rem 1.5rem;
+  }
+  .stems li {
+    display: grid;
+    grid-template-columns: 3.2rem 1fr;
+    gap: 0.8rem;
+    align-items: center;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--text-dim);
+    font-size: 0.93rem;
+  }
+  .stems .g {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--text);
+    text-align: center;
+  }
+  .stems b {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .statics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem 1rem;
+  }
+  .statics a {
+    text-decoration: none;
+    color: var(--text-dim);
+  }
+  .statics a:hover {
+    color: var(--text);
+  }
+  @media (max-width: 720px) {
+    .controls {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,3 +1,12 @@
+/* ñü.Føňt, the house typeface, for display roles. Built by tools/font/build.sh. */
+@font-face {
+  font-family: 'nu Font';
+  src: url('/fonts/nufont/nuFont-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: oblique 0deg 11deg;
+  font-display: swap;
+}
+
 :root {
   --bg: #0a0b0d;
   --bg-raised: #111317;
@@ -15,7 +24,7 @@
   --khensu-soft: color-mix(in srgb, var(--khensu) 10%, transparent);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans Hebrew', 'Noto Sans Devanagari', 'Noto Sans Thai', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans', sans-serif;
-  --font-display: var(--font-sans);
+  --font-display: 'nu Font', var(--font-sans);
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --measure: 64ch;
@@ -350,7 +359,7 @@ code,
 }
 
 /* ñü.aura: the house gradient, green, electric blue and purple, drifting slowly. Used for every highlight: chart fills,
-   khensu.ñü's own rows, emphasised text, sliders and primary buttons. */
+   khėnsu.ñü's own rows, emphasised text, sliders and primary buttons. */
 :root {
   --aura-green: #22f59a;
   --aura-blue: #1e8fff;
@@ -402,3 +411,12 @@ input[type='range']::-webkit-slider-thumb {
 }
 input[type='range']::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(30, 143, 255, 0.35), 0 0 16px rgba(30, 143, 255, 0.7); }
 input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgba(34, 245, 154, 0.55), 0 0 18px rgba(30, 143, 255, 0.8); }
+
+/* ñü.Føňt wordmarks (NuMark.astro): the ė dot pulses and phases through the aura; all other strokes stay put. */
+.nf-word { display: inline-block; line-height: 0; vertical-align: -0.04em; }
+.nf-word svg { height: 1em; width: auto; overflow: visible; fill: currentColor; }
+.nf-word .mark.dot { transform-box: fill-box; transform-origin: center; animation: nf-dot-pulse 2.8s ease-in-out infinite, nf-dot-aura 9s linear infinite; }
+@keyframes nf-dot-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.28); } }
+@keyframes nf-dot-aura { 0% { fill: #22f59a; } 33% { fill: #1e8fff; } 66% { fill: #8b5cff; } 100% { fill: #22f59a; } }
+@media (prefers-reduced-motion: reduce) { .nf-word .mark.dot { animation: none; fill: var(--accent); } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

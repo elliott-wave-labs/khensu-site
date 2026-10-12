@@ -174,7 +174,7 @@
       },
       {
         "id": "khensu",
-        "name": "khensu.ñü",
+        "name": "khėnsu.ñü",
         "note": "No platform cut and a 42¢ minimum payout. Only a network fee of a fraction of a cent, paid to node operators",
         "platform": [
           0.1,
@@ -185,7 +185,7 @@
         "ours": true,
         "sources": [
           {
-            "name": "khensu.ñü, Shielded payments: Creators (no platform cut; network fee only, estimate)",
+            "name": "khėnsu.ñü, Shielded payments: Creators (no platform cut; network fee only, estimate)",
             "url": "https://khensu.nu/creators#fans-pay-section",
             "checked": "2026-10-11"
           }
@@ -200,8 +200,8 @@
     "rows": [
       {
         "id": "khensu",
-        "name": "khensu.ñü",
-        "note": "A cent a play, every play, all of it to the creator. khensu.ñü takes no cut, so nothing comes off before it reaches you",
+        "name": "khėnsu.ñü",
+        "note": "A cent a play, every play, all of it to the creator. khėnsu.ñü takes no cut, so nothing comes off before it reaches you",
         "paid": [
           10,
           10
@@ -215,7 +215,7 @@
         "ours": true,
         "sources": [
           {
-            "name": "khensu.ñü, creator pay (1¢ a play, no platform cut)",
+            "name": "khėnsu.ñü, creator pay (1¢ a play, no platform cut)",
             "url": "https://khensu.nu/creators#fans-pay-section",
             "checked": "2026-10-11"
           }

@@ -33,7 +33,7 @@ const jobs = [
 ];
 
 const fees = [
-  { name: 'khensu.ñü', fee: 10, label: '10%', keeps: '$90', ours: true },
+  { name: 'khėnsu.ñü', fee: 10, label: '10%', keeps: '$90', ours: true },
   { name: 'Epic Games Store', fee: 12, label: '12%', keeps: '$88' },
   { name: 'Apple App Store, Google Play', fee: 30, from: 15, label: '15–30%', keeps: '$70–85' },
 ];
@@ -66,9 +66,9 @@ const money = (n: number) => (n >= 1e6 ? `$${(n / 1e6).toFixed(n >= 1e8 ? 0 : 1)
 const pipeline = [
   { t: 'You subscribe in the App Store', text: 'Pro, Ultra or Akashic, paid with Apple Pay. Apple keeps its 15% and pays the rest to Elliott Wave LLC each month.' },
   { t: 'Half goes to the network as USDC', text: 'The network’s 50% is converted 1:1 to USDC, a fully reserved dollar stablecoin, and paid into the shielded pool as that epoch’s pay pool.' },
-  { t: 'Nodes are paid for proved work', text: 'Each node is paid in khensu.ñü coin for its verified work receipts, at one worldwide rate, and the coin turns into USDC the moment it lands in the wallet. Nobody sees who was paid or how much.' },
+  { t: 'Nodes are paid for proved work', text: 'Each node is paid in khėnsu.ñü coin for its verified work receipts, at one worldwide rate, and the coin turns into USDC the moment it lands in the wallet. Nobody sees who was paid or how much.' },
   { t: 'Operators spend it with Apple Pay', text: 'Keep it, send it, or spend it anywhere with a USDC debit card in Apple Pay, or withdraw to a bank.' },
-  { t: 'The other half is the founder’s', text: 'Elliott Wave LLC’s 50% pays for building and running khensu.ñü. It is the only cut, and it comes only from these subscriptions.' },
+  { t: 'The other half is the founder’s', text: 'Elliott Wave LLC’s 50% pays for building and running khėnsu.ñü. It is the only cut, and it comes only from these subscriptions.' },
 ];
 const succession = [
   { t: 'On every change', text: 'Every code push, private or public, every release and every network upgrade is archived on the network automatically, within one epoch. A release that isn’t archived won’t install.' },
@@ -81,7 +81,7 @@ const succession = [
 
 <Base
   title="ñü.ñetwork: contracts, paid node work and a gift to everyone"
-  description="webË contracts for any work, from escrow to anonymous ballots. Six jobs node operators are paid for. A flat 10% app fee, the lowest in the industry. And a network that belongs to everyone, the founder’s powers included."
+  description="webe contracts for any work, from escrow to anonymous ballots. Six jobs node operators are paid for. A flat 10% app fee, the lowest in the industry. And a network that belongs to everyone, the founder’s powers included."
 >
   <div class="khensu">
     <section class="page-head">
@@ -116,7 +116,7 @@ const succession = [
         <RevealText
           parts={[
             ['On most chains, a contract is a public record of who paid whom and why. '],
-            ['On webË, the code is public and everything else is private.', true],
+            ['On webe, the code is public and everything else is private.', true],
             [' Each step is proved on the device of the person who takes it, and the chain keeps only the proof. '],
             ['Nothing for an observer to read, and nothing for a quantum computer to break later.', true],
           ]}
@@ -253,7 +253,7 @@ const succession = [
         <p class="eyebrow">network economics</p>
         <h2>Half to the network.<br /><span class="dim">Half to the founder. Nothing from you.</span></h2>
         <p class="intro">
-          khensu.ñü earns only from its own subscriptions. After Apple’s cut, every dollar splits evenly: half pays the
+          khėnsu.ñü earns only from its own subscriptions. After Apple’s cut, every dollar splits evenly: half pays the
           people who run the network, half goes to the founder’s company.
         </p>
         <figure class="glass econ">
@@ -302,7 +302,7 @@ const succession = [
         <p class="eyebrow">node earnings</p>
         <h2>Over $1,000 a week.<br /><span class="dim">Once the audience is there.</span></h2>
         <p class="intro">
-          What a node earns depends on how many people use khensu.ñü and how much work the node does. Here is a month at each
+          What a node earns depends on how many people use khėnsu.ñü and how much work the node does. Here is a month at each
           audience size, paid from the network’s half of subscriptions alone.
         </p>
         <figure class="glass econ">
@@ -310,7 +310,7 @@ const succession = [
           <div class="econ-scroll" tabindex="0">
             <table>
               <thead>
-                <tr><th scope="col">People on khensu.ñü</th><th scope="col">Network pool a month</th><th scope="col">Nodes</th><th scope="col">Average node</th><th scope="col">High-capacity node</th><th scope="col">Per week</th></tr>
+                <tr><th scope="col">People on khėnsu.ñü</th><th scope="col">Network pool a month</th><th scope="col">Nodes</th><th scope="col">Average node</th><th scope="col">High-capacity node</th><th scope="col">Per week</th></tr>
               </thead>
               <tbody>
                 {scale.map((r) => (
@@ -335,8 +335,8 @@ const succession = [
         <p class="footnote">
           Estimates. They assume 5% of people subscribe (98.9% Pro, 1% Ultra, 0.1% Akashic, about $3.37 a month to the network
           per subscriber after Apple’s 15%), node counts growing more slowly than the audience, and a high-capacity node
-          proving ten times the average work. Before electricity and bandwidth costs, and before tax. Earnings from webË apps,
-          contracts, media delivery and the <a href="/bi">ñü.bi</a> dividend are not included. Real earnings depend on usage and are not guaranteed.
+          proving ten times the average work. Before electricity and bandwidth costs, and before tax. Earnings from webe apps,
+          contracts, media delivery and the <a href="/bi">nu.bi</a> dividend are not included. Real earnings depend on usage and are not guaranteed.
         </p>
       </div>
     </section>
@@ -346,7 +346,7 @@ const succession = [
         <p class="eyebrow">app commerce</p>
         <h2>A flat 10%.<br /><span class="dim">The lowest fee in the industry.</span></h2>
         <p class="intro">
-          Apps, Mini Apps and webË sites sell purchases and subscriptions over the network. khensu.ñü keeps 10%, on the
+          Apps, Mini Apps and webe sites sell purchases and subscriptions over the network. khėnsu.ñü keeps 10%, on the
           first dollar and the billionth. It never scales up or down. There is no tier, no programme to apply for, no minimum
           payout and no payout date: each payment reaches the developer’s wallet as it’s made.
         </p>
@@ -368,8 +368,8 @@ const succession = [
         </figure>
         <div class="grid three">
           <article class="glass"><h3>Buyers stay anonymous</h3><p>The developer learns that item X sold at price P and gets paid. No name, email, device or purchase history, and two purchases by one person can’t be linked.</p></article>
-          <article class="glass"><h3>Tips stay 100%</h3><p>A tip is a gift to a person, not a purchase. khensu.ñü takes nothing from it, and views, gifts and a creator’s own sales carry no platform cut (<a href="/creators">for artists</a>).</p></article>
-          <article class="glass"><h3>Fee included</h3><p>The network fee that pays node operators for carrying a payment comes out of khensu.ñü’s 10%, never on top.</p></article>
+          <article class="glass"><h3>Tips stay 100%</h3><p>A tip is a gift to a person, not a purchase. khėnsu.ñü takes nothing from it, and views, gifts and a creator’s own sales carry no platform cut (<a href="/creators">for artists</a>).</p></article>
+          <article class="glass"><h3>Fee included</h3><p>The network fee that pays node operators for carrying a payment comes out of khėnsu.ñü’s 10%, never on top.</p></article>
         </div>
         <p class="footnote">
           Other stores at their published standard rates, checked 11 October 2026: Epic Games Store 12%; Apple App Store and

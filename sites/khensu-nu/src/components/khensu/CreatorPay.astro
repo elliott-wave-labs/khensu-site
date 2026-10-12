@@ -1,6 +1,6 @@
 ---
-// What artists keep on today's platforms against paying them directly on khensu.ñü.
-// Every number and its source lives in src/data/creator-pay.json; khensu.ñü's fee is an estimate.
+// What artists keep on today's platforms against paying them directly on khėnsu.ñü.
+// Every number and its source lives in src/data/creator-pay.json; khėnsu.ñü's fee is an estimate.
 import data from '../../data/creator-pay.json';
 
 type Src = { name: string; url: string; checked: string };
@@ -34,7 +34,7 @@ const pct = (v: number) => (v / max) * 100;
 
 const uniq = (rows: { sources: Src[] }[]) => {
   const seen = new Map<string, Src>();
-  for (const r of rows) for (const s of r.sources) if (!s.url.includes('khensu.ñü')) seen.set(s.url, s);
+  for (const r of rows) for (const s of r.sources) if (!s.url.includes('khėnsu.ñü')) seen.set(s.url, s);
   return [...seen.values()];
 };
 const cutSources = uniq(cut);
@@ -51,7 +51,7 @@ const points = [
   { t: 'Paid straight to you', b: 'Views, tips, gifts, sales and live tickets go from a fan’s wallet to yours. No platform cut and no card processor in between.' },
   { t: 'Funded by fans, not advances', b: 'Raise the money for a film, an album or a tour with nufi. Backers pay only if you reach your goal, and you keep your rights.' },
   { t: 'Everyone on the credits paid', b: 'Set the split once, and every payment is shared between collaborators automatically. No label recoupment first.' },
-  { t: 'Every right stays yours', b: 'Publishing rights, copyright, trademarks and IP, like nowhere else. khensu.ñü takes no licence to your work, no share of your masters or publishing, and never trains AI on it.' },
+  { t: 'Every right stays yours', b: 'Publishing rights, copyright, trademarks and IP, like nowhere else. khėnsu.ñü takes no licence to your work, no share of your masters or publishing, and never trains AI on it.' },
 ];
 ---
 
@@ -60,13 +60,13 @@ const points = [
     <p class="eyebrow">ñü.network &amp; fans pay artists directly</p>
     <h2 id="creator-pay-title" class="big">From fan to artist.<br /><em>Nobody takes a cut in between.</em></h2>
     <p class="lede">
-      Studios, labels and streaming services keep most of what people spend on art. On khensu.ñü, fans pay the people
+      Studios, labels and streaming services keep most of what people spend on art. On khėnsu.ñü, fans pay the people
       who made it, in the app, and the only charge is a network fee under 1¢ to send, receive or withdraw. And you keep every right
       to your work: publishing, copyright, trademarks and IP, like nowhere else. There are no ads: you’re paid for
       people using and interacting with your work, every play and view, and every tip and gift.
     </p>
 
-    <div class="stats" aria-label="How khensu.ñü payments work" hidden={page}>
+    <div class="stats" aria-label="How khėnsu.ñü payments work" hidden={page}>
       <p class="target">how payments work</p>
       <div class="sv"><b>0%</b><span>platform cut</span></div>
       <div class="sv"><b>100%</b><span>of every view and tip, gift or payment to the artist</span></div>
@@ -78,7 +78,7 @@ const points = [
       <figure class="card cp-card views-card" data-scene="reveal">
         <figcaption>
           <b>Views and plays: what reaches the artist for <output class="amt" data-plays>1,000</output> plays</b>
-          <span>US dollars for streams or views. On khensu.ñü, a cent a play with no cut; drag to change the number of plays.</span>
+          <span>US dollars for streams or views. On khėnsu.ñü, a cent a play with no cut; drag to change the number of plays.</span>
         </figcaption>
         <label class="scale">
           <span class="sr-only">Number of plays, from 1,000 to 1 billion</span>
@@ -107,12 +107,12 @@ const points = [
         <ul class="key" role="list">
           <li><i class="k-ghost" />Paid for the plays, before label or platform share</li>
           <li><i class="k-plat" />Reaches the artist</li>
-          <li class="k-ours"><i />khensu.ñü, all to the artist</li>
+          <li class="k-ours"><i />khėnsu.ñü, all to the artist</li>
         </ul>
         <p class="src">
           Estimates checked {data.checked}; services pay from a monthly pool, not a fixed rate, and pay varies by country,
           plan and audience. Signed-artist figures apply a 15–20% royalty to the rights holders’ payout, before recoupment.
-          On khensu.ñü every play pays the artist 1¢ and khensu.ñü takes no cut, so $10 per 1,000 plays reaches the artist in full. The play rate is the same for everyone; artists set prices only for what they sell, such as albums, tickets and in-app purchases; tips arrive in full, and paid content
+          On khėnsu.ñü every play pays the artist 1¢ and khėnsu.ñü takes no cut, so $10 per 1,000 plays reaches the artist in full. The play rate is the same for everyone; artists set prices only for what they sell, such as albums, tickets and in-app purchases; tips arrive in full, and paid content
           bought inside the iPhone app follows Apple’s purchase rules.
           Sources: {perSources.map((s, i) => <>{i ? '; ' : ''}<a href={s.url} rel="noopener">{s.name}</a></>)}.
         </p>
@@ -148,7 +148,7 @@ const points = [
           </ul>
         </div>
         <ul class="key" role="list">
-          <li class="k-ours"><i />khensu.ñü, kept by the artist</li>
+          <li class="k-ours"><i />khėnsu.ñü, kept by the artist</li>
           <li><i class="k-plat" />Kept by the artist</li>
           <li><i class="k-range" />Range</li>
           <li><i class="k-taken" />Taken by the platform and label</li>
@@ -158,8 +158,8 @@ const points = [
           $1 billion; the App Store’s 15% rate covers developers earning under $1 million a year and subscriptions after their
           first year, otherwise 30%. The Spotify row is an estimate: about two-thirds of Spotify’s revenue goes to rights
           holders, and a typical new-artist label deal pays the artist 15–20% of that, before any advance is recouped;
-          songwriting royalties are paid separately. Card fees are worked out at typical payment sizes. khensu.ñü’s network
-          fee is an estimate. Apps built on khensu.ñü pay a flat 10% of their own in-app purchases and app subscriptions, never scaled up or down; views, gifts, tickets, sales and tips pay no cut.
+          songwriting royalties are paid separately. Card fees are worked out at typical payment sizes. khėnsu.ñü’s network
+          fee is an estimate. Apps built on khėnsu.ñü pay a flat 10% of their own in-app purchases and app subscriptions, never scaled up or down; views, gifts, tickets, sales and tips pay no cut.
           Sources: {cutSources.map((s, i) => <>{i ? '; ' : ''}<a href={s.url} rel="noopener">{s.name}</a></>)}.
         </p>
       </figure>

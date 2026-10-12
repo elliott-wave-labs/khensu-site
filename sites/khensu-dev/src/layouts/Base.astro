@@ -5,6 +5,7 @@ import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '../styles/global.css';
+import NuMark from '../components/khensu/NuMark.astro';
 import Crescent from '../components/khensu/Crescent.astro';
 import { CARDS, cardFor } from '../../../khensu-nu/src/data/og';
 
@@ -14,9 +15,9 @@ interface Props {
   noindex?: boolean;
 }
 
-const SITE_NAME = 'khensu.ñü developers';
+const SITE_NAME = 'khėnsu.ñü developers';
 const DEFAULT_DESC =
-  'Developer documentation for khensu.ñü, the post-quantum private messenger on a network run by people: architecture, running a node, repositories, licences and security.';
+  'Developer documentation for khėnsu.ñü, the post-quantum private messenger on a network run by people: architecture, running a node, repositories, licences and security.';
 
 const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
@@ -85,15 +86,15 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="wrap bar">
-        <a href="/" class="brand" aria-label="khensu.ñü developers, home">
+        <a href="/" class="brand" aria-label="khėnsu.ñü developers, home">
           <img class="seal" src="/seal-128.webp" alt="" width="26" height="26" />
-          <span>khensu.ñü <small>developers</small></span>
+          <span><NuMark name="khensu" /> <small>developers</small></span>
         </a>
         <nav aria-label="Primary">
           <ul>
             <li><a href="/node">Run a node</a></li>
             <li><a href="/security">Security</a></li>
-            <li><a href="https://khensu.nu">khensu.ñü</a></li>
+            <li><a href="https://khensu.nu">khėnsu.ñü</a></li>
           </ul>
         </nav>
       </div>
@@ -118,7 +119,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       <div class="wrap legal">
         <p>
           © 2026 Elliott Wave LLC. Docs licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
-          khensu.ñü™ is a trademark of Elliott Wave LLC. Patents pending.
+          khėnsu.ñü™ is a trademark of Elliott Wave LLC. Patents pending.
         </p>
       </div>
     </footer>

@@ -4,12 +4,12 @@ import StatStrip from '../components/khensu/StatStrip.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 ---
 
-<Base title="khensu.ñü on the App Store" description="khensu.ñü for iPhone, iPad and Mac, on the App Store.">
+<Base title="khėnsu.ñü on the App Store" description="khėnsu.ñü for iPhone, iPad and Mac, on the App Store.">
   {APP_STORE_ID && <meta http-equiv="refresh" content={`0; url=${APP_STORE_URL}`} slot="head" />}
   <section class="page-head">
     <div class="wrap">
       <p class="eyebrow">app store</p>
-      <h1>khensu.ñü for iPhone, iPad and Mac.<br />Everything runs on your device.</h1>
+      <h1>khėnsu.ñü for iPhone, iPad and Mac.<br />Everything runs on your device.</h1>
       <StatStrip
         items={[
           { n: 5, label: 'Mix network hops for every message' },
@@ -18,7 +18,7 @@ import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
           { n: 26, label: 'iOS, iPadOS or macOS, the version it needs' },
         ]}
       />
-      <p class="lede">This page opens khensu.ñü on the App Store the moment Apple lists it, so it is safe to share.</p>
+      <p class="lede">This page opens khėnsu.ñü on the App Store the moment Apple lists it, so it is safe to share.</p>
       <div class="btn-row"><a class="btn primary" href="/webe#run-a-node-section">Run a node</a></div>
     </div>
   </section>

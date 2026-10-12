@@ -26,7 +26,7 @@ const adversaries = [
   { who: 'An internet-wide observer', can: 'Watches every link, like an ISP coalition or an intelligence agency', result: 'Messages, receipts and typing stay hidden in the crowd. Live call timing is a stated limit.' },
   { who: 'A future quantum computer', can: 'Records everything today and decrypts it later', result: 'Nothing to decrypt. No classical cryptography protects anything.' },
   { who: 'Us, Elliott Wave LLC', can: 'Runs the push gateway, credential issuer, transparency log and the first nodes', result: 'We can’t read, redirect or link your messages, contacts or payments.' },
-  { who: 'Apple', can: 'Runs notifications, App Attest and the App Store', result: 'Sees that a device uses khensu.ñü and a fixed “New message” alert. Never content or contacts.' },
+  { who: 'Apple', can: 'Runs notifications, App Attest and the App Store', result: 'Sees that a device uses khėnsu.ñü and a fixed “New message” alert. Never content or contacts.' },
   { who: 'Someone with your locked phone', can: 'Has the device but not the passcode', result: 'Everything is unreadable, with keys held in the Secure Enclave.' },
   { who: 'Someone who forces you to unlock', can: 'Has your phone and your face or passcode', result: 'Duress passcode wipes, hidden profiles stay hidden, panic wipe erases keys first.' },
   { who: 'A malicious group member', can: 'Is legitimately in your group', result: 'Can’t impersonate others or read history from before they joined or after they left.' },
@@ -37,7 +37,7 @@ const adversaries = [
 const limits = [
   { t: 'Authorship provable for up to 7 days', text: 'Until a retired signing key is revealed, a recipient could show someone that your device signed a message. After 7 days they can’t. Use disappearing messages if that matters.' },
   { t: 'Anonymity grows with the network', text: 'You hide among the people sending at the same time. The app shows an Early network notice until there are enough nodes, operators and countries.' },
-  { t: 'Phones mask activity while the app is open', text: 'iOS pauses background apps, so cover traffic runs while khensu.ñü is open. A Mac node or suñůlink.shield keeps it running around the clock.' },
+  { t: 'Phones mask activity while the app is open', text: 'iOS pauses background apps, so cover traffic runs while khėnsu.ñü is open. A Mac node or suñůlink.shield keeps it running around the clock.' },
   { t: 'Live calls can be timed', text: 'Calls can’t wait in a mixnet. Two relays run by different operators, constant-rate media and random padding hide most of it, but an observer of both ends can match start and end times.' },
 ];
 
@@ -52,7 +52,7 @@ const supply = [
 
 <Base
   title="Security"
-  description="Post-quantum end-to-end encryption, a five-hop mixnet, and no server that can read anything. Who khensu.ñü defends against, the limits we state openly, and how to report a vulnerability."
+  description="Post-quantum end-to-end encryption, a five-hop mixnet, and no server that can read anything. Who khėnsu.ñü defends against, the limits we state openly, and how to report a vulnerability."
 >
   <div class="khensu">
     <section class="page-head">
@@ -76,7 +76,7 @@ const supply = [
         <RevealText
           parts={[
             ['Most apps ask you to trust the company that runs the servers. '],
-            ['khensu.ñü is built so there’s nothing to trust.', true],
+            ['khėnsu.ñü is built so there’s nothing to trust.', true],
             [' Your devices hold the only readable copies. The network carries sealed packets it can’t open or trace. '],
             ['Even we can’t read it or hand it over.', true],
           ]}
@@ -118,7 +118,7 @@ const supply = [
       <div class="wrap">
         <p class="eyebrow">known limits</p>
         <h2>Stated, not hidden.</h2>
-        <p class="intro">No system is perfect. These are the edges of what khensu.ñü protects, and what to do about each.</p>
+        <p class="intro">No system is perfect. These are the edges of what khėnsu.ñü protects, and what to do about each.</p>
         <div class="grid two">
           {limits.map((l) => (
             <article class="glass"><h3>{l.t}</h3><p>{l.text}</p></article>

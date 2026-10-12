@@ -19,7 +19,7 @@ const fps = Number(ultra.note.match(/at (\d+) fps/)?.[1]);
 
 <Base
   title="ñü.media: measurements"
-  description="How ñü.media photos and video compare with JPEG, HEIC, H.264, HEVC and AV1, what each one measures, and how we test."
+  description="How nu.media photos and video compare with JPEG, HEIC, H.264, HEVC and AV1, what each one measures, and how we test."
 >
   <section class="page-head">
     <div class="wrap">
@@ -37,7 +37,7 @@ const fps = Number(ultra.note.match(/at (\d+) fps/)?.[1]);
         with M1 Pro, 11 October 2026. Raw results sit beside each chart below.
       </StatStrip>
       <p class="lede">
-        ñü.media sends a smaller picture, and the receiving iPhone’s Neural Engine rebuilds the full one.
+        nu.media sends a smaller picture, and the receiving iPhone’s Neural Engine rebuilds the full one.
       </p>
     </div>
   </section>
@@ -46,7 +46,7 @@ const fps = Number(ultra.note.match(/at (\d+) fps/)?.[1]);
     <div class="wrap prose">
       <h2>How it works</h2>
       <p class="body">
-        ñü.media sends video in two layers. The base layer is the video at half size, encoded by your iPhone’s hardware
+        nu.media sends video in two layers. The base layer is the video at half size, encoded by your iPhone’s hardware
         HEVC encoder; it is what crosses the network. The receiving iPhone’s Neural Engine then rebuilds the full picture.
         The measurements here show the base layer alone, and the full picture rebuilt with Apple’s built-in super
         resolution on the Neural Engine.
@@ -61,7 +61,7 @@ const fps = Number(ultra.note.match(/at (\d+) fps/)?.[1]);
 
       <h2>How we test</h2>
       <ul class="facts">
-        <li><b>The picture you see:</b> every codec is scored on the decoded frames shown on the receiving phone, so ñü.media is scored with its enhancement on, never the base layer alone.</li>
+        <li><b>The picture you see:</b> every codec is scored on the decoded frames shown on the receiving phone, so nu.media is scored with its enhancement on, never the base layer alone.</li>
         <li><b>Two scores, side by side:</b> Netflix’s <a href="https://github.com/Netflix/vmaf">VMAF</a> as published, unmodified, and a viewer test to <a href="https://www.itu.int/rec/T-REC-P.910">ITU-T P.910</a>, where people rate clips without knowing the codec. VMAF is known to under-rate generated detail, so the viewer test is the deciding score when they disagree.</li>
         <li><b>Same conditions for everyone:</b> the same clips, bitrates and phones, hardware encoders at live-call settings, and the raw results published as JSON beside each chart.</li>
       </ul>

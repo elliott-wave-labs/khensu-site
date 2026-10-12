@@ -8,6 +8,7 @@ import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '../styles/global.css';
+import NuMark from '../components/khensu/NuMark.astro';
 
 interface Props {
   title?: string;
@@ -15,9 +16,9 @@ interface Props {
   noindex?: boolean;
 }
 
-const SITE_NAME = 'khensu.ñü';
+const SITE_NAME = 'khėnsu.ñü';
 const DEFAULT_DESC =
-  'khensu.ñü is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device.';
+  'khėnsu.ñü is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device.';
 
 const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — webË, private by design. Post-quantum. Run profitably by the people.`;
@@ -30,11 +31,12 @@ const nav = [
   { href: '/webe', label: 'webË' },
   { href: '/void', label: 'ñü.vœîð' },
   { href: '/media', label: 'ñü.media' },
-  { href: '/memory', label: 'Memory' },
-  { href: '/creators', label: 'Creators' },
+  { href: '/memory', label: 'ñü.ẽřåł' },
+  { href: '/creators', label: 'ñü.ċřêæțẽ' },
   { href: '/waves', label: 'ñü.ŵævẽš' },
-  { href: '/nufi', label: 'nu.Fi' },
-  { href: '/bi', label: 'ñü.bi' },
+  { href: '/font', label: 'ñü.Føňt' },
+  { href: '/nufi', label: 'ñũ.Fî' },
+  { href: '/bi', label: 'ñũ.Bî' },
   { href: '/shield', label: 'suñůlink.shield' },
   { href: '/network', label: 'ñü.ñetwork' },
   { href: '/compliance', label: 'Compliance' },
@@ -97,9 +99,9 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="wrap bar">
-        <a href="/" class="brand" aria-label="khensu.ñü, home">
+        <a href="/" class="brand" aria-label="khėnsu.ñü, home">
           <img class="seal" src="/seal-128.webp" alt="" width="26" height="26" />
-          <span>khensu.ñü</span>
+          <span><NuMark name="khensu" /></span>
         </a>
         <nav aria-label="Primary">
           <ul>
@@ -120,22 +122,23 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <footer class="site-footer">
       <div class="wrap foot">
         <div>
-          <p class="foot-brand">khensu.ñü</p>
+          <p class="foot-brand"><NuMark name="khensu" /></p>
           <p class="foot-tag">The first app on webe. From <a href="https://elliottwave.studio">elliottwave.studio lab</a>.</p>
         </div>
         <ul class="foot-links">
           <li><a href="/webe">webË</a></li>
           <li><a href="/void">ñü.vœîð</a></li>
           <li><a href="/media">ñü.media</a></li>
-          <li><a href="/memory">Memory</a></li>
-          <li><a href="/creators">Creators</a></li>
+          <li><a href="/memory">ñü.ẽřåł</a></li>
+          <li><a href="/creators">ñü.ċřêæțẽ</a></li>
           <li><a href="/waves">ñü.ŵævẽš</a></li>
-          <li><a href="/nufi">nu.Fi</a></li>
+          <li><a href="/font">ñü.Føňt</a></li>
+          <li><a href="/nufi">ñũ.Fî</a></li>
           <li><a href="/shield">suñůlink.shield</a></li>
           <li><a href="/transfer">Send big files</a></li>
           <li><a href="/quality">How we measure</a></li>
           <li><a href="/network">ñü.ñetwork</a></li>
-          <li><a href="/bi">ñü.bi basic income</a></li>
+          <li><a href="/bi">ñũ.Bî basic income</a></li>
           <li><a href="/privacy">Privacy</a></li>
           <li><a href="/compliance">Compliance</a></li>
           <li><a href="https://dev.khensu.nu">Developers</a></li>
@@ -146,7 +149,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       </div>
       <div class="wrap legal">
         <p>
-          © 2026 Elliott Wave LLC. All rights reserved. khensu.ñü™ and elliottwave.studio lab™ are trademarks of Elliott Wave LLC.
+          © 2026 Elliott Wave LLC. All rights reserved. khėnsu.ñü™ and elliottwave.studio lab™ are trademarks of Elliott Wave LLC.
           Apple, the Apple logo, Apple Intelligence, iPhone, iPad, Mac and Liquid Glass are trademarks of Apple Inc., registered in the U.S. and other countries. App Store is a service mark of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC. khensu.nu is not affiliated with or endorsed by Apple or Google.
         </p>
         <p>Elliott Wave LLC, founded and solely owned by Elliott, owns all intellectual property in its projects, the open-source projects included.</p>
@@ -204,13 +207,19 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
   nav ul {
     display: flex;
-    gap: clamp(0.9rem, 2.5vw, 2rem);
+    gap: clamp(0.75rem, 1.6vw, 1.6rem);
     list-style: none;
     margin: 0;
     padding: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav ul::-webkit-scrollbar {
+    display: none;
   }
   nav a {
-    font-size: 0.9rem;
+    font-size: 0.86rem;
+    letter-spacing: -0.005em;
     text-decoration: none;
     color: var(--text-dim);
   }
@@ -282,13 +291,8 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
   @media (max-width: 720px) {
     nav ul {
-      overflow-x: auto;
-      scrollbar-width: none;
       mask-image: linear-gradient(90deg, #000 85%, transparent);
       padding-right: 1.5rem;
-    }
-    nav ul::-webkit-scrollbar {
-      display: none;
     }
   }
   @media (max-width: 560px) {

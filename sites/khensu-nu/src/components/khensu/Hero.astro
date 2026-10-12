@@ -1,6 +1,7 @@
 ---
-// khensu.ñü hero: three app screens fan out from one phone as the page scrolls (--e from scenes.ts).
+// khėnsu.ñü hero: three app screens fan out from one phone as the page scrolls (--e from scenes.ts).
 import AppScreen from './AppScreen.astro';
+import NuMark from './NuMark.astro';
 
 interface Props {
   eyebrow?: string;
@@ -13,8 +14,8 @@ const {
   heading = 'h1',
   cta = true,
   links = [
-    { href: '/khensu', label: 'Explore khensu.ñü' },
-    { href: 'https://khensu.nu', label: 'Visit khensu.ñü' },
+    { href: '/khensu', label: 'Explore khėnsu.ñü' },
+    { href: 'https://khensu.nu', label: 'Visit khėnsu.ñü' },
   ],
 } = Astro.props;
 const H = heading;
@@ -37,7 +38,7 @@ const H = heading;
           </>
         ))}
       </p>
-      <H id="k-hero-title" class="title">khensu<span>.ñü</span></H>
+      <H id="k-hero-title" class="title"><NuMark name="khensu" aura /></H>
       <p class="tag">webË, private by design. <em>Post-quantum.</em><br /><em>Run profitably by the people.</em></p>
       {cta && (
         <div class="btn-row">
@@ -138,19 +139,15 @@ const H = heading;
   }
   .title {
     font-size: clamp(3.4rem, 10vw, 8rem);
-    font-weight: 600;
-    letter-spacing: -0.05em;
     line-height: 0.95;
     margin: 0;
-    background: var(--aura);
-    background-size: 300% 100%;
-    animation: aura-flow var(--aura-flow-dur) linear infinite;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
-  .title span {
-    font-weight: 300;
+  .title :global(.nf-word) {
+    vertical-align: baseline;
+  }
+  .title :global(svg) {
+    height: 1.08em;
+    max-width: 92vw;
   }
   .tag {
     font-size: clamp(1.1rem, 2.2vw, 1.6rem);

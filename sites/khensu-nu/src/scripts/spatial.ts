@@ -44,7 +44,7 @@ type Track = {
 const fork = (id: string, title: string, label: string, hz: number, planet: string, pos: Pos, mark: string): Track => ({
   id,
   title,
-  by: `khensu.ñü · ${planet}`,
+  by: `khėnsu.ñü · ${planet}`,
   spec: `${hz.toFixed(2)} Hz · ${planet}`,
   dur: 8,
   kind: 'fork',
@@ -59,7 +59,7 @@ const TRACKS: Record<string, Track> = {
   attempt: {
     id: 'attempt',
     title: 'First Attempt (Demo)',
-    by: 'khensu.ñü · More Of The Same · 2008',
+    by: 'khėnsu.ñü · More Of The Same · 2008',
     spec: '5 instruments in 3D · 48 kHz · 9.1 MB · 6:40',
     dur: 400,
     kind: 'song',
@@ -68,7 +68,7 @@ const TRACKS: Record<string, Track> = {
   creek: {
     id: 'creek',
     title: 'Stair Creek',
-    by: 'khensu.ñü · ñü.ŵævẽš · healing',
+    by: 'khėnsu.ñü · ñü.ŵævẽš · healing',
     spec: 'One sound beside you · rendered in the browser · loops',
     dur: 48,
     kind: 'creek',
@@ -80,7 +80,7 @@ const TRACKS: Record<string, Track> = {
   scream: {
     id: 'scream',
     title: 'Wilhelm Scream',
-    by: 'khensu.ñü · Wikimedia Commons · CC0',
+    by: 'khėnsu.ñü · Wikimedia Commons · CC0',
     spec: 'The 1951 Wilhelm scream · 1.6 s',
     dur: 1.62,
     kind: 'scream',

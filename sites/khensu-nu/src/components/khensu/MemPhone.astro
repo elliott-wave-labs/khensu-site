@@ -1,5 +1,5 @@
 ---
-// iPhone-sized screens of the khensu.ñü app for /memory: For you, What it knows about me, Ask khensu, and the iOS
+// iPhone-sized screens of the khėnsu.ñü app for /memory: For you, What it knows about me, Ask khėnsu, and the iOS
 // home screen the app goes to when it is backgrounded. Sized in container units, so a phone renders the same at any
 // width. With `cycle`, the For you screen gives way to the home screen and back on a 12 s loop that matches the
 // traffic timelines in MemShield.
@@ -96,7 +96,7 @@ const main = cycle ? 'foryou' : screen;
       {main === 'ask' && (
         <div class="mp-body">
           <div class="mp-nav"><span></span><span class="mp-circle"><Icon name="more" /></span></div>
-          <p class="mp-large">Ask khensu</p>
+          <p class="mp-large">Ask khėnsu</p>
           <div class="mp-q"><Icon name="search" /> When do we sail to Naxos?</div>
           <div class="mp-answer">
             <p class="mp-k"><Icon name="sparkle" /> Private AI on this iPhone</p>
@@ -128,7 +128,7 @@ const main = cycle ? 'foryou' : screen;
         <div class="mp-status"><b>10:10</b><span class="mp-island"></span><span class="mp-sys"><i></i><i></i><i></i><i></i><span class="mp-batt"></span></span></div>
         <div class="mp-grid">
           {apps.map((a) => <span class="mp-app-i"><i></i><small>{a}</small></span>)}
-          <span class="mp-app-i nu"><i><b>ñü</b></i><small>khensu.ñü</small></span>
+          <span class="mp-app-i nu"><i><b>ñü</b></i><small>khėnsu.ñü</small></span>
         </div>
         <div class="mp-dock"><i></i><i></i><i></i><i></i></div>
       </div>
