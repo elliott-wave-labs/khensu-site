@@ -12,11 +12,11 @@ const VENUES: Record<string, Venue> = {
   },
   club: {
     rt: 0.9, wet: 0.2, pre: 0.012,
-    pos: { drums: { x: 0, y: 2.3, z: 0.1 }, piano: { x: -1.7, y: 1.6, z: 0 }, synths: { x: 1.9, y: 0.6, z: 1 }, guitar: { x: 1.3, y: 2, z: 0.4 }, bass: { x: 0, y: 1.2, z: -0.6 } },
+    pos: { drums: { x: 0, y: 2.6, z: 0.7 }, piano: { x: -1.9, y: 1.4, z: 0 }, synths: { x: 1.1, y: 0.5, z: 1.7 }, guitar: { x: 2.3, y: 1.6, z: -0.3 }, bass: { x: -0.9, y: 1, z: -0.8 } },
   },
   hall: {
     rt: 2.1, wet: 0.32, pre: 0.025,
-    pos: { drums: { x: 0, y: 3.4, z: 0.6 }, piano: { x: -2.2, y: 2.8, z: 0.3 }, synths: { x: 2.4, y: 2.6, z: 1.4 }, guitar: { x: 1.2, y: 3, z: 0.8 }, bass: { x: -0.8, y: 3.2, z: -0.3 } },
+    pos: { drums: { x: 0, y: 3.4, z: 0.9 }, piano: { x: -2.3, y: 2.6, z: 0.3 }, synths: { x: 1.4, y: 2.2, z: 1.8 }, guitar: { x: 2.6, y: 3, z: -0.1 }, bass: { x: -1.1, y: 3.2, z: -0.7 } },
   },
   stadium: {
     rt: 3.2, wet: 0.38, pre: 0.06,
