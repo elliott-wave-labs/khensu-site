@@ -73,16 +73,20 @@ const venues = [
               <dl class="sp-spec">
                 <div data-for="orig">
                   <dt>Original 2008</dt>
-                  <dd>AAC-LC · stereo · 44.1 kHz · 191 kbit/s · 9.6 MB</dd>
+                  <dd>AAC-LC · stereo · 44.1 kHz · 191 kbit/s · 9.6 MB · 6:40</dd>
                 </div>
                 <div data-for="wave">
                   <dt>ñü.wæve</dt>
-                  <dd>Opus objects · 5 × mono · 48 kHz · 174 kbit/s · 9.1 MB</dd>
+                  <dd>Opus objects · 5 × mono · 48 kHz · 174 kbit/s · 9.1 MB · 6:40</dd>
                   <dd class="sp-each">synths 48 · drums 45 · piano 39 · guitar 21 · bass 20 kbit/s</dd>
                 </div>
                 <div class="ref">
                   <dt>Opus 5.1</dt>
                   <dd>6 channels · 48 kHz · 258 kbit/s · 13.0 MB</dd>
+                </div>
+                <div class="ref">
+                  <dt>Lossless FLAC of the original</dt>
+                  <dd>stereo · 44.1 kHz · 16-bit · bit-exact · 28.6 MB</dd>
                 </div>
               </dl>
               <p class="sp-vs">
@@ -553,6 +557,10 @@ const venues = [
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+  .sp-spec .ref + .ref {
+    padding-top: 0;
+    border-top: 0;
   }
   .sp-spec .ref {
     padding-top: 0.45rem;
