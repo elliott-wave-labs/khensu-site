@@ -10,6 +10,7 @@ import NufiHero from '../components/khensu/NufiHero.astro';
 import NufiPhone from '../components/khensu/NufiPhone.astro';
 import NufiPledgeGraph from '../components/khensu/NufiPledgeGraph.astro';
 import NufiBurst from '../components/khensu/NufiBurst.astro';
+import Burst from '../components/creators/Burst.astro';
 import { BACKERS, DAILY_MET, total, usd } from '../data/nufi-campaign';
 
 const products = [
@@ -107,6 +108,17 @@ const feeCap = Math.ceil(BACKERS / 100);
 
   <div class="khensu nufi">
     <NufiHero />
+    <Burst
+      id="nufi-numbers-section"
+      eyebrow="ñüFi by the numbers"
+      title="Pay anyone for under a cent."
+      em="Artists keep every tip and every view."
+      items={[
+        { g: '<1¢', t: 'Transaction fee', s: 'To send or withdraw, paid to the people running nodes; receiving is free. Estimate' },
+        { g: '100%', t: 'Of every tip, to the artist', s: 'Tips, gifts and sales arrive whole, with no platform cut' },
+        { g: '1¢', t: 'A view, all of it to the artist', s: 'Artists keep 100% of their view revenue: $10 per 1,000 plays' },
+      ]}
+    />
     <ProductBar name="ñüFi" action="Get the app" href="/app" explore="#nufi-platform-section" />
 
     <section class="nf-intro" id="nufi-intro-section" aria-label="What ñüFi is">

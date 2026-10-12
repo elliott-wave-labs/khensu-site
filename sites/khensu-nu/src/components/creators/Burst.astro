@@ -1,19 +1,33 @@
 ---
-// Three numbers that burst out of a cloud of particles and explode into each other as the page scrolls.
+// Big numbers that burst out of a cloud of particles and explode into each other as the page scrolls.
 // The list is the content; the canvas only draws it. Reduced motion and no-JS show the list as a grid.
-const items = [
-  { g: '100%', t: 'Creator cut', s: 'of every view and tip, gift or payment. The fan pays the network fee on top' },
-  { g: '42¢', t: 'Minimum payout', s: 'Every payment lands in your wallet as it’s sent' },
-  { g: '<1¢', t: 'Network fee', s: 'a payment, paid to the people running nodes. Estimate' },
-];
+interface Props {
+  id?: string;
+  eyebrow?: string;
+  title?: string;
+  em?: string;
+  items?: { g: string; t: string; s: string }[];
+}
+const {
+  id = 'numbers-section',
+  eyebrow = 'by the numbers',
+  title = 'Three numbers.',
+  em = 'All of them in your favour.',
+  items = [
+    { g: '100%', t: 'Creator cut', s: 'of every view and tip, gift or payment. The fan pays the network fee on top' },
+    { g: '42¢', t: 'Minimum payout', s: 'Every payment lands in your wallet as it’s sent' },
+    { g: '<1¢', t: 'Network fee', s: 'a payment, paid to the people running nodes. Estimate' },
+  ],
+} = Astro.props;
+const titleId = `${id}-title`;
 ---
 
-<section class="burst" id="numbers-section" data-burst aria-labelledby="burst-title">
+<section class="burst" id={id} data-burst aria-labelledby={titleId}>
   <div class="burst-stage">
     <canvas aria-hidden="true"></canvas>
     <div class="wrap burst-head">
-      <p class="eyebrow">by the numbers</p>
-      <h2 id="burst-title">Three numbers.<em>All of them in your favour.</em></h2>
+      <p class="eyebrow">{eyebrow}</p>
+      <h2 id={titleId}>{title}<em>{em}</em></h2>
     </div>
     <ol class="burst-list" role="list">
       {items.map((it, i) => (
@@ -26,6 +40,10 @@ const items = [
     </ol>
   </div>
 </section>
+
+<script>
+  import '../../scripts/burst';
+</script>
 
 <style>
   .burst {
@@ -94,31 +112,31 @@ const items = [
   }
 
   /* Pinned particle version. */
-  :global(.cr-motion) .burst {
+  :global(.burst-motion) .burst {
     height: 360vh;
   }
-  :global(.cr-motion) .burst-stage {
+  :global(.burst-motion) .burst-stage {
     position: sticky;
     top: 0;
     height: 100svh;
     padding: 0;
     overflow: hidden;
   }
-  :global(.cr-motion) canvas {
+  :global(.burst-motion) canvas {
     display: block;
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
   }
-  :global(.cr-motion) .burst-head {
+  :global(.burst-motion) .burst-head {
     position: relative;
     padding-top: calc(130px + clamp(1rem, 4vh, 2.5rem));
   }
-  :global(.cr-motion) .burst-head h2 {
+  :global(.burst-motion) .burst-head h2 {
     font-size: clamp(1.6rem, 3vw, 2.4rem);
   }
-  :global(.cr-motion) .burst-list {
+  :global(.burst-motion) .burst-list {
     position: absolute;
     left: 0;
     right: 0;
@@ -128,7 +146,7 @@ const items = [
     height: 6.5rem;
     text-align: center;
   }
-  :global(.cr-motion) .burst-list li {
+  :global(.burst-motion) .burst-list li {
     position: absolute;
     inset: 0;
     min-height: 0;
@@ -141,47 +159,47 @@ const items = [
     translate: 0 14px;
     transition: opacity 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), translate 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
-  :global(.cr-motion) .burst-list li.on {
+  :global(.burst-motion) .burst-list li.on {
     opacity: 1;
     translate: 0 0;
   }
-  :global(.cr-motion) .burst-n {
+  :global(.burst-motion) .burst-n {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip: rect(0 0 0 0);
   }
-  :global(.cr-motion) .burst-t {
+  :global(.burst-motion) .burst-t {
     font-size: clamp(1.4rem, 2.6vw, 2rem);
     font-weight: 600;
     letter-spacing: -0.02em;
   }
-  :global(.cr-motion) .burst-s {
+  :global(.burst-motion) .burst-s {
     max-width: 38rem;
     font-size: 1.05rem;
   }
   @media (max-height: 820px) {
-    :global(.cr-motion) .burst-head {
+    :global(.burst-motion) .burst-head {
       padding-top: calc(130px + 0.5rem);
     }
-    :global(.cr-motion) .burst-head .eyebrow {
+    :global(.burst-motion) .burst-head .eyebrow {
       margin-bottom: 0.4rem;
     }
-    :global(.cr-motion) .burst-head h2 em {
+    :global(.burst-motion) .burst-head h2 em {
       display: inline;
     }
-    :global(.cr-motion) .burst-head h2 em::before {
+    :global(.burst-motion) .burst-head h2 em::before {
       content: ' ';
     }
-    :global(.cr-motion) .burst-list {
+    :global(.burst-motion) .burst-list {
       bottom: clamp(1rem, 4vh, 2.5rem);
       height: 5rem;
     }
-    :global(.cr-motion) .burst-t {
+    :global(.burst-motion) .burst-t {
       font-size: clamp(1.25rem, 2.2vw, 1.6rem);
     }
-    :global(.cr-motion) .burst-s {
+    :global(.burst-motion) .burst-s {
       font-size: 0.92rem;
     }
   }

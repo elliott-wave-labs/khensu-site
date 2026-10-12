@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Burst from '../components/creators/Burst.astro';
 
 const DEV = 'https://dev.khensu.nu';
 const CONTACT = 'mailto:hello@elliottwave.studio?subject=%C3%B1%C3%BC.bi%20%E2%80%94%20government%20enquiry';
@@ -94,6 +95,18 @@ const status = [
         <p class="bi-status">Published 11 October 2026 · in development, not yet live · nothing here is a promise of income</p>
       </div>
     </section>
+
+    <Burst
+      id="bi-numbers-section"
+      eyebrow="ñü.bi by the numbers"
+      title="Paid for the work. Kept in full."
+      em="Under a cent to move it."
+      items={[
+        { g: '<1¢', t: 'Transaction fee', s: 'To send or withdraw, paid to the people running nodes; receiving is free. Estimate' },
+        { g: '100%', t: 'Of tips and views, to the artist', s: 'Artists keep every tip and all their view revenue, 1¢ a view' },
+        { g: '1', t: 'Rate for the whole world', s: 'A node in Tangier is paid the same per proof as one in Berlin' },
+      ]}
+    />
 
     <section class="section" aria-label="Two stages">
       <div class="wrap">
