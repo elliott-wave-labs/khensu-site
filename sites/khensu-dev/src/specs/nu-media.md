@@ -110,10 +110,10 @@ Audio adds 1,920,000 bits per minute (Opus at 32,000 bit/s, constant).
 
 | Property | ñü.media | ImageIO HEIC / JPEG | Hardware H.264 / HEVC on iPhone |
 | --- | --- | --- | --- |
-| Primaries | **BT.2020** (about 76% of CIE 1931 xy; P3 is about 54%, sRGB about 36%) | P3 or sRGB | BT.709, P3, BT.2020 (HEVC Main 10) |
+| Primaries | **BT.2020** (about 76% of the CIE 1931 spectral locus; Display P3 is about 45%, sRGB about 36%) | P3 or sRGB | BT.709, P3, BT.2020 (HEVC Main 10) |
 | Transfer | **PQ (SMPTE ST 2084, up to 10,000 nits) and HLG (BT.2100)**; sRGB and P3 gamma for SDR | sRGB gamma; HDR through a gain map | PQ, HLG (HEVC Main 10); SDR only on H.264 |
-| Bit depth | **12-bit images, 10-bit video** (12-bit via the residual layer) | 8-bit JPEG; 8- or 10-bit HEIC | 8-bit H.264; 10-bit HEVC |
-| Chroma | **4:4:4 images**; 4:2:0 video base with chroma restored by the enhancement layer | 4:2:0 typical | 4:2:0 |
+| Bit depth | **12-bit images. Stored video is 12-bit after the residual; the live base the chip encodes is 10-bit** | 8-bit JPEG; 8- or 10-bit HEIC | 8-bit H.264; 10-bit HEVC |
+| Chroma | **4:4:4 images, and 4:4:4 stored video after the residual.** The live base is 4:2:0 | 4:2:0 typical | 4:2:0 |
 | Working space | Linear-light FP16 in BT.2020, native to the Neural Engine | Display-referred | Display-referred |
 | HDR metadata | Mastering display, MaxCLL/MaxFALL, and our own per-scene tone-mapping curves | ISO 21496-1 gain map | HDR10 static; Dolby Vision 8.4 from the camera |
 
@@ -121,6 +121,19 @@ Audio adds 1,920,000 bits per minute (Opus at 32,000 bit/s, constant).
 - **Export:** when you save to Photos or share outside khensu.ñü, ñü.media writes HEIC with an ISO 21496-1 gain map through ImageIO (images), or HEVC Main 10 HLG through VideoToolbox (video), so other apps show it correctly.
 - **Dolby Vision and HDR10+:** received camera clips in Dolby Vision profile 8.4 are carried as their HLG base plus our own tone-mapping metadata. We play Dolby Vision and HDR10+ through Apple's decoders but don't author either; both need licences from their owners.
 - **Cost of HDR:** about 10–25% more bits than SDR at the same quality (estimate), included in the tables above.
+
+### 6.1 Against what phones store and what streams send
+
+These are properties of the format, not a measured quality score. The comparison is 10-bit 4:2:0 delivery in P3 or BT.2020, which is HEIC, HEVC Main 10, AV1 Main and the streams from the large video services. Area figures are the primary triangle inside the CIE 1931 spectral locus.
+
+| | What ships | ñü.media | Times |
+| --- | --- | --- | --- |
+| Steps per channel | 10-bit: 1,024 | 12-bit: 4,096 on images, and on stored video once the residual is applied | 4× |
+| Colour samples | 4:2:0, one chroma sample for every four pixels | 4:4:4 on images and on stored video after the residual | 4× |
+| Gamut | Display P3 about 45% of visible colour; BT.2020 about 76%; sRGB about 36% | BT.2020 | about 1.7× P3. Not 2×. Twice P3 would be about 91% of human vision, and twice BT.2020 is larger than human vision, so no format can claim it |
+| Peak white | iPhone 18 Pro, 1,600 nits. Many HDR10 grades stop at 1,000 | PQ, 10,000 nits, the top of SMPTE ST 2084 | about 6× the phone |
+
+The live base stays 10-bit 4:2:0. That is the picture the iPhone's hardware encoder can emit in real time (HEVC Main 10). The residual layer is what makes a stored file 12-bit and 4:4:4 (`nu-media-protocol.md` 5.3). Cinema archives already go further than this file: ACES in 16-bit half float holds every visible colour. ñü.media does not claim to beat that. It does hold four times the steps and four times the colour samples of the 10-bit 4:2:0 picture a phone or a stream delivers, in a gamut about 1.7 times P3, at a peak about 6 times the iPhone's.
 
 ## 7. More than the usual formats
 
@@ -188,6 +201,56 @@ VMAF alone can't judge nu-media. Its models stop at 3840 × 2160 and assume 8-bi
 First run, on a synthetic 7680 × 4320 clip with x264 at CRF 32: VMAF mean 87, but the worst 1% of frames 62 and the worst tile 78, which a single VMAF number would have hidden.
 
 **Test media.** `bench/ytstream.py` saves exactly the stream YouTube delivers, without re-encoding, with a JSON record of the format, codec, resolution, frame rate, HDR transfer, bitrate, licence and SHA-256. The first clip is "Best of 8K Video" (4K Video ULTRA HD on YouTube), format 702: AV1 Main 10-bit, 7680 × 4320, 59.94 fps, PQ (SMPTE ST 2084) in BT.2020, about 51 Mbit/s; 20 seconds from 1:00. The title says 120 fps, but YouTube sends 60. Downloaded streams are for private dev testing; showing them publicly needs the owner's permission.
+
+### 7.4 Depth for every picture, estimated on the device
+
+Depth is what turns a flat photo into refocus, relighting, a parallax Live Photo, a spatial photo for Vision Pro and an object you can place in a room. Three sources, in order of preference:
+
+| Source | Where it comes from | What ñü.media stores |
+| --- | --- | --- |
+| Measured depth | LiDAR on iPhone Pro and iPad Pro; the Portrait-mode disparity map from the dual camera | Quarter-resolution depth plane, 16-bit, coded as a residual layer (section 7, Depth) |
+| TrueDepth | The front camera's structured-light module (Face ID) | The same plane, plus the confidence map, since TrueDepth is dense but short-range |
+| Estimated depth | Everything else: a photo with no depth plane, a Live Photo, a received picture, a screenshot of a scene | A depth plane computed on the receiving or sending device's Neural Engine, marked `estimated` so the UI never presents it as measured |
+
+**Estimation.** The estimator is a monocular depth network running in FP16 on the Neural Engine, with two inputs the published models don't use together:
+
+- the picture itself, for the single-image prior (shape from texture, perspective, known object sizes);
+- for a Live Photo, the up to 3 s of motion around the still, from which the parallax between frames gives true relative depth for anything that moved against the background, fused with the prior where nothing moved.
+
+The result is a metric-scaled depth plane where the camera metadata allows (focal length and sensor size, which the camera pipeline keeps and ñü.media's EXIF stripping removes before sending; estimation therefore happens on the capturing device, and only the plane travels). Where it doesn't, the plane is relative, and the UI says so.
+
+**Where our work is.** The reference monocular estimators to measure against are Apple's Depth Pro (2024), Depth Anything V2, MiDaS v3.1 and Marigold. None of them is designed for a phone's neural engine, and none fuses Live Photo motion. ñü.media's contribution, to be built and measured before any claim is made, is an estimator shaped for the Neural Engine's tiles and FP16 path (batch-1 latency rather than throughput, no dynamic shapes, 8 ms per 12 MP picture as the target), the Live Photo fusion, and a confidence plane the renderer uses to fade effects out where depth is unsure. The algorithm Elliott referred to in the brief ("this algo", "their algo") was not attached; this section names the published candidates and will be revised against the intended one.
+
+**Published.** Like the rest of ñü.media: the format in `nu-media-protocol.md`, the model weights and the estimator code in `khensu-core` under its licence, and the benchmark (`bench/depth.py`, to be written: AbsRel and δ₁ against the NYU Depth V2, KITTI and iBims-1 test sets, plus latency and energy on each chip) beside them. Patent rights and ownership stay with Elliott Wave LLC (`PATENTS.md`); publication is never held for a filing.
+
+**Privacy.** Estimated depth is computed on the device and travels only inside the encrypted object. It is never sent to a server, and the estimator never sees a picture the person did not already choose to send or open.
+
+### 7.5 The owner's mark: invisible, anonymous, readable only by you
+
+A person who makes or shares a picture wants to know where it went: did a friend forward it, did it end up in a public feed, was it screenshotted and reposted. Everyone else wants that same picture to say nothing about who made it. ñü.media gives both with one mechanism, the **owner's mark**, built on the provenance design (`nu-provenance.md`) and on its rule P1: nothing in a file identifies a device or a person.
+
+- **What is embedded.** A short code (96 bits), derived on the owner's device from a secret the owner holds and a per-picture random salt, is embedded invisibly into the picture: in the learned codec's latent for ñü.media files, and as a robust spread-spectrum watermark in the pixels for anything exported to JPEG, HEIC or HEVC, so it survives re-encoding, scaling, cropping to about a third of the frame and screenshots. The code is indistinguishable from random to anyone without the secret. It carries no name, no key, no device and no time.
+- **What the owner sees.** The owner's app can test any picture it encounters, in a chat, a feed, a forum or a public webË site, against the owner's own secret, on the device. A match says: this is mine, from this capture, and it appeared *here*. The app collects these sightings privately into one view: "this photo was shared on by two people in groups you're in, and appeared once in a public feed". Sightings are only ever gathered from places the owner's own device already visits; nothing crawls on the owner's behalf.
+- **What everyone else sees.** Nothing. Without the secret, the mark is noise. Two pictures from the same owner can't be linked by the mark, because each carries a fresh salt. No server, node or operator can test a mark, since the secret never leaves the owner's devices (it syncs between them inside the owner's own encrypted conversation with themselves).
+- **Off this line.** The mark covers pictures, video and audio the owner chooses to share. It is never applied to, and the sightings view never includes, the private side of a person's life in the app: calendar, itinerary, notes, drafts, the memory layer, payments, and media that was received rather than made. Those stay in their own encrypted stores and are never marked, indexed or matched.
+- **Interactions.** When someone reacts to, replies to, forwards or quotes the owner's media inside khensu.ñü, that is already an interaction the owner's app knows about through the conversation itself, with no mark needed. The mark adds only the cases the conversation can't see: a re-upload, a screenshot, a public repost.
+- **Not evidence.** As with perceptual fingerprints (`nu-provenance.md` 7), a sighting is shown to the owner as "looks like yours", never asserted to anyone else, never used for moderation, and never connected to the illegal-content hash list.
+- **To build and measure.** Robustness (survival rate against re-encode, scale, crop, screenshot, print-and-scan), false-positive rate at 96 bits over the device's library, quality cost in nu-score, and the cost in bits inside the learned latent. Prior art to compare against for `PATENTS.md`: spread-spectrum image watermarking (Cox et al., 1997), Digimarc, Google SynthID, Meta's Stable Signature and Video Seal, and C2PA's soft bindings. The candidate novelty is the owner-only, unlinkable, per-picture code combined with sightings gathered solely by the owner's own device.
+
+### 7.6 Receivers rebuild more than they receive
+
+The enhancement layer (section 5) runs on the receiver and is what a viewer of a ñü.media stream actually sees:
+
+| Received | Shown, on a device that can run the enhancement layer |
+| --- | --- |
+| 1080p or 1440p base | 4K, super-resolved per tile |
+| 24, 25 or 30 fps | 120 fps on ProMotion screens, interpolated; 240 and 320 fps where a display takes it (section 7.1) |
+| 10-bit 4:2:0 BT.709 or P3 base | 12-bit 4:4:4 in BT.2020 once the residual is applied, tone-mapped to the screen with EDR |
+| Block and ringing artefacts of a low-bitrate base | Removed |
+
+**The card on the sites.** Where a ñü.media stream is shown on khensu.ñü, the player puts one small card beside it, the same kind the creators page uses, that states what the receiver did: "nu.media rebuilt this at 4K · 25 → 120 fps · BT.709 → BT.2020, 12-bit". The figures are read from the decoder, never typed in. No before-and-after.
+
+**The hero video, honestly.** The Earth video behind the home page is today an H.264 1080p25 BT.709 8-bit file, because no browser can decode ñü.media yet. It is not ñü.media and carries no card. The order of work to change that: the WebAssembly decoder for the enhancement layer (SIMD plus WebGPU; the learned transform is out of reach of WebAssembly at 4K, so the browser path is base plus enhancement, not the full codec), then encoding the Earth source as a ñü.media base at a low rate, then the card with measured numbers. Until then the home page says nothing about ñü.media over the video; the claim appears only when the decoder is running.
 
 ## 8. Benchmark: replacing the estimates
 

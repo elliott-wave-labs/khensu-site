@@ -1,10 +1,30 @@
 // Link-preview cards, one per page on khensu.nu and dev.khensu.nu. `tools/og.sh` screenshots /og/<slug>/ to
-// public/og/<slug>.jpg (1200 x 630), the size Meta (Instagram, Facebook, WhatsApp), iMessage and X all crop well.
-// `bg` fills the card; `product` sits on the right instead.
-export type Card = { title: string; em?: string; line: string; bg?: string; product?: string; alt: string };
+// public/og/<slug>.jpg (1200 x 630), the size Meta (Instagram, Facebook, WhatsApp), iMessage and X all crop well,
+// and the square ones (1080 x 1080) for Instagram link pages and posts. `bg` fills the card; `product` sits on the
+// right instead. `note` is a small sentence under the line (the materials); `foot` are small bold footnotes.
+// `thumb` cards carry only the phone and a few big words, for the tiny thumbnails next to a link.
+// The marketing cards spell the names out in full: kħėñšü.ñü, šûñüłîñk.šħîēłð, ñü.îšħẽřü.
+export type Card = {
+  title: string;
+  em?: string;
+  line: string;
+  note?: string;
+  foot?: string[];
+  bg?: string;
+  product?: string;
+  screen?: string;
+  alt: string;
+  thumb?: boolean;
+};
 
 const EARTH = '/khensu/hero/earth.jpg';
 const SHIELD_ALT = 'suñůlink.shield in solid brass on an iPhone 18 Pro, the ñü.isheru in stone and platinum, over Earth wrapped in the khėnsu.ñü network';
+const SHIELD_NOTE =
+  'Ceramic powder-coated titanium or anti-microbial pure brass¹. Set with the ñü.îšħẽřü gemstone, platinum, and a laser-etched pyrite hexagon, mirror of the Triangulum constellation.';
+const SHIELD_FOOT = [
+  '¹ Both rust-proof for immunity on bluewater sails, weekend-warrior ready, and power hacker user.',
+  '² CNC’d to add 0 mm to your actual phone thickness, based on the camera bump.',
+];
 
 export const CARDS: Record<string, Card> = {
   home: { title: 'khėnsu.ñü', em: 'webË, private by design.', line: 'Post-quantum. Run by the people. suñůlink.shield, set with the ñü.isheru.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
@@ -12,14 +32,15 @@ export const CARDS: Record<string, Card> = {
   void: { title: 'ñü.vœîð', em: '64 KiB chunks. One key each.', line: 'Eight copies, no file names, and a footer inside the ciphertext. A wrong key opens nothing.', bg: EARTH, alt: 'ñü.vœîð, stealth storage on khėnsu.ñü' },
   media: { title: 'ñü.media', em: 'Same look, a fraction of the bits.', line: 'Photos and video measured against JPEG, HEIC, H.264, HEVC and AV1.', bg: '/khensu/codec/compare-720p.jpg', screen: '/khensu/creators/compare-nu.webp', alt: 'ñü.media against H.264 at the same bitrate' },
   quality: { title: 'How we measure', em: 'Check every number.', line: 'The tests behind ñü.media, with public tools you can run yourself.', bg: '/khensu/codec/compare-aurora.jpg', alt: 'An aurora clip compared across codecs' },
-  memory: { title: 'ñü.ẽřåł', em: 'Your private AI.', line: 'It learns what you’re looking forward to, on your device. No tracking, ever.', bg: EARTH, product: '/khensu/memory/phone_burgundy.webp', alt: 'iPhone showing khėnsu.ñü ñü.ẽřåł planning a sailing trip in Greece' },
+  memory: { title: 'ñü.řåł', em: 'Your private AI.', line: 'It learns what you’re looking forward to, on your device. No tracking, ever.', bg: EARTH, product: '/khensu/memory/phone_burgundy.webp', alt: 'iPhone showing khėnsu.ñü ñü.řåł planning a sailing trip in Greece' },
   creators: { title: 'ñü.ċřêæțẽ', em: 'You own everything.', line: 'Your rights, your fans, and $10 per 1,000 plays with no cut.', bg: '/khensu/creators/hero.webp', screen: '/khensu/creators/fans-1080.webp', alt: 'A creator performing, streamed in 1080p with ñü.media on khėnsu.ñü' },
   nufi: { title: 'ñũ.Fî', em: 'A basic income first.', line: 'Creators paid for every view, nodes for every job. Private, with no cut.', bg: EARTH, alt: 'ñũ.Fî private payments on khėnsu.ñü' },
   bi: { title: 'ñũ.Bî', em: 'A basic income, paid by the network.', line: 'Node operators paid for real work at one worldwide rate, and an equal share for every person next.', bg: EARTH, alt: 'ñũ.Bî, the ñü basic income, over Earth wrapped in the khėnsu.ñü network' },
   font: { title: 'ñü.Føňt', em: 'The dot is E.', line: 'A stroke font on the golden ratio: capsule ends, no stems where a letter can live without one, six weights and the italic in one file.', bg: EARTH, alt: 'ñü.Føňt, the khėnsu.ñü typeface, over Earth at night' },
   network: { title: 'The network', em: 'A gift to everyone.', line: 'Freedom, privacy and a basic income. Contracts for any work and nodes paid for real jobs.', bg: EARTH, alt: 'The khėnsu.ñü network wrapped around Earth at night' },
-  shield: { title: 'suñůlink.shield', em: '0 mm. The whole back.', line: 'khėnsu.ñü’s network-profitable, post-quantum encrypted stealth transceiver.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
-  buy: { title: 'suñůlink.shield', em: 'Made in Morocco.', line: 'Titanium or solid brass, set with the ñü.isheru: stone and platinum, flush to the metal.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
+  shield: { title: 'šûñüłîñk.šħîēłð', em: 'made in morocco.', line: 'post-quantum E2EE stealth transceiver shield²', note: SHIELD_NOTE, foot: SHIELD_FOOT, bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
+  buy: { title: 'šûñüłîñk.šħîēłð', em: 'made in morocco.', line: 'post-quantum E2EE stealth transceiver shield²', note: SHIELD_NOTE, foot: SHIELD_FOOT, bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
+  thumb: { title: 'šûñüłîñk.šħîēłð', line: 'post-quantum E2EE stealth transceiver shield node', product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT, thumb: true },
   transfer: { title: 'Private transfer', em: 'Send 4K privately, free.', line: 'Native resolution, end to end. Against Dropbox and Aspera.', bg: '/khensu/codec/compare-nasa4k.jpg', alt: 'A 4K clip sent with khėnsu.ñü private transfer' },
   app: { title: 'khėnsu.ñü', em: 'For iPhone, iPad and Mac.', line: 'Messages, calls, feeds and payments, post-quantum.', bg: EARTH, product: '/khensu/renders/og-maroon.png', alt: 'khėnsu.ñü on iPhone with suñůlink.shield' },
   privacy: { title: 'Privacy', em: 'Nothing to collect.', line: 'No accounts on servers, no cookies, no tracking, no data to sell.', bg: EARTH, alt: 'The khėnsu.ñü mark over Earth at night' },
@@ -37,6 +58,25 @@ export const CARDS: Record<string, Card> = {
   'dev-contribute': { title: 'Contribute', em: 'Code and consensus.', line: 'Pull requests for code, governance for the network’s rules.', bg: EARTH, alt: 'Contribute to khėnsu.ñü' },
   'dev-specs': { title: 'Specifications', em: 'Every protocol, public.', line: 'webË, the protocol, the threat model, network work and compliance.', bg: EARTH, alt: 'khėnsu.ñü specifications' },
 };
+
+// Animated squares (tools/og-anim.sh): 3-second HEVC, 1080 x 1080, emitted as nu:preview beside og:image (WEBE.md 7.1).
+// Bytes and hashes are written by tools/og-anim.sh so clients can check what they fetch.
+export const PREVIEWS: Record<string, { bytes: number; hash: string }> = {
+  "home": {
+    bytes: 2864793,
+    hash: "sha-256=a5c9a3c3e779073a5848f36a401357115053d182ff999942ba0a595a8bd199f4"
+  },
+  "buy": {
+    bytes: 3281996,
+    hash: "sha-256=76c064e4f4b49d7d8c09dfbf8908af3ca58dd80c12556ea53f9770e3a030f5ab"
+  },
+  "thumb": {
+    bytes: 2925787,
+    hash: "sha-256=08729f962da33864fd6f1ce302fbaca7bffffe719214870f5e7c0bef24fb246f"
+  }
+};
+// The shield pages share the buy card's animation.
+export const previewFor = (card: string) => (card === 'shield' || card === 'dev-shell' ? 'buy' : card in PREVIEWS ? card : undefined);
 
 export const cardFor = (path: string, prefix = '') => {
   const parts = path.replace(/^\/|\/$/g, '').split('/');

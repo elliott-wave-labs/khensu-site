@@ -1,0 +1,34 @@
+---
+// The words of a card alone on a transparent page, for tools/og.sh to lay over video in the animated versions.
+import OgCard from '../../../components/khensu/OgCard.astro';
+import { CARDS } from '../../../data/og';
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '../../../styles/global.css';
+
+export function getStaticPaths() {
+  return Object.keys(CARDS).map((slug) => ({ params: { slug } }));
+}
+const c = CARDS[Astro.params.slug as string];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>{c.title}</title>
+  </head>
+  <body>
+    <OgCard c={c} overlay />
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    background: transparent;
+  }
+</style>

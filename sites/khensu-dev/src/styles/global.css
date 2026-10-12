@@ -1,7 +1,14 @@
-/* ñü.Føňt, the house typeface, for display roles. Built by tools/font/build.sh. */
+/* ñü.Føňt, the house typeface, for display roles; ñü.Føňt Mono for code and commands. Built by tools/font/build.sh. */
 @font-face {
   font-family: 'nu Font';
   src: url('/fonts/nufont/nuFont-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: oblique 0deg 11deg;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'nu Font Mono';
+  src: url('/fonts/nufont/nuFontMono-Variable.woff2') format('woff2');
   font-weight: 100 900;
   font-style: oblique 0deg 11deg;
   font-display: swap;
@@ -25,7 +32,7 @@
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans Hebrew', 'Noto Sans Devanagari', 'Noto Sans Thai', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans', sans-serif;
   --font-display: 'nu Font', var(--font-sans);
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-mono: 'nu Font Mono', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --measure: 64ch;
   --wrap: 1180px;
@@ -418,5 +425,12 @@ input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px 
 .nf-word .mark.dot { transform-box: fill-box; transform-origin: center; animation: nf-dot-pulse 2.8s ease-in-out infinite, nf-dot-aura 9s linear infinite; }
 @keyframes nf-dot-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.28); } }
 @keyframes nf-dot-aura { 0% { fill: #22f59a; } 33% { fill: #1e8fff; } 66% { fill: #8b5cff; } 100% { fill: #22f59a; } }
-@media (prefers-reduced-motion: reduce) { .nf-word .mark.dot { animation: none; fill: var(--accent); } }
+.nf-word .nf-lights { display: none; }
+.nf-word.pulse .nf-lights { display: block; }
+.nf-word.pulse .mark { animation: nf-dot-aura var(--aura-flow-dur, 9s) linear infinite; }
+.nf-word.pulse .nf-light { fill: var(--nf-light, #fff); opacity: 0; filter: blur(var(--nf-blur, 20px)); animation: nf-light-fade var(--nf-light-dur, 3.6s) ease-in-out infinite, nf-light-move calc(var(--nf-light-dur, 3.6s) * 4) step-end infinite; }
+.nf-word.pulse .nf-light.b { animation-delay: calc(var(--nf-light-dur, 3.6s) * -0.5), calc(var(--nf-light-dur, 3.6s) * -0.5); }
+@keyframes nf-light-fade { 0%, 100% { opacity: 0; } 50% { opacity: var(--nf-light-opacity, 0.85); } }
+@keyframes nf-light-move { 0% { transform: translate(var(--lx0), var(--ly0)); } 25% { transform: translate(var(--lx1), var(--ly1)); } 50% { transform: translate(var(--lx2), var(--ly2)); } 75% { transform: translate(var(--lx3), var(--ly3)); } 100% { transform: translate(var(--lx0), var(--ly0)); } }
+@media (prefers-reduced-motion: reduce) { .nf-word .mark.dot, .nf-word.pulse .mark { animation: none; fill: var(--accent); } .nf-word.pulse .nf-lights { display: none; } }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

@@ -6,6 +6,14 @@
   font-style: oblique 0deg 11deg;
   font-display: swap;
 }
+/* ñü.Føňt Mono: the same letters fitted to a 0.6 em cell, for code, commands, terminals and figures. */
+@font-face {
+  font-family: 'nu Font Mono';
+  src: url('/fonts/nufont/nuFontMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: oblique 0deg 11deg;
+  font-display: swap;
+}
 
 :root {
   --bg: #0a0b0d;
@@ -27,7 +35,7 @@
   /* ñü.Føňt (code: nu Font) sets every display role: headings, the wordmark, navigation, buttons and labels.
      Running text stays on the sans until the font has kerning and hinting; switch it by setting --font-sans. */
   --font-display: 'nu Font', var(--font-sans);
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-mono: 'nu Font Mono', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --measure: 64ch;
   --wrap: 1180px;
@@ -371,6 +379,15 @@ code,
   position: relative;
   z-index: 1;
 }
+/* A hero that received the relay network from Base.astro: the net sits under the content, over the background. */
+.has-hero-net {
+  position: relative;
+  isolation: isolate;
+}
+.has-hero-net > [class$='-bg'],
+.has-hero-net > [class*='-bg '] {
+  z-index: -2;
+}
 
 /* Sound toggle for videos with sound (scripts/sound.ts): shown while one is on screen. */
 .sound-toggle {
@@ -558,8 +575,44 @@ h2:hover > .sec-link,
   100% { fill: var(--aura-green); color: var(--aura-green); }
 }
 .nf-word.still .mark.dot { animation: none; fill: var(--accent); }
+
+/* Pulse mode (NuMark `pulse`): every diacritic phases through the aura, and two soft lights move inside it. The
+   mark's own outline is the clip, so the light has a hard edge at the glyph and never leaves it; one light fades
+   out while the other fades in somewhere else, like the pulses on the relay network. Set on the .nf-word:
+     --nf-light           colour of the light (default white)
+     --nf-light-opacity   how bright it gets at its peak (default 0.85)
+     --nf-light-dur       one fade in and out; a light jumps to its next place while it is dark (default 3.6s)
+     --aura-flow-dur      how long one pass through green, blue and purple takes (default 9s)
+   The four resting places of each light (--lx0..3, --ly0..3) and its softness (--nf-blur) are written into the SVG
+   by tools/font/nufont.py in glyph units. */
+.nf-word .nf-lights { display: none; }
+.nf-word.pulse .nf-lights { display: block; }
+.nf-word.pulse .mark { animation: nf-dot-aura var(--aura-flow-dur, 9s) linear infinite; }
+.nf-word.pulse .nf-light {
+  fill: var(--nf-light, #fff);
+  opacity: 0;
+  filter: blur(var(--nf-blur, 20px));
+  animation:
+    nf-light-fade var(--nf-light-dur, 3.6s) ease-in-out infinite,
+    nf-light-move calc(var(--nf-light-dur, 3.6s) * 4) step-end infinite;
+}
+.nf-word.pulse .nf-light.b {
+  animation-delay: calc(var(--nf-light-dur, 3.6s) * -0.5), calc(var(--nf-light-dur, 3.6s) * -0.5);
+}
+@keyframes nf-light-fade {
+  0%, 100% { opacity: 0; }
+  50% { opacity: var(--nf-light-opacity, 0.85); }
+}
+@keyframes nf-light-move {
+  0% { transform: translate(var(--lx0), var(--ly0)); }
+  25% { transform: translate(var(--lx1), var(--ly1)); }
+  50% { transform: translate(var(--lx2), var(--ly2)); }
+  75% { transform: translate(var(--lx3), var(--ly3)); }
+  100% { transform: translate(var(--lx0), var(--ly0)); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .nf-word .mark.dot { animation: none; fill: var(--accent); }
+  .nf-word .mark.dot, .nf-word.pulse .mark { animation: none; fill: var(--accent); }
+  .nf-word.pulse .nf-lights { display: none; }
 }
 .sr {
   position: absolute;

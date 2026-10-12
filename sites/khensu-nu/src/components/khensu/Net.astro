@@ -49,7 +49,7 @@ const { contained = false, closeup = false, nodes = 96, label, class: cls, coins
   } from 'three';
 
   const NEIGHBOURS = 3;
-  const SPARKS = 12;
+  const SPARKS = 18;
   const PULSES = 36;
   const SPEED = 0.9;
 
@@ -322,7 +322,7 @@ const { contained = false, closeup = false, nodes = 96, label, class: cls, coins
     const rate = pos.map(() => 0.4 + Math.random() * 0.7);
     const paint = (time: number) => {
       pos.forEach((p, i) => {
-        const breathe = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(time * rate[i] + phase[i]));
+        const breathe = 0.28 + 0.72 * (0.5 + 0.5 * Math.sin(time * rate[i] + phase[i]));
         sample(tone(p, time), c).multiplyScalar(breathe).toArray(nodeCol, i * 3);
       });
       edges.forEach(([a, b], k) => {
@@ -532,6 +532,16 @@ const { contained = false, closeup = false, nodes = 96, label, class: cls, coins
     max-width: 640px;
     aspect-ratio: 4 / 5;
     mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, #000 50%, transparent 100%);
+  }
+  /* Behind a page's hero (Base.astro puts one in every hero that has none): under the text, over the background,
+     a little dimmer, and without the aurora glow where the hero brings its own picture (`plain`). */
+  .net.hero-net {
+    z-index: -1;
+    opacity: 0.85;
+    mask-image: radial-gradient(ellipse 80% 75% at var(--net-at, 50% 50%), #000 35%, transparent 85%);
+  }
+  .net.plain::before {
+    display: none;
   }
   /* Behind a section's text: the web fills the whole section and stays dim enough to read over. */
   .net.closeup.behind {

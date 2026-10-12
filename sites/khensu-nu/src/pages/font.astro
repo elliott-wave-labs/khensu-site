@@ -21,6 +21,15 @@ const weights = [
   ['Blackout', 900],
 ] as const;
 const stems = Object.entries(info.stems as Record<string, string>);
+const monoWoff2 = sizes['nuFontMono-Variable.woff2'];
+const monoTtf = sizes['nuFontMono-Variable.ttf'];
+const scripts = [
+  { t: 'Latin', sample: 'kħėñšü.ñü šûñüłîñk.šħîēłð', text: 'ASCII, Latin-1 and Latin Extended-A, so every Western and Central European language sets, and every mark the khėnsu.ñü names use.' },
+  { t: 'Tiếng Việt', sample: 'ấầẩẫậ ắằẳẵặ ếềểễệ ốồổỗộ ớờởỡợ ứừửữự đ', text: 'The Vietnamese letters with two marks stacked. The second mark sits on the first; a dot below stays below.' },
+  { t: 'Ελληνικά', sample: 'αβγδεζηθικλμνξοπρσςτυφχψω άέήίόύώ', text: 'Monotonic Greek, with tonos and dialytika. Same horseshoes, same capsule ends.' },
+  { t: 'Кириллица', sample: 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя ЄІЇҐЎ', text: 'Russian, Ukrainian and Belarusian: the full alphabet, with the capitals in the same proportions as the Latin ones.' },
+];
+const monoLines = ['~node status', 'mixnet     up     3 hops   412 ms', 'mailbox    up     1,204 queued', 'fn main() -> Result<(), E> { ok(0xFF) }'];
 const shapes = [
   { g: 'n u m', t: 'Horseshoes, not stems', text: 'n is an upside-down horseshoe, u a horseshoe, m two of them. The legs are the same height on both sides; nothing stands on a stem.' },
   { g: 'h', t: 'h squiggles back', text: 'The stem stops at the x-height, half the letter’s height, and bends into the shoulder, so the left side never touches the baseline.' },
@@ -42,19 +51,22 @@ const shapes = [
       <div class="wrap">
         <p class="eyebrow"><span class="name-case">ñü.Føňt</span> · the house typeface</p>
         <h1 class="mark"><NuMark name="nufont" aura /></h1>
-        <p class="lede">A stroke font drawn on the golden ratio. Capsule ends, no sharp corners, and no stems where a letter can live without one. Six weights and the italic travel in one small file, and every letter can animate on its own, starting with the dot on the ė.</p>
+        <p class="lede">A stroke font drawn on the golden ratio. Capsule ends, no sharp corners, and no stems where a letter can live without one. Six weights and the italic travel in one small file, with a monospaced twin for code; it sets Latin, Vietnamese, Greek and Cyrillic, and every letter can animate on its own, starting with the dot on the ė.</p>
         <StatStrip
           items={[
             { n: weights.length, label: 'Weights, ultralight to blackout, plus the italic of each' },
-            { n: info.glyphs, label: 'Glyphs: Latin, digits, punctuation and every mark the names use' },
+            { n: info.glyphs, label: 'Glyphs: Latin, Vietnamese, Greek and Cyrillic, digits, punctuation and every mark the names use' },
+            { n: 2, label: 'Families: ñü.Føňt and ñü.Føňt Mono, each one variable file' },
             { n: Math.round(variableWoff2 / 1024), unit: 'KB', label: 'The whole family as one variable WOFF2' },
-            { n: 2, label: 'Axes: weight 100 to 900, slant 0 to −11°' },
           ]}
         />
         <nav class="chips" aria-label="On this page">
           <a href="#font-dot">The dot is E</a>
+          <a href="#font-pulse">Pulse mode</a>
           <a href="#font-shapes">Shapes</a>
           <a href="#font-weights">Weights</a>
+          <a href="#font-scripts">Scripts</a>
+          <a href="#font-mono">Mono</a>
           <a href="#font-stems">Stems</a>
           <a href="#font-install">Install</a>
           <a href="#font-next">Next</a>
@@ -82,6 +94,35 @@ const shapes = [
       </div>
     </section>
 
+
+    <section class="section" id="font-pulse">
+      <div class="wrap">
+        <p class="eyebrow">pulse mode</p>
+        <h2>A light inside the mark.<br /><span class="dim">Cut hard at its edge.</span></h2>
+        <div class="dot-stage pulse-stage">
+          <NuMark name="webe" aura pulse class="big" />
+        </div>
+        <div class="grid two">
+          <article class="glass">
+            <h3>How it is done</h3>
+            <p>Pulse mode does two things to every diacritic. The mark itself phases through the ñü.aura, green to blue to purple. And inside it, two soft lights take turns: one fades out while the other fades in somewhere else, the way pulses move on the relay network. Each light is a blurred circle, and the mark’s own outline is its clip, so the glow is soft inside the shape and stops dead at its edge. It never spills onto the page.</p>
+            <p>The font tool writes all of this into the wordmark’s SVG: for each mark, a <code>&lt;clipPath&gt;</code> of its outline and two <code>&lt;circle&gt;</code> lights whose four resting places are stored as CSS variables in glyph units. The lights jump while they are dark, so you only ever see them arrive.</p>
+          </article>
+          <article class="glass">
+            <h3>Colours and speed</h3>
+            <p>Everything is CSS on the wordmark, so a page can tune it without touching the SVG:</p>
+            <pre class="code"><code>.nf-word.pulse &#123;
+  --nf-light: #fff;          /* the light’s colour */
+  --nf-light-opacity: 0.85;  /* how bright at its peak */
+  --nf-light-dur: 3.6s;      /* one fade in and out */
+  --aura-flow-dur: 9s;       /* green → blue → purple → green */
+&#125;</code></pre>
+            <p>The light moves every <code>--nf-light-dur</code>; a full tour of its four places takes four of them. The aura colours are the site’s <code>--aura-green</code>, <code>--aura-blue</code> and <code>--aura-purple</code>. Reduced-motion settings switch the lights off and hold the marks in the accent colour.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="font-shapes">
       <div class="wrap">
         <p class="eyebrow">shapes</p>
@@ -104,7 +145,7 @@ const shapes = [
         <p class="eyebrow">weights</p>
         <h2>Ultralight to blackout.<br /><span class="dim">One file.</span></h2>
         <div class="tester glass">
-          <p class="tester-text" id="font-tester" contenteditable="true" spellcheck="false" aria-label="Type to try ñü.Føňt">khėnsu.ñü webË ñü.vœîð ñü.ẽřåł ñü.ċřêæțẽ ñü.ŵævẽš ñũ.Fî ñũ.Bî</p>
+          <p class="tester-text" id="font-tester" contenteditable="true" spellcheck="false" aria-label="Type to try ñü.Føňt">khėnsu.ñü webË ñü.vœîð ñü.řåł ñü.ċřêæțẽ ñü.ŵævẽš ñũ.Fî ñũ.Bî</p>
           <div class="controls">
             <label class="ctl">
               <span>Weight <b id="font-wght-label">500 · Medium</b></span>
@@ -134,6 +175,38 @@ const shapes = [
       </div>
     </section>
 
+
+    <section class="section" id="font-scripts">
+      <div class="wrap">
+        <p class="eyebrow">scripts</p>
+        <h2>Four scripts, one hand.</h2>
+        <p class="intro">Each script is drawn from the same skeleton rules, so a page that mixes them reads as one voice. Marks stack the way the languages need them to; a Vietnamese ậ keeps its dot below and its circumflex above.</p>
+        <div class="grid two scripts">
+          {scripts.map((sc) => (
+            <article class="glass">
+              <p class="sample script-sample" lang={sc.t === 'Ελληνικά' ? 'el' : sc.t === 'Кириллица' ? 'ru' : sc.t === 'Tiếng Việt' ? 'vi' : 'en'} aria-hidden="true">{sc.sample}</p>
+              <h3 class="name-case">{sc.t}</h3>
+              <p>{sc.text}</p>
+            </article>
+          ))}
+        </div>
+        <p class="small">Not yet: Arabic, Hebrew, Devanagari, CJK, and the language-specific forms (locl) that Inter carries for Bulgarian, Serbian and Dutch. Figures are tabular in both families, so columns of numbers line up.</p>
+      </div>
+    </section>
+
+    <section class="section band" id="font-mono">
+      <div class="wrap">
+        <p class="eyebrow">mono</p>
+        <h2><span class="name-case">ñü.Føňt</span> Mono.<br /><span class="dim">The same letters, one cell each.</span></h2>
+        <p class="intro">Every glyph fitted to a 600-unit cell: wide letters are squeezed, narrow ones centred, and the pen stays the same width. Six weights and the italic again, in a second variable file. It sets the ~commands, the node terminal and every figure on these pages.</p>
+        <div class="grid two">
+          <pre class="mono-demo glass" aria-label="ñü.Føňt Mono sample">{monoLines.join('\n')}</pre>
+          <pre class="mono-demo glass heavy" aria-label="ñü.Føňt Mono, heavy">{monoLines.join('\n')}</pre>
+        </div>
+        <p><a class="btn" href="/fonts/nufont/nuFontMono-Variable.ttf" download>nuFontMono-Variable.ttf · {kb(monoTtf)}</a> <a class="btn" href="/fonts/nufont/nuFontMono-Variable.woff2" download>nuFontMono-Variable.woff2 · {kb(monoWoff2)}</a></p>
+      </div>
+    </section>
+
     <section class="section" id="font-stems">
       <div class="wrap">
         <p class="eyebrow">stems</p>
@@ -158,7 +231,7 @@ const shapes = [
         <div class="grid three">
           <article class="glass">
             <h3>Everything</h3>
-            <p>The variable TTF, the twelve static TTFs and the metrics file in one archive.</p>
+            <p>Both families: the variable TTFs, the twelve static TTFs of each, and the metrics file in one archive.</p>
             <p><a class="btn primary" href="/fonts/nufont/nufont.zip" download>Download nufont.zip · {kb(sizes['nufont.zip'])}</a></p>
           </article>
           <article class="glass">
@@ -213,6 +286,10 @@ const shapes = [
           <article class="glass">
             <h3>Kerning and hinting</h3>
             <p>Pair spacing for every name on this site, then hinting for small text, so ñü.Føňt can take over running text as well.</p>
+          </article>
+          <article class="glass">
+            <h3>More scripts</h3>
+            <p>Arabic, Hebrew, Devanagari and the language forms Inter carries, with mark attachment in the font itself rather than drawn per letter.</p>
           </article>
           <article class="glass">
             <h3>Capsule rendering</h3>
@@ -353,6 +430,43 @@ const shapes = [
   .dot-stage :global(svg) {
     height: 1.1em;
     max-width: 92vw;
+  }
+  .pulse-stage {
+    --nf-light-dur: 3.6s;
+  }
+  .code {
+    margin: 0.8rem 0;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.35);
+    font: 500 0.82rem/1.5 var(--font-mono);
+    color: rgba(255, 255, 255, 0.86);
+    overflow-x: auto;
+  }
+  .scripts .script-sample {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+    overflow-wrap: anywhere;
+  }
+  .small {
+    margin-top: 1.4rem;
+    font-size: 0.92rem;
+    color: var(--text-dim, rgba(255, 255, 255, 0.62));
+  }
+  .mono-demo {
+    margin: 0;
+    padding: 1.2rem 1.4rem;
+    font: 500 clamp(0.95rem, 1.5vw, 1.2rem)/1.6 var(--font-mono);
+    color: rgba(255, 255, 255, 0.9);
+    overflow-x: auto;
+  }
+  .mono-demo.heavy {
+    font-weight: 800;
   }
   .shapes .sample {
     font-family: var(--font-display);

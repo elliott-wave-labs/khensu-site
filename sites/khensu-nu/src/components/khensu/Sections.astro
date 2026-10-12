@@ -1,5 +1,5 @@
 ---
-// The khensu.ñü sections, shared by the home page and the topic pages; each page lists the ones it shows, in order.
+// The khėnsu.ñü sections, shared by the home page and the topic pages; each page lists the ones it shows, in order.
 import AppScreen from './AppScreen.astro';
 import Exploded from './Exploded.astro';
 import Finishes from './Finishes.astro';
@@ -15,12 +15,13 @@ import RingCode from './RingCode.astro';
 import Economics from './Economics.astro';
 import PerAnkh from './PerAnkh.astro';
 import StatStrip from './StatStrip.astro';
+import NuMark from './NuMark.astro';
 
 const highlights = [
   { icon: 'lock', href: '/security#security-protections', go: 'How the encryption works', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
   { icon: 'shield', href: '/webe', go: 'How stealth works', title: 'Full stealth mode, beyond a VPN', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not, and the relays carrying you keep switching, so none of them sees a whole conversation.' },
   { icon: 'feed', href: '/webe', go: 'Explore webË', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
-  { icon: 'wallet', href: '/nufi', go: 'See ñüFi', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
+  { icon: 'wallet', href: '/nufi', go: 'See ñũ.Fî', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
   { icon: 'sparkle', href: '/memory', go: 'How memory stays private', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
   { icon: 'live', href: '/shield', go: 'See suñůlink.shield', title: 'Runs on any connection', body: 'Fibre, cable, 5G, satellite. With no internet at all, phones reach each other at about 100 m, and suñůlink.shield stretches that to 600 m, or 2 km to a rooftop node.' },
 ] as const;
@@ -44,10 +45,10 @@ const specs = [
 ];
 
 const pages = [
-  { href: '/webe', title: 'webË', body: 'The people-run internet under khensu.ñü: stealth, better than a VPN, and built for ten billion people.', go: 'How webË works' },
+  { href: '/webe', title: 'webË', body: 'The people-run internet under khėnsu.ñü: stealth, better than a VPN, and built for ten billion people.', go: 'How webË works' },
   { href: '/media', title: 'ñü.media', body: 'Our codec: 4K at 240 fps, light and green-screen keys, and every measurement.', go: 'See the demos' },
   { href: '/memory', title: 'Memory and your feed', body: 'Per-Ankh remembers for you, and your recommendations are worked out only on your device.', go: 'How it stays private' },
-  { href: '/creators', title: 'For creators', body: 'What artists keep on khensu.ñü compared with streaming, studios and labels.', go: 'Compare the cuts' },
+  { href: '/creators', title: 'For creators', body: 'What artists keep on khėnsu.ñü compared with streaming, studios and labels.', go: 'Compare the cuts' },
   { href: '/shield', title: 'suñůlink.shield', body: 'A full node on your iPhone, with its own battery and a mesh radio.', go: 'Explore suñůlink.shield' },
   { href: '/transfer', title: 'Send big files', body: '4K video and huge files, private end to end, with no fee per gigabyte.', go: 'Send privately' },
   { href: '/quality', title: 'How we measure', body: 'Why VMAF isn’t enough, and how to rerun every number yourself.', go: 'Check our numbers' },
@@ -67,8 +68,8 @@ const { show } = Astro.props as { show: Key[] };
         <p class="eyebrow">The first app on <span class="name-case">webË</span></p>
         <h2 class="big">A messenger with no company in the middle. <em>Because there isn’t one.</em></h2>
         <p class="lede">
-          khensu.ñü runs on a network of small computers in people’s homes, not on a company’s servers. No one can read
-          what you send, see who you send it to, or switch it off. It is the first app on webË, a people-run internet
+          khėnsu.ñü runs on a network of small computers in people’s homes, not on a company’s servers. No one can read
+          what you send, see who you send it to, or switch it off. It is the first app on webe, a people-run internet
           that sits on the one you already use.
         </p>
         <div class="btn-row">
@@ -149,7 +150,7 @@ const { show } = Astro.props as { show: Key[] };
       <Net />
       <div class="wrap">
         <p class="eyebrow">The new internet</p>
-        <h2 id="webe-title" class="webe-name"><span class="name-case">webË</span></h2>
+        <h2 id="webe-title" class="webe-name"><NuMark name="webe" aura pulse /></h2>
         <p class="webe-sub">A new internet, alongside the one you use.</p>
         <StatStrip
           items={[
@@ -175,7 +176,13 @@ const { show } = Astro.props as { show: Key[] };
         <div class="btn-row webe-links">
           <a class="btn primary" href="https://dev.khensu.nu/webe">webË specification</a>
           <a class="btn" href="https://dev.khensu.nu/webe#build">Build an app on webË</a>
-          <a class="btn" href="https://dev.khensu.nu/webe#extend">Extend khensu.ñü</a>
+          <a class="btn" href="https://dev.khensu.nu/webe#extend">Extend khėnsu.ñü</a>
+        </div>
+        <div class="btn-row webe-links">
+          <a class="btn" href="#stealth-section">Stealth by default</a>
+          <a class="btn" href="#relays-section">Ten billion a day</a>
+          <a class="btn" href="#space-section">Any link</a>
+          <a class="btn" href="#characters-section">Not only English</a>
         </div>
       </div>
     </section>
@@ -194,19 +201,19 @@ const { show } = Astro.props as { show: Key[] };
         <h2 id="vpn-title" class="big webe-title">Better than a VPN. Nothing to switch on.</h2>
         <p class="lede">
           A VPN moves your trust from your internet provider to one VPN company, which then sees your address and
-          everything you open. On webË, nobody holds both.
+          everything you open. On webe, nobody holds both.
         </p>
         <ul class="webe" role="list">
           <li><b>No one sees both ends</b><span>The first relay knows who you are but not what you open. The last knows what, not who. They’re run by different operators in different countries.</span></li>
-          <li><b>Looks like a normal website</b><span>VPN protocols are easy to recognise and block. webË traffic is ordinary HTTPS.</span></li>
-          <li><b>Hides when, not just where</b><span>A VPN still shows when and how much you use it. khensu.ñü keeps the same rhythm all day.</span></li>
+          <li><b>Looks like a normal website</b><span>VPN protocols are easy to recognise and block. webe traffic is ordinary HTTPS.</span></li>
+          <li><b>Hides when, not just where</b><span>A VPN still shows when and how much you use it. khėnsu.ñü keeps the same rhythm all day.</span></li>
           <li><b>Nothing to log</b><span>“No logs” is a VPN’s promise. Relays never see your content or both ends, so there’s nothing to hand over.</span></li>
           <li><b>Post-quantum only</b><span>ML-KEM-1024 and ML-DSA-87, so traffic recorded today can’t be decrypted later.</span></li>
           <li><b>No off switch, no leaks</b><span>No kill switch needed: there is no unprotected mode to fall back to.</span></li>
         </ul>
         <p class="footnote">
-          This covers everything on webË: messages, calls, payments, feeds, forums, sites and live streams. For the rest
-          of the internet, webË exit is a VPN profile for iPhone, iPad and Mac that sends all your traffic through two
+          This covers everything on webe: messages, calls, payments, feeds, forums, sites and live streams. For the rest
+          of the internet, webe exit is a VPN profile for iPhone, iPad and Mac that sends all your traffic through two
           relays from different operators, under the same rules.
         </p>
         <div class="btn-row webe-links">
@@ -228,14 +235,14 @@ const { show } = Astro.props as { show: Key[] };
     )}
     {k === 'stealth' && (
       <>
-    <section class="statement" data-scene="reveal" aria-label="Stealth by default">
+    <section class="statement" id="stealth-section" data-scene="reveal" aria-labelledby="stealth-title">
       <div class="wrap">
         <p class="eyebrow">Stealth by default</p>
-        <p class="words">
+        <h2 id="stealth-title" class="words">
           {statement.map((w, i) => (
             <span style={`--i:${i};--n:${statement.length}`}>{w} </span>
           ))}
-        </p>
+        </h2>
         <div class="pulse" aria-hidden="true">
           {['Typing a message', 'Idle', 'Asleep in a pocket', 'Battery at 5%'].map((label) => (
             <div class="pulse-row">
@@ -258,7 +265,7 @@ const { show } = Astro.props as { show: Key[] };
           on your lock screen and stay live when you switch apps, like any phone call. The VoIP itself runs on our own
           network, not a phone carrier’s: encrypted end to end over HTTP/3, the faster successor to secure WebSockets,
           and the same goes for live streams you’re in. New messages arrive
-          through a wake-up that carries nothing, then one standard-size fetch. With a suñůlink.shield on your phone,
+          through a wake-up that carries nothing, then one standard-size fetch. With a sunulink.shield on your phone,
           the rhythm never stops at all: it’s a full node with its own battery.
         </p>
         <p class="footnote">There is no setting to turn this off. Privacy you can switch off is privacy someone can make you switch off.</p>
@@ -268,14 +275,14 @@ const { show } = Astro.props as { show: Key[] };
     )}
     {k === 'relays' && (
       <>
-    <section class="section relays-sec net-host" data-scene="reveal" aria-labelledby="relays-title">
+    <section class="section relays-sec net-host" id="relays-section" data-scene="reveal" aria-labelledby="relays-title">
       <Net closeup nodes={170} class="behind" label="A close-up of the relay network: messages move along links, vanish and reappear on other links as relays switch." />
       <div class="wrap">
         <div class="relays-copy">
           <p class="eyebrow">10 billion → ∞</p>
           <h2 id="relays-title" class="big">Ten billion people a day. <em>And beyond.</em></h2>
           <p class="lede">
-            khensu.ñü is built to carry 10 billion people a day on about 6 million small computers, or 2 in every 100
+            khėnsu.ñü is built to carry 10 billion people a day on about 6 million small computers, or 2 in every 100
             people running a node on ordinary home broadband. There is no central server to outgrow: every node that
             joins adds capacity, so the network keeps scaling past that without limit.
           </p>
@@ -322,7 +329,7 @@ const { show } = Astro.props as { show: Key[] };
     )}
     {k === 'space' && (
       <>
-    <section class="section space" aria-labelledby="space-title">
+    <section class="section space" id="space-section" aria-labelledby="space-title">
       <div class="wrap split rev">
         <Orbit />
         <div>
@@ -332,7 +339,7 @@ const { show } = Astro.props as { show: Key[] };
             A boat, a castle, a farm estate, the city or the slums, a private lab, a plane, a spaceship or an ET base.
             A node needs a connection and a power socket, nothing more. One on satellite internet, such as Starlink, is
             a full node: it relays, stores and earns like any other. Where there is no internet at all, devices reach each other directly and carry messages hop by hop:<br />
-            phone to phone about 100 m outdoors; with suñůlink.shield about 600 m on open ground, and up to 2 km to a
+            phone to phone about 100 m outdoors; with sunulink.shield about 600 m on open ground, and up to 2 km to a
             rooftop node.
           </p>
           <ul class="links">
@@ -341,7 +348,7 @@ const { show } = Astro.props as { show: Key[] };
             <li>Fibre and cable</li>
             <li>Node-to-node mesh, no internet</li>
           </ul>
-          <p class="footnote">Mesh ranges are line of sight outdoors, calculated from each radio’s link budget: phones over Bluetooth and Wi-Fi peer-to-peer reach about 30 m indoors; suñůlink.shield’s Wi-Fi HaLow reaches about 100 m between shields in a city and 250–500 m to a rooftop node in towns and suburbs. Ranges in Europe are about a third shorter, under its lower power limit. Starlink is a trademark of SpaceX, and 5G Ultra Wideband of Verizon. Named only as examples; no affiliation or endorsement.</p>
+          <p class="footnote">Mesh ranges are line of sight outdoors, calculated from each radio’s link budget: phones over Bluetooth and Wi-Fi peer-to-peer reach about 30 m indoors; sunulink.shield’s Wi-Fi HaLow reaches about 100 m between shields in a city and 250–500 m to a rooftop node in towns and suburbs. Ranges in Europe are about a third shorter, under its lower power limit. Starlink is a trademark of SpaceX, and 5G Ultra Wideband of Verizon. Named only as examples; no affiliation or endorsement.</p>
         </div>
       </div>
     </section>
@@ -380,6 +387,62 @@ const { show } = Astro.props as { show: Key[] };
           <a class="btn" href="https://dev.khensu.nu/shell">Full suñůlink.shield specifications</a>
         </div>
         <PatentNotice />
+      </div>
+    </section>
+      </>
+    )}
+    {k === 'characters' && (
+      <>
+    <section class="section" id="characters-section" aria-labelledby="characters-title">
+      <div class="wrap">
+        <p class="eyebrow">Names, links, titles, passwords</p>
+        <h2 id="characters-title">Not only the<br /><span class="dim"> English alphabet.</span></h2>
+        <StatStrip
+          items={[
+            { n: 13, label: 'Full-Unicode characters. 34 times as many names as the P-256 prime' },
+            { n: 39, label: 'Printable ASCII characters to pass that same prime' },
+            { n: 2, unit: 'bytes', label: 'Æ, æ, AE and ae. Four values, the same size' },
+            { n: 1112064, label: 'Scalar values. Each added character multiplies the names by this' },
+          ]}
+        />
+        <p class="lede">
+          A name, a webe address, a title and a password use the whole Unicode repertoire. Æ and æ are different letters, and both are different from AE and ae. ñ is not n. ü is not u.
+        </p>
+        <div class="bits">
+          <h3>Bits of a file in each byte stored</h3>
+          <p class="bits-note">Higher holds more of a file. Raw bytes win. These letters are not a smaller way to store one.</p>
+          <div class="bit"><span>Raw bytes</span><i style="--w:100%"><b></b></i><em>8.00</em></div>
+          <div class="bit"><span>Printable ASCII</span><i style="--w:82.1%"><b></b></i><em>6.57</em></div>
+          <div class="bit"><span>A Unicode letter, 4-byte UTF-8</span><i style="--w:62.8%"><b></b></i><em>5.02</em></div>
+          <div class="bit"><span>Æ, ñ, ü</span><i style="--w:50%"><b></b></i><em>4.00</em></div>
+          <div class="bit"><span>One emoji of 3,790</span><i style="--w:37.1%"><b></b></i><em>2.97</em></div>
+          <h3>Characters to cover a 256-bit name</h3>
+          <p class="bits-note">Fewer characters, the same space. This is a shorter name, not a smaller file.</p>
+          <div class="bit"><span>A to Z</span><i style="--w:100%"><b></b></i><em>55</em></div>
+          <div class="bit"><span>Printable ASCII</span><i style="--w:70.9%"><b></b></i><em>39</em></div>
+          <div class="bit"><span>Every Unicode letter</span><i style="--w:23.6%"><b></b></i><em>13</em></div>
+        </div>
+        <ul class="webe letters" role="list">
+          <li><b>Æ</b><span>U+00C6, stored as c3 86. One letter, two bytes, its own value.</span></li>
+          <li><b>æ</b><span>U+00E6, stored as c3 a6. Different from Æ. The case is already in the letter.</span></li>
+          <li><b>Ñ ñ and Ü ü</b><span>U+00D1, U+00F1, U+00DC, U+00FC. Each is its own letter. n, N, u and U stay different names.</span></li>
+          <li><b>Emoji</b><span>Allowed in a name, a link, a title and a password. One emoji is 4 bytes, about 11.9 bits of choice in 32 bits stored. Not a saving.</span></li>
+        </ul>
+        <p class="lede">
+          The ligature is the smaller way to keep the difference. Æ is 16 bits. AE plus a bit that says “this is the ligature” is 17. The same for æ, and for case.
+          Each added character multiplies the number of names by 1,112,064, which is 11,706 times the step of a printable ASCII character.
+          Thirteen of them pass the P-256 prime. Twelve fall short, at 241 bits. A to Z needs 55 characters to pass the same prime.
+        </p>
+        <p class="lede">
+          Sealed messages, pictures and sound stay raw bytes. A byte holds 8 bits. Ninety-five printable characters hold 6.57 bits in that byte, and Æ, ñ and ü cost 16 bits each, so packing a file into those letters takes more room than the bytes.
+          A character is a digit only when the digit is smaller. These stay letters: in usernames, site links, titles and passwords.
+        </p>
+        <p class="footnote">
+          The P-256 prime is 2²⁵⁶ − 2²²⁴ + 2¹⁹² + 2⁹⁶ − 1, the field prime of secp256r1 in <a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf">FIPS 186-4</a>.
+          Thirteen characters over the 1,112,064 Unicode scalar values (17 × 65,536 − 2,048 surrogates) are 261 bits, 34 times that prime, and they also pass the Curve25519 prime 2²⁵⁵ − 19 (<a href="https://www.rfc-editor.org/rfc/rfc7748">RFC 7748</a>).
+          The public DNS host folds the pair: Ægir and ægir both encode as xn--gir-xla. The webe name keeps both.
+          The message key is ML-KEM-1024. The alphabet is the name and the text. <a href="https://dev.khensu.nu/specs/webe#36-characters">Character rules</a>.
+        </p>
       </div>
     </section>
       </>
@@ -586,6 +649,13 @@ const { show } = Astro.props as { show: Key[] };
     max-width: 24ch;
     margin: 0 0 3rem;
   }
+  h2.words {
+    font-size: clamp(1.9rem, 4.6vw, 3.6rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+    margin: 0 0 3rem;
+  }
   .words span {
     opacity: clamp(0.14, calc(var(--p) * var(--n) * 1.25 - var(--i)), 1);
   }
@@ -744,15 +814,11 @@ const { show } = Astro.props as { show: Key[] };
     margin: calc(0.2rem - 0.25em) 0 0;
     padding-top: 0.25em;
     font-size: clamp(4.5rem, 13vw, 10rem);
-    font-weight: 600;
     line-height: 0.95;
-    letter-spacing: -0.04em;
-    background: var(--aura);
-    background-size: 300% 100%;
-    animation: aura-flow var(--aura-flow-dur) linear infinite;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  }
+  .webe-name :global(svg) {
+    height: 1.1em;
+    max-width: 92vw;
   }
   .webe-sub {
     margin: 0.8rem 0 0;
@@ -804,6 +870,23 @@ const { show } = Astro.props as { show: Key[] };
   }
   .webe-links {
     margin-top: 2rem;
+  }
+  .letters li {
+    min-height: 0;
+  }
+  #characters-section .footnote {
+    max-width: none;
+    margin-top: 2rem;
+  }
+  .bits { margin-top: 2rem; display: grid; gap: 0.65rem; max-width: 46rem; }
+  .bits h3 { margin: 1.4rem 0 0; font-size: 1rem; font-weight: 500; }
+  .bits-note { margin: 0; color: var(--text-dim); font-size: 0.92rem; }
+  .bit { display: grid; grid-template-columns: minmax(8rem, 16rem) 1fr 3.2rem; gap: 0.75rem; align-items: center; font-size: 0.92rem; }
+  .bit i { display: block; height: 8px; border-radius: 99px; background: rgba(255, 255, 255, 0.08); position: relative; }
+  .bit i b { position: absolute; inset: 0 auto 0 0; width: var(--w); border-radius: inherit; background: #f2f1ec; }
+  .bit em { font-style: normal; font-variant-numeric: tabular-nums; text-align: right; }
+  #characters-section .footnote a {
+    color: inherit;
   }
 
   .cta h2 {

@@ -37,7 +37,7 @@ Wire primitives, encodings and the mixnet are as in `PROTOCOL.md` (sections 1, 3
 
 ### 3.1 Form
 
-A webË name is a khensu handle: `name.khensu.nu`, with optional subnames (`blog.name.khensu.nu`) controlled by the same identity. Names are permanent, non-tradeable and resolved only from the log. Content can also be addressed directly by hash (3.4).
+A webË name is a khensu handle: `name.khensu.nu`, with optional subnames (`blog.name.khensu.nu`) controlled by the same identity. The label is any NFC string (3.6), so `Ægir.khensu.nu` and `ægir.khensu.nu` are different names. Names are permanent, non-tradeable and resolved only from the log. Content can also be addressed directly by hash (3.4).
 
 ### 3.2 Name record
 
@@ -75,6 +75,24 @@ No resolver is trusted: a wrong answer fails the proof.
 ### 3.5 Gateways (optional)
 
 Operators may run gateways that serve public webË content to ordinary browsers over the public web, under `*.khensu.nu` DNS. Gateways are not stealthy (they see the reader's IP and request) and show a banner saying so. They are a bridge for reach, not part of webË. Whether to run any is `OPEN-QUESTIONS.md` 56.
+
+The public host is a DNS name, so it follows the IDNA mapping. `Ægir` and `ægir` both encode as `xn--gir-xla`, and `Æ` and `æ` both encode as `xn--6ca`. The gateway has one host for each pair. The webË name keeps both.
+
+### 3.6 Characters
+
+Names, paths, queries and the text inside encrypted messages are Unicode scalar values, stored as UTF-8 and compared after NFC only. Case stays. There is no casefold and no compatibility fold.
+
+Æ (U+00C6) and æ (U+00E6) are different values. The two-letter sequences AE and ae are two more values. Unicode 15 gives none of the four a decomposition. Each is 2 bytes in UTF-8 (`c3 86`, `c3 a6`, `41 45`, `61 65`). A folded letter plus a separate bit that recorded the difference would be at least 17 bits, so the distinct character is the smaller encoding. A combining mark that NFC composes becomes that one character (`é`). A mark that does not compose stays on the letter.
+
+The space of strings grows with the alphabet. There are 1,112,064 scalar values (17 planes of 65,536, excluding the 2,048 surrogates), which is 20.08 bits a character and 11,706 times the 95 printable ASCII characters. A string of 13 such characters has 34 times as many values as the P-256 field prime
+
+```
+p = 2^256 - 2^224 + 2^192 + 2^96 - 1
+```
+
+the prime of secp256r1 in FIPS 186-4. Length 12 is 241 bits and is smaller than `p`. Printable ASCII passes `p` at length 39. Adding only Æ and æ to those 95 characters (97 symbols, 6.60 bits each) still passes `p` at length 39. The same 13-character string also exceeds the Curve25519 prime `2^255 - 19` (RFC 7748). This is the size of the name and of a passphrase someone types. The sealed packet stays ML-KEM-1024 and MLS.
+
+Ciphertext and media samples stay raw bytes. A digit alphabet stored as UTF-8 holds less than 8 bits per stored byte. Ninety-five printable characters carry 6.57 bits in one byte. An alphabet of those 95 plus Æ and æ averages 1.02 bytes a symbol and 6.60 bits of value, about 81% of a raw byte, against 82% for the ASCII digits alone. A character is included as a packed digit only when that packing is smaller than the bytes. Æ and æ fail that test, so they are letters, and the samples stay bits. Emoji are scalar values, so a name, a link, a title and a password may use them. A typical emoji is 4 bytes and one of about 3,790 choices, about 11.9 bits in 32 bits stored. They fail the same test, so they stay letters too.
 
 ## 4. Objects
 
@@ -152,6 +170,29 @@ Every object is verified against its address before use; manifests are verified 
 - A site is a `SiteManifest` plus its objects: static files and optional WebAssembly. There is no server-side code at launch (`OPEN-QUESTIONS.md` 50).
 - The origin for browser security is the name (`webe://name.khensu.nu`). Sites can't fetch from the ordinary web or from other names unless their policy lists them; this blocks third-party tracking by construction.
 - Sites can embed feeds, forums and live tracks by reference.
+
+### 7.1 Link previews
+
+A link shared into a chat, a feed or another site carries a preview. On the ordinary web a preview is one still image (`og:image`). On webË, and on the khensu.ñü sites today, a preview is **media**: anything the receiving client can show, play or open, declared by the page in `nu:preview` meta tags next to the Open Graph ones, which stay as the fallback for every client that doesn't read `nu:preview`.
+
+```html
+<meta property="og:image" content="https://khensu.nu/og/buy.jpg" />
+<meta property="og:image:alt" content="…" />
+<meta property="nu:preview" content="https://khensu.nu/og/buy-square.mp4" />
+<meta property="nu:preview:type" content="video/mp4; codecs=hvc1" />
+<meta property="nu:preview:duration" content="3" />
+<meta property="nu:preview:size" content="1080x1080" />
+<meta property="nu:preview:bytes" content="3279733" />
+<meta property="nu:preview:hash" content="sha-256=…" />
+<meta property="nu:preview:effect" content="ripple" />
+```
+
+- **Kinds.** `nu:preview:type` is a media type. Clients show: still images (`image/*`, including animated GIF and animated AVIF/WebP), video (`video/mp4` with HEVC or H.264, `video/nu-media` once the decoder ships; muted, looping, autoplay, 10 s at most), audio (`audio/*`, with a play control and the still as artwork), documents (`application/pdf`, with the first page as the still), webË contracts (`application/nu-contract+cbor`, 14.3, shown as the contract's interface summary) and archives and installers (`application/zip`, `application/vnd.android.package-archive`, `application/x-apple-diskimage`). Several `nu:preview` tags may be given; a client takes the first one it can show.
+- **Executable and archive warnings.** An `apk`, `dmg`, `pkg`, `exe`, `zip` or any type a client can't inspect is never auto-opened. The preview shows the type, the byte count, the hash and a warning in the client's own words ("This link installs software. Only continue if you trust the sender."), and the file is fetched only after a deliberate tap. A preview can't change the warning or its wording.
+- **Fetch.** Preview media is fetched like any other object: on webË through the two-relay stealth fetch (5.1); on the ordinary web through the app's mixnet exit. Previews are capped at 8 MiB and 10 s unless the person taps to load more. `nu:preview:hash` must match or the preview is dropped and the `og:image` still is shown instead.
+- **Rendering on Apple platforms.** The app renders previews in SwiftUI. Video previews are decoded by VideoToolbox (HEVC with alpha where present) or by the nu.media decoder on the Neural Engine, then drawn through a Metal layer so a page can ask for one of a small set of named effects in `nu:preview:effect`: `ripple` (a touch sends a ring across the video), `tilt` (parallax with the device), `glass` (the Liquid Glass material over the frame) and `none`. The effect is a hint; a client may ignore it, and reduced-motion settings always do.
+- **Privacy.** Fetching a preview must not tell the page who looked: no cookies, no referrer, no per-person URL. Clients fetch previews through the mixnet, prefetch at most the first `nu:preview`, and strip `nu:preview:*` from pages they publish on a person's behalf unless the author set them.
+- **The khensu.ñü sites.** Every page on khensu.ñü and dev.khensu.nu emits `og:image` (1200 × 630), the square still for Instagram-style link pages, and, where one exists, `nu:preview` with the 3-second HEVC square (`tools/og-anim.sh`): Earth time-lapsed under the phone turning once, the card's words on top.
 
 ## 8. Feeds
 

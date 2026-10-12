@@ -7,7 +7,7 @@ import '@fontsource/jetbrains-mono/400.css';
 import '../styles/global.css';
 import NuMark from '../components/khensu/NuMark.astro';
 import Crescent from '../components/khensu/Crescent.astro';
-import { CARDS, cardFor } from '../../../khensu-nu/src/data/og';
+import { CARDS, PREVIEWS, cardFor, previewFor } from '../../../khensu-nu/src/data/og';
 
 interface Props {
   title?: string;
@@ -24,6 +24,8 @@ const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const card = cardFor(Astro.url.pathname, 'dev-');
 const ogImage = `https://khensu.nu/og/${card}.jpg`;
+const preview = previewFor(card);
+const previewUrl = preview ? `https://khensu.nu/og/${preview}-square.mp4` : undefined;
 const ogAlt = CARDS[card].alt;
 
 const DOCS = [
@@ -81,6 +83,22 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogAlt} />
+    {preview && previewUrl && (
+      <>
+        <meta property="og:video" content={previewUrl} />
+        <meta property="og:video:secure_url" content={previewUrl} />
+        <meta property="og:video:type" content="video/mp4" />
+        <meta property="og:video:width" content="1080" />
+        <meta property="og:video:height" content="1080" />
+        <meta property="nu:preview" content={previewUrl} />
+        <meta property="nu:preview:type" content="video/mp4; codecs=hvc1" />
+        <meta property="nu:preview:duration" content="3" />
+        <meta property="nu:preview:size" content="1080x1080" />
+        <meta property="nu:preview:bytes" content={String(PREVIEWS[preview].bytes)} />
+        <meta property="nu:preview:hash" content={PREVIEWS[preview].hash} />
+        <meta property="nu:preview:effect" content="ripple" />
+      </>
+    )}
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>

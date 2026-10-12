@@ -929,7 +929,40 @@ def mark_strokes(kind: str, cx: float, ybase: float, m: Metrics) -> list[Stroke]
     if kind == "cedilla":
         y = -hw - 10
         return [Stroke([line((cx, y), (cx, y - 0.1 * XH)), arc((cx - 0.07 * XH, y - 0.1 * XH - 0.07 * XH), 0.07 * XH, 0, -150)], tag="mark cedilla")]
+    if kind == "macron":
+        return [Stroke([line((cx - 0.19 * XH, ybase + hw), (cx + 0.19 * XH, ybase + hw))], tag="mark macron")]
+    if kind == "breve":
+        a = 0.19 * XH
+        b = 0.1 * XH + 0.25 * m.w
+        return [Stroke([earc((cx, ybase + hw + b), a, b, 200, 340)], tag="mark breve")]
+    if kind == "doubleacute":
+        d = 0.09 * XH
+        return [
+            Stroke([line((cx - d - 0.05 * XH, ybase + hw), (cx - d + 0.09 * XH, ybase + hw + 0.15 * XH))], tag="mark acute"),
+            Stroke([line((cx + d - 0.03 * XH, ybase + hw), (cx + d + 0.11 * XH, ybase + hw + 0.15 * XH))], tag="mark acute"),
+        ]
+    if kind == "hookabove":
+        r = 0.07 * XH + 0.2 * m.w
+        cy = ybase + hw + 1.6 * r
+        return [Stroke([arc((cx, cy), r, 180, -70), line((cx + r * math.cos(math.radians(-70)), cy + r * math.sin(math.radians(-70))), (cx + 0.15 * r, ybase + hw))], tag="mark hook")]
+    if kind == "dotbelow":
+        wm = 1.15 + 8 / m.w
+        return [dot_stroke(cx, -m.mark_gap - m.w * wm, m, tag="mark dotbelow")]
+    if kind == "ogonek":
+        r = 0.09 * XH + 0.3 * hw
+        return [Stroke([line((cx, hw * 0.6), (cx, -r)), arc((cx + r, -r), r, 180, 300)], tag="mark ogonek")]
+    if kind == "horn":
+        return [Stroke([line((cx - 0.4 * hw, 0.7 * XH), (cx + 0.11 * XH, 0.9 * XH))], tag="mark horn")]
+    if kind in ("tonos",):
+        return mark_strokes("acute", cx, ybase, m)
+    if kind in ("dialytika",):
+        return mark_strokes("dieresis", cx, ybase, m)
     raise KeyError(kind)
+
+
+# Marks that sit on the right edge (x) or below the baseline (y) instead of centred above.
+SIDE_MARKS = {"ogonek", "horn"}
+BELOW_MARKS = {"commabelow", "cedilla", "dotbelow", "ogonek"}
 
 
 COMPOSITES = {
@@ -1149,17 +1182,40 @@ def orient(contours: list[list[Pt]], s: Stroke) -> list[list[Pt]]:
     return [c[::-1] if signed_area(c) > 0 else c for c in contours]
 
 
+# Which glyphs count as capitals for mark height: Latin, Greek and Cyrillic capitals all register here.
+TALL_BASES: set[str] = set()
+
+
 def glyph_strokes(name: str, m: Metrics) -> list[Stroke]:
     if name in COMPOSITES:
-        base, mark = COMPOSITES[name]
+        base, marks = COMPOSITES[name]
+        if isinstance(marks, str):
+            marks = (marks,)
         strokes = glyph_strokes(base, m)
         x0, x1 = skeleton_xrange(strokes, m)
-        cx = (x0 + x1) / 2
-        ybase = (CAP if base[0].isupper() else XH) + m.mark_gap
-        if mark in ("commabelow", "cedilla"):
-            ybase = 0
-        return strokes + mark_strokes(mark, cx, ybase, m)
+        tall = base in TALL_BASES or (base[0].isupper() and base.isascii())
+        top = (CAP if tall else XH)
+        for i, mark in enumerate(marks):
+            cx = (x0 + x1) / 2
+            if mark in SIDE_MARKS:
+                cx = x1 - m.hw
+            if mark in BELOW_MARKS:
+                ybase = 0.0
+            else:
+                ybase = (top if i == 0 or marks[i - 1] in BELOW_MARKS else skeleton_top(strokes, m)) + m.mark_gap * (1.0 if i == 0 else 0.7)
+            strokes = strokes + mark_strokes(mark, cx, ybase, m)
+        return strokes
     return GLYPHS[name](m)
+
+
+def skeleton_top(strokes, m: Metrics) -> float:
+    ys = []
+    for s in strokes:
+        for p in s.prims:
+            for i in range(9):
+                pt, _ = p.eval(i / 8)
+                ys.append(pt[1] + m.hw * s.wmul)
+    return max(ys) if ys else XH
 
 
 def skeleton_xrange(strokes, m: Metrics):
@@ -1186,8 +1242,38 @@ def fix_segments(strokes_by_master: list[list[Stroke]], ref_index: int):
 REF_INDEX = 2  # medium
 
 
-def build_glyph_masters(name: str, masters: list[Metrics], slants: list[float]):
-    """Per (slant, master): (contours, advance). Contours have identical structure across all of them."""
+MONO_ADV = 600  # the cell of nu Font Mono, 0.6 em like most code faces
+MONO_SB = 34
+DIGITS = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+
+
+def scale_x(strokes: list[Stroke], sx: float) -> list[Stroke]:
+    """Squeeze a skeleton horizontally without thinning the pen: arcs become ellipse arcs. Keeps segment counts."""
+    out = []
+    for s in strokes:
+        prims = []
+        for p in s.prims:
+            if p.kind == "line":
+                (x0, y0), (x1, y1) = p.data
+                q = Prim("line", ((x0 * sx, y0), (x1 * sx, y1)), p.k)
+            elif p.kind == "arc":
+                (cx, cy), r, a0, a1 = p.data
+                q = Prim("earc", ((cx * sx, cy), r * sx, r, a0, a1), p.k)
+            elif p.kind == "earc":
+                (cx, cy), a, b, t0, t1 = p.data
+                q = Prim("earc", ((cx * sx, cy), a * sx, b, t0, t1), p.k)
+            else:
+                (x, y), = p.data
+                q = Prim("point", ((x * sx, y),), p.k)
+            prims.append(q)
+        out.append(Stroke(prims, s.closed, s.wmul, s.tag))
+    return out
+
+
+def build_glyph_masters(name: str, masters: list[Metrics], slants: list[float], mono: bool = False):
+    """Per (slant, master): (contours, advance). Contours have identical structure across all of them.
+    `mono` fits every glyph into one cell of MONO_ADV: wide skeletons are squeezed, narrow ones centred.
+    Digits are tabular in both families."""
     strokes_by_master = [glyph_strokes(name, m) for m in masters]
     fix_segments(strokes_by_master, REF_INDEX)
     out = {}
@@ -1198,13 +1284,34 @@ def build_glyph_masters(name: str, masters: list[Metrics], slants: list[float]):
             for s in strokes:
                 contours += orient(stroke_contours(s, m), s)
             if not contours:
-                out[(slant, mi)] = ([], round(0.26 * CAP + 0.3 * m.w))
+                out[(slant, mi)] = ([], MONO_ADV if mono else round(0.26 * CAP + 0.3 * m.w))
                 continue
             minx = min(p[0] for c in contours for p in c)
             maxx = max(p[0] for c in contours for p in c)
-            dx = m.sb - minx
+            ink = maxx - minx
+            if mono:
+                room = MONO_ADV - 2 * MONO_SB
+                if ink > room:
+                    sx = max(0.5, (room - 0.0) / max(ink - m.w, 1) * (ink - m.w) / ink)
+                    # squeeze the skeleton so the stroked ink fits: ink' = (ink - w) * k + w
+                    k = (room - m.w) / max(ink - m.w, 1)
+                    squeezed = scale_x(strokes, k)
+                    contours = []
+                    for s in squeezed:
+                        contours += orient(stroke_contours(s, m), s)
+                    minx = min(p[0] for c in contours for p in c)
+                    maxx = max(p[0] for c in contours for p in c)
+                    ink = maxx - minx
+                adv = MONO_ADV
+                dx = (MONO_ADV - ink) / 2 - minx
+            elif name in DIGITS:
+                adv = round(DW + 2 * m.sb)
+                dx = (adv - ink) / 2 - minx
+            else:
+                adv = round(ink + 2 * m.sb)
+                dx = m.sb - minx
             contours = [[(x + dx + y * sh, y, on) for x, y, on in c] for c in contours]
-            out[(slant, mi)] = (contours, round(maxx - minx + 2 * m.sb))
+            out[(slant, mi)] = (contours, adv)
     return out
 
 
@@ -1213,6 +1320,9 @@ def build_glyph_masters(name: str, masters: list[Metrics], slants: list[float]):
 # --------------------------------------------------------------------------------------------------------------
 
 FAMILY = "nu Font"
+sys.modules.setdefault("nufont", sys.modules[__name__])  # so glyphs_more registers into this module even when run as a script
+import glyphs_more  # noqa: E402,F401  (registers Greek, Cyrillic, more Latin and symbols into GLYPHS, COMPOSITES, CMAP)
+
 GLYPH_ORDER = [".notdef", "space"] + [n for n in GLYPHS if n != "space"] + list(COMPOSITES)
 
 
@@ -1244,13 +1354,20 @@ def tt_glyph(contours: list[list[Pt]]):
     return g
 
 
-def build_fonts(outdir: Path):
+FAMILIES = [
+    # family name, PostScript prefix, monospaced
+    ("nu Font", "nuFont", False),
+    ("nu Font Mono", "nuFontMono", True),
+]
+
+
+def build_family(outdir: Path, family: str, prefix: str, mono: bool):
     from fontTools.designspaceLib import AxisDescriptor, DesignSpaceDocument, InstanceDescriptor, SourceDescriptor
     from fontTools.fontBuilder import FontBuilder
     from fontTools.ttLib.tables._g_l_y_f import dropImpliedOnCurvePoints
     from fontTools import varLib
+    from fontTools.ttLib.woff2 import compress
 
-    outdir.mkdir(parents=True, exist_ok=True)
     masters = [Metrics(w) for _, _, w in WEIGHTS]
     slants = [0.0, -SLANT_DEG]
     cmap = {cp: n for n, cp in CMAP.items() if n in GLYPH_ORDER}
@@ -1263,9 +1380,9 @@ def build_fonts(outdir: Path):
             for sl, mi in keys:
                 m = masters[mi]
                 cs = [[(x + m.sb, y, on) for x, y, on in c] for c in notdef_contours(m)]
-                per[(sl, mi)] = (cs, round(0.5 * CAP + 2 * m.sb))
+                per[(sl, mi)] = (cs, MONO_ADV if mono else round(0.5 * CAP + 2 * m.sb))
         else:
-            per = build_glyph_masters(name, masters, slants)
+            per = build_glyph_masters(name, masters, slants, mono)
         glyphs = {k: tt_glyph(per[k][0]) for k in keys}
         if per[keys[0]][0]:
             dropImpliedOnCurvePoints(*glyphs.values())
@@ -1278,7 +1395,7 @@ def build_fonts(outdir: Path):
     for sl, mi in keys:
         wname, wght, _ = WEIGHTS[mi]
         style = f"{wname} Italic" if sl else wname
-        ps = f"nuFont-{style.replace(' ', '')}"
+        ps = f"{prefix}-{style.replace(' ', '')}"
         glyphs = glyph_sets[(sl, mi)]
         fb = FontBuilder(UPM, isTTF=True)
         fb.setupGlyphOrder(GLYPH_ORDER)
@@ -1294,20 +1411,20 @@ def build_fonts(outdir: Path):
         ymin = min((g.yMin for g in glyphs.values() if g.numberOfContours), default=DESC)
         fb.setupHorizontalHeader(ascent=ASC + 150, descent=DESC - 60, lineGap=0)
         fb.setupNameTable({
-            "familyName": FAMILY,
+            "familyName": family,
             "styleName": style,
-            "uniqueFontIdentifier": f"khensu.nu;{ps};1.0",
-            "fullName": f"{FAMILY} {style}",
+            "uniqueFontIdentifier": f"khensu.nu;{ps};1.1",
+            "fullName": f"{family} {style}",
             "psName": ps,
-            "version": "Version 1.000",
+            "version": "Version 1.100",
             "copyright": "Copyright 2026 Elliott Wave LLC. Shown as ñü.Føňt.",
             "manufacturer": "Elliott Wave LLC",
             "designer": "Elliott",
-            "description": "ñü.Føňt: a stroke font on a golden-ratio grid with capsule ends and no stems where a letter can live without one. khensu.nu/font",
+            "description": "ñü.Føňt: a stroke font on a golden-ratio grid with capsule ends and no stems where a letter can live without one. Latin, Vietnamese, Greek and Cyrillic. khensu.nu/font",
             "vendorURL": "https://khensu.nu/font",
             "licenseDescription": "Licensed under the SIL Open Font License, Version 1.1.",
             "licenseInfoURL": "https://openfontlicense.org",
-            "typographicFamily": FAMILY,
+            "typographicFamily": family,
             "typographicSubfamily": style,
         })
         fb.setupOS2(
@@ -1316,9 +1433,14 @@ def build_fonts(outdir: Path):
             usWinAscent=max(ASC + 200, ymax + 10), usWinDescent=max(-(DESC - 100), -ymin + 10),
             sxHeight=XH, sCapHeight=CAP, usWeightClass=wght, usWidthClass=5,
             fsType=0, achVendID="EWLL",
+            ulUnicodeRange1=(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 7) | (1 << 9) | (1 << 29) | (1 << 31),
+            ulUnicodeRange2=(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3),
             fsSelection=0x80 | (0x20 if wght == 700 and not sl else 0) | (0x01 if sl else 0) | (0x40 if wght == 500 and not sl else 0),
         )
-        fb.setupPost(italicAngle=-SLANT_DEG if sl else 0.0)
+        fb.setupPost(italicAngle=-SLANT_DEG if sl else 0.0, isFixedPitch=1 if mono else 0)
+        if mono:
+            fb.font["OS/2"].panose.bProportion = 9
+            fb.font["OS/2"].xAvgCharWidth = MONO_ADV
         fb.font["head"].macStyle = (0x01 if wght == 700 else 0) | (0x02 if sl else 0)
         out = outdir / f"{ps}.ttf"
         fb.save(str(out))
@@ -1328,27 +1450,40 @@ def build_fonts(outdir: Path):
     doc.addAxis(AxisDescriptor(tag="wght", name="Weight", minimum=100, default=500, maximum=900))
     doc.addAxis(AxisDescriptor(tag="slnt", name="Slant", minimum=-SLANT_DEG, default=0, maximum=0))
     for (wght, sl), p in paths.items():
-        doc.addSource(SourceDescriptor(path=str(p), location={"Weight": wght, "Slant": sl}, familyName=FAMILY))
+        doc.addSource(SourceDescriptor(path=str(p), location={"Weight": wght, "Slant": sl}, familyName=family))
     for wname, wght, _ in WEIGHTS:
-        doc.addInstance(InstanceDescriptor(familyName=FAMILY, styleName=wname, location={"Weight": wght, "Slant": 0}))
-        doc.addInstance(InstanceDescriptor(familyName=FAMILY, styleName=f"{wname} Italic", location={"Weight": wght, "Slant": -SLANT_DEG}))
+        doc.addInstance(InstanceDescriptor(familyName=family, styleName=wname, location={"Weight": wght, "Slant": 0}))
+        doc.addInstance(InstanceDescriptor(familyName=family, styleName=f"{wname} Italic", location={"Weight": wght, "Slant": -SLANT_DEG}))
     vf, _, _ = varLib.build(doc)
-    vpath = outdir / "nuFont-Variable.ttf"
+    vpath = outdir / f"{prefix}-Variable.ttf"
     vf.save(str(vpath))
-    from fontTools.ttLib.woff2 import compress
-
-    compress(str(vpath), str(outdir / "nuFont-Variable.woff2"))
+    compress(str(vpath), str(outdir / f"{prefix}-Variable.woff2"))
     for (wght, sl), p in paths.items():
         compress(str(p), str(p.with_suffix(".woff2")))
+    return len(keys), round(total_points / len(keys))
+
+
+def build_fonts(outdir: Path):
+    outdir.mkdir(parents=True, exist_ok=True)
+    fams = {}
+    for family, prefix, mono in FAMILIES:
+        masters, pts = build_family(outdir, family, prefix, mono)
+        fams[prefix] = {"family": family, "mono": mono, "masters": masters, "pointsPerMasterAvg": pts}
     sizes = {p.name: p.stat().st_size for p in sorted(outdir.iterdir()) if p.suffix in (".ttf", ".woff2")}
+    scripts = {
+        "Latin": "ASCII, Latin-1, Latin Extended-A, the Vietnamese letters with stacked marks, and the ligatures and letters the names use",
+        "Greek": "monotonic: the alphabet with tonos and dialytika",
+        "Cyrillic": "Russian, Ukrainian and Belarusian",
+    }
     info = {
-        "family": FAMILY, "glyphs": len(GLYPH_ORDER), "masters": len(keys), "weights": [w[0] for w in WEIGHTS],
+        "family": FAMILY, "families": fams, "glyphs": len(GLYPH_ORDER), "masters": fams["nuFont"]["masters"], "weights": [w[0] for w in WEIGHTS],
         "axes": {"wght": [100, 900], "slnt": [-SLANT_DEG, 0]}, "upm": UPM, "capHeight": CAP, "xHeight": XH, "descender": DESC,
-        "pointsPerMasterAvg": round(total_points / len(keys)), "sizes": sizes,
+        "monoAdvance": MONO_ADV, "scripts": scripts,
+        "pointsPerMasterAvg": fams["nuFont"]["pointsPerMasterAvg"], "sizes": sizes,
         "stems": STEM_NOTES,
     }
     (outdir / "nufont.json").write_text(json.dumps(info, indent=1, ensure_ascii=False) + "\n")
-    print(f"{len(GLYPH_ORDER)} glyphs, {len(keys)} masters, {info['pointsPerMasterAvg']} points per master")
+    print(f"{len(GLYPH_ORDER)} glyphs, {info['masters']} masters per family, {info['pointsPerMasterAvg']} points per master")
     for k, v in sizes.items():
         print(f"{v:>9,}  {k}")
 
@@ -1438,6 +1573,8 @@ def svg_runs(runs: list[tuple[str, int]], slant: float = 0.0, tracking: float = 
                 cls = f' class="{s.tag}"' if s.tag else ""
                 paths.append(f'<path{cls} data-g="{name}" data-i="{ci}" d="{d}"/>')
                 ys += [p[1] for c in cs for p in c]
+                if s.tag.startswith("mark"):
+                    paths.append(pulse_lights(cs, dx, sh, len(paths)))
             x += maxx - minx + 2 * m.sb + tracking
             ci += 1
     width = x
@@ -1451,6 +1588,35 @@ def svg_runs(runs: list[tuple[str, int]], slant: float = 0.0, tracking: float = 
     )
 
 
+def pulse_lights(contours: list[list[Pt]], dx: float, sh: float, n: int) -> str:
+    """Pulse mode for one diacritic: the mark's own outline becomes a clip, and two soft lights move inside it,
+    each fading out while the other fades in somewhere else, so the glow is hard-edged at the glyph and never
+    leaves it. Positions are written as CSS variables in user units; `global.css` animates them, so colour and
+    speed are set in CSS. `@ID@` is replaced by the component with an id unique to the page."""
+    xs = [p[0] + dx + p[1] * sh for c in contours for p in c]
+    ys = [-p[1] for c in contours for p in c]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    cx, cy, w, h = (x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0
+    r = 0.42 * max(w, h)
+    blur = 0.3 * r
+    d = "".join(contour_d(c, dx, sh) for c in contours)
+
+    def spots(phase: float) -> str:
+        out = []
+        for k in range(4):
+            a = math.radians(phase + 90 * k)
+            out.append(f"--lx{k}:{0.42 * w * math.cos(a):.1f}px;--ly{k}:{0.42 * h * math.sin(a):.1f}px")
+        return ";".join(out)
+
+    return (
+        f'<clipPath id="@ID@-c{n}"><path d="{d}"/></clipPath>'
+        f'<g class="nf-lights" clip-path="url(#@ID@-c{n})">'
+        f'<circle class="nf-light a" cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" style="--nf-blur:{blur:.1f}px;{spots(45)}"/>'
+        f'<circle class="nf-light b" cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" style="--nf-blur:{blur:.1f}px;{spots(225)}"/>'
+        f"</g>"
+    )
+
+
 def svg_text(text: str, weight: int = 500, slant: float = 0.0, tracking: float = 0.0) -> str:
     return svg_runs([(text, weight)], slant, tracking, tight=False)
 
@@ -1459,14 +1625,17 @@ def svg_text(text: str, weight: int = 500, slant: float = 0.0, tracking: float =
 MARKS = {
     "khensu": [("khėnsu", 600), (".ñü", 300)],
     "nufont": [("ñü.Føňt", 600)],
+    "webe": [("webË", 600)],
+    "khensu-full": [("kħėñšü", 600), (".ñü", 400)],
+    "shield-full": [("šûñüłîñk.šħîēłð", 600)],
 }
 
 
 def write_marks(paths: list[Path]):
-    lines = ["// Generated by tools/font/nufont.py marks. Inline SVG wordmarks in ñü.Føňt, one <path> per stroke;", "// diacritics carry class=\"mark …\" so the ė dot can pulse on its own.", "export const MARKS: Record<string, string> = {"]
+    lines = ["// Generated by tools/font/nufont.py marks. Inline SVG wordmarks in ñü.Føňt, one <path> per stroke;", "// diacritics carry class=\"mark …\" so the ė dot can pulse on its own; each mark also carries its pulse-mode lights (NuMark.astro).", "export const MARKS: Record<string, string> = {"]
     for key, runs in MARKS.items():
         svg = svg_runs(runs, tracking=-22)
-        lines.append(f"  {key}: {json.dumps(svg, ensure_ascii=False)},")
+        lines.append(f"  {json.dumps(key)}: {json.dumps(svg, ensure_ascii=False)},")
     lines.append("};")
     lines.append("export const MARK_TEXT: Record<string, string> = " + json.dumps({k: "".join(t for t, _ in v) for k, v in MARKS.items()}, ensure_ascii=False) + ";")
     out = "\n".join(lines) + "\n"

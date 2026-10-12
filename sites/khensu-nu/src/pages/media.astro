@@ -65,6 +65,37 @@ const fps = Number(ultra.note.match(/at (\d+) fps/)?.[1]);
         <li><b>Two scores, side by side:</b> Netflix’s <a href="https://github.com/Netflix/vmaf">VMAF</a> as published, unmodified, and a viewer test to <a href="https://www.itu.int/rec/T-REC-P.910">ITU-T P.910</a>, where people rate clips without knowing the codec. VMAF is known to under-rate generated detail, so the viewer test is the deciding score when they disagree.</li>
         <li><b>Same conditions for everyone:</b> the same clips, bitrates and phones, hardware encoders at live-call settings, and the raw results published as JSON beside each chart.</li>
       </ul>
+
+      <h2>What the receiver rebuilds</h2>
+      <p class="body">
+        The enhancement layer runs on the receiving phone, so what you see is more than what was sent: a 1080p base
+        becomes 4K, 25 frames a second become 120 on a ProMotion screen, and a 10-bit 4:2:0 base in BT.709 becomes
+        12-bit 4:4:4 in BT.2020 once the residual is applied, tone-mapped to the screen. Where a nu.media stream
+        plays on this site, a small card beside it states what the receiver did, with figures read from the decoder.
+        The Earth video on the home page is ordinary H.264 today, so it carries no card; it will when the browser
+        decoder ships.
+      </p>
+
+      <h2>Colour</h2>
+      <ul class="facts">
+        <li><b>BT.2020 primaries,</b> about 76% of the colours people can see. Display P3, what phones store, is about 45%; sRGB about 36%. That is about 1.7 times P3, not twice: twice P3 would be more than human vision.</li>
+        <li><b>PQ to 10,000 nits and HLG,</b> about six times the iPhone 18 Pro’s 1,600-nit peak, so the same file looks right on later screens.</li>
+        <li><b>12-bit, 4:4:4</b> on images and on stored video after the residual: four times the steps per channel and four times the colour samples of the 10-bit 4:2:0 picture a phone or a stream delivers. The live base stays 10-bit 4:2:0, which is what the hardware encoder emits in real time.</li>
+      </ul>
+
+      <h2>Depth, for every picture</h2>
+      <ul class="facts">
+        <li><b>Measured where there is a sensor:</b> LiDAR and Portrait disparity on the back, TrueDepth on the front, carried as a quarter-resolution depth plane with its confidence.</li>
+        <li><b>Estimated where there isn’t:</b> a photo with no depth, a Live Photo, a received picture. A depth network on the Neural Engine builds the plane, using the picture’s own cues and, for a Live Photo, the parallax in its three seconds of motion. It is marked as estimated, and effects fade out where it is unsure. Codec, model, code and the benchmark against published estimators will be public when built; nothing here is claimed before it is measured.</li>
+        <li><b>On the device only.</b> Depth is computed where the picture already is and travels inside the encrypted object. No server ever sees a picture.</li>
+      </ul>
+
+      <h2>Your mark, invisible to everyone else</h2>
+      <ul class="facts">
+        <li><b>What it is:</b> a short code only you can read, embedded invisibly in what you make and share, surviving re-encodes, scaling, crops and screenshots. To anyone else it is noise, and two of your pictures can’t be linked by it.</li>
+        <li><b>What you see:</b> where your picture went. Forwarded by two people in groups you’re in, posted once in a public feed. Your own phone notices this in the places it already visits; nothing crawls for you, and nothing is reported to anyone.</li>
+        <li><b>What it never touches:</b> your calendar, itinerary, notes, drafts, memory, payments, or anything you received rather than made. Those stay in their own encrypted stores and are never marked or matched.</li>
+      </ul>
     </div>
   </section>
 

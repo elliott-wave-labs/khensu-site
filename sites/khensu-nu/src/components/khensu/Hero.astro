@@ -2,6 +2,7 @@
 // khėnsu.ñü hero: three app screens fan out from one phone as the page scrolls (--e from scenes.ts).
 import AppScreen from './AppScreen.astro';
 import NuMark from './NuMark.astro';
+import Net from './Net.astro';
 
 interface Props {
   eyebrow?: string;
@@ -29,6 +30,7 @@ const H = heading;
         <source src="/khensu/hero/earth-1080.mp4" type="video/mp4" />
       </video>
     </div>
+    <Net class="hero-net plain" nodes={80} />
     <div class="wrap head">
       <p class="eyebrow">
         {eyebrow.split('webË').map((part, i) => (
@@ -38,7 +40,7 @@ const H = heading;
           </>
         ))}
       </p>
-      <H id="k-hero-title" class="title"><NuMark name="khensu" aura /></H>
+      <H id="k-hero-title" class="title"><NuMark name="khensu" aura pulse /></H>
       <p class="tag">webË, private by design. <em>Post-quantum.</em><br /><em>Run profitably by the people.</em></p>
       {cta && (
         <div class="btn-row">
@@ -104,7 +106,11 @@ const H = heading;
   .hero-video {
     position: absolute;
     inset: 0;
+    z-index: -2;
     opacity: calc(1 - var(--e) * 0.5);
+  }
+  .sticky {
+    isolation: isolate;
   }
   .hero-video video {
     width: 100%;

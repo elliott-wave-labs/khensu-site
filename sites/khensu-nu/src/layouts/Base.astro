@@ -1,5 +1,5 @@
 ---
-import { CARDS, cardFor } from '../data/og';
+import { CARDS, PREVIEWS, cardFor, previewFor } from '../data/og';
 import Crescent from '../components/khensu/Crescent.astro';
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
@@ -9,6 +9,7 @@ import '@fontsource/inter/700.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '../styles/global.css';
 import NuMark from '../components/khensu/NuMark.astro';
+import Net from '../components/khensu/Net.astro';
 
 interface Props {
   title?: string;
@@ -25,13 +26,15 @@ const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — webË,
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const card = cardFor(Astro.url.pathname);
 const ogImage = new URL(`/og/${card}.jpg`, Astro.site);
+const preview = previewFor(card);
+const previewUrl = preview ? `https://khensu.nu/og/${preview}-square.mp4` : undefined;
 const ogAlt = CARDS[card].alt;
 
 const nav = [
   { href: '/webe', label: 'webË' },
   { href: '/void', label: 'ñü.vœîð' },
   { href: '/media', label: 'ñü.media' },
-  { href: '/memory', label: 'ñü.ẽřåł' },
+  { href: '/memory', label: 'ñü.řåł' },
   { href: '/creators', label: 'ñü.ċřêæțẽ' },
   { href: '/waves', label: 'ñü.ŵævẽš' },
   { href: '/font', label: 'ñü.Føňt' },
@@ -80,6 +83,22 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogAlt} />
+    {preview && previewUrl && (
+      <>
+        <meta property="og:video" content={previewUrl} />
+        <meta property="og:video:secure_url" content={previewUrl} />
+        <meta property="og:video:type" content="video/mp4" />
+        <meta property="og:video:width" content="1080" />
+        <meta property="og:video:height" content="1080" />
+        <meta property="nu:preview" content={previewUrl} />
+        <meta property="nu:preview:type" content="video/mp4; codecs=hvc1" />
+        <meta property="nu:preview:duration" content="3" />
+        <meta property="nu:preview:size" content="1080x1080" />
+        <meta property="nu:preview:bytes" content={String(PREVIEWS[preview].bytes)} />
+        <meta property="nu:preview:hash" content={PREVIEWS[preview].hash} />
+        <meta property="nu:preview:effect" content="ripple" />
+      </>
+    )}
 
     <script
       type="application/ld+json"
@@ -118,6 +137,22 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <main id="main">
       <slot />
     </main>
+    <!-- The relay network pulses behind the first hero of every page. Hero.astro places its own; this one moves into
+         the first [data-hero] or .page-head before the network's script runs (a <template> would leave that script inert). -->
+    <div id="hero-net-src" hidden><Net class="hero-net" nodes={72} /></div>
+    <script is:inline>
+      (() => {
+        const src = document.getElementById('hero-net-src');
+        if (!src) return;
+        const net = src.firstElementChild;
+        const hero = document.querySelector('[data-hero], .page-head');
+        if (net && hero && !hero.querySelector('.net') && !document.querySelector('.k-hero')) {
+          hero.classList.add('has-hero-net');
+          hero.prepend(net);
+        }
+        src.remove();
+      })();
+    </script>
 
     <footer class="site-footer">
       <div class="wrap foot">
@@ -129,7 +164,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
           <li><a href="/webe">webË</a></li>
           <li><a href="/void">ñü.vœîð</a></li>
           <li><a href="/media">ñü.media</a></li>
-          <li><a href="/memory">ñü.ẽřåł</a></li>
+          <li><a href="/memory">ñü.řåł</a></li>
           <li><a href="/creators">ñü.ċřêæțẽ</a></li>
           <li><a href="/waves">ñü.ŵævẽš</a></li>
           <li><a href="/font">ñü.Føňt</a></li>

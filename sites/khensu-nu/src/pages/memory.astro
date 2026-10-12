@@ -77,7 +77,7 @@ const wellbeing = [
 ---
 
 <Base
-  title="ñü.ẽřåł: your private AI"
+  title="ñü.řåł: your private AI"
   description="khėnsu.ñü’s private AI remembers what you’ve been told and finds what you’re looking for, entirely on your iPhone, iPad or Mac. No tracking, no profile, no servers: here is how the algorithms work."
 >
   <meta slot="head" name="color-scheme" content="dark" />
@@ -107,7 +107,7 @@ const wellbeing = [
       </div>
     </section>
 
-    <ProductBar name="ñü.ẽřåł" action="Get the app" href="/app" explore="#memory-recall-section" />
+    <ProductBar name="ñü.řåł" action="Get the app" href="/app" explore="#memory-recall-section" />
 
     <section class="section intro" id="memory-intro-section" aria-label="In short">
       <div class="wrap">
@@ -129,7 +129,7 @@ const wellbeing = [
           <MemPhone screen="ask" label="Ask khėnsu answers “When do we sail to Naxos?” with the date, the plan and three sources: Sam’s chat message, the charter PDF and the skipper’s voice note." />
         </div>
         <div>
-          <p class="eyebrow"><span class="name-case">ñü.ẽřåł</span> · per-ankh, your memory</p>
+          <p class="eyebrow"><span class="name-case">ñü.řåł</span> · per-ankh, your memory</p>
           <h2 id="ankh-title" class="big">Ask anything you’ve been told.<br /><em>Every answer shows its sources.</em></h2>
           <p class="lede">
             In ancient Egypt the Per-Ankh, the House of Life, kept the records. Yours lives on your phone: what you’ve
@@ -432,8 +432,8 @@ const wellbeing = [
     margin: 1.8rem 0 0;
     padding: 1.2rem 0 0;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(4, auto);
+    gap: 1rem 1.2rem;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
   .stats li {
@@ -455,7 +455,7 @@ const wellbeing = [
   }
   @media (max-width: 1000px) and (min-width: 700px), (max-width: 460px) {
     .stats {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(2, auto);
       row-gap: 1.3rem;
     }
   }

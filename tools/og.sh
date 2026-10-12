@@ -1,6 +1,7 @@
 #!/bin/sh
 # Screenshots every /og/<slug>/ card (khensu-nu, see src/data/og.ts) to public/og/<slug>.jpg, the 1200 x 630
-# link-preview images, and /og/home/ to public/og.png. Builds into its own directory so it never touches dist.
+# link-preview images, and /og/home/ to public/og.png; then the squares and the transparent word overlays that
+# tools/og-anim.sh lays over video. Builds into its own directory so it never touches dist.
 set -eu
 site="$(cd "$(dirname "$0")/../sites/khensu-nu" && pwd)"
 out="${TMPDIR:-/tmp}/khensu-og"
@@ -28,19 +29,42 @@ shot() {
 }
 for dir in "$out"/dist/og/*/; do
   slug="$(basename "$dir")"
+  [ "$slug" = overlay ] && continue
   shot 1200,630 "$slug" "$out/$slug.png"
   sips -s format jpeg -s formatOptions 88 "$out/$slug.png" --out "$site/public/og/$slug.jpg" >/dev/null
   echo "wrote public/og/$slug.jpg"
 done
 cp "$out/home.png" "$site/public/og.png"
-# Square cards for Instagram; home, buy and bi also go to the Desktop as PNGs.
+# Square cards for Instagram link pages and posts, plus the thumbnail card (phone and a few big words, for the tiny
+# image next to a link). Home, buy, bi and thumb also go to the Desktop as PNG and best-quality JPEG.
 insta="$HOME/Desktop/khensu-instagram"
 mkdir -p "$insta"
-for slug in home buy shield bi; do
+for slug in home buy shield bi thumb; do
   shot 1080,1080 "$slug" "$out/$slug-square.png"
   sips -s format jpeg -s formatOptions 88 "$out/$slug-square.png" --out "$site/public/og/$slug-square.jpg" >/dev/null
   echo "wrote public/og/$slug-square.jpg"
 done
-cp "$out/home-square.png" "$insta/khensu-nu-square.png"
-cp "$out/buy-square.png" "$insta/khensu-nu-buy-square.png"
-cp "$out/bi-square.png" "$insta/khensu-bi-square.png"
+desk() {
+  cp "$out/$1-square.png" "$insta/$2.png"
+  sips -s format jpeg -s formatOptions 100 "$out/$1-square.png" --out "$insta/$2.jpg" >/dev/null
+}
+desk home khensu-nu-square
+desk buy khensu-nu-buy-square
+desk bi khensu-bi-square
+desk thumb khensu-nu-link-thumb
+# Small copies of the thumbnail, the sizes a link preview actually shows it at.
+for px in 128 256 512; do
+  sips -Z "$px" "$out/thumb-square.png" --out "$insta/khensu-nu-link-thumb-$px.png" >/dev/null
+done
+# The words alone, on a transparent page, for the animated versions (tools/og-anim.sh).
+for slug in home buy thumb; do
+  for try in 1 2 3; do
+    rm -f "$out/$slug-overlay.png"
+    "$chrome" --headless=new --hide-scrollbars --force-device-scale-factor=1 --default-background-color=00000000 \
+      --use-angle=swiftshader --enable-unsafe-swiftshader --window-size=1080,1080 --virtual-time-budget=6000 \
+      --screenshot="$out/$slug-overlay.png" "http://localhost:$port/og/overlay/$slug/" >/dev/null 2>&1 || true
+    [ -s "$out/$slug-overlay.png" ] && break
+    sleep 1
+  done
+done
+echo "overlays in $out; run tools/og-anim.sh for the animated squares"

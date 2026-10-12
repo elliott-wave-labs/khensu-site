@@ -127,6 +127,13 @@ const chakras = [
       >
         Figures for iPhone 18 Pro. Battery life and charge time vary with use and settings.
       </StatStrip>
+      <div class="made-of" data-reveal>
+        <p class="made-of-line">Post-quantum E2EE stealth transceiver shield.<sup>2</sup> Ceramic powder-coated titanium or anti-microbial pure brass.<sup>1</sup> Set with the ñü.isheru gemstone, platinum, and a laser-etched pyrite hexagon, the mirror of the Triangulum constellation.</p>
+        <ol class="made-of-notes">
+          <li>Both rust-proof, for immunity on bluewater sails, weekend-warrior ready, and for the power hacker user.</li>
+          <li>CNC’d to add 0 mm to your actual phone thickness, based on the camera bump.</li>
+        </ol>
+      </div>
     </div>
   </section>
 
@@ -556,5 +563,32 @@ const chakras = [
   .specs dd { margin: 0; color: var(--text-dim); font-size: 0.9rem; }
   @media (max-width: 900px) {
     .buy-grid, .two { grid-template-columns: 1fr; }
+  }
+
+  /* What it is made of, under the figures: one line and two small notes, nothing more. */
+  .made-of {
+    margin: 1.6rem 0 0;
+    max-width: 62rem;
+  }
+  .made-of-line {
+    margin: 0;
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    line-height: 1.5;
+    color: var(--text-dim, rgba(255, 255, 255, 0.72));
+  }
+  .made-of-line sup {
+    font-size: 0.65em;
+    margin-left: 0.1em;
+  }
+  .made-of-notes {
+    margin: 0.7rem 0 0;
+    padding-left: 1.2rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--text-faint, rgba(255, 255, 255, 0.55));
+  }
+  .made-of-notes li + li {
+    margin-top: 0.2rem;
   }
 </style>
