@@ -39,7 +39,7 @@ const venues = [
         </p>
       </div>
 
-      <div class="wrap sp-player" data-spatial>
+      <div class="wrap sp-player" data-spatial data-mode="wave">
         <div class="sp-glass">
           <img class="sp-bloom" src={`${S}/first-attempt.webp`} alt="" aria-hidden="true" width="273" height="466" />
           <div class="sp-card">
@@ -70,7 +70,26 @@ const venues = [
                 <button type="button" data-mode="orig" aria-pressed="false">Original 2008</button>
                 <button type="button" data-mode="wave" aria-pressed="true">ñü.wæve</button>
               </div>
-              <p class="sp-fmt">ñü.wæve · 5 instruments · 9.1 MB for 6:40<br />Original stereo file: 9.6 MB</p>
+              <dl class="sp-spec">
+                <div data-for="orig">
+                  <dt>Original 2008</dt>
+                  <dd>AAC-LC · stereo · 44.1 kHz · 191 kbit/s · 9.6 MB</dd>
+                </div>
+                <div data-for="wave">
+                  <dt>ñü.wæve</dt>
+                  <dd>Opus objects · 5 × mono · 48 kHz · 174 kbit/s · 9.1 MB</dd>
+                  <dd class="sp-each">synths 48 · drums 45 · piano 39 · guitar 21 · bass 20 kbit/s</dd>
+                </div>
+                <div class="ref">
+                  <dt>Opus 5.1</dt>
+                  <dd>6 channels · 48 kHz · 258 kbit/s · 13.0 MB</dd>
+                </div>
+              </dl>
+              <p class="sp-vs">
+                ñü.wæve uses 33% fewer bits than Opus 5.1 and 9% fewer than the original, and it does what 5.1 can’t:
+                every instrument moves, to any angle, distance and height. 5.1 fixes six speakers on one flat ring, with
+                the instruments mixed together inside them.
+              </p>
             </div>
             <audio preload="none" crossorigin="anonymous" data-orig src={`${S}/first-attempt-original.m4a`}></audio>
             {instruments.map((i) => <audio preload="none" crossorigin="anonymous" data-stem={i.id} src={`${S}/stems/${i.id}.mp4`} />)}
@@ -490,10 +509,46 @@ const venues = [
     color: rgba(255, 255, 255, 0.55);
     margin-top: 0.5rem;
   }
-  .sp-fmt {
-    font: 500 0.75rem/1.4 var(--font-mono);
-    color: rgba(255, 255, 255, 0.5);
+  .sp-spec {
     margin: 0;
+    display: grid;
+    gap: 0.45rem;
+    font: 500 0.72rem/1.45 var(--font-mono);
+  }
+  .sp-spec > div {
+    color: rgba(255, 255, 255, 0.45);
+    transition: color 0.25s;
+  }
+  .sp-spec dt {
+    font-weight: 650;
+  }
+  .sp-spec dd {
+    margin: 0;
+  }
+  .sp-spec .sp-each {
+    font-size: 0.66rem;
+  }
+  [data-mode='orig'] .sp-spec [data-for='orig'],
+  [data-mode='wave'] .sp-spec [data-for='wave'] {
+    color: #fff;
+  }
+  [data-mode='wave'] .sp-spec [data-for='wave'] dt {
+    background: var(--aura);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sp-spec .ref {
+    padding-top: 0.45rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.38);
+  }
+  .sp-vs {
+    margin: 0.7rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.7);
   }
   @media (prefers-reduced-motion: reduce) {
     .sp-play,
