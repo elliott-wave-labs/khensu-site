@@ -80,13 +80,13 @@ const succession = [
 ---
 
 <Base
-  title="The network: contracts, paid node work and a gift to everyone"
+  title="ñü.ñetwork: contracts, paid node work and a gift to everyone"
   description="webË contracts for any work, from escrow to anonymous ballots. Six jobs node operators are paid for. A flat 10% app fee, the lowest in the industry. And a network that belongs to everyone, the founder’s powers included."
 >
   <div class="khensu">
     <section class="page-head">
       <div class="wrap">
-        <p class="eyebrow"><span class="name-case">webË</span> · the network</p>
+        <p class="eyebrow"><span class="name-case">ñü.ñetwork</span> · the network under webË</p>
         <h1>Private contracts.<br /><span class="dim">Owned by everyone.</span></h1>
         <StatStrip
           items={[
@@ -97,6 +97,7 @@ const succession = [
           ]}
         />
         <p class="lede">Agreements that keep themselves, node work that pays, and a network that belongs to all of us, so people everywhere can create, earn and live securely.</p>
+        <p class="lede nun">The name comes from Nun, the dark, formless waters that Egyptian creation stories begin with. Here those waters are tamed: every node runs the same open code and is checked the same way, so the whole network takes one shape, calm and alike, like Isheru, the crescent sacred lake at Karnak that the ñü.isheru is named for.</p>
         <nav class="chips" aria-label="On this page">
           <a href="#network-contracts">Contracts</a>
           <a href="#network-ballots">Ballots</a>
@@ -441,6 +442,12 @@ const succession = [
   }
   .page-head .lede {
     margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
+  .page-head .lede.nun {
+    margin-top: 1rem;
+    max-width: 44rem;
+    font-size: 1rem;
+    color: var(--text-dim);
   }
   .chips {
     display: flex;
