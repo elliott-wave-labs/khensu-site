@@ -1,4 +1,4 @@
-// ñü.sounds player: the original 2008 stereo file and its separated instruments play in step, and a toggle
+// ñü.ŵævẽš player: the original 2008 stereo file and its separated instruments play in step, and a toggle
 // crossfades between them. Every sound (instrument, clone, stair creak, tuning fork) runs through its own HRTF panner,
 // placed where it sits in the orb, then through the room. Everything renders in the browser; nothing is sent anywhere.
 import { createOrb, type Orb, type Pos } from './orb';
@@ -27,22 +27,89 @@ const VENUES: Record<string, Venue> = {
     pos: { drums: { x: 0, y: 2.6, z: 0.4 }, piano: { x: -2.4, y: -1.4, z: 1 }, synths: { x: 2.2, y: -1.4, z: 2 }, guitar: { x: 2.2, y: 1.8, z: 0.6 }, bass: { x: 0, y: 1, z: -0.5 } },
   },
 };
-const EXTRAS: Record<string, { label: string; pos: Pos }> = {
-  // Behind you to the left, about 2 m (6–7 ft) above your ears.
-  creak: { label: 'Stair creak', pos: { x: -1.4, y: -2.2, z: 2 } },
-  // Just in front of the forehead.
-  fork: { label: 'Third-eye fork', pos: { x: 0, y: 0.45, z: 0.25 } },
+type TrackKind = 'song' | 'creek' | 'scream' | 'fork';
+type Track = {
+  id: string;
+  title: string;
+  by: string;
+  spec: string;
+  dur: number;
+  kind: TrackKind;
+  hz?: number;
+  label?: string;
+  pos?: Pos;
+  mark: string;
+  hzLine?: string;
 };
+const fork = (id: string, title: string, label: string, hz: number, planet: string, pos: Pos, mark: string): Track => ({
+  id,
+  title,
+  by: `khensu.ñü · ${planet}`,
+  spec: `${hz.toFixed(2)} Hz · ${planet}`,
+  dur: 8,
+  kind: 'fork',
+  hz,
+  label,
+  pos,
+  mark,
+  hzLine: planet,
+});
+// Planetary chakra forks, bottom to top. Third eye stays at 221.23 Hz, the figure already on this page.
+const TRACKS: Record<string, Track> = {
+  attempt: {
+    id: 'attempt',
+    title: 'First Attempt (Demo)',
+    by: 'khensu.ñü · More Of The Same · 2008',
+    spec: '5 instruments in 3D · 48 kHz · 9.1 MB · 6:40',
+    dur: 400,
+    kind: 'song',
+    mark: '',
+  },
+  creek: {
+    id: 'creek',
+    title: 'Stair Creek',
+    by: 'khensu.ñü · ñü.ŵævẽš · healing',
+    spec: 'One sound beside you · rendered in the browser · loops',
+    dur: 48,
+    kind: 'creek',
+    label: 'Stair Creek',
+    pos: { x: -1.5, y: -1.6, z: -0.6 },
+    mark: '#3d8f8a',
+    hzLine: 'a creek',
+  },
+  scream: {
+    id: 'scream',
+    title: 'Wilhelm Scream',
+    by: 'khensu.ñü · Wikimedia Commons · CC0',
+    spec: 'The 1951 Wilhelm scream · 1.6 s',
+    dur: 1.62,
+    kind: 'scream',
+    label: 'Wilhelm',
+    pos: { x: -0.7, y: 1.8, z: 0.15 },
+    mark: '#c8c2b8',
+    hzLine: 'a yell',
+  },
+  root: fork('root', 'Muladhara', 'Muladhara', 194.18, 'Root', { x: 0, y: 0.4, z: -1.2 }, '#ff4b4b'),
+  sacral: fork('sacral', 'Svadhisthana', 'Svadhisthana', 210.42, 'Sacral', { x: 0.15, y: 0.4, z: -0.75 }, '#ff8a3c'),
+  solar: fork('solar', 'Manipura', 'Manipura', 126.22, 'Solar plexus', { x: -0.1, y: 0.45, z: -0.4 }, '#ffd23c'),
+  heart: fork('heart', 'Anahata', 'Anahata', 136.1, 'Heart', { x: 0, y: 0.5, z: -0.12 }, '#3ccf7a'),
+  throat: fork('throat', 'Vishuddha', 'Vishuddha', 141.27, 'Throat', { x: 0, y: 0.42, z: 0.08 }, '#38a8ff'),
+  eye: fork('eye', 'Ajna', 'Ajna', 221.23, 'Third eye', { x: 0, y: 0.45, z: 0.22 }, '#6c6cff'),
+  crown: fork('crown', 'Sahasrara', 'Sahasrara', 172.06, 'Crown', { x: 0, y: 0.2, z: 0.55 }, '#b07cff'),
+};
+const CHAKRA_ORDER = ['root', 'sacral', 'solar', 'heart', 'throat', 'eye', 'crown'];
+const ORIG_SPEC = 'AAC-LC · stereo · 44.1 kHz · 9.6 MB · 6:40';
 const MAX_R = 4; // metres to the edge of the orb
 const MAX_CLONES = 12;
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-/** Room sound added on top of the clean instruments. "Match original" is tuned by ear to the 2008 file's room. */
-type Fx = { gain: number; wet: number; rt: number; pre: number }; // dB, 0–100 %, seconds, milliseconds
+/** ñü.ÊQ, on top of the clean instruments. "Match original" is tuned by ear to the 2008 file's room, with no extra bounces. */
+type Fx = { gain: number; wet: number; rt: number; pre: number; bounces: number }; // dB, 0–100 %, seconds, milliseconds, count
 const PRESETS: Record<string, Fx> = {
-  original: { gain: 0, wet: 45, rt: 1.8, pre: 25 },
-  clean: { gain: 0, wet: 0, rt: 1.8, pre: 0 },
+  original: { gain: 0, wet: 45, rt: 1.8, pre: 25, bounces: 0 },
+  clean: { gain: 0, wet: 0, rt: 1.8, pre: 0, bounces: 0 },
 };
+const ECHO_TAPS = 8;
 
 /** A room impulse: a few early reflections, then decaying noise, slightly different in each ear. Pre-delay is a separate node. */
 function impulse(ctx: BaseAudioContext, rt: number) {
@@ -50,76 +117,91 @@ function impulse(ctx: BaseAudioContext, rt: number) {
   const buf = ctx.createBuffer(2, len, ctx.sampleRate);
   for (let c = 0; c < 2; c++) {
     const d = buf.getChannelData(c);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp((-6.9 * i) / ctx.sampleRate / rt);
+    let lp = 0;
+    for (let i = 0; i < len; i++) {
+      const n = (Math.random() * 2 - 1) * Math.exp((-6.9 * i) / ctx.sampleRate / rt);
+      lp += 0.04 * (n - lp);
+      d[i] = lp;
+    }
     for (let k = 1; k <= 6; k++) {
       const i = Math.floor(ctx.sampleRate * 0.007 * k * (1 + 0.13 * c));
-      if (i < len) d[i] += (c ? -0.6 : 0.6) / k;
+      if (i < len) d[i] += (c ? -0.18 : 0.18) / k;
     }
   }
   return buf;
 }
 
-/** One creak of a wooden stair: stick-slip friction, a run of clicks whose rate rises then falls, ringing in the wood. */
-function creak(ctx: BaseAudioContext) {
+/** A short loop of a creek: low water, a slow swell, and a few bubbles. */
+function creek(ctx: BaseAudioContext) {
   const sr = ctx.sampleRate;
-  const len = Math.floor(sr * (0.55 + Math.random() * 0.35));
+  const len = Math.floor(sr * 4);
   const buf = ctx.createBuffer(1, len, sr);
   const d = buf.getChannelData(0);
-  const modes = [
-    { f: 480 + Math.random() * 120, a: 1 },
-    { f: 1150 + Math.random() * 200, a: 0.6 },
-    { f: 2300 + Math.random() * 300, a: 0.3 },
-  ];
-  const peak = 55 + Math.random() * 40;
-  let t = 0;
-  while (t < len / sr) {
-    const k = t / (len / sr);
-    const rate = 18 + peak * Math.sin(Math.PI * k);
-    const amp = Math.sin(Math.PI * k) ** 0.6 * (0.6 + Math.random() * 0.4);
-    const start = Math.floor(t * sr);
-    for (const m of modes) {
-      for (let i = 0; i < sr * 0.012 && start + i < len; i++) {
-        d[start + i] += amp * m.a * Math.sin((2 * Math.PI * m.f * i) / sr) * Math.exp(-i / (sr * 0.0025));
-      }
-    }
-    t += 1 / rate;
+  let brown = 0;
+  for (let i = 0; i < len; i++) {
+    brown = brown * 0.985 + (Math.random() * 2 - 1) * 0.015;
+    const swell = 0.62 + 0.38 * Math.sin((2 * Math.PI * i) / sr / 1.7);
+    d[i] = brown * swell;
   }
-  for (let i = 0; i < len; i++) d[i] *= 0.25;
+  for (let n = 0; n < 14; n++) {
+    const at = Math.floor(Math.random() * (len - sr * 0.04));
+    const f = 500 + Math.random() * 700;
+    for (let k = 0; k < sr * 0.03; k++) d[at + k] += 0.55 * Math.sin((2 * Math.PI * f * k) / sr) * Math.exp(-k / (sr * 0.007));
+  }
+  let peak = 0;
+  for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(d[i]));
+  const g = peak > 0 ? 0.4 / peak : 1;
+  for (let i = 0; i < len; i++) d[i] *= g;
   return buf;
 }
 
-/** One strike of a tuning fork: a long pure tone, a faint second tine beating against it, and a short metallic clang. */
-function strike(ctx: AudioContext, out: AudioNode, t: number, f: number) {
-  const tone = (freq: number, amp: number, decay: number) => {
+/** Hold, then fade. The attack stretches to the crossfade when a chakra hands off to the next. */
+function strike(ctx: AudioContext, out: AudioNode, t: number, f: number, hold: number, fade: number, attack: number) {
+  const voice = (freq: number, amp: number) => {
     const o = ctx.createOscillator();
     const g = ctx.createGain();
+    o.type = 'sine';
     o.frequency.value = freq;
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(amp, t + 0.004);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+    const end = t + hold + fade;
+    const rise = t + Math.max(0.02, Math.min(attack, hold));
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(amp, rise);
+    g.gain.setValueAtTime(amp, t + hold);
+    g.gain.exponentialRampToValueAtTime(0.0001, Math.max(rise + 0.02, end));
     o.connect(g).connect(out);
     o.start(t);
-    o.stop(t + decay + 0.05);
+    o.stop(end + 0.05);
   };
-  tone(f, 0.32, 7.5);
-  tone(f + 0.6, 0.06, 6.5);
-  tone(f * 6.27, 0.07, 0.35);
+  voice(f, 0.2);
+  voice(f + 0.6, 0.035);
+  const clang = ctx.createOscillator();
+  const cg = ctx.createGain();
+  clang.frequency.value = f * 6.27;
+  cg.gain.setValueAtTime(0.04, t);
+  cg.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+  clang.connect(cg).connect(out);
+  clang.start(t);
+  clang.stop(t + 0.35);
 }
 
-type Kind = 'stem' | 'creak' | 'fork';
+type Kind = 'stem' | 'creek' | 'scream' | 'fork';
 type Obj = {
   key: string;
   kind: Kind;
   stem?: string; // which instrument a stem or its clone plays
   label: string;
+  bubble: HTMLElement;
   node: HTMLButtonElement;
   pos: Pos;
+  hz?: number;
   el?: HTMLAudioElement;
   panner?: PannerNode;
   meter?: AnalyserNode;
   out?: GainNode; // synth sounds feed this
+  src?: AudioBufferSourceNode;
   timer?: number;
   clone: boolean;
+  gone?: boolean;
 };
 
 const root = document.querySelector<HTMLElement>('[data-spatial]');
@@ -131,7 +213,16 @@ if (root) {
   const cur = root.querySelector<HTMLElement>('[data-cur]')!;
   const dur = root.querySelector<HTMLElement>('[data-dur]')!;
   const label = root.querySelector<HTMLElement>('[data-label]')!;
+  const titleEl = root.querySelector<HTMLElement>('[data-title]')!;
+  const byEl = root.querySelector<HTMLElement>('[data-by]')!;
+  const specEl = root.querySelector<HTMLElement>('[data-spec]')!;
+  const art = root.querySelector<HTMLImageElement>('[data-art]')!;
+  const markName = root.querySelector<HTMLElement>('[data-mark-name]')!;
+  const markHz = root.querySelector<HTMLElement>('[data-mark-hz]')!;
+  const bloom = root.querySelector<HTMLImageElement>('.sp-bloom')!;
+  const card = root.querySelector<HTMLElement>('.sp-card')!;
   const modeBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-mode]')];
+  const trackBtns = [...root.querySelectorAll<HTMLButtonElement>('.sp-tracks [data-track]')];
   const venueBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-venue]')];
   const ring = root.querySelector<HTMLElement>('[data-ring]')!;
   const canvas = ring.querySelector<HTMLCanvasElement>('[data-orb]')!;
@@ -140,9 +231,6 @@ if (root) {
   const height = root.querySelector<HTMLInputElement>('[data-height]')!;
   const heightOut = root.querySelector<HTMLElement>('[data-height-out]')!;
   const picked = root.querySelector<HTMLElement>('[data-picked]')!;
-  const extraBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-extra]')];
-  const cloneBtn = root.querySelector<HTMLButtonElement>('[data-clone]')!;
-  const removeBtn = root.querySelector<HTMLButtonElement>('[data-remove]')!;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
   const fxBox = root.querySelector<HTMLElement>('[data-fx]')!;
@@ -151,22 +239,53 @@ if (root) {
     wet: fxBox.querySelector<HTMLInputElement>('[data-fx-wet]')!,
     rt: fxBox.querySelector<HTMLInputElement>('[data-fx-rt]')!,
     pre: fxBox.querySelector<HTMLInputElement>('[data-fx-pre]')!,
+    bounces: fxBox.querySelector<HTMLInputElement>('[data-fx-bounces]')!,
   };
   const presetBtns = [...fxBox.querySelectorAll<HTMLButtonElement>('[data-preset]')];
-  const fx: Fx = { ...PRESETS.original };
+  let venue = 'hall';
+  const venueFx = (id: string) => {
+    const v = VENUES[id];
+    return { wet: Math.round((v.wet / 0.8) * 100), rt: v.rt, pre: Math.round(v.pre * 1000) };
+  };
+  const VENUE_WHY: Record<string, string> = {
+    room: 'Private room. Close and dry, an arm’s length away.',
+    club: 'Club. Drums a few steps away, keys either side.',
+    hall: 'Concert hall. Strings, winds and piano, written as a film score.',
+    stadium: 'Stadium. The band far ahead, the room all the way round.',
+    festival: 'Festival. Kick and bass centred, the rest wrapping around.',
+  };
+  const fx: Fx = { gain: 0, bounces: 0, ...venueFx(venue) };
 
   let mode: 'wave' | 'orig' = 'wave';
-  let venue = 'club';
+  let trackId = 'attempt';
   let started = false;
+  let playing = false;
+  let playhead = 0;
+  let playStamp = 0;
   let serial = 0;
+  let aimX = 0.34;
+  let aimY = 0.42;
+  let tiltX = 0.34;
+  let tiltY = 0.42;
+  let cardKick = 1;
+  const cardT0 = performance.now();
+  let creekBuf: AudioBuffer | null = null;
+  let screamBuf: AudioBuffer | null = null;
+  let cycling = false;
+  const tone = { hold: 8, fade: 4, cross: 2 };
+  const toneDur = () => tone.hold + tone.fade;
+  const playDur = () => (track().kind === 'fork' ? toneDur() : track().dur);
 
+  const STEM_MARK: Record<string, string> = { drums: '#e8e4dc', piano: '#f4f1ea', synths: '#7ec8ff', guitar: '#c8a2ff', bass: '#6dffbf' };
   const objs: Obj[] = [...ring.querySelectorAll<HTMLButtonElement>('.sp-node[data-node]')].map((node) => {
     const stem = node.dataset.node!;
+    node.style.setProperty('--mark', STEM_MARK[stem] ?? '#7ee0ff');
     return {
       key: stem,
       kind: 'stem' as Kind,
       stem,
       label: node.dataset.label!,
+      bubble: node.parentElement as HTMLElement,
       node,
       pos: { ...VENUES[venue].pos[stem] },
       el: root.querySelector<HTMLAudioElement>(`[data-stem="${stem}"]`)!,
@@ -174,10 +293,14 @@ if (root) {
     };
   });
   let selected = objs[0];
+  const looping = () => loopBtn.getAttribute('aria-pressed') === 'true';
+  const shown = () => objs.filter((o) => !o.gone && !o.bubble.hidden);
+  const track = () => TRACKS[trackId];
 
   let ctx: AudioContext | null = null;
   let origGain: GainNode, waveGain: GainNode, dry: GainNode, wet: GainNode, verb: ConvolverNode;
-  let bus: GainNode, sum: GainNode, makeup: GainNode, user: GainNode, preDelay: DelayNode, extrasDry: GainNode;
+  let bus: GainNode, sum: GainNode, makeup: GainNode, user: GainNode, preDelay: DelayNode, extrasDry: GainNode, echoIn: GainNode;
+  let echoDelays: DelayNode[], echoGains: GainNode[];
   let origMeter: AnalyserNode, waveMeter: AnalyserNode;
   let origPow = 0;
   let wavePow = 0;
@@ -185,7 +308,7 @@ if (root) {
   const meterBuf = new Float32Array(1024);
 
   const panner = (c: AudioContext) =>
-    new PannerNode(c, { panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 1.5, rolloffFactor: 0.7 });
+    new PannerNode(c, { panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 2, maxDistance: 12, rolloffFactor: 0.45 });
 
   /** Wires one sound into the graph: stems and their clones into the song's bus, synth sounds alongside it. */
   const wire = (o: Obj) => {
@@ -195,8 +318,23 @@ if (root) {
     o.meter.fftSize = 1024;
     if (o.kind === 'stem') {
       const src = ctx.createMediaElementSource(o.el!);
-      src.connect(o.panner).connect(bus);
-      src.connect(o.meter);
+      let into: AudioNode = src;
+      if (o.stem === 'piano') {
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 6200;
+        lp.Q.value = 0.6;
+        const soft = ctx.createDynamicsCompressor();
+        soft.threshold.value = -16;
+        soft.knee.value = 10;
+        soft.ratio.value = 2.5;
+        soft.attack.value = 0.004;
+        soft.release.value = 0.14;
+        src.connect(lp).connect(soft);
+        into = soft;
+      }
+      into.connect(o.panner).connect(bus);
+      into.connect(o.meter);
     } else {
       o.out = ctx.createGain();
       o.out.connect(o.panner);
@@ -204,6 +342,7 @@ if (root) {
       // Extras sit in the same room, and stay audible when you switch to the original.
       o.panner.connect(extrasDry);
       o.panner.connect(preDelay);
+      o.panner.connect(echoIn);
     }
     place(o);
   };
@@ -217,11 +356,29 @@ if (root) {
     wet = ctx.createGain();
     verb = ctx.createConvolver();
     bus = ctx.createGain();
+    bus.gain.value = 0.55;
     sum = ctx.createGain();
     makeup = ctx.createGain();
+    const lim = ctx.createDynamicsCompressor();
+    lim.threshold.value = -3;
+    lim.knee.value = 6;
+    lim.ratio.value = 12;
+    lim.attack.value = 0.002;
+    lim.release.value = 0.08;
     user = ctx.createGain();
     extrasDry = ctx.createGain();
     preDelay = ctx.createDelay(0.5);
+    echoIn = ctx.createGain();
+    echoDelays = [];
+    echoGains = [];
+    for (let i = 0; i < ECHO_TAPS; i++) {
+      const d = ctx.createDelay(4);
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      echoIn.connect(d).connect(g).connect(sum);
+      echoDelays.push(d);
+      echoGains.push(g);
+    }
     origMeter = ctx.createAnalyser();
     waveMeter = ctx.createAnalyser();
     origMeter.fftSize = waveMeter.fftSize = 2048;
@@ -231,8 +388,9 @@ if (root) {
     // Instruments → room (dry + pre-delay → reverb) → loudness match → your gain → mode crossfade.
     bus.connect(dry).connect(sum);
     bus.connect(preDelay).connect(verb).connect(wet).connect(sum);
+    bus.connect(echoIn);
     sum.connect(waveMeter);
-    sum.connect(makeup).connect(user).connect(waveGain).connect(ctx.destination);
+    sum.connect(makeup).connect(lim).connect(user).connect(waveGain).connect(ctx.destination);
     extrasDry.connect(ctx.destination);
     for (const x of objs) wire(x);
     room();
@@ -248,10 +406,12 @@ if (root) {
     out('wet', `${Math.round(fx.wet)}%`);
     out('rt', `${fx.rt.toFixed(1)} s`);
     out('pre', `${Math.round(fx.pre)} ms`);
+    out('bounces', String(Math.round(fx.bounces)));
     fxIn.gain.value = String(fx.gain);
     fxIn.wet.value = String(fx.wet);
     fxIn.rt.value = String(fx.rt);
     fxIn.pre.value = String(fx.pre);
+    fxIn.bounces.value = String(fx.bounces);
   };
 
   let rtTimer = 0;
@@ -263,8 +423,17 @@ if (root) {
     wet.gain.setTargetAtTime(w, t, 0.08);
     dry.gain.setTargetAtTime(1 - w * 0.5, t, 0.08);
     extrasDry.gain.setTargetAtTime(1 - w * 0.5, t, 0.08);
-    preDelay.delayTime.setTargetAtTime(fx.pre / 1000, t, 0.03);
+    preDelay.delayTime.setTargetAtTime(Math.min(0.45, fx.pre / 1000), t, 0.03);
     user.gain.setTargetAtTime(10 ** (fx.gain / 20), t, 0.05);
+    const n = Math.round(fx.bounces);
+    const gap = fx.pre / 1000;
+    for (let i = 0; i < ECHO_TAPS; i++) {
+      const on = i < n && gap > 0.005;
+      const at = gap * (i + 1);
+      echoDelays[i].delayTime.setTargetAtTime(on ? Math.min(3.8, at) : 0.001, t, 0.03);
+      const amp = on ? Math.exp((-3 * at) / Math.max(0.15, fx.rt)) * 0.4 : 0;
+      echoGains[i].gain.setTargetAtTime(amp, t, 0.05);
+    }
     if (fx.rt !== builtRt) {
       clearTimeout(rtTimer);
       rtTimer = window.setTimeout(() => {
@@ -284,15 +453,15 @@ if (root) {
     for (let i = 0; i < meterBuf.length; i++) s += meterBuf[i] * meterBuf[i];
     return s / meterBuf.length;
   };
-  /** Keeps ñü.wẽævẽß at the original's loudness: both play in step all the time, so their levels can be compared live. */
+  /** Keeps ñü.ŵævẽš at the original's loudness: both play in step all the time, so their levels can be compared live. */
   const matchLoudness = () => {
-    if (!ctx || master().paused) return;
+    if (!ctx || orig.paused) return;
     const po = level(origMeter);
     const pw = level(waveMeter);
     if (po < 1e-6 || pw < 1e-6) return;
     origPow = origPow ? origPow * 0.98 + po * 0.02 : po;
     wavePow = wavePow ? wavePow * 0.98 + pw * 0.02 : pw;
-    const k = Math.min(8, Math.max(0.25, Math.sqrt(origPow / wavePow)));
+    const k = Math.min(1.6, Math.max(0.5, Math.sqrt(origPow / wavePow)));
     makeup.gain.setTargetAtTime(k, ctx.currentTime, 0.4);
   };
 
@@ -328,46 +497,86 @@ if (root) {
     }
   };
 
+  const canRemove = () => shown().length > 1;
+
   const select = (o: Obj) => {
     selected = o;
-    for (const x of objs) x.node.setAttribute('aria-pressed', String(x === o));
+    for (const x of objs) {
+      x.node.setAttribute('aria-pressed', String(x === o));
+      const rm = x.bubble.querySelector<HTMLButtonElement>('[data-remove]');
+      if (rm) rm.disabled = !canRemove();
+    }
     height.value = String(o.pos.z);
     heightOut.textContent = `${o.label} · ${o.pos.z >= 0 ? '+' : ''}${o.pos.z.toFixed(1)} m`;
-    removeBtn.hidden = !(o.clone || o.kind !== 'stem');
   };
 
-  // MARK: Clones and extra sounds
+  // MARK: Clones and synthesised tracks
 
   const makeNode = (labelText: string) => {
-    const node = template.content.firstElementChild!.cloneNode(true) as HTMLButtonElement;
+    const bubble = template.content.firstElementChild!.cloneNode(true) as HTMLElement;
+    const node = bubble.querySelector<HTMLButtonElement>('.sp-node')!;
     node.querySelector('span')!.textContent = labelText;
-    ring.append(node);
-    return node;
+    ring.append(bubble);
+    return { bubble, node };
   };
 
-  const startSynth = (o: Obj) => {
-    if (!ctx || o.timer) return;
-    const run = () => {
-      if (!ctx || !o.out) return;
-      const t = ctx.currentTime + 0.05;
-      if (o.kind === 'fork') {
-        strike(ctx, o.out, t, 221.23);
-        o.timer = window.setTimeout(run, 7000);
-      } else {
-        // Two or three steps, one creak each, then a pause.
-        const steps = 2 + Math.floor(Math.random() * 2);
-        let at = t;
-        for (let i = 0; i < steps; i++) {
-          const s = ctx.createBufferSource();
-          s.buffer = creak(ctx);
-          s.connect(o.out);
-          s.start(at);
-          at += s.buffer.duration + 0.25 + Math.random() * 0.3;
-        }
-        o.timer = window.setTimeout(run, (at - t) * 1000 + 3500 + Math.random() * 3000);
+  const stopSynth = (o: Obj) => {
+    clearTimeout(o.timer);
+    o.timer = undefined;
+    try { o.src?.stop(); } catch { /* already stopped */ }
+    o.src = undefined;
+  };
+
+  const loadScream = async (c: AudioContext) => {
+    if (screamBuf) return screamBuf;
+    const res = await fetch('/khensu/sounds/wilhelm-scream.ogg');
+    screamBuf = await c.decodeAudioData(await res.arrayBuffer());
+    TRACKS.scream.dur = screamBuf.duration;
+    return screamBuf;
+  };
+
+  const scheduleCycle = (o: Obj, fromId: string) => {
+    if (!cycling || o.kind !== 'fork' || !ctx) return;
+    const elapsed = Math.max(0, ctx.currentTime - playStamp);
+    const wait = Math.max(0.05, tone.hold + tone.fade - tone.cross - elapsed);
+    o.timer = window.setTimeout(() => {
+      if (!cycling || !playing || trackId !== fromId) return;
+      const i = CHAKRA_ORDER.indexOf(fromId);
+      if (i < 0) return;
+      void loadTrack(CHAKRA_ORDER[(i + 1) % CHAKRA_ORDER.length], true);
+    }, wait * 1000);
+  };
+
+  const trigger = async (o: Obj) => {
+    if (!ctx || !o.out || !playing) return;
+    if (o.kind === 'fork') {
+      const attack = cycling ? Math.max(0.04, tone.cross) : 0.04;
+      strike(ctx, o.out, ctx.currentTime + 0.02, o.hz ?? 136.1, tone.hold, tone.fade, attack);
+      scheduleCycle(o, trackId);
+      return;
+    }
+    if (o.kind === 'creek') {
+      if (o.src) return;
+      const s = ctx.createBufferSource();
+      s.buffer = creekBuf ?? (creekBuf = creek(ctx));
+      s.loop = true;
+      s.connect(o.out);
+      s.start();
+      o.src = s;
+      return;
+    }
+    if (o.kind === 'scream') {
+      try { o.src?.stop(); } catch { /* already stopped */ }
+      const s = ctx.createBufferSource();
+      s.buffer = await loadScream(ctx);
+      s.connect(o.out);
+      s.start();
+      o.src = s;
+      if (trackId === 'scream') {
+        seek.max = String(TRACKS.scream.dur);
+        dur.textContent = mmss(TRACKS.scream.dur);
       }
-    };
-    run();
+    }
   };
 
   const addObj = (o: Obj) => {
@@ -375,35 +584,45 @@ if (root) {
     bind(o);
     if (ctx) wire(o);
     select(o);
-  };
-
-  const addExtra = async (kind: 'creak' | 'fork', pos?: Pos, clone = false) => {
-    graph();
-    await ctx!.resume();
-    const e = EXTRAS[kind];
-    const n = objs.filter((x) => x.kind === kind).length;
-    const labelText = n ? `${e.label} ${n + 1}` : e.label;
-    const o: Obj = { key: `${kind}-${++serial}`, kind, label: labelText, node: makeNode(labelText), pos: { ...(pos ?? e.pos) }, clone };
-    addObj(o);
-    startSynth(o);
     return o;
   };
 
-  const removeObj = (o: Obj) => {
-    if (!o.clone && o.kind === 'stem') return;
-    clearTimeout(o.timer);
+  const addSynth = (kind: Kind, labelText: string, hz: number | undefined, pos: Pos, clone: boolean) => {
+    graph();
+    const made = makeNode(labelText);
+    const meta = Object.values(TRACKS).find((tr) => tr.kind === kind && tr.label === labelText);
+    if (meta?.mark) made.node.style.setProperty('--mark', meta.mark);
+    return addObj({
+      key: `${kind}-${++serial}`,
+      kind,
+      label: labelText,
+      bubble: made.bubble,
+      node: made.node,
+      pos: { ...pos },
+      hz,
+      clone,
+    });
+  };
+
+  const dropObj = (o: Obj) => {
+    stopSynth(o);
     o.el?.pause();
     o.panner?.disconnect();
     o.out?.disconnect();
-    o.node.remove();
+    o.bubble.remove();
     objs.splice(objs.indexOf(o), 1);
-    if (o.el) o.el.remove();
-    syncExtras();
-    select(objs[0]);
+    if (o.clone && o.el) o.el.remove();
   };
 
-  const syncExtras = () => {
-    for (const b of extraBtns) b.setAttribute('aria-pressed', String(objs.some((x) => x.kind === b.dataset.extra)));
+  const removeObj = (o: Obj) => {
+    if (!canRemove() || o.gone) return;
+    if (!o.clone && o.kind === 'stem') {
+      o.gone = true;
+      o.el?.pause();
+      o.bubble.hidden = true;
+    } else dropObj(o);
+    const next = shown()[0];
+    if (next) select(next);
   };
 
   const cloneSelected = async () => {
@@ -412,7 +631,10 @@ if (root) {
     const offset = { x: s.pos.x + 0.6, y: s.pos.y - 0.4, z: s.pos.z + 0.3 };
     clamp(offset);
     if (s.kind !== 'stem') {
-      await addExtra(s.kind, offset, true);
+      const n = objs.filter((x) => x.kind === s.kind).length;
+      const base = s.label.replace(/ \d+$/, '');
+      const o = addSynth(s.kind, `${base} ${n + 1}`, s.hz, offset, true);
+      if (playing) trigger(o);
       return;
     }
     const src = s.el!;
@@ -423,8 +645,18 @@ if (root) {
     root.append(el);
     const n = objs.filter((x) => x.stem === s.stem).length;
     const base = objs.find((x) => x.stem === s.stem && !x.clone)!.label;
-    const labelText = `${base} ${n + 1}`;
-    addObj({ key: `${s.stem}-${++serial}`, kind: 'stem', stem: s.stem, label: labelText, node: makeNode(labelText), pos: offset, el, clone: true });
+    const made = makeNode(`${base} ${n + 1}`);
+    addObj({
+      key: `${s.stem}-${++serial}`,
+      kind: 'stem',
+      stem: s.stem,
+      label: `${base} ${n + 1}`,
+      bubble: made.bubble,
+      node: made.node,
+      pos: offset,
+      el,
+      clone: true,
+    });
     el.currentTime = orig.currentTime;
     if (!orig.paused) {
       graph();
@@ -432,20 +664,122 @@ if (root) {
     }
   };
 
+  const paintCard = () => {
+    const t = track();
+    titleEl.textContent = t.title;
+    byEl.textContent = t.by;
+    specEl.textContent = t.kind === 'song' && mode === 'orig' ? ORIG_SPEC : t.spec;
+    root.dataset.track = t.id;
+    root.style.setProperty('--mark', t.mark || '#7ee0c8');
+    markName.textContent = t.title;
+    markHz.textContent = t.hzLine ?? '';
+    const photo = t.kind === 'song';
+    art.hidden = !photo;
+    bloom.hidden = !photo;
+    if (t.kind === 'song') {
+      const d = Number.isFinite(orig.duration) ? orig.duration : t.dur;
+      seek.max = String(d);
+      dur.textContent = mmss(d);
+    } else {
+      const d = t.kind === 'fork' ? toneDur() : t.dur;
+      seek.max = String(d);
+      dur.textContent = mmss(d);
+      if (t.kind === 'fork') specEl.textContent = `${(t.hz ?? 0).toFixed(2)} Hz · ${t.hzLine ?? ''} · ${tone.hold.toFixed(1)} s hold · ${tone.fade.toFixed(1)} s fade`;
+    }
+    const chakraOpen = root.querySelector<HTMLButtonElement>('[data-chakra-open]');
+    if (chakraOpen) chakraOpen.setAttribute('aria-pressed', String(t.kind === 'fork'));
+    if (chakraOpen && t.kind === 'fork') chakraOpen.textContent = t.title;
+    if (chakraOpen && t.kind !== 'fork' && !cycling) chakraOpen.textContent = 'Chakras';
+  };
+
+  const loadTrack = async (id: string, overlap = false, force = false) => {
+    const t = TRACKS[id];
+    if (!t) return;
+    if (id === trackId && !overlap) {
+      if (force && t.kind !== 'song' && !playing) {
+        graph();
+        await ctx!.resume();
+        playing = true;
+        started = true;
+        playStamp = ctx!.currentTime;
+        const o = objs.find((x) => x.kind === t.kind);
+        if (o) void trigger(o);
+        state();
+      }
+      return;
+    }
+    const was = force || (trackId === 'attempt' ? !orig.paused : playing);
+    const fading = overlap ? objs.filter((o) => o.kind === 'fork') : [];
+    if (!overlap) {
+      for (const el of songEls()) el.pause();
+      playing = false;
+      for (const o of [...objs]) if (o.clone || o.kind !== 'stem') dropObj(o);
+    }
+    if (t.kind !== 'fork') {
+      cycling = false;
+      root.querySelector<HTMLButtonElement>('[data-cycle]')?.setAttribute('aria-pressed', 'false');
+    }
+    for (const o of objs) if (o.kind === 'stem') {
+      o.gone = false;
+      o.bubble.hidden = id !== 'attempt';
+    }
+    trackId = id;
+    const menu = root.querySelector<HTMLElement>('[data-chakra-menu]');
+    if (menu) menu.hidden = true;
+    root.querySelector('[data-chakra-open]')?.setAttribute('aria-expanded', 'false');
+    cardKick = 1;
+    playhead = 0;
+    for (const b of trackBtns) b.setAttribute('aria-pressed', String(b.dataset.track === id));
+    paintCard();
+    bar(0);
+    cur.textContent = '0:00';
+    if (t.kind !== 'song' && t.pos && t.label) {
+      graph();
+      await ctx!.resume();
+      const o = addSynth(t.kind, t.label, t.hz, t.pos, false);
+      if (was || overlap) {
+        playing = true;
+        started = true;
+        playStamp = ctx!.currentTime;
+        void trigger(o);
+      }
+      if (fading.length) {
+        const ms = Math.max(40, tone.cross * 1000);
+        window.setTimeout(() => {
+          for (const old of fading) if (objs.includes(old)) dropObj(old);
+        }, ms);
+      }
+    } else {
+      const first = shown()[0];
+      if (first) select(first);
+      if (was) {
+        graph();
+        await ctx!.resume();
+        started = true;
+        for (const el of songEls()) {
+          el.preload = 'auto';
+          el.play().catch(() => {});
+        }
+      }
+    }
+    state();
+  };
+
   // MARK: Transport
 
-  const songEls = () => [orig, ...objs.filter((o) => o.kind === 'stem').map((o) => o.el!)];
-  const master = () => orig;
+  const songEls = () => [orig, ...objs.filter((o) => o.kind === 'stem' && !o.gone && o.el).map((o) => o.el!)];
 
   const showLabel = () => {
-    const m = master();
-    const t = !started ? 'Next up' : m.paused ? (m.ended ? 'Played' : 'Paused') : m.readyState < 3 ? 'Loading' : 'Now playing';
+    const live = trackId === 'attempt' ? !orig.paused : playing;
+    const ended = trackId === 'attempt' ? orig.ended : !playing && started && playhead >= playDur() - 0.05;
+    const t = !started ? 'Next up' : live ? 'Now playing' : ended ? 'Played' : 'Paused';
     if (label.textContent !== t) label.textContent = t;
   };
 
   const state = () => {
-    const m = master();
-    const st = !m.paused ? 'pause' : m.ended ? 'replay' : 'play';
+    const live = trackId === 'attempt' ? !orig.paused : playing;
+    const ended = trackId === 'attempt' ? orig.ended : !playing && started && playhead >= playDur() - 0.05;
+    const st = live ? 'pause' : ended ? 'replay' : 'play';
     play.dataset.state = st;
     play.setAttribute('aria-label', { play: 'Play', pause: 'Pause', replay: 'Play again' }[st]);
     showLabel();
@@ -474,18 +808,39 @@ if (root) {
   new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(ring);
 
   const frame = (now: number) => {
-    const m = master();
-    if (!dragging) bar(m.currentTime);
-    cur.textContent = mmss(m.currentTime);
-    matchLoudness();
-    if (now - lastSync > 500) {
-      lastSync = now;
-      for (const el of songEls()) if (el !== m && !m.paused && Math.abs(el.currentTime - m.currentTime) > 0.05) el.currentTime = m.currentTime;
+    if (trackId === 'attempt') {
+      if (!dragging) bar(orig.currentTime);
+      cur.textContent = mmss(orig.currentTime || 0);
+      if (now - lastSync > 500) {
+        lastSync = now;
+        for (const el of songEls()) if (el !== orig && !orig.paused && Math.abs(el.currentTime - orig.currentTime) > 0.05) el.currentTime = orig.currentTime;
+      }
+    } else if (!dragging) {
+      let t = playhead;
+      if (playing && ctx) t = playhead + (ctx.currentTime - playStamp);
+      const end = playDur();
+      if (t >= end && !(cycling && track().kind === 'fork')) {
+        if (looping()) {
+          playhead = 0;
+          playStamp = ctx ? ctx.currentTime : 0;
+          for (const o of shown()) if (o.kind === 'scream' || o.kind === 'fork') void trigger(o);
+          t = 0;
+        } else if (playing) {
+          playing = false;
+          playhead = end;
+          for (const o of objs) stopSynth(o);
+          t = end;
+          state();
+        }
+      }
+      bar(Math.min(t, end));
+      cur.textContent = mmss(Math.min(t, end));
     }
+    matchLoudness();
     let total = 0;
-    for (const o of objs) {
+    for (const o of shown()) {
       let v = 0;
-      const live = o.kind === 'stem' ? mode === 'wave' && !m.paused : true;
+      const live = o.kind === 'stem' ? mode === 'wave' && !orig.paused : playing;
       if (o.meter && live) {
         const db = 10 * Math.log10(level(o.meter) + 1e-12);
         v = Math.max(0, Math.min(1, (db + 62) / 44));
@@ -497,14 +852,17 @@ if (root) {
     swell = swell * 0.85 + Math.min(1, total / 3) * 0.15;
     if (orb && visible) {
       const motion = !reduce.matches;
-      orb.frame(motion ? now / 1000 : 0, objs.map((o) => ({ pos: o.pos, level: motion ? levels.get(o) ?? 0 : 0 })), motion ? swell : 0);
-      for (const o of objs) {
+      const liveObjs = shown();
+      orb.frame(motion ? now / 1000 : 0, liveObjs.map((o) => ({ pos: o.pos, level: motion ? levels.get(o) ?? 0 : 0 })), motion ? swell : 0);
+      for (const o of liveObjs) {
         const p = orb.project(o.pos);
-        o.node.style.left = `${p.x}px`;
-        o.node.style.top = `${p.y}px`;
-        o.node.style.zIndex = String(1 + Math.round(p.near * 10));
-        o.node.style.setProperty('--near', p.near.toFixed(3));
-        o.node.style.setProperty('--lvl', reduce.matches ? '0' : (levels.get(o) ?? 0).toFixed(3));
+        o.bubble.style.left = `${p.x}px`;
+        o.bubble.style.top = `${p.y}px`;
+        o.bubble.style.zIndex = String((o === selected ? 30 : 1) + Math.round(p.near * 10));
+        o.bubble.style.setProperty('--near', p.near.toFixed(3));
+        const lvl = levels.get(o) ?? 0;
+        o.bubble.style.setProperty('--lvl', reduce.matches ? '0' : lvl.toFixed(3));
+        o.node.dataset.live = !reduce.matches && lvl > 0.08 ? '1' : '0';
       }
       for (const d of dirs) {
         const p = orb.project(DIRS[d.dataset.dir!]);
@@ -513,20 +871,55 @@ if (root) {
       }
     }
     showLabel();
+    if (reduce.matches) card.style.transform = '';
+    else {
+      const t = (now - cardT0) / 1000;
+      tiltX += (aimX - tiltX) * 0.08;
+      tiltY += (aimY - tiltY) * 0.08;
+      cardKick += (0 - cardKick) * 0.05;
+      const intro = Math.min(1, t / 1.15);
+      const ease = 1 - (1 - intro) ** 3;
+      const idleX = Math.sin(t * 0.65) * 2.4;
+      const idleY = Math.cos(t * 0.5) * 3.6;
+      const idleZ = Math.sin(t * 0.38) * 1.4;
+      const live = trackId === 'attempt' ? !orig.paused : playing;
+      const rx = (1 - ease) * 26 + ease * (6 + idleX + (0.42 - tiltY) * 18);
+      const ry = (1 - ease) * -38 + ease * (-12 + idleY + (tiltX - 0.38) * 24) + cardKick * 22;
+      const rz = (1 - ease) * -7 + ease * (idleZ + (tiltX - 0.5) * 6);
+      const sc = 0.72 + ease * 0.28 + Math.sin(t * 0.9) * 0.012 + cardKick * 0.07 + (live ? 0.045 : 0);
+      const tz = (1 - ease) * -90 + cardKick * 36;
+      card.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) translateZ(${tz.toFixed(1)}px) scale(${sc.toFixed(3)})`;
+    }
     requestAnimationFrame(frame);
   };
 
   // MARK: Events
 
   play.addEventListener('click', async () => {
-    const m = master();
-    if (m.paused) {
+    if (trackId !== 'attempt') {
       graph();
       await ctx!.resume();
-      if (m.ended) for (const el of songEls()) el.currentTime = 0;
+      if (playing) {
+        playhead = Math.min(playDur(), playhead + (ctx!.currentTime - playStamp));
+        playing = false;
+        for (const o of objs) stopSynth(o);
+      } else {
+        if (playhead >= playDur() - 0.05) playhead = 0;
+        playing = true;
+        started = true;
+        playStamp = ctx!.currentTime;
+        for (const o of shown()) void trigger(o);
+      }
+      state();
+      return;
+    }
+    if (orig.paused) {
+      graph();
+      await ctx!.resume();
+      if (orig.ended) for (const el of songEls()) el.currentTime = 0;
       for (const el of songEls()) {
         el.preload = 'auto';
-        el.currentTime = m.currentTime;
+        el.currentTime = orig.currentTime;
       }
       started = true;
       await Promise.allSettled(songEls().map((el) => el.play()));
@@ -550,6 +943,17 @@ if (root) {
   });
   seek.addEventListener('change', () => {
     dragging = false;
+    if (trackId !== 'attempt') {
+      playhead = Number(seek.value);
+      if (playing && ctx) {
+        playStamp = ctx.currentTime;
+        for (const o of shown()) {
+          if (o.kind !== 'creek') stopSynth(o);
+          void trigger(o);
+        }
+      }
+      return;
+    }
     for (const el of songEls()) {
       if (el.readyState === 0) el.preload = 'auto';
       el.currentTime = Number(seek.value);
@@ -566,8 +970,51 @@ if (root) {
       mode = b.dataset.mode as 'wave' | 'orig';
       for (const x of modeBtns) x.setAttribute('aria-pressed', String(x === b));
       root.dataset.mode = mode;
+      paintCard();
       mix();
     });
+
+  for (const b of trackBtns) b.addEventListener('click', () => void loadTrack(b.dataset.track!));
+
+  const chakraOpen = root.querySelector<HTMLButtonElement>('[data-chakra-open]');
+  const chakraMenu = root.querySelector<HTMLElement>('[data-chakra-menu]');
+  chakraOpen?.addEventListener('click', () => {
+    const open = chakraMenu?.hidden !== false;
+    if (chakraMenu) chakraMenu.hidden = !open;
+    chakraOpen.setAttribute('aria-expanded', String(open));
+  });
+  addEventListener('pointerdown', (e) => {
+    if (!chakraMenu || chakraMenu.hidden) return;
+    if ((e.target as HTMLElement).closest('.sp-chakra')) return;
+    chakraMenu.hidden = true;
+    chakraOpen?.setAttribute('aria-expanded', 'false');
+  });
+  root.querySelector<HTMLButtonElement>('[data-cycle]')?.addEventListener('click', () => {
+    cycling = !cycling;
+    const btn = root.querySelector<HTMLButtonElement>('[data-cycle]')!;
+    btn.setAttribute('aria-pressed', String(cycling));
+    if (chakraMenu) chakraMenu.hidden = true;
+    chakraOpen?.setAttribute('aria-expanded', 'false');
+    if (!cycling) return;
+    if (track().kind === 'fork' && playing) {
+      const o = objs.find((x) => x.kind === 'fork');
+      if (o && o.timer == null) scheduleCycle(o, trackId);
+      return;
+    }
+    void loadTrack(track().kind === 'fork' ? trackId : 'root', false, true);
+  });
+  const bindTone = (sel: string, key: 'hold' | 'fade' | 'cross') => {
+    const input = root.querySelector<HTMLInputElement>(sel);
+    const out = root.querySelector<HTMLOutputElement>(`[data-tone-out="${key}"]`);
+    input?.addEventListener('input', () => {
+      tone[key] = Number(input.value);
+      if (out) out.textContent = `${tone[key].toFixed(1)} s`;
+      if (track().kind === 'fork') paintCard();
+    });
+  };
+  bindTone('[data-tone-hold]', 'hold');
+  bindTone('[data-tone-fade]', 'fade');
+  bindTone('[data-tone-cross]', 'cross');
 
   for (const b of venueBtns)
     b.addEventListener('click', () => {
@@ -580,23 +1027,18 @@ if (root) {
         }
       }
       select(selected);
-      picked.hidden = venue !== 'club';
-      const v = VENUES[venue];
-      Object.assign(fx, { wet: Math.round((v.wet / 0.8) * 100), rt: v.rt, pre: Math.round(v.pre * 1000) });
+      picked.hidden = false;
+      picked.textContent = VENUE_WHY[venue] ?? '';
+      Object.assign(fx, venueFx(venue));
       preset(null);
       room();
     });
 
-  for (const b of extraBtns)
-    b.addEventListener('click', async () => {
-      const kind = b.dataset.extra as 'creak' | 'fork';
-      const have = objs.filter((x) => x.kind === kind);
-      if (have.length) for (const o of have) removeObj(o);
-      else await addExtra(kind);
-      syncExtras();
-    });
-  cloneBtn.addEventListener('click', () => void cloneSelected());
-  removeBtn.addEventListener('click', () => removeObj(selected));
+  ring.addEventListener('click', (e) => {
+    const el = e.target as HTMLElement;
+    if (el.closest('[data-clone]')) void cloneSelected();
+    else if (el.closest('[data-remove]')) removeObj(selected);
+  });
 
   // Drag a sound anywhere in the orb; drag the orb itself to look around.
   let held: Obj | null = null;
@@ -675,8 +1117,19 @@ if (root) {
       room();
     });
 
+  card.addEventListener('pointermove', (e) => {
+    const r = card.getBoundingClientRect();
+    aimX = (e.clientX - r.left) / Math.max(1, r.width);
+    aimY = (e.clientY - r.top) / Math.max(1, r.height);
+  });
+  card.addEventListener('pointerleave', () => {
+    aimX = 0.34;
+    aimY = 0.42;
+  });
+
   for (const o of objs) place(o);
   select(objs[0]);
+  paintCard();
   fxText();
   state();
   requestAnimationFrame(frame);

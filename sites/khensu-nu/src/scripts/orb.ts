@@ -1,4 +1,4 @@
-// The ñü.sounds orb: a sphere of points with the listener at its centre. Every sound sits somewhere inside it, with a
+// The ñü.ŵævẽš orb: a sphere of points with the listener at its centre. Every sound sits somewhere inside it, with a
 // thread down to ear level so its height reads at a glance. While the song plays, each sound sends waves across the
 // sphere from its own direction, and the whole sphere swells in and out with the music.
 import {
@@ -8,7 +8,6 @@ import {
   Color,
   Group,
   LineBasicMaterial,
-  LineLoop,
   LineSegments,
   PerspectiveCamera,
   Plane,
@@ -107,23 +106,6 @@ export function createOrb(canvas: HTMLCanvasElement, radius: number) {
   };
   const shellMat = new ShaderMaterial({ uniforms, vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false, blending: AdditiveBlending });
   world.add(new Points(shellGeo, shellMat));
-
-  // Ear level, 2 m above and below, and the line straight ahead.
-  const ring = (y: number, opacity: number) => {
-    const pts: number[] = [];
-    const r = Math.sqrt(Math.max(0, radius * radius - y * y));
-    for (let i = 0; i < 96; i++) {
-      const a = (i / 96) * Math.PI * 2;
-      pts.push(Math.cos(a) * r, y, Math.sin(a) * r);
-    }
-    const g = new BufferGeometry();
-    g.setAttribute('position', new BufferAttribute(new Float32Array(pts), 3));
-    return new LineLoop(g, new LineBasicMaterial({ color: '#4fb0ff', transparent: true, opacity }));
-  };
-  world.add(ring(0, 0.45), ring(2, 0.12), ring(-2, 0.12));
-  const aheadGeo = new BufferGeometry();
-  aheadGeo.setAttribute('position', new BufferAttribute(new Float32Array([0, 0, 0, 0, 0, -radius]), 3));
-  world.add(new LineSegments(aheadGeo, new LineBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.18 })));
 
   // The listener's head.
   const headGeo = new BufferGeometry();
