@@ -28,19 +28,28 @@ const products = [
     licensed: false,
   },
   {
-    id: 'lend',
-    name: 'Lend',
-    line: 'Small loans between people and to small businesses, repaid in instalments.',
-    body: 'Interest-free between people. Loans with interest come through licensed lending partners.',
-    licensed: true,
-  },
-  {
     id: 'invest',
     name: 'Invest',
     line: 'Shares, revenue shares or notes in creators’ companies, startups and local businesses.',
     body: 'Offered through a registered funding portal or its local equivalent, with the issuer’s disclosures up front.',
     licensed: true,
   },
+  {
+    id: 'lend',
+    name: 'Lend',
+    line: 'Small loans between people and to small businesses, repaid in instalments.',
+    body: 'Interest-free between people. Loans with interest come through licensed lending partners.',
+    licensed: true,
+  },
+];
+
+const platform = [
+  { t: 'ñü.bi, the basic income', b: 'First, and the reason the network exists. Everyone who runs a node is paid in dollar stablecoin for verified work, at one worldwide rate. An equal share for every person is in research.', href: '/bi', link: 'How ñü.bi works' },
+  { t: 'Creators keep it all', b: 'Every view or play pays the creator 1¢, $10 per 1,000, with no cut. Tips, subscriptions and sales of albums, downloads and tickets reach them whole.', href: '/creators', link: 'What creators keep' },
+  { t: 'Node contributors', b: 'A Mac or a Raspberry Pi 5 on an ordinary connection is a node, and a suñůlink.shield joins the mesh. Each is paid every epoch for the work it proves, never by where it is.', href: '/network', link: 'Run a node' },
+  { t: 'Subscriptions fund the network', b: 'After Apple’s share, half of every Pro, Ultra and Akashic subscription goes to the network and half to the founder’s company. No shareholders. The network is paid more than it costs, and that surplus is what funds ñü.bi.', href: '/bi#bi-how', link: 'Follow the money' },
+  { t: 'Payments and tickets', b: 'Pay anyone privately, tap to pay at the till, and buy tickets for festivals, shows and retreats that nobody can link to you. Scan them at the door with ñü.code.', href: '#nufi-contracts-section', link: 'Tickets and contracts' },
+  { t: 'Fund each other', b: 'Give, back a project, invest where licensed, and, last, lend. Person to person, with no platform cut on giving and pledges.', href: '#nufi-products-section', link: 'Four ways to fund' },
 ];
 
 const steps = [
@@ -92,33 +101,49 @@ const feeCap = Math.ceil(BACKERS / 100);
 
 <Base
   title="ñüFi"
-  description="ñüFi on khensu.ñü: give, back, lend and invest person to person. Pledges that refund if the goal isn’t met, shielded amounts and anonymous backers, contracts that enforce the terms, and no platform cut on giving and pledges."
+  description="ñüFi, the khensu.ñü finance platform: a basic income first, creators paid 1¢ a view, nodes paid for their work, subscriptions that fund the network with no shareholders, private payments and tickets, and give, back, invest and lend person to person."
 >
   <meta slot="head" name="color-scheme" content="dark" />
 
   <div class="khensu nufi">
     <NufiHero />
-    <ProductBar name="ñüFi" action="Get the app" href="/app" explore="#nufi-products-section" />
+    <ProductBar name="ñüFi" action="Get the app" href="/app" explore="#nufi-platform-section" />
 
     <section class="nf-intro" id="nufi-intro-section" aria-label="What ñüFi is">
       <div class="wrap">
         <RevealText
           parts={[
-            ['ñüFi lets people fund each other directly. '],
-            ['Fans fund a film, an album or a tour', true],
-            [' with pledges that pay out only if the goal is met. '],
-            ['Gifts reach the person whole.', true],
-            [' Lending and investing run through licensed partners, where the law allows. On giving and pledges, '],
-            ['nobody takes a cut, and nobody holds the money.', true],
+            ['ñüFi is all the money on khensu.ñü. '],
+            ['First, a basic income', true],
+            [' for the people who run the network. Then '],
+            ['creators paid for every view, nodes paid for every job,', true],
+            [' and subscriptions that fund it all, with no shareholders. Then private payments, tickets, and ways to fund each other, '],
+            ['with nobody taking a cut.', true],
           ]}
         />
       </div>
     </section>
 
+    <section class="section nf-band" id="nufi-platform-section" aria-labelledby="nufi-platform-title">
+      <div class="wrap">
+        <p class="eyebrow">the whole platform</p>
+        <h2 id="nufi-platform-title" class="big">A basic income first.<br /><em>Then everything else that pays.</em></h2>
+        <ul class="nf-cards nf-platform" role="list">
+          {platform.map((c, i) => (
+            <li class="nf-glass" data-reveal style={`--i:${i % 3}`}>
+              <b>{c.t}</b>
+              <span>{c.b}</span>
+              <a href={c.href}>{c.link}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
     <section class="section nf-band" id="nufi-products-section" aria-labelledby="nufi-products-title">
       <div class="wrap">
-        <p class="eyebrow">four ways to fund</p>
-        <h2 id="nufi-products-title" class="big">Give. Back. Lend. Invest.<br /><em>One wallet, person to person.</em></h2>
+        <p class="eyebrow">fund each other</p>
+        <h2 id="nufi-products-title" class="big">Give. Back. Invest. Lend.<br /><em>One wallet, person to person.</em></h2>
         <ul class="nf-products" role="list">
           {products.map((p, i) => (
             <li class:list={['nf-product', `p-${p.id}`]} data-reveal style={`--i:${i}`}>
@@ -637,6 +662,12 @@ const feeCap = Math.ceil(BACKERS / 100);
     font-size: 1.12rem;
     font-weight: 600;
     line-height: 1.3;
+  }
+  .nf-platform a {
+    display: inline-block;
+    margin-top: 0.7rem;
+    font-size: 0.9rem;
+    color: #fff;
   }
   .nf-cards span {
     color: var(--text-dim);
