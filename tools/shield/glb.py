@@ -5,7 +5,7 @@ then:
 
   /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup -P tools/shield/glb.py
 
-The shield is the CAD's wrap-xl on the procedural iPhone 18 Pro from photoreal.py (web detail: fewer segments,
+The shield is the CAD's wrap on the procedural iPhone 18 Pro from photoreal.py (web detail: fewer segments,
 no lens iris, the wallpaper as a 640 px JPEG). Models are written in metres, upright, with the back facing the
 viewer. Material "iPhone" is the phone's aluminium, so the page can repaint it.
 """

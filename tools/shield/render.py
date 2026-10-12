@@ -2,7 +2,7 @@
 
   /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup -P tools/shield/render.py -- [stills|turntable|og|all]
 
-Builds the scene directly (the CAD's wrap-xl housing and windows, its USB-C receptacle, the stone inlay and the
+Builds the scene directly (the CAD's wrap housing and windows, its USB-C receptacle, the stone inlay and the
 procedural iPhone 18 Pro from khensu-specs/hardware/sunu/photoreal.py) rather than from the web GLBs, so the
 renders get the full-detail phone. Lit like apple.com's product shots: black, a big soft overhead key, thin strip
 rims along the edges, low fill, a soft contact shadow and no visible floor, AgX. Writes WebP with alpha (the
@@ -155,7 +155,7 @@ def crop_png(src, dst, height):
     print("wrote", dst, flush=True)
 
 
-SHIELD_MID = (0.0, (31.28 - 74.58) / 2, S.T / 2)  # the shield's centre in the CAD frame
+SHIELD_MID = (0.0, 0.0, S.T / 2)  # the shield's centre in the CAD frame: it covers the whole back
 
 
 def hero():
@@ -164,7 +164,7 @@ def hero():
     rig = product("maroon", yaw=-38)
     t = world_point(rig, SHIELD_MID)
     floor(world_point(rig, (0, S.YMIN, 0)).z)
-    camera(t + Vector((20, -290, 20)), t, 70)
+    camera(t + Vector((25, -370, 25)), t, 70)
     still("hero.webp")
 
 
@@ -236,18 +236,20 @@ def turntable(frames=48):
 
 
 def og():
-    # Link-preview cut-outs: the shield alone on transparency, cropped to it, 1100 px tall.
-    for finish, yaw in (("maroon", -22), ("brass", -22)):
-        reset(1000, 2000, 128)
+    # Link-preview cut-outs: the shield on an iPhone 18 Pro in the matching colour, on transparency, cropped to it,
+    # 1100 px tall.
+    for finish, yaw in (("maroon", -30), ("brass", -30)):
+        reset(1100, 2000, 160)
         bpy.context.scene.render.image_settings.file_format = "PNG"
-        rig = product(finish, yaw=yaw)
-        t = world_point(rig, SHIELD_MID)
-        camera(t + Vector((30, -330, 30)), t, 70, **(BRASS_LIGHT if finish == "brass" else {}))
+        rig = product(finish, phone=S.PHONE_FOR[finish], yaw=yaw)
+        t = world_point(rig, (0, 0, 0))
+        camera(t + Vector((40, -470, 50)), t, 70, **(BRASS_LIGHT if finish == "brass" else {}))
         still(f"og-{finish}-full.png")
         crop_png(f"og-{finish}-full.png", f"og-{finish}.png", 1100)
         (OUT / f"og-{finish}-full.png").unlink()
 
 
+S.sync_cad()
 if WHAT in ("stills", "all"):
     stills()
 if WHAT in ("og", "all"):

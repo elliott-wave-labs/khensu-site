@@ -69,9 +69,9 @@ export const RESULTS: Record<PhoneId, Record<Slim, Result>> = {
 };
 
 // One product. The other CAD styles stay in hardware/sunu as engineering references only.
-export const SHIELD = 'wrap-xl' as const;
+export const SHIELD = 'wrap' as const;
 export const STYLES: { id: StyleId; name: string; line: string }[] = [
-  { id: SHIELD, name: 'suñůlink.shield', line: 'The back of the phone around the camera, level with the lens tops, its top edge angled clear of every field of view' },
+  { id: SHIELD, name: 'suñůlink.shield', line: 'The whole back, a flat plate over the camera level with the lens tops, with an opening for every lens and sensor' },
 ];
 
 const C = {
@@ -100,6 +100,8 @@ const bumpRect = (p: Phone): Rect => ({
   w: p.bump.w, h: p.bump.h, r: p.bump.r,
 });
 const bumpBottom = (p: Phone) => p.h / 2 - p.bump.y0 - p.bump.h;
+// Fill and wrap carry a plate over the camera: one unbroken metal face a Qi2 coil can't see through.
+const plate = (s: StyleId) => s === 'fill' || s === 'wrap';
 const cardCenterY = (p: Phone) => Math.min(p.magsafeY, bumpBottom(p) - B.gap - 43 - 1);
 
 function outline(p: Phone, s: StyleId): Rect[] {
@@ -112,6 +114,7 @@ function outline(p: Phone, s: StyleId): Rect[] {
     return [{ cx: 0, cy: (bb + bot) / 2, w: p.w - 6, h: bb - bot, r: p.r - 3 }];
   }
   if (s === 'case') return [{ cx: 0, cy: 0, w: p.w + 3.2, h: p.h + 3.2, r: p.r + 1.6 }, { ...cut, w: b.w + 1.6, h: b.h + 1.6, r: b.r + 0.8 }];
+  if (s === 'wrap') return [{ cx: 0, cy: 0, w: p.w - 2 * B.inset, h: p.h - 2 * B.inset, r: p.r - B.inset }];
   if (p.bump.w + 2 * B.gap >= p.w - 2 * B.inset - 2 * B.wall) {
     const bot = -p.h / 2 + B.inset;
     return [{ cx: 0, cy: (bb + bot) / 2, w: p.w - 2 * B.inset, h: bb - bot, r: 1 }];
@@ -175,7 +178,7 @@ export function backView(p: Phone, s: StyleId, scale: number, withInternals: boo
       `<path d="${rr(n.inner, sx, sy, scale)}" fill="url(#${id})"/>`,
       `<circle cx="${mx}" cy="${my}" r="${((n.ringOD / 2 + 1) * scale).toFixed(1)}" fill="${C.bg}"/>`,
       `<circle cx="${mx}" cy="${my}" r="${(((n.ringOD + n.ringID) / 4) * scale).toFixed(1)}" fill="none" stroke="${C.dim}" stroke-width="${(((n.ringOD - n.ringID) / 2) * scale).toFixed(1)}" opacity="0.5"/>`,
-      `<circle cx="${mx}" cy="${my}" r="${((B.coilD / 2) * scale).toFixed(1)}" fill="none" stroke="${C.yellow}" stroke-width="1.4" stroke-dasharray="4 3"/>`,
+      plate(s) ? '' : `<circle cx="${mx}" cy="${my}" r="${((B.coilD / 2) * scale).toFixed(1)}" fill="none" stroke="${C.yellow}" stroke-width="1.4" stroke-dasharray="4 3"/>`,
       `<path d="${rr(n.pcb, sx, sy, scale)}" fill="${C.blue}" opacity="0.75"/>`,
       `<path d="${rr(n.antenna, sx, sy, scale)}" fill="none" stroke="${C.pink}" stroke-width="1.4" stroke-dasharray="2 2"/>`,
       n.usb ? `<path d="${rr(n.usb, sx, sy, scale)}" fill="${C.text}"/>` : '',
@@ -202,11 +205,13 @@ export function sectionView(p: Phone, s: Slim): string {
   const zb = B.suction + B.base;
   const top = T - B.skin;
   const coilZ = top - B.coilT;
-  const hasCoil = coilZ >= zb + B.magnetT + 0.1;
+  const hasCoil = coilZ >= zb + B.magnetT + 0.1 && !plate(s);
   const zoneA = n.magsafe.y - (n.ringOD / 2 + 1);
   const zoneB = n.magsafe.y + (n.ringOD / 2 + 1);
   const stacked = coilZ - (zb + B.magnetT) - 0.2;
   const yi0 = y0 + B.wall, yi1 = y1 - B.wall;
+  // Under a plate the camera sits in a pocket, so the cells stop short of it.
+  const yc = plate(s) ? Math.min(yi1, bumpBottom(p) - B.gap - B.wall) : yi1;
   const pcbA = n.pcb.cy - B.pcbW / 2, pcbB = n.pcb.cy + B.pcbW / 2;
   const antB = n.antenna.cy + B.antW / 2;
   const batFrom = Math.max(pcbB + 1, antB + 1);
@@ -226,8 +231,10 @@ export function sectionView(p: Phone, s: Slim): string {
     box(y0, y1, top, T, C.dim, 0.85),
     box(n.antenna.cy - B.antW / 2, antB, zb, top, C.pink, 0.25),
     n.pcb.cx - B.pcbL / 2 <= 0 ? box(pcbA, pcbB, zb, zb + B.pcbT, C.blue, 0.8) : '',
-    box(Math.max(batFrom, yi0 + 0.5), Math.min(zoneA, yi1 - 0.5), zb + 0.05, top - 0.05, C.green, 0.45),
-    box(Math.max(zoneB, batFrom), yi1 - 0.5, zb + 0.05, top - 0.05, C.green, 0.45),
+    box(Math.max(batFrom, yi0 + 0.5), Math.min(zoneA, yc - 0.5), zb + 0.05, top - 0.05, C.green, 0.45),
+    box(Math.max(zoneB, batFrom), yc - 0.5, zb + 0.05, top - 0.05, C.green, 0.45),
+    plate(s) ? box(bumpBottom(p), Math.min(y1, p.h / 2 - p.bump.y0), 0, top - 0.3, C.bump, 1) : '',
+    plate(s) ? t((X(Math.max(y0, bumpBottom(p))) + X(Math.min(y1, p.h / 2 - p.bump.y0))) / 2, Z(top / 2) + 4, 'camera, under the plate', 'middle') : '',
     box(n.magsafe.y - ringA - ringW / 2, n.magsafe.y - ringA + ringW / 2, zb, zb + B.magnetT, C.text, 0.8),
     box(n.magsafe.y + ringA - ringW / 2, n.magsafe.y + ringA + ringW / 2, zb, zb + B.magnetT, C.text, 0.8),
     stacked >= 0.8 ? box(Math.max(zoneA, yi0 + 0.5), Math.min(zoneB, yi1 - 0.5), zb + B.magnetT + 0.1, zb + B.magnetT + 0.1 + stacked, C.green, 0.45) : '',
@@ -244,7 +251,6 @@ export const LEGEND: { label: string; color: string; dashed: boolean }[] = [
   { label: 'Shield outline', color: C.accent, dashed: false },
   { label: 'Battery cells', color: C.green, dashed: false },
   { label: 'Magnet ring', color: C.dim, dashed: false },
-  { label: 'Qi2 coil: a sip from the phone when its cells run out', color: C.yellow, dashed: true },
   { label: 'Board and radios', color: C.blue, dashed: false },
   { label: 'Heat spreader: 25 µm graphite under the whole skin, into the titanium back', color: C.orange, dashed: false },
   { label: 'HaLow antenna window (no metal)', color: C.pink, dashed: true },

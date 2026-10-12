@@ -43,7 +43,7 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
         items={[
           { n: 0, unit: 'mm', label: 'Above the lenses: your iPhone gets no thicker' },
           { n: 4.7, dec: 1, unit: 'mm', label: 'On the back, level with the lens tops' },
-          { n: 6.5, dec: 1, unit: 'Wh', label: 'Its own battery, about 5 hours relaying' },
+          { n: 7.5, dec: 1, unit: 'Wh', label: 'Its own battery, about 6 hours relaying' },
           { n: 600, unit: 'm', label: 'Shield to shield, or 2 km to a rooftop node' },
         ]}
       >
@@ -90,19 +90,18 @@ import { PHONES, RESULTS, LEGEND, SHIELD, backView, sectionView } from '../lib/s
                 <h2>suñůlink.shield <small>on the {p.short}</small></h2>
                 <p class="line">
                   {p.id === 'iphone-18-pro'
-                    ? 'The back below the camera plateau, level with the lens tops, its top edge angled so no camera ever sees it.'
-                    : 'The whole back around the camera island, level with the lens tops, the camera in a well angled clear of every field of view.'}
+                    ? 'The whole back, a flat plate over the camera plateau level with the lens tops, with an opening for every lens, the flash and the sensors.'
+                    : 'The whole back, a flat plate over the camera island level with the lens tops, with an opening for every lens, the flash and the sensors.'}
                 </p>
                 <dl class="stats">
                   <div><dt>{r.wh} Wh</dt><dd>battery, {r.cm3} cm³ of cells</dd></div>
                   <div><dt>{r.t} mm</dt><dd>thick, {r.proud} mm above the lens tops</dd></div>
                   <div><dt>{r.tiG} g</dt><dd>in titanium</dd></div>
-                  <div><dt>about {r.wh.toFixed(0)} h</dt><dd>relaying on its own cells</dd></div>
+                  <div><dt>about {Math.round(r.wh * 0.85)} h</dt><dd>relaying on its own cells</dd></div>
                 </dl>
                 <p class="small">
                   Footprint {r.footprint[0]} × {r.footprint[1]} mm. Magnet ring {r.ring} mm. Charges over its USB-C from a wall
-                  charger or power bank. When its cells run out it takes a little from the phone through its Qi2 coil, where the
-                  phone supports it, or over a short USB-C cable.
+                  charger or power bank. When its cells run out it takes a little from the phone over a short USB-C cable.
                 </p>
                 <h3>Section through the magnet centre</h3>
                 <div class="section-draw" set:html={sectionView(p, SHIELD)} />

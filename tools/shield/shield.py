@@ -1,7 +1,8 @@
 """suñůlink.shield in Blender, shared by glb.py and render.py.
 
-The housing and its PC windows (Qi2 coil window, HaLow antenna band) are the CAD's wrap-xl for iPhone 18 Pro
-(khensu-specs/hardware/sunu/sunu.py, out/iphone-18-pro/wrap-xl/), copied into the site's 3d folder; the USB-C
+The housing and its PC windows (Qi2 coil window, HaLow antenna band) are the CAD's wrap for iPhone 18 Pro
+(khensu-specs/hardware/sunu/sunu.py, out/iphone-18-pro/wrap/): the whole back, a plate over the camera plateau with an
+opening per lens and sensor, level with the lens rings, copied into the site's 3d folder; the USB-C
 receptacle, the iPhone 18 Pro and the studio lights come from khensu-specs/hardware/sunu/photoreal.py. The repos
 sit side by side, so the CAD is found at ../khensu-specs. Millimetres, the phone's back at z = 0 facing +Z, +Y up.
 """
@@ -16,21 +17,21 @@ import bpy
 
 ROOT = Path(__file__).resolve().parents[2]
 SPECS = ROOT.parent / "khensu-specs/hardware/sunu"
-CAD = SPECS / "out/iphone-18-pro/wrap-xl"
+CAD = SPECS / "out/iphone-18-pro/wrap"
 D3 = ROOT / "sites/khensu-nu/public/khensu/shell/3d"
 sys.path.insert(0, str(SPECS))
 
 import photoreal as P  # noqa: E402
 
-def _wrap_xl():
+def _wrap():
     import json
 
     for phone in json.loads((SPECS / "out/summary.json").read_text())["phones"]:
         if phone["phone"]["name"] == "iphone-18-pro":
-            return next(s for s in phone["styles"] if s["style"] == "wrap-xl")
+            return next(s for s in phone["styles"] if s["style"] == "wrap")
 
 
-T = _wrap_xl()["thickness_mm"]  # off the phone's back: level with the lens rings, no bump above the camera
+T = _wrap()["thickness_mm"]  # off the phone's back: level with the lens rings, no bump above the camera
 YMIN = -74.58  # bottom edge of the shield's outline
 INLAY_C = (0.0, -5.0)  # the inlay sits at the centre of the Qi2 coil window, on the MagSafe axis
 INLAY_R = 10.6  # mm: the onyx rim's outer edge (53 of the mark's 60-unit radius on a 24 mm square)
@@ -54,7 +55,7 @@ def linear(hex_):
 
 
 def sync_cad():
-    """Copy the current wrap-xl housing and windows into the site's 3d folder."""
+    """Copy the current wrap housing and windows into the site's 3d folder."""
     for name in ("housing", "window_inserts"):
         shutil.copyfile(CAD / f"{name}.stl", D3 / f"{name}.stl")
 
