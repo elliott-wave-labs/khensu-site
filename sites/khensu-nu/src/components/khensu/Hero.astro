@@ -146,7 +146,7 @@ const H = heading;
   .title {
     font-size: clamp(3.4rem, 10vw, 8rem);
     font-weight: 600;
-    letter-spacing: 0;
+    letter-spacing: -0.05em;
     line-height: 0.95;
     margin: 0;
     background: var(--aura);
@@ -155,6 +155,9 @@ const H = heading;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+  .title :global(.tld) {
+    font-weight: 300;
   }
   .tag {
     font-size: clamp(1.1rem, 2.2vw, 1.6rem);

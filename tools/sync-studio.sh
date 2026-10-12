@@ -15,10 +15,10 @@ mkdir -p "$STUDIO/src/data" && cp "$K"/data/*.ts "$K"/data/*.json "$STUDIO/src/d
 for d in shell codec hero; do
   rsync -a --delete "$HERE/sites/khensu-nu/public/khensu/$d/" "$STUDIO/public/khensu/$d/"
 done
-# Fonts the studio's global.css (copied below) loads: Dosis for titles, ñü.Føňt and ñü.Føňt Mono for the wordmarks.
-mkdir -p "$STUDIO/public/fonts/nufont" "$STUDIO/public/fonts/dosis"
+# ñü.Føňt and ñü.Føňt Mono: the studio's global.css (copied below) loads both variable WOFF2s for the wordmarks.
+mkdir -p "$STUDIO/public/fonts/nufont"
 cp "$HERE/sites/khensu-nu/public/fonts/nufont/nuFont-Variable.woff2" "$HERE/sites/khensu-nu/public/fonts/nufont/nuFontMono-Variable.woff2" "$STUDIO/public/fonts/nufont/"
-cp "$HERE/sites/khensu-nu/public/fonts/dosis/"* "$STUDIO/public/fonts/dosis/"
+rm -rf "$STUDIO/public/fonts/dosis"
 sed 's/--accent: #18e0c8;/--accent: #f59e0b;/' "$K/styles/global.css" > "$STUDIO/src/styles/global.css"
 cp "$HERE/studio/pages/index.astro" "$STUDIO/src/pages/index.astro"
 python3 - "$K/pages/index.astro" "$STUDIO/src/pages/khensu.astro" <<'PY'

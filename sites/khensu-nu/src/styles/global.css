@@ -1,12 +1,6 @@
-/* Dosis (SIL OFL, /fonts/dosis/OFL.txt) sets the titles while ñü.Føňt is redrawn on its proportions. */
-@font-face {
-  font-family: 'Dosis';
-  src: url('/fonts/dosis/Dosis-Variable.woff2') format('woff2');
-  font-weight: 200 800;
-  font-display: swap;
-}
 /* ñü.Føňt: one variable file carries six weights and the italic (wght 100–900, slnt 0 to -11). tools/font/build.sh.
-   Loaded for its own page and the wordmarks only, until the redraw. */
+   Loaded for its own page, the wordmarks and the link-preview cards; the sites set their type in the sans until
+   the redraw lands. */
 @font-face {
   font-family: 'nu Font';
   src: url('/fonts/nufont/nuFont-Variable.woff2') format('woff2');
@@ -40,10 +34,9 @@
   --khensu-soft: color-mix(in srgb, var(--khensu) 10%, transparent);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans Hebrew', 'Noto Sans Devanagari', 'Noto Sans Thai', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans', sans-serif;
-  /* Titles (h1–h3, the hero title, the wordmark) are set in Dosis for now; ñü.Føňt (code: nu Font) is being
-     redrawn on Dosis proportions with the house stem rule and takes the titles back when it lands. Navigation,
-     buttons, labels and running text stay on the sans; code on JetBrains Mono. */
-  --font-title: 'Dosis', var(--font-sans);
+  /* Every display role (headings, the name, navigation, buttons, labels) is on the sans; ñü.Føňt (code: nu Font)
+     is being redrawn on cleaner, more condensed proportions with the house stem rule and comes back here when
+     Elliott signs it off. Code is on JetBrains Mono. */
   --font-display: var(--font-sans);
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
@@ -107,10 +100,10 @@ a:hover {
 h1,
 h2,
 h3 {
-  font-family: var(--font-title);
+  font-family: var(--font-display);
   font-weight: var(--heading-weight, 300);
   line-height: 1.06;
-  letter-spacing: 0;
+  letter-spacing: -0.03em;
   margin: 0 0 0.5em;
   text-wrap: balance;
 }
@@ -556,17 +549,12 @@ h2:hover > .sec-link,
   font-family: var(--font-display);
 }
 
-/* The name as text (Name.astro): khėnsu in the title face, with the dot on the e drawn by CSS so it can pulse and
-   phase through the aura on its own. The dot's place and size are tuned to Dosis (x-height 0.472 em, the ė dot
-   centred 0.663 em up); --edot-top and --edot-size move it for another face. */
+/* The name as text (Name.astro): khėnsu in the display face, with the dot on the e drawn by CSS so it can pulse and
+   phase through the aura on its own. The dot's place and size are tuned to Inter (its dot accent is centred
+   0.69 em up and 0.14 em wide at 600); --edot-top and --edot-size move it for another face. */
 .k-name {
-  font-family: var(--font-title);
-  font-weight: 600;
-  letter-spacing: 0;
+  font-family: var(--font-display);
   white-space: nowrap;
-}
-.k-name .tld {
-  font-weight: 300;
 }
 .k-name .edot {
   position: relative;
@@ -578,10 +566,10 @@ h2:hover > .sec-link,
   content: '';
   position: absolute;
   left: 50%;
-  top: var(--edot-top, 0.175em);
-  width: var(--edot-size, 0.115em);
-  height: var(--edot-size, 0.115em);
-  margin-left: calc(var(--edot-size, 0.115em) / -2);
+  top: var(--edot-top, 0.11em);
+  width: var(--edot-size, 0.125em);
+  height: var(--edot-size, 0.125em);
+  margin-left: calc(var(--edot-size, 0.125em) / -2);
   border-radius: 50%;
   background: var(--aura-green);
   animation: edot-pulse 2.8s ease-in-out infinite, edot-aura 9s linear infinite;
