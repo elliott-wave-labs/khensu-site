@@ -8,7 +8,7 @@ import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '../styles/global.css';
-import NuMark from '../components/khensu/NuMark.astro';
+import Name from '../components/khensu/Name.astro';
 import Net from '../components/khensu/Net.astro';
 
 interface Props {
@@ -42,8 +42,8 @@ const nav = [
   { href: '/bi', label: 'ñũ.Bî' },
   { href: '/shield', label: 'suñůlink.shield' },
   { href: '/network', label: 'ñü.ñetwork' },
-  { href: '/compliance', label: 'Compliance' },
-  { href: '/security', label: 'Security' },
+  { href: '/compliance', label: 'Compliance', minor: true },
+  { href: '/security', label: 'Security', minor: true },
   { href: '/webe#run-a-node-section', label: 'Run a node' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -120,12 +120,12 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       <div class="wrap bar">
         <a href="/" class="brand" aria-label="khėnsu.ñü, home">
           <img class="seal" src="/seal-128.webp" alt="" width="26" height="26" />
-          <span><NuMark name="khensu" /></span>
+          <span><Name /></span>
         </a>
         <nav aria-label="Primary">
           <ul>
             {nav.map((n) => (
-              <li>
+              <li class:list={[n.minor && 'minor']}>
                 <a href={n.href} aria-current={path === n.href ? 'page' : undefined}>{n.label}</a>
               </li>
             ))}
@@ -157,7 +157,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <footer class="site-footer">
       <div class="wrap foot">
         <div>
-          <p class="foot-brand"><NuMark name="khensu" /></p>
+          <p class="foot-brand"><Name /></p>
           <p class="foot-tag">The first app on webe. From <a href="https://elliottwave.studio">elliottwave.studio lab</a>.</p>
         </div>
         <ul class="foot-links">
@@ -232,17 +232,14 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     align-items: center;
     gap: 0.6rem;
     text-decoration: none;
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    font-weight: 500;
-    letter-spacing: -0.03em;
+    font-size: 1.3rem;
   }
   .brand:hover {
     color: var(--text);
   }
   nav ul {
     display: flex;
-    gap: clamp(0.75rem, 1.6vw, 1.6rem);
+    gap: clamp(0.7rem, 1.25vw, 1.25rem);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -252,9 +249,17 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   nav ul::-webkit-scrollbar {
     display: none;
   }
+  @media (max-width: 1439px) {
+    nav li.minor {
+      display: none;
+    }
+  }
+  /* The nav is the list of names, so it takes the title face: bigger, and narrow enough that every name shows. */
   nav a {
-    font-size: 0.86rem;
-    letter-spacing: -0.005em;
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.005em;
     text-decoration: none;
     color: var(--text-dim);
   }
@@ -281,10 +286,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     gap: 2rem;
   }
   .foot-brand {
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    font-weight: 500;
-    letter-spacing: -0.03em;
+    font-size: 1.5rem;
     margin: 0 0 0.25rem;
   }
   .foot-tag {

@@ -101,6 +101,7 @@ const CHAKRA_ORDER = ['root', 'sacral', 'solar', 'heart', 'throat', 'eye', 'crow
 const ORIG_SPEC = 'AAC-LC · stereo · 44.1 kHz · 9.6 MB · 6:40';
 const MAX_R = 4; // metres to the edge of the orb
 const MAX_CLONES = 12;
+const FADE_S = 2; // a cloned or removed sound fades in or out over this long, so there is no tick
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 /** ñü.ÊQ, on top of the clean instruments. "Match original" is tuned by ear to the 2008 file's room, with no extra bounces. */
@@ -198,6 +199,7 @@ type Obj = {
   panner?: PannerNode;
   meter?: AnalyserNode;
   out?: GainNode; // synth sounds feed this
+  fade?: GainNode; // stems and clones pass through this; clone and remove ramp it over FADE_S so nothing clicks
   src?: AudioBufferSourceNode;
   timer?: number;
   clone: boolean;
@@ -333,8 +335,9 @@ if (root) {
         src.connect(lp).connect(soft);
         into = soft;
       }
-      into.connect(o.panner).connect(bus);
-      into.connect(o.meter);
+      o.fade = ctx.createGain();
+      into.connect(o.fade).connect(o.panner).connect(bus);
+      o.fade.connect(o.meter);
     } else {
       o.out = ctx.createGain();
       o.out.connect(o.panner);
@@ -604,23 +607,50 @@ if (root) {
     });
   };
 
-  const dropObj = (o: Obj) => {
+  /** Ramps a sound's level to `to` over FADE_S from wherever it is now. Returns the time the ramp lands. */
+  const rampTo = (g: GainNode | undefined, to: number) => {
+    if (!ctx || !g) return 0;
+    const t = ctx.currentTime;
+    g.gain.cancelScheduledValues(t);
+    g.gain.setValueAtTime(g.gain.value, t);
+    g.gain.linearRampToValueAtTime(to, t + FADE_S);
+    return t + FADE_S;
+  };
+
+  /** Silences a sound (stem, clone or synth) with a FADE_S fade, then runs `done` to stop and unwire it. */
+  const fadeOut = (o: Obj, done: () => void) => {
+    const g = o.kind === 'stem' ? o.fade : o.out;
+    const live = ctx && g && (o.kind === 'stem' ? !o.el?.paused : o.src || o.kind === 'fork');
+    if (!live) return done();
+    rampTo(g, 0);
+    window.setTimeout(done, FADE_S * 1000 + 60);
+  };
+
+  const unwire = (o: Obj) => {
     stopSynth(o);
     o.el?.pause();
     o.panner?.disconnect();
     o.out?.disconnect();
-    o.bubble.remove();
-    objs.splice(objs.indexOf(o), 1);
+    o.fade?.disconnect();
     if (o.clone && o.el) o.el.remove();
+  };
+
+  const dropObj = (o: Obj, fade = false) => {
+    o.bubble.remove();
+    if (objs.includes(o)) objs.splice(objs.indexOf(o), 1);
+    if (fade) fadeOut(o, () => unwire(o));
+    else unwire(o);
   };
 
   const removeObj = (o: Obj) => {
     if (!canRemove() || o.gone) return;
     if (!o.clone && o.kind === 'stem') {
       o.gone = true;
-      o.el?.pause();
       o.bubble.hidden = true;
-    } else dropObj(o);
+      fadeOut(o, () => {
+        if (o.gone) o.el?.pause();
+      });
+    } else dropObj(o, true);
     const next = shown()[0];
     if (next) select(next);
   };
@@ -634,7 +664,13 @@ if (root) {
       const n = objs.filter((x) => x.kind === s.kind).length;
       const base = s.label.replace(/ \d+$/, '');
       const o = addSynth(s.kind, `${base} ${n + 1}`, s.hz, offset, true);
-      if (playing) trigger(o);
+      if (playing) {
+        if (o.out && o.kind !== 'fork') {
+          o.out.gain.value = 0;
+          rampTo(o.out, 1);
+        }
+        void trigger(o);
+      }
       return;
     }
     const src = s.el!;
@@ -646,7 +682,7 @@ if (root) {
     const n = objs.filter((x) => x.stem === s.stem).length;
     const base = objs.find((x) => x.stem === s.stem && !x.clone)!.label;
     const made = makeNode(`${base} ${n + 1}`);
-    addObj({
+    const o = addObj({
       key: `${s.stem}-${++serial}`,
       kind: 'stem',
       stem: s.stem,
@@ -660,6 +696,12 @@ if (root) {
     el.currentTime = orig.currentTime;
     if (!orig.paused) {
       graph();
+      if (!o.fade) wire(o);
+      // Joins mid-song, so it comes up from silence instead of landing with a tick.
+      if (o.fade) {
+        o.fade.gain.value = 0;
+        rampTo(o.fade, 1);
+      }
       el.play().catch(() => {});
     }
   };
@@ -722,6 +764,10 @@ if (root) {
     for (const o of objs) if (o.kind === 'stem') {
       o.gone = false;
       o.bubble.hidden = id !== 'attempt';
+      if (ctx && o.fade) {
+        o.fade.gain.cancelScheduledValues(ctx.currentTime);
+        o.fade.gain.setValueAtTime(1, ctx.currentTime);
+      }
     }
     trackId = id;
     const menu = root.querySelector<HTMLElement>('[data-chakra-menu]');

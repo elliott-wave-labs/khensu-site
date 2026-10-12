@@ -110,7 +110,7 @@ const abilities = [
                 </button>
               </div>
               <div class="sp-mode" data-song-modes role="group" aria-label="What to play">
-                <button type="button" data-mode="orig" aria-pressed="false">Original 2008</button>
+                <button type="button" data-mode="orig" aria-pressed="false">original</button>
                 <button type="button" data-mode="wave" aria-pressed="true">ñü.ŵævẽš</button>
               </div>
             </div>
@@ -954,10 +954,12 @@ const abilities = [
     margin: 0 0 0.8rem;
   }
   .sp-mode button {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
     white-space: nowrap;
-    padding-inline: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-inline: 0.6rem;
   }
   @media (max-width: 560px) {
     .sp-mode button {
@@ -1571,7 +1573,7 @@ const abilities = [
   }
   .sp-auto h2 {
     font-size: clamp(2rem, 5vw, 3.6rem);
-    letter-spacing: -0.03em;
+    letter-spacing: 0;
     line-height: 1.05;
     max-width: 48rem;
     margin: 0.4rem auto 1rem;

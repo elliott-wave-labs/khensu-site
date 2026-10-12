@@ -1,4 +1,12 @@
-/* ñü.Føňt: one variable file carries six weights and the italic (wght 100–900, slnt 0 to -11). tools/font/build.sh */
+/* Dosis (SIL OFL, /fonts/dosis/OFL.txt) sets the titles while ñü.Føňt is redrawn on its proportions. */
+@font-face {
+  font-family: 'Dosis';
+  src: url('/fonts/dosis/Dosis-Variable.woff2') format('woff2');
+  font-weight: 200 800;
+  font-display: swap;
+}
+/* ñü.Føňt: one variable file carries six weights and the italic (wght 100–900, slnt 0 to -11). tools/font/build.sh.
+   Loaded for its own page and the wordmarks only, until the redraw. */
 @font-face {
   font-family: 'nu Font';
   src: url('/fonts/nufont/nuFont-Variable.woff2') format('woff2');
@@ -6,7 +14,7 @@
   font-style: oblique 0deg 11deg;
   font-display: swap;
 }
-/* ñü.Føňt Mono: the same letters fitted to a 0.6 em cell, for code, commands, terminals and figures. */
+/* ñü.Føňt Mono: the same letters fitted to a 0.6 em cell. */
 @font-face {
   font-family: 'nu Font Mono';
   src: url('/fonts/nufont/nuFontMono-Variable.woff2') format('woff2');
@@ -32,10 +40,12 @@
   --khensu-soft: color-mix(in srgb, var(--khensu) 10%, transparent);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans Hebrew', 'Noto Sans Devanagari', 'Noto Sans Thai', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans', sans-serif;
-  /* ñü.Føňt (code: nu Font) sets every display role: headings, the wordmark, navigation, buttons and labels.
-     Running text stays on the sans until the font has kerning and hinting; switch it by setting --font-sans. */
-  --font-display: 'nu Font', var(--font-sans);
-  --font-mono: 'nu Font Mono', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* Titles (h1–h3, the hero title, the wordmark) are set in Dosis for now; ñü.Føňt (code: nu Font) is being
+     redrawn on Dosis proportions with the house stem rule and takes the titles back when it lands. Navigation,
+     buttons, labels and running text stay on the sans; code on JetBrains Mono. */
+  --font-title: 'Dosis', var(--font-sans);
+  --font-display: var(--font-sans);
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --measure: 64ch;
   --wrap: 1180px;
@@ -97,10 +107,10 @@ a:hover {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display);
+  font-family: var(--font-title);
   font-weight: var(--heading-weight, 300);
   line-height: 1.06;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   margin: 0 0 0.5em;
   text-wrap: balance;
 }
@@ -544,6 +554,50 @@ h2:hover > .sec-link,
 .pbar b,
 .stat-strip b {
   font-family: var(--font-display);
+}
+
+/* The name as text (Name.astro): khėnsu in the title face, with the dot on the e drawn by CSS so it can pulse and
+   phase through the aura on its own. The dot's place and size are tuned to Dosis (x-height 0.472 em, the ė dot
+   centred 0.663 em up); --edot-top and --edot-size move it for another face. */
+.k-name {
+  font-family: var(--font-title);
+  font-weight: 600;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.k-name .tld {
+  font-weight: 300;
+}
+.k-name .edot {
+  position: relative;
+  display: inline-block;
+  font-style: normal;
+  line-height: 1;
+}
+.k-name .edot::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: var(--edot-top, 0.175em);
+  width: var(--edot-size, 0.115em);
+  height: var(--edot-size, 0.115em);
+  margin-left: calc(var(--edot-size, 0.115em) / -2);
+  border-radius: 50%;
+  background: var(--aura-green);
+  animation: edot-pulse 2.8s ease-in-out infinite, edot-aura 9s linear infinite;
+}
+@keyframes edot-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 transparent; }
+  50% { transform: scale(1.28); box-shadow: 0 0 0.35em currentColor; }
+}
+@keyframes edot-aura {
+  0% { background-color: var(--aura-green); color: var(--aura-green); }
+  33% { background-color: var(--aura-blue); color: var(--aura-blue); }
+  66% { background-color: var(--aura-purple); color: var(--aura-purple); }
+  100% { background-color: var(--aura-green); color: var(--aura-green); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .k-name .edot::after { animation: none; background: var(--accent); }
 }
 
 /* ñü.Føňt wordmarks (NuMark.astro): inline SVG, one path per stroke. Letters inherit the text colour or take the

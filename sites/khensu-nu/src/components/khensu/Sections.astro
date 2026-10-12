@@ -15,7 +15,6 @@ import RingCode from './RingCode.astro';
 import Economics from './Economics.astro';
 import PerAnkh from './PerAnkh.astro';
 import StatStrip from './StatStrip.astro';
-import NuMark from './NuMark.astro';
 
 const highlights = [
   { icon: 'lock', href: '/security#security-protections', go: 'How the encryption works', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
@@ -150,7 +149,7 @@ const { show } = Astro.props as { show: Key[] };
       <Net />
       <div class="wrap">
         <p class="eyebrow">The new internet</p>
-        <h2 id="webe-title" class="webe-name"><NuMark name="webe" aura pulse /></h2>
+        <h2 id="webe-title" class="webe-name"><span class="name-case">webË</span></h2>
         <p class="webe-sub">A new internet, alongside the one you use.</p>
         <StatStrip
           items={[
@@ -814,11 +813,15 @@ const { show } = Astro.props as { show: Key[] };
     margin: calc(0.2rem - 0.25em) 0 0;
     padding-top: 0.25em;
     font-size: clamp(4.5rem, 13vw, 10rem);
+    font-weight: 600;
     line-height: 0.95;
-  }
-  .webe-name :global(svg) {
-    height: 1.1em;
-    max-width: 92vw;
+    letter-spacing: 0;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .webe-sub {
     margin: 0.8rem 0 0;
