@@ -136,39 +136,36 @@ const abilities = [
           </div>
           <p class="sp-picked" data-picked>Picked for this song: a club, the room a 2008 demo like this was made for.</p>
           <div class="sp-ring" data-ring>
-            <svg viewBox="0 0 400 400" aria-hidden="true">
-              <defs>
-                <radialGradient id="sp-floor">
-                  <stop offset="0" stop-color="#4fb0ff" stop-opacity="0.16" />
-                  <stop offset="0.7" stop-color="#8b5cff" stop-opacity="0.06" />
-                  <stop offset="1" stop-color="#000" stop-opacity="0" />
-                </radialGradient>
-              </defs>
-              <circle cx="200" cy="200" r="190" fill="url(#sp-floor)" />
-              <circle class="ring" cx="200" cy="200" r="190" />
-              <circle class="ring std" cx="200" cy="200" r="95" />
-              <circle class="ring in" cx="200" cy="200" r="47.5" />
-              <text class="ring-k" x="200" y="248">1 m</text>
-              <text class="ring-k" x="200" y="306">2 m</text>
-              <text class="ring-k" x="200" y="402">4 m</text>
-              <text class="ring-k ahead" x="200" y="-8">ahead</text>
-              <g class="head" transform="translate(200 200)">
-                <ellipse rx="15" ry="18" />
-                <path d="M-5 -17 0 -25 5 -17" />
-                <rect x="-20" y="-6" width="6" height="12" rx="3" />
-                <rect x="14" y="-6" width="6" height="12" rx="3" />
-              </g>
-            </svg>
+            <canvas data-orb aria-hidden="true"></canvas>
+            <span class="sp-dir" data-dir="ahead">ahead</span>
+            <span class="sp-dir" data-dir="behind">behind</span>
+            <span class="sp-dir" data-dir="above">above</span>
+            <span class="sp-dir" data-dir="below">below</span>
             {instruments.map((i) => (
-              <button type="button" class="sp-node" data-node={i.id} data-label={i.label} aria-pressed="false">
+              <button type="button" class="sp-node" data-node={i.id} data-label={i.label} data-kind="stem" aria-pressed="false">
                 <i aria-hidden="true"></i>
                 <span>{i.label}</span>
               </button>
             ))}
+            <template data-node-template>
+              <button type="button" class="sp-node" aria-pressed="false"><i aria-hidden="true"></i><span></span></button>
+            </template>
           </div>
+          <div class="sp-extras" role="group" aria-label="Add sounds to the orb">
+            <button type="button" data-extra="creak" aria-pressed="false">Stair creak</button>
+            <button type="button" data-extra="fork" aria-pressed="false">Third-eye tuning fork</button>
+            <button type="button" data-clone>Clone</button>
+            <button type="button" data-remove hidden>Remove</button>
+          </div>
+          <p class="sp-orb-note">
+            Every sound has its own height, above or below your ears as well as all the way round. Add the stair creak:
+            it plays behind you to the left, about 2 m (6–7 ft) above your head, like someone on the stairs at your back.
+            The third-eye tuning fork rings at 221.23 Hz just in front of your forehead; drag it anywhere in the orb, or
+            clone it and spread the copies around you. Both are made in your browser as you listen.
+          </p>
           <div class="sp-height">
             <label for="sp-height">Height</label>
-            <input id="sp-height" type="range" min="-1.5" max="3" step="0.1" value="0" data-height />
+            <input id="sp-height" type="range" min="-3" max="3" step="0.1" value="0" data-height />
             <output for="sp-height" data-height-out>Drums · +0.0 m</output>
           </div>
           <fieldset class="sp-fx" data-fx>
@@ -187,8 +184,9 @@ const abilities = [
             </p>
           </fieldset>
           <figcaption>
-            Drag an instrument round the ring to move it, towards you or away up to 4 m, and set its height below. With a
-            keyboard, use the arrow keys, and Page Up and Page Down for height. Each glows with its own level.
+            Drag a sound to move it anywhere in the orb, up to 4 m away, above or below you; drag the orb itself to look
+            around it. The height slider sets the selected sound’s height. With a keyboard, use the arrow keys, and Page
+            Up and Page Down for height. Each sound sends its own waves across the orb as it plays.
           </figcaption>
         </figure>
       </div>
@@ -776,48 +774,67 @@ const abilities = [
     margin: 1.6rem auto 0;
     touch-action: none;
   }
-  .sp-ring svg {
+  .sp-ring canvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    overflow: visible;
+    cursor: grab;
   }
   [data-mode='orig'] .sp-ring {
     opacity: 0.45;
     filter: saturate(0.3);
     transition: opacity 0.3s, filter 0.3s;
   }
-  .ring {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.14);
-    stroke-dasharray: 2 5;
-  }
-  .ring.std {
-    stroke: rgba(79, 176, 255, 0.4);
-    stroke-dasharray: none;
-  }
-  .ring.in {
-    stroke: rgba(255, 255, 255, 0.07);
-  }
-  .ring-k {
-    fill: rgba(255, 255, 255, 0.4);
-    font: 500 9px var(--font-mono);
-    text-anchor: middle;
-  }
-  .ring-k.ahead {
-    fill: rgba(255, 255, 255, 0.6);
+  .sp-dir {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    font: 500 0.62rem var(--font-mono);
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+  }
+  .sp-extras {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.45rem;
+    margin: 1rem auto 0;
+  }
+  .sp-extras button {
+    padding: 0.42rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    font: 500 0.8rem inherit;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .sp-extras button[aria-pressed='true'] {
+    background: #fff;
+    color: #000;
+  }
+  .sp-orb-note {
+    max-width: 30rem;
+    margin: 0.8rem auto 0;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
   }
   .sp-node {
-    --z: 0;
+    --near: 0.5;
     --lvl: 0;
-    --s: calc(1.5rem + var(--z) * 0.22rem);
+    --s: calc(1rem + var(--near) * 0.9rem);
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: 0;
+    top: 0;
     transform: translate(-50%, calc(var(--s) / -2));
+    opacity: calc(0.55 + var(--near) * 0.45);
     display: grid;
     justify-items: center;
     gap: 0.3rem;
@@ -845,7 +862,7 @@ const abilities = [
     background: radial-gradient(circle at 35% 30%, #fff, #6dffbf 30%, #4fb0ff 65%, #8b5cff);
     box-shadow:
       0 0 calc(6px + var(--lvl) * 30px) calc(var(--lvl) * 8px) rgba(79, 176, 255, calc(0.35 + var(--lvl) * 0.5)),
-      0 calc(4px + var(--z) * 4px) calc(8px + var(--z) * 4px) rgba(0, 0, 0, 0.5);
+      0 4px 10px rgba(0, 0, 0, 0.5);
     transform: scale(calc(1 + var(--lvl) * 0.25));
     transition: transform 0.08s linear;
   }
