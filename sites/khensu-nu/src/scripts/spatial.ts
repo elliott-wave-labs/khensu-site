@@ -829,7 +829,10 @@ if (root) {
     play.dataset.state = st;
     play.setAttribute('aria-label', { play: 'Play', pause: 'Pause', replay: 'Play again' }[st]);
     showLabel();
+    // refreshIdle is defined with the pointer handlers below; call through a stub until then.
+    idleHook?.();
   };
+  let idleHook: (() => void) | null = null;
 
   let dragging = false;
   let lastSync = 0;
@@ -1089,6 +1092,21 @@ if (root) {
   // Drag a sound anywhere in the orb; drag the orb itself to look around.
   let held: Obj | null = null;
   let orbiting: { x: number; y: number } | null = null;
+  // Drag / tap / swipe cues on the bubble while nothing is playing and the hand is free.
+  let idleTimer = 0;
+  const refreshIdle = () => {
+    clearTimeout(idleTimer);
+    const live = trackId === 'attempt' ? !orig.paused : playing;
+    const busy = live || held != null || orbiting != null || reduce.matches;
+    if (busy) {
+      ring.dataset.idle = '0';
+      return;
+    }
+    idleTimer = window.setTimeout(() => {
+      ring.dataset.idle = '1';
+    }, 700);
+  };
+  idleHook = refreshIdle;
   addEventListener('pointermove', (e) => {
     if (held && orb) {
       held.pos = orb.drag(e.clientX, e.clientY, held.pos);
@@ -1104,12 +1122,14 @@ if (root) {
     held?.node.classList.remove('drag');
     held = null;
     orbiting = null;
+    refreshIdle();
   };
   addEventListener('pointerup', release);
   addEventListener('pointercancel', release);
   canvas.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     orbiting = { x: e.clientX, y: e.clientY };
+    refreshIdle();
   });
 
   function bind(o: Obj) {
@@ -1118,6 +1138,7 @@ if (root) {
       select(o);
       held = o;
       o.node.classList.add('drag');
+      refreshIdle();
     });
     o.node.addEventListener('keydown', (e) => {
       const p = o.pos;
@@ -1178,5 +1199,6 @@ if (root) {
   paintCard();
   fxText();
   state();
+  refreshIdle();
   requestAnimationFrame(frame);
 }
