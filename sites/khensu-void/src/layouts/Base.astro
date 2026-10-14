@@ -1,0 +1,122 @@
+---
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '../../../khensu-nu/src/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = 'ñü.vœîð', description = '64 KiB chunks, one key each, eight copies. A wrong key opens nothing.' } = Astro.props;
+const fullTitle = `${title} — void.khensu.nu`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const nav = [
+  { href: '/#feet-section', label: '64 KiB' },
+  { href: '/#security-section', label: 'Security' },
+  { href: '/#bench-section', label: 'Benchmarks' },
+  { href: '/#protocol-section', label: 'Format' },
+  { href: 'https://webe.khensu.nu', label: 'webË' },
+  { href: 'https://khensu.nu/', label: 'khensu.ñü' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#0A0B0D" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ñü.vœîð" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content="https://khensu.nu/og/void.jpg" />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a href="/" class="brand" aria-label="ñü.vœîð, home">
+          <img class="seal" src="/seal-128.webp" alt="" width="26" height="26" />
+          <span>ñü.vœîð</span>
+        </a>
+        <nav aria-label="Primary">
+          <ul>
+            {nav.map((n) => (
+              <li><a href={n.href}>{n.label}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap foot">
+        <div>
+          <p class="foot-brand">ñü.vœîð</p>
+          <p class="foot-tag">Stealth storage on <a href="https://khensu.nu">khensu.ñü</a>. From <a href="https://elliottwave.studio">elliottwave.studio lab</a>.</p>
+        </div>
+        <ul class="foot-links">
+          <li><a href="/#feet-section">64 KiB chunks</a></li>
+          <li><a href="/#security-section">Security</a></li>
+          <li><a href="/#bench-section">Benchmarks</a></li>
+          <li><a href="/#protocol-section">Format</a></li>
+          <li><a href="/#patents-section">Patents</a></li>
+          <li><a href="https://webe.khensu.nu">webË</a></li>
+        </ul>
+      </div>
+      <div class="wrap legal">
+        <p>© 2026 Elliott Wave LLC. All rights reserved. khensu.ñü™ and elliottwave.studio lab™ are trademarks of Elliott Wave LLC.</p>
+        <p>Elliott Wave LLC, founded and solely owned by Elliott, owns all intellectual property in its projects, the open-source projects included.</p>
+      </div>
+    </footer>
+    <script>
+      import '../../../khensu-nu/src/scripts/section-links.ts';
+      import '../../../_shared/aura-buttons.ts';
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { left: 1rem; top: 1rem; z-index: 10; background: var(--accent); color: var(--bg); padding: 0.5rem 1rem; border-radius: 6px; }
+  .site-header {
+    position: sticky; top: 0; z-index: 5;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 1rem; }
+  .brand { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; font-size: 1.15rem; font-weight: 500; letter-spacing: -0.03em; }
+  .seal { width: 26px; height: 26px; }
+  nav ul { display: flex; gap: clamp(0.9rem, 2.5vw, 2rem); list-style: none; margin: 0; padding: 0; }
+  nav a { font-size: 0.9rem; text-decoration: none; color: var(--text-dim); white-space: nowrap; }
+  .site-footer { border-top: 1px solid var(--line); padding: 3.5rem 0 2.5rem; margin-top: 2rem; }
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; }
+  .foot-brand { font-size: 1.3rem; font-weight: 500; letter-spacing: -0.03em; margin: 0 0 0.25rem; }
+  .foot-tag { color: var(--text-dim); font-size: 0.9rem; }
+  .foot-links { display: grid; grid-template-columns: repeat(3, auto); gap: 0.5rem 2rem; list-style: none; padding: 0; margin: 0; font-size: 0.9rem; }
+  .foot-links a { color: var(--text-dim); text-decoration: none; }
+  .legal { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .legal p { font-size: 0.8rem; color: var(--text-faint); max-width: none; margin: 0; }
+  .legal p + p { margin-top: 0.4rem; }
+  @media (max-width: 720px) {
+    nav ul { overflow-x: auto; scrollbar-width: none; }
+  }
+</style>

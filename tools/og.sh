@@ -8,6 +8,7 @@ out="${TMPDIR:-/tmp}/khensu-og"
 port=8765
 chrome="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 rm -rf "$out"
+mkdir -p "$out"
 (cd "$site" && ./node_modules/.bin/astro build --outDir "$out/dist" >"$out.log" 2>&1)
 (cd "$out/dist" && python3 -m http.server "$port" >/dev/null 2>&1) &
 server=$!
@@ -29,14 +30,13 @@ shot() {
 }
 for dir in "$out"/dist/og/*/; do
   slug="$(basename "$dir")"
-  [ "$slug" = overlay ] && continue
+  case "$slug" in overlay) continue ;; esac
   shot 1200,630 "$slug" "$out/$slug.png"
   sips -s format jpeg -s formatOptions 88 "$out/$slug.png" --out "$site/public/og/$slug.jpg" >/dev/null
   echo "wrote public/og/$slug.jpg"
 done
 cp "$out/home.png" "$site/public/og.png"
-# Square cards for Instagram link pages and posts, plus the thumbnail card (phone and a few big words, for the tiny
-# image next to a link). Home, buy, bi and thumb also go to the Desktop as PNG and best-quality JPEG.
+# Square cards for Instagram link pages and posts, plus the thumbnail card.
 insta="$HOME/Desktop/khensu-instagram"
 mkdir -p "$insta"
 for slug in home buy shield bi thumb; do
@@ -52,11 +52,10 @@ desk home khensu-nu-square
 desk buy khensu-nu-buy-square
 desk bi khensu-bi-square
 desk thumb khensu-nu-link-thumb
-# Small copies of the thumbnail, the sizes a link preview actually shows it at.
 for px in 128 256 512; do
   sips -Z "$px" "$out/thumb-square.png" --out "$insta/khensu-nu-link-thumb-$px.png" >/dev/null
 done
-# The words alone, on a transparent page, for the animated versions (tools/og-anim.sh).
+# Word overlays: square (anim squares) and wide (iMessage landscape).
 for slug in home buy thumb; do
   for try in 1 2 3; do
     rm -f "$out/$slug-overlay.png"
@@ -66,5 +65,13 @@ for slug in home buy thumb; do
     [ -s "$out/$slug-overlay.png" ] && break
     sleep 1
   done
+  for try in 1 2 3; do
+    rm -f "$out/$slug-overlay-wide.png"
+    "$chrome" --headless=new --hide-scrollbars --force-device-scale-factor=1 --default-background-color=00000000 \
+      --use-angle=swiftshader --enable-unsafe-swiftshader --window-size=1200,630 --virtual-time-budget=6000 \
+      --screenshot="$out/$slug-overlay-wide.png" "http://localhost:$port/og/overlay/$slug/" >/dev/null 2>&1 || true
+    [ -s "$out/$slug-overlay-wide.png" ] && break
+    sleep 1
+  done
 done
-echo "overlays in $out; run tools/og-anim.sh for the animated squares"
+echo "overlays in $out; run tools/og-anim.sh for the animated cards"

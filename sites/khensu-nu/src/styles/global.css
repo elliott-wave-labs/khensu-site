@@ -1,22 +1,3 @@
-/* ñü.Føňt: one variable file carries six weights and the italic (wght 100–900, slnt 0 to -11). tools/font/build.sh.
-   Loaded for its own page, the wordmarks and the link-preview cards; the sites set their type in the sans until
-   the redraw lands. */
-@font-face {
-  font-family: 'nu Font';
-  src: url('/fonts/nufont/nuFont-Variable.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: oblique 0deg 11deg;
-  font-display: swap;
-}
-/* ñü.Føňt Mono: the same letters fitted to a 0.6 em cell. */
-@font-face {
-  font-family: 'nu Font Mono';
-  src: url('/fonts/nufont/nuFontMono-Variable.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: oblique 0deg 11deg;
-  font-display: swap;
-}
-
 :root {
   --bg: #0a0b0d;
   --bg-raised: #111317;
@@ -34,9 +15,7 @@
   --khensu-soft: color-mix(in srgb, var(--khensu) 10%, transparent);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans Hebrew', 'Noto Sans Devanagari', 'Noto Sans Thai', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans', sans-serif;
-  /* Every display role (headings, the name, navigation, buttons, labels) is on the sans; ñü.Føňt (code: nu Font)
-     is being redrawn on cleaner, more condensed proportions with the house stem rule and comes back here when
-     Elliott signs it off. Code is on JetBrains Mono. */
+  /* Headings, the name, navigation, buttons and labels use the sans; code uses JetBrains Mono. */
   --font-display: var(--font-sans);
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
@@ -539,7 +518,7 @@ h2:hover > .sec-link,
   .aura-fill, .aura-text { animation: none; }
 }
 
-/* Display roles beyond the headings take ñü.Føňt too. */
+/* Display roles beyond the headings use the same face. */
 .btn,
 .pill,
 .chips a,
@@ -586,75 +565,6 @@ h2:hover > .sec-link,
 }
 @media (prefers-reduced-motion: reduce) {
   .k-name .edot::after { animation: none; background: var(--accent); }
-}
-
-/* ñü.Føňt wordmarks (NuMark.astro): inline SVG, one path per stroke. Letters inherit the text colour or take the
-   aura gradient; the ė dot pulses and phases through the aura on its own. Every other stroke keeps its own look. */
-.nf-word {
-  display: inline-block;
-  line-height: 0;
-  vertical-align: -0.04em;
-}
-.nf-word svg {
-  height: 1em;
-  width: auto;
-  overflow: visible;
-  fill: currentColor;
-}
-.nf-word .mark.dot {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: nf-dot-pulse 2.8s ease-in-out infinite, nf-dot-aura 9s linear infinite;
-}
-@keyframes nf-dot-pulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
-  50% { transform: scale(1.28); filter: drop-shadow(0 0 0.35em currentColor); }
-}
-@keyframes nf-dot-aura {
-  0% { fill: var(--aura-green); color: var(--aura-green); }
-  33% { fill: var(--aura-blue); color: var(--aura-blue); }
-  66% { fill: var(--aura-purple); color: var(--aura-purple); }
-  100% { fill: var(--aura-green); color: var(--aura-green); }
-}
-.nf-word.still .mark.dot { animation: none; fill: var(--accent); }
-
-/* Pulse mode (NuMark `pulse`): every diacritic phases through the aura, and two soft lights move inside it. The
-   mark's own outline is the clip, so the light has a hard edge at the glyph and never leaves it; one light fades
-   out while the other fades in somewhere else, like the pulses on the relay network. Set on the .nf-word:
-     --nf-light           colour of the light (default white)
-     --nf-light-opacity   how bright it gets at its peak (default 0.85)
-     --nf-light-dur       one fade in and out; a light jumps to its next place while it is dark (default 3.6s)
-     --aura-flow-dur      how long one pass through green, blue and purple takes (default 9s)
-   The four resting places of each light (--lx0..3, --ly0..3) and its softness (--nf-blur) are written into the SVG
-   by tools/font/nufont.py in glyph units. */
-.nf-word .nf-lights { display: none; }
-.nf-word.pulse .nf-lights { display: block; }
-.nf-word.pulse .mark { animation: nf-dot-aura var(--aura-flow-dur, 9s) linear infinite; }
-.nf-word.pulse .nf-light {
-  fill: var(--nf-light, #fff);
-  opacity: 0;
-  filter: blur(var(--nf-blur, 20px));
-  animation:
-    nf-light-fade var(--nf-light-dur, 3.6s) ease-in-out infinite,
-    nf-light-move calc(var(--nf-light-dur, 3.6s) * 4) step-end infinite;
-}
-.nf-word.pulse .nf-light.b {
-  animation-delay: calc(var(--nf-light-dur, 3.6s) * -0.5), calc(var(--nf-light-dur, 3.6s) * -0.5);
-}
-@keyframes nf-light-fade {
-  0%, 100% { opacity: 0; }
-  50% { opacity: var(--nf-light-opacity, 0.85); }
-}
-@keyframes nf-light-move {
-  0% { transform: translate(var(--lx0), var(--ly0)); }
-  25% { transform: translate(var(--lx1), var(--ly1)); }
-  50% { transform: translate(var(--lx2), var(--ly2)); }
-  75% { transform: translate(var(--lx3), var(--ly3)); }
-  100% { transform: translate(var(--lx0), var(--ly0)); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .nf-word .mark.dot, .nf-word.pulse .mark { animation: none; fill: var(--accent); }
-  .nf-word.pulse .nf-lights { display: none; }
 }
 .sr {
   position: absolute;

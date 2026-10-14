@@ -52,7 +52,7 @@ const chartLabel =
       <p class="eyebrow">ñü.media</p>
       <h2 id="ds-title">Same reel. Same data.<em>Nearly twice the picture.</em></h2>
       <p class="ds-lede">
-        Both sides are sent at <strong>{r1(nu.actual_kbps)} kbit/s</strong>. Drag to compare H.264 with ñü.media.
+        Both sides are sent at <strong>{r1(nu.actual_kbps)} kbit/s</strong>. Drag to compare H.264 with nu.media.
       </p>
     </div>
 
@@ -63,7 +63,7 @@ const chartLabel =
       <span class="wl r" aria-hidden="true"><b>ñü.media</b>{r1(nu.actual_kbps)} kbit/s · VMAF {r1(nu.vmaf)}</span>
       <span class="wbar" aria-hidden="true"><i></i></span>
       <label class="wrange">
-        <span class="sr">Compare H.264 and ñü.media: move left to see more ñü.media</span>
+        <span class="sr">Compare H.264 and nu.media: move left to see more nu.media</span>
         <input type="range" min="0" max="100" value="50" step="1" />
       </label>
       <figcaption class="tag">benchmark</figcaption>
@@ -86,14 +86,14 @@ const chartLabel =
         <b class="ds-big" data-count data-to={less} data-suf="%">{less}%</b>
         <span>less data than the 720p original</span>
         <small>
-          Instagram’s 720p file of this reel carries {(ORIGINAL_KBPS / 1000).toFixed(1)} Mbit/s of video. ñü.media sends
+          Instagram’s 720p file of this reel carries {(ORIGINAL_KBPS / 1000).toFixed(1)} Mbit/s of video. nu.media sends
           {r1(nu.actual_kbps)} kbit/s, and the fan’s device rebuilds the picture. Benchmark
         </small>
       </div>
     </div>
 
     <figure class="ds-card chart" data-scene="reveal">
-      <figcaption><b>A sharper picture from less data</b><span>Higher means a sharper picture. Further left means less data sent. Each line is one way of sending the whole {Math.round((run as any).seconds)}-second reel from an iPhone Air, and ñü.media’s is highest at almost every point. Benchmark</span></figcaption>
+      <figcaption><b>A sharper picture from less data</b><span>Higher means a sharper picture. Further left means less data sent. Each line is one way of sending the whole {Math.round((run as any).seconds)}-second reel from an iPhone Air, and nu.media’s is highest at almost every point. Benchmark</span></figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={chartLabel}>
         {[0, 25, 50, 75, 100].map((v) => (
           <g class="gy"><line x1={L} x2={R} y1={y(v)} y2={y(v)} /><text x={L - 8} y={y(v) + 4}>{v}</text></g>
@@ -114,9 +114,9 @@ const chartLabel =
         {SERIES.map((s) => <li class={s.cls}><i></i>{s.name}</li>)}
       </ul>
       <p class="note">
-        Measured 11 October 2026 with VMAF {(run as any).vmaf_model}. ñü.media sends a smaller picture where that looks
+        Measured 11 October 2026 with VMAF {(run as any).vmaf_model}. nu.media sends a smaller picture where that looks
         better and the receiving device rebuilds it; AV1 runs in software on a Mac, because iPhone has no AV1 encoder.
-        Full results on the <a href="/media">ñü.media</a> page. Source: @deemsterhotline on Instagram, used with thanks.
+        Full results on the <a href="https://media.khensu.nu">nu.media</a> page. Source: @deemsterhotline on Instagram, used with thanks.
       </p>
     </figure>
   </div>

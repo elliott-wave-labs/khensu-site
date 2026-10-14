@@ -116,15 +116,15 @@ const { full = false } = Astro.props as { full?: boolean };
       <CodecPair run={ladReel as any} dir="ladder-reel" origin="Instagram · 720 × 1280 · 2.44 Mbit/s"
         srcKbps={2437.958} srcName="Instagram’s own file" start={500}
         title="The whole reel, two at a time"
-        sub={`All ${Math.round((ladReel as any).seconds)} seconds, whole frames, encoded on an iPhone Air over USB. ñü.media here is its low-data mode, which sends a smaller picture and rebuilds it on the receiving iPhone. Pick a bitrate and a pair; one side is always the original or ñü.media.`}>
-        <p class="note">Source: @deemsterhotline on Instagram, used with thanks: H.264, 720 × 1280 at 30 fps, 2.44 Mbit/s. A dropped frame shows as the previous frame held, and is counted in the label. Rebuilt to 4K (2160 × 3840) from the same bits, the reel scores the same as at 720p: VMAF 87 at 1.4 Mbit/s and 59 at 351 kbit/s, no dropped frames. The iPhone’s low-latency scaler doesn’t accept 720 × 1280 frames, so on the phone that step is a plain upscale; ñü.media Ultra, below, rebuilds 4K on the host’s Mac instead. VMAF is Netflix’s 0 to 100 quality score; 93 and up looks the same as the original to most viewers.</p>
+        sub={`All ${Math.round((ladReel as any).seconds)} seconds, whole frames, encoded on an iPhone Air over USB. nu.media here is its low-data mode, which sends a smaller picture and rebuilds it on the receiving iPhone. Pick a bitrate and a pair; one side is always the original or nu.media.`}>
+        <p class="note">Source: @deemsterhotline on Instagram, used with thanks: H.264, 720 × 1280 at 30 fps, 2.44 Mbit/s. A dropped frame shows as the previous frame held, and is counted in the label. Rebuilt to 4K (2160 × 3840) from the same bits, the reel scores the same as at 720p: VMAF 87 at 1.4 Mbit/s and 59 at 351 kbit/s, no dropped frames. The iPhone’s low-latency scaler doesn’t accept 720 × 1280 frames, so on the phone that step is a plain upscale; nu.media Ultra, below, rebuilds 4K on the host’s Mac instead. VMAF is Netflix’s 0 to 100 quality score; 93 and up looks the same as the original to most viewers.</p>
       </CodecPair>
 
       <CodecPair run={lad4k as any} dir="ladder-4k" origin="NASA · 3840 × 2160 · 16 Mbit/s"
         srcKbps={16197} srcName="YouTube’s 4K stream" start={4000}
         title="4K, two at a time: ñü.media rebuilt to 4K"
-        sub="ñü.media sends a smaller picture and the receiving iPhone rebuilds it to the full 3840 × 2160. Whole frames, shown at 2560 × 1440; use Zoom 3× to see the detail. Encoded on an iPhone Air over USB; AV1 in software on a Mac, because iPhone has no AV1 encoder.">
-        <p class="note">Stunning Aurora Borealis from Space in Ultra-High Definition (4K), NASA, filmed from the International Space Station; public domain. The source is YouTube’s best stream, VP9 at about 16 Mbit/s. ñü.media picks the base size that scores best at each bitrate and rebuilds it on the receiving iPhone’s Neural Engine; Apple’s scaler, measured here, stops at 1920 × 1080, so in these runs the last step to 4K is a plain upscale.</p>
+        sub="nu.media sends a smaller picture and the receiving iPhone rebuilds it to the full 3840 × 2160. Whole frames, shown at 2560 × 1440; use Zoom 3× to see the detail. Encoded on an iPhone Air over USB; AV1 in software on a Mac, because iPhone has no AV1 encoder.">
+        <p class="note">Stunning Aurora Borealis from Space in Ultra-High Definition (4K), NASA, filmed from the International Space Station; public domain. The source is YouTube’s best stream, VP9 at about 16 Mbit/s. nu.media picks the base size that scores best at each bitrate and rebuilds it on the receiving iPhone’s Neural Engine; Apple’s scaler, measured here, stops at 1920 × 1080, so in these runs the last step to 4K is a plain upscale.</p>
       </CodecPair>
 
       <ProReel />
@@ -138,9 +138,9 @@ const { full = false } = Astro.props as { full?: boolean };
 
       {full && (<>
         <LadderChart run={lad4k as any} title="How low 4K can go, measured" refName="H.265 at 4 Mbit/s"
-          sub="Quality against bitrate on iPhone Air, 32 kbit/s to 4 Mbit/s. ñü.media in colour." />
+          sub="Quality against bitrate on iPhone Air, 32 kbit/s to 4 Mbit/s. nu.media in colour." />
         <LadderChart run={ladReel as any} title="How low 720p can go, measured" refName="H.265 at 2 Mbit/s"
-          sub="The whole Instagram reel on iPhone Air, 64 kbit/s to 2 Mbit/s. ñü.media in colour." />
+          sub="The whole Instagram reel on iPhone Air, 64 kbit/s to 2 Mbit/s. nu.media in colour." />
       </>)}
 
       <figure class="card">
@@ -184,11 +184,11 @@ const { full = false } = Astro.props as { full?: boolean };
             </li>
           ))}
         </ul>
-        <p class="note"><a href="https://github.com/Netflix/vmaf">VMAF</a> is Netflix’s open video quality score: it compares each video with the original and predicts how people would rate it, 0 to 100. Above 70 looks good on a phone. <a href="/quality">Why VMAF alone isn’t enough, and how to check our numbers.</a> ñü.media sends a half-size base layer; the receiving iPhone’s Neural Engine restores the rest.</p>
+        <p class="note"><a href="https://github.com/Netflix/vmaf">VMAF</a> is Netflix’s open video quality score: it compares each video with the original and predicts how people would rate it, 0 to 100. Above 70 looks good on a phone. <a href="/quality">Why VMAF alone isn’t enough, and how to check our numbers.</a> nu.media sends a half-size base layer; the receiving iPhone’s Neural Engine restores the rest.</p>
       </figure>
 
       <figure class="card wide" data-scene="reveal">
-        <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. ñü.media in colour, everything else in grey. Solid lines are benchmarks; dashed lines are published estimates, not measured.</span></figcaption>
+        <figcaption><b>Quality for every bitrate</b><span>Higher and further left is better. nu.media in colour, everything else in grey. Solid lines are benchmarks; dashed lines are published estimates, not measured.</span></figcaption>
         <div class="rds">
           {charts.map((c, ci) => (
             <div class="rdw">
@@ -249,10 +249,10 @@ const { full = false } = Astro.props as { full?: boolean };
             </li>
           ))}
         </ul>
-        <p class="note">Measured on iPhone Air. Apple’s hardware HEVC matches real-time AV1 software at a fraction of the power, so it carries ñü.media’s base layer. Apple’s super resolution runs at 459 fps on the Neural Engine, but adds texture the original doesn’t have, so it scores below a plain upscale and never reaches VMAF 80 up to 1.4 Mbit/s. ñü.media’s own network is trained to restore the original instead.</p>
+        <p class="note">Measured on iPhone Air. Apple’s hardware HEVC matches real-time AV1 software at a fraction of the power, so it carries nu.media’s base layer. Apple’s super resolution runs at 459 fps on the Neural Engine, but adds texture the original doesn’t have, so it scores below a plain upscale and never reaches VMAF 80 up to 1.4 Mbit/s. nu.media’s own network is trained to restore the original instead.</p>
       </figure>
       ) : (
-        <a class="card wide more" href="/media">
+        <a class="card wide more" href="https://media.khensu.nu">
           <b>How ñü.media video measures</b>
           <span>Quality scores against H.264, HEVC and AV1, what each layer does, and how we test.</span>
           <span class="go">See the measurements →</span>
@@ -278,7 +278,7 @@ const { full = false } = Astro.props as { full?: boolean };
       All video figures are benchmarks: <a href="https://github.com/Netflix/vmaf">VMAF</a> (4K model for 4K) on 6-second clips.
       <a href="https://www.itu.int/rec/T-REC-H.264">H.264</a> and <a href="https://www.itu.int/rec/T-REC-H.265">HEVC</a> from an
       iPhone Air’s hardware encoder (iOS 26.6.1) at live-call settings; AV1 from <a href="https://gitlab.com/AOMediaCodec/SVT-AV1">SVT-AV1</a>
-      real time on an M1 Pro, as iPhone has no AV1 encoder; ñü.media as its half-size base layer, and end to end on iPhone with Apple’s
+      real time on an M1 Pro, as iPhone has no AV1 encoder; nu.media as its half-size base layer, and end to end on iPhone with Apple’s
       <a href="https://developer.apple.com/documentation/videotoolbox/vtsuperresolutionscaler">super resolution</a>. Only the dashed
       lines aren’t measured: <a href="https://aomedia.org/">AV2</a> (about 30% under AV1, per AOMedia) and
       <a href="https://github.com/microsoft/DCVC">DCVC-RT</a> (its authors’ gain over H.266) are scaled from our AV1 curve.

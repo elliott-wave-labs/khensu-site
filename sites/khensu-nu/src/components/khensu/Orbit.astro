@@ -91,6 +91,66 @@ float height(vec2 p, int octaves) {
 const vec3 MOON = vec3(-0.42, 0.2, 0.88);
 const vec3 HAZE = vec3(0.105, 0.14, 0.2);
 const vec3 ZENITH = vec3(0.035, 0.04, 0.05);
+const float BOAT_Z = 9.2;
+
+float ellip(vec3 ro, vec3 rd, vec3 c, vec3 r) {
+  vec3 oc = (ro - c) / r;
+  vec3 d = rd / r;
+  float b = dot(oc, d);
+  float h = b * b - (dot(oc, oc) - 1.0);
+  if (h < 0.0) return -1.0;
+  float s = sqrt(h);
+  float t0 = -b - s;
+  if (t0 > 0.02) return t0;
+  float t1 = -b + s;
+  return t1 > 0.02 ? t1 : -1.0;
+}
+
+vec3 shade(vec3 n, vec3 rd, vec3 albedo, float rough) {
+  vec3 L = normalize(MOON);
+  float ndl = max(dot(n, L), 0.0);
+  vec3 h = normalize(L - rd);
+  float spec = pow(max(dot(n, h), 0.0), mix(18.0, 220.0, 1.0 - rough));
+  float fres = pow(1.0 - max(dot(n, -rd), 0.0), 4.0);
+  vec3 amb = albedo * (0.06 + 0.14 * max(n.y, 0.0));
+  return amb + albedo * ndl * 0.85 + vec3(0.95, 0.93, 0.86) * spec * (0.25 + (1.0 - rough)) + albedo * fres * 0.2;
+}
+
+vec3 satAt(float i) {
+  float a = t * 0.045 + i * 0.62;
+  return vec3(sin(a) * 6.5, 3.15 + 0.28 * cos(a * 1.7), 8.2 + 1.6 * sin(a * 0.5));
+}
+
+vec4 satellites(vec3 ro, vec3 rd) {
+  float nearest = 80.0;
+  vec3 col = vec3(0.0);
+  float any = 0.0;
+  for (int i = 0; i < 7; i++) {
+    vec3 c = satAt(float(i));
+    float body = ellip(ro, rd, c, vec3(0.22, 0.09, 0.28));
+    float panel = ellip(ro, rd, c, vec3(0.85, 0.02, 0.26));
+    float hit = body;
+    vec3 rad = vec3(0.22, 0.09, 0.28);
+    vec3 alb = vec3(0.72, 0.74, 0.78);
+    float rough = 0.35;
+    if (panel > 0.0 && (hit < 0.0 || panel < hit)) {
+      hit = panel;
+      rad = vec3(0.85, 0.02, 0.26);
+      alb = vec3(0.08, 0.16, 0.32);
+      rough = 0.15;
+    }
+    if (hit > 0.0 && hit < nearest) {
+      nearest = hit;
+      any = 1.0;
+      vec3 p = ro + rd * hit;
+      vec3 n = normalize((p - c) / (rad * rad));
+      vec3 lit = shade(n, rd, alb, rough);
+      float spec = pow(max(dot(n, normalize(normalize(MOON) - rd)), 0.0), 40.0);
+      col = lit + vec3(0.7, 0.85, 1.0) * spec * 0.35;
+    }
+  }
+  return vec4(col, any);
+}
 
 vec3 sky(vec3 d) {
   float y = max(d.y, 0.0);
@@ -106,6 +166,11 @@ void main() {
   vec3 rd = normalize(vec3(uv.x, uv.y - HORIZON, FOCAL));
 
   if (rd.y >= -0.002) {
+    vec4 sat = satellites(ro, rd);
+    if (sat.a > 0.5) {
+      gl_FragColor = vec4(sat.rgb, 1.0);
+      return;
+    }
     float a = 1.0 - smoothstep(0.0, 0.32, rd.y);
     gl_FragColor = vec4(sky(rd) * a, a);
     return;
@@ -139,6 +204,44 @@ void main() {
   col += vec3(1.0, 0.98, 0.92) * glitter;
 
   col = mix(col, HAZE, 1.0 - exp(-d * 0.018));
+
+  float by = height(vec2(0.0, BOAT_Z), 3);
+  vec3 bc = vec3(0.0, by + 0.15, BOAT_Z);
+  float slope = (height(vec2(0.0, BOAT_Z + 0.45), 3) - height(vec2(0.0, BOAT_Z - 0.45), 3)) / 0.9;
+  float ang = atan(slope) * 0.75;
+  float co = cos(ang), si = sin(ang);
+  vec3 lro = ro - bc;
+  lro = vec3(lro.x, lro.y * co - lro.z * si, lro.y * si + lro.z * co);
+  vec3 lrd = vec3(rd.x, rd.y * co - rd.z * si, rd.y * si + rd.z * co);
+
+  float best = -1.0;
+  vec3 rad = vec3(1.0);
+  vec3 cen = vec3(0.0);
+  vec3 alb = vec3(0.02);
+  float rough = 0.45;
+  float h1 = ellip(lro, lrd, vec3(0.0, 0.02, 0.05), vec3(0.22, 0.08, 0.62));
+  if (h1 > 0.0) { best = h1; rad = vec3(0.22, 0.08, 0.62); cen = vec3(0.0, 0.02, 0.05); alb = vec3(0.05, 0.055, 0.06); rough = 0.22; }
+  float h2 = ellip(lro, lrd, vec3(0.0, 0.1, -0.08), vec3(0.12, 0.05, 0.16));
+  if (h2 > 0.0 && (best < 0.0 || h2 < best)) { best = h2; rad = vec3(0.12, 0.05, 0.16); cen = vec3(0.0, 0.1, -0.08); alb = vec3(0.1, 0.11, 0.12); rough = 0.35; }
+  float h3 = ellip(lro, lrd, vec3(0.0, 0.48, -0.02), vec3(0.016, 0.42, 0.016));
+  if (h3 > 0.0 && (best < 0.0 || h3 < best)) { best = h3; rad = vec3(0.016, 0.42, 0.016); cen = vec3(0.0, 0.48, -0.02); alb = vec3(0.75, 0.76, 0.78); rough = 0.2; }
+  float h4 = ellip(lro, lrd, vec3(0.0, 0.55, 0.12), vec3(0.28, 0.36, 0.03));
+  if (h4 > 0.0 && (best < 0.0 || h4 < best)) { best = h4; rad = vec3(0.28, 0.36, 0.03); cen = vec3(0.0, 0.55, 0.12); alb = vec3(0.93, 0.91, 0.86); rough = 0.55; }
+  float h5 = ellip(lro, lrd, vec3(0.0, 0.36, -0.32), vec3(0.14, 0.2, 0.025));
+  if (h5 > 0.0 && (best < 0.0 || h5 < best)) { best = h5; rad = vec3(0.14, 0.2, 0.025); cen = vec3(0.0, 0.36, -0.32); alb = vec3(0.9, 0.88, 0.82); rough = 0.55; }
+  float h6 = ellip(lro, lrd, vec3(0.0, 0.14, -0.55), vec3(0.1, 0.02, 0.1));
+  if (h6 > 0.0 && (best < 0.0 || h6 < best)) { best = h6; rad = vec3(0.1, 0.02, 0.1); cen = vec3(0.0, 0.14, -0.55); alb = vec3(0.82, 0.84, 0.88); rough = 0.15; }
+
+  float wake = length(vec2(p.x, p.z - BOAT_Z));
+  col += vec3(0.75, 0.84, 0.9) * exp(-wake * wake * 2.4) * 0.45;
+
+  if (best > 0.0 && best < d) {
+    vec3 lp = lro + lrd * best;
+    vec3 n = normalize((lp - cen) / (rad * rad));
+    n = vec3(n.x, n.y * co + n.z * si, -n.y * si + n.z * co);
+    col = shade(n, rd, alb, rough);
+  }
+
   col = pow(col, vec3(0.92));
   gl_FragColor = vec4(col, 1.0);
 }`;
@@ -256,6 +359,9 @@ void main() {
   }
   .orbit.live .sea {
     background: none;
+  }
+  .orbit.live svg {
+    visibility: hidden;
   }
   .orbit svg {
     position: absolute;

@@ -96,10 +96,11 @@ Each adversary is described by what it can do. "Covered" means the guarantees in
 - **L3.** Memory-derived data (facts, embeddings, observations) is deleted with the messages it came from and is never backed up.
 - **L4.** A duress passcode wipes; a second passcode opens a hidden profile; nothing in storage reveals how many profiles exist.
 - **L5.** Panic wipe crypto-erases by deleting the Secure Enclave wrapping key first.
+- **L6.** ñü.vœîð objects have no file names on disk or on the network. The map (name, chunk order, per-chunk keys) is a memory record wrapped by the Secure Enclave. Nodes hold 65,536-byte ciphertext only. The ñü.fêět footer is inside that ciphertext (`design/nu-void.md`).
 
 ### 3.6 Availability
 
-- **V1.** Every packet is stored on three mailbox replicas run by different operators.
+- **V1.** Every packet is stored on three mailbox replicas run by different operators. Each ñü.vœîð chunk is stored on eight nodes that have not opted out, or it stays on the device until eight are available.
 - **V2.** Sequencer duty fails over to a standby at the next epoch.
 - **V3.** Apps pin the genesis keys and embed a seed list, so the network keeps working if `khensu.nu` or `tatenan.khensu.nu` is blocked or seized.
 - **V4.** The committee tolerates fewer than 1/3 faulty members per epoch.
@@ -146,7 +147,7 @@ Until step-down, the founder threshold key co-signs rule changes and approves va
 | 5.2 | Timing correlation of live calls by a global observer | A mixnet's delays can't carry live media | Stealth call profile (`PROTOCOL.md` 7.1): two relays from different operators, networks and jurisdictions; setup over the mixnet; constant-rate fixed-size media (no speech-pattern leak); padded relay trunks; random 2–8 s padding before and after each call; camouflaged transport on UDP 443; independent random relay rotation during the call; no direct internet paths. A global observer can still match call start, end and duration across the two edges over time; the app says so |
 | 5.3 | A global active adversary breaking anonymity | Active attacks on all links defeat any practical mixnet | Content and identity guarantees still hold; loop measurement detects nodes that drop traffic |
 | 5.4 | A malicious app release | We sign the app | Release hashes in the transparency log, reproducible node builds, binary transparency checks in the app for updates, hardware keys on accounts, signing only from locked-down CI |
-| 5.5 | A recipient leaking content | Recipients see plaintext | Disappearing messages, screenshot notice where iOS allows, message franking for reports |
+| 5.5 | A recipient leaking content | Recipients see plaintext | Disappearing messages, screenshot notice where iOS allows, message franking for reports. View-once ñü.vœîð draws on a capture-excluded surface (the screenshot and recording buffers get a blank frame) and then deletes that person's map. A second camera still sees the screen |
 | 5.6 | Rubber-hose coercion for passcodes | No software stops that | Duress passcode, hidden profiles, panic wipe, wipe after failed attempts |
 | 5.7 | Forensic storage-size analysis across time for hidden profiles | Container size is fixed, but wear patterns may leak | Fixed-size container with random fill; stated limit |
 | 5.8 | A censor blocking all QUIC or all unknown traffic | Requires a different transport | Bridges and pluggable transports are tracked as later work |

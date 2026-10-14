@@ -18,11 +18,11 @@ import StatStrip from './StatStrip.astro';
 
 const highlights = [
   { icon: 'lock', href: '/security#security-protections', go: 'How the encryption works', title: 'Post-quantum, end to end', body: 'Every message, call and payment uses encryption built for the age of quantum computers. Not an option you switch on. The only way it works.' },
-  { icon: 'shield', href: '/webe', go: 'How stealth works', title: 'Full stealth mode, beyond a VPN', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not, and the relays carrying you keep switching, so none of them sees a whole conversation.' },
-  { icon: 'feed', href: '/webe', go: 'Explore webË', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
-  { icon: 'wallet', href: '/nufi', go: 'See ñũ.Fî', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
-  { icon: 'sparkle', href: '/memory', go: 'How memory stays private', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
-  { icon: 'live', href: '/shield', go: 'See suñůlink.shield', title: 'Runs on any connection', body: 'Fibre, cable, 5G, satellite. With no internet at all, phones reach each other at about 100 m, and suñůlink.shield stretches that to 600 m, or 2 km to a rooftop node.' },
+  { icon: 'shield', href: 'https://webe.khensu.nu', go: 'How stealth works', title: 'Full stealth mode, beyond a VPN', body: 'Not the network, not the people who run it, not someone watching the whole internet. Your phone looks the same whether you’re talking or not, and the relays carrying you keep switching, so none of them sees a whole conversation.' },
+  { icon: 'feed', href: 'https://webe.khensu.nu', go: 'Explore webË', title: 'Feeds, forums and sites', body: 'Follow people, join forums, publish a site and stream live, on the same private network. Posters sign what they publish; readers stay anonymous.' },
+  { icon: 'wallet', href: 'https://fi.khensu.nu', go: 'See ñũ.Fî', title: 'Pay privately', body: 'Send money in a chat with the amount hidden and no lasting record. The same payments keep the network running.' },
+  { icon: 'sparkle', href: 'https://memory.khensu.nu', go: 'How memory stays private', title: 'Private AI, only for you', body: 'Search, summaries and answers run on your own device. There are no AI nodes or servers for your data to leak to. We can’t sell your data because we don’t have it. Only you do.' },
+  { icon: 'live', href: 'https://shield.khensu.nu', go: 'See suñůlink.shield', title: 'Runs on any connection', body: 'Fibre, cable, 5G, satellite. With no internet at all, phones reach each other at about 100 m, and suñůlink.shield stretches that to 600 m, or 2 km to a rooftop node.' },
 ] as const;
 
 const screens = [
@@ -44,11 +44,11 @@ const specs = [
 ];
 
 const pages = [
-  { href: '/webe', title: 'webË', body: 'The people-run internet under khėnsu.ñü: stealth, better than a VPN, and built for ten billion people.', go: 'How webË works' },
-  { href: '/media', title: 'ñü.media', body: 'Our codec: 4K at 240 fps, light and green-screen keys, and every measurement.', go: 'See the demos' },
-  { href: '/memory', title: 'Memory and your feed', body: 'Per-Ankh remembers for you, and your recommendations are worked out only on your device.', go: 'How it stays private' },
-  { href: '/creators', title: 'For creators', body: 'What artists keep on khėnsu.ñü compared with streaming, studios and labels.', go: 'Compare the cuts' },
-  { href: '/shield', title: 'suñůlink.shield', body: 'A full node on your iPhone, with its own battery and a mesh radio.', go: 'Explore suñůlink.shield' },
+  { href: 'https://webe.khensu.nu', title: 'webË', body: 'The people-run internet under khėnsu.ñü: stealth, better than a VPN, and built for ten billion people.', go: 'How webË works' },
+  { href: 'https://media.khensu.nu', title: 'ñü.media', body: 'Our codec: 4K at 240 fps, light and green-screen keys, and every measurement.', go: 'See the demos' },
+  { href: 'https://memory.khensu.nu', title: 'Memory and your feed', body: 'Per-Ankh remembers for you, and your recommendations are worked out only on your device.', go: 'How it stays private' },
+  { href: 'https://create.khensu.nu', title: 'For creators', body: 'What artists keep on khėnsu.ñü compared with streaming, studios and labels.', go: 'Compare the cuts' },
+  { href: 'https://shield.khensu.nu', title: 'suñůlink.shield', body: 'A full node on your iPhone, with its own battery and a mesh radio.', go: 'Explore suñůlink.shield' },
   { href: '/transfer', title: 'Send big files', body: '4K video and huge files, private end to end, with no fee per gigabyte.', go: 'Send privately' },
   { href: '/quality', title: 'How we measure', body: 'Why VMAF isn’t enough, and how to rerun every number yourself.', go: 'Check our numbers' },
   { href: '/privacy', title: 'Privacy', body: 'What we never collect, and why we couldn’t if we tried.', go: 'Read the policy' },
@@ -313,7 +313,7 @@ const { show } = Astro.props as { show: Key[] };
               <p class="nc-kind">suñůlink.shield <small>Best</small></p>
               <b class="nc-big">24/7</b><span class="nc-unit">wherever you go</span>
               <p>A full node on your phone with its own battery and a guard chip, so the rhythm never stops, even in your pocket. Its mesh radio carries the network where there’s no internet.</p>
-              <a class="nc-link" href="/shield">Explore suñůlink.shield</a>
+              <a class="nc-link" href="https://shield.khensu.nu">Explore suñůlink.shield</a>
             </li>
           </ul>
           <p class="footnote">

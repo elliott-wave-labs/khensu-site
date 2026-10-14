@@ -695,7 +695,7 @@ Nothing stays private past the switch, patented code included. Every private rep
 | Recipient | How it arrives |
 | --- | --- |
 | Every node on the network | Already holds the archive; the opened objects replicate like any archive object |
-| The founder's list of friends | Each person on the list, sealed in the escrow with their khensu.ñü handle, gets the archive and the notice by message over the mixnet |
+| The founder's list of friends | Each person on the list, sealed in the escrow with their khėnsu.ñü handle, gets the archive and the notice by message over the mixnet |
 | The press | The notice, the archive root and a download link go to The Wall Street Journal and Forbes, plus any outlet added to the list, through their published tip lines |
 | Wikimedia | The archive and notice are uploaded to Wikimedia Commons under the open licences below |
 | Internet Archive | The archive is uploaded to archive.org as a public item, with the notice and every release |

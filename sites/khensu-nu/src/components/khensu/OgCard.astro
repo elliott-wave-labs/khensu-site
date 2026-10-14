@@ -1,7 +1,7 @@
 ---
 // One link-preview card. 1200 x 630 by default; square (1080 x 1080) when the viewport is square. `overlay` draws
 // only the words on a transparent page, so tools/og.sh can lay them over video for the animated versions.
-import NuMark from './NuMark.astro';
+import Name from './Name.astro';
 import type { Card } from '../../data/og';
 
 interface Props { c: Card; overlay?: boolean }
@@ -12,7 +12,7 @@ const { c, overlay = false } = Astro.props;
   {c.product && !overlay && <img class="shot" src={c.product} alt="" />}
   {c.screen && !overlay && <img class="screen" src={c.screen} alt="" />}
   <div class="front">
-    <p class="brand">{!c.thumb && <span class="mark"><img src="/seal.webp" alt="" /></span>}<NuMark name="khensu-full" still /></p>
+    <p class="brand">{!c.thumb && <span class="mark"><img src="/seal.webp" alt="" /></span>}<Name /></p>
     <h1>{c.title}{c.em && <em>{c.em}</em>}</h1>
     <p class="line">{c.line}</p>
     {c.note && <p class="note">{c.note}</p>}
@@ -37,7 +37,6 @@ const { c, overlay = false } = Astro.props;
       var(--bg-img, radial-gradient(60% 70% at 75% 50%, rgba(139, 123, 255, 0.25), transparent 70%)) center / cover,
       #050507;
   }
-  /* Overlay: the words and the shade behind them, nothing else, over a transparent page. */
   .card.overlay {
     background:
       linear-gradient(90deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.45) 55%, rgba(0, 0, 0, 0.1) 100%),
@@ -45,17 +44,17 @@ const { c, overlay = false } = Astro.props;
   }
   .shot {
     position: absolute;
-    right: 40px;
-    top: 56%;
-    height: 540px;
+    right: 48px;
+    top: 50%;
+    height: 420px;
     translate: 0 -50%;
-    filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.7));
+    filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.7));
   }
   .screen {
     position: absolute;
     right: 96px;
     top: 50%;
-    height: 520px;
+    height: 480px;
     aspect-ratio: 9 / 16;
     object-fit: cover;
     translate: 0 -50%;
@@ -72,14 +71,17 @@ const { c, overlay = false } = Astro.props;
   .overlay .front {
     max-width: 640px;
   }
-  /* The name, set in ñü.Føňt with every mark, a little softer than the title but never faint. */
   .brand {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin: 0 0 26px;
-    font-size: 46px;
+    margin: 0 0 22px;
+    font: 600 56px/1 var(--font-display);
+    letter-spacing: -0.02em;
     color: rgba(242, 241, 236, 0.9);
+  }
+  .brand :global(.tld) {
+    font-weight: 300;
   }
   .brand .mark {
     width: 52px;
@@ -93,7 +95,7 @@ const { c, overlay = false } = Astro.props;
   }
   h1 {
     margin: 0;
-    font: 600 80px/1 'nu Font', var(--font-sans);
+    font: 600 80px/1 var(--font-display);
     letter-spacing: -0.02em;
   }
   h1 em {
@@ -106,7 +108,7 @@ const { c, overlay = false } = Astro.props;
   }
   .line {
     margin: 22px 0 0;
-    font: 500 30px/1.3 'nu Font', var(--font-sans);
+    font: 500 30px/1.3 var(--font-display);
     color: rgba(242, 241, 236, 0.9);
   }
   .note {
@@ -124,7 +126,6 @@ const { c, overlay = false } = Astro.props;
   .foot span {
     display: block;
   }
-  /* Square, 1080 x 1080, for Instagram link pages and posts: product above, words below. */
   @media (aspect-ratio: 1 / 1) {
     .card {
       padding: 64px 72px 60px;
@@ -139,15 +140,15 @@ const { c, overlay = false } = Astro.props;
     .shot {
       right: auto;
       left: 50%;
-      top: 36px;
-      height: 500px;
+      top: 72px;
+      height: 420px;
       translate: -50% 0;
     }
     .screen {
       right: auto;
       left: 50%;
-      top: 56px;
-      height: 560px;
+      top: 80px;
+      height: 480px;
       translate: -50% 0;
     }
     .front,
@@ -156,8 +157,8 @@ const { c, overlay = false } = Astro.props;
       max-width: none;
     }
     .brand {
-      font-size: 52px;
-      margin-bottom: 22px;
+      font-size: 56px;
+      margin-bottom: 18px;
     }
     h1 {
       font-size: 84px;
@@ -174,14 +175,13 @@ const { c, overlay = false } = Astro.props;
     .foot {
       font-size: 17px;
     }
-    /* Thumbnails: the phone and a few words, big enough to read at 64 px. */
     .thumb {
       padding: 0 60px 70px;
       text-align: center;
     }
     .thumb .shot {
-      top: 24px;
-      height: 460px;
+      top: 56px;
+      height: 400px;
       filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.7));
     }
     .thumb .front {
@@ -190,7 +190,7 @@ const { c, overlay = false } = Astro.props;
     .thumb .brand {
       justify-content: center;
       font-size: 120px;
-      margin-bottom: 26px;
+      margin-bottom: 22px;
     }
     .thumb h1 {
       font-size: 92px;

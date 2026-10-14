@@ -15,7 +15,7 @@ Brazil Canada Québec Japan Korea Australia Zealand India Singapore Africa Switz
 Liquid Glass Neural Engine Face Touch Pro Max Air Ultra Ceramic Shield Secure Enclave Qi2 Morse Rogers Rust Swift
 SwiftUI Go Wasm Elliott Wave Kickstarter Bitcoin Ethereum Monero Zcash Venmo Cash Chime Grammy Oscar Christmas
 Monday Tuesday Wednesday Thursday Friday Saturday Sunday January February March April May June July August September
-October November December English Unicode Fi Fî Bî Føňt IETF
+October November December English Unicode Fi Fî Bî IETF
 `.split(/\s+/).filter(Boolean));
 
 const WORD = /(?<![\p{L}\p{N}])[\p{L}][\p{L}\p{M}\p{N}'’-]*/gu;

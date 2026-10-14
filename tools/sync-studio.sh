@@ -15,10 +15,8 @@ mkdir -p "$STUDIO/src/data" && cp "$K"/data/*.ts "$K"/data/*.json "$STUDIO/src/d
 for d in shell codec hero; do
   rsync -a --delete "$HERE/sites/khensu-nu/public/khensu/$d/" "$STUDIO/public/khensu/$d/"
 done
-# ñü.Føňt and ñü.Føňt Mono: the studio's global.css (copied below) loads both variable WOFF2s for the wordmarks.
-mkdir -p "$STUDIO/public/fonts/nufont"
-cp "$HERE/sites/khensu-nu/public/fonts/nufont/nuFont-Variable.woff2" "$HERE/sites/khensu-nu/public/fonts/nufont/nuFontMono-Variable.woff2" "$STUDIO/public/fonts/nufont/"
-rm -rf "$STUDIO/public/fonts/dosis"
+rm -rf "$STUDIO/public/fonts/nufont" "$STUDIO/public/fonts/dosis"
+rm -f "$STUDIO/src/components/khensu/NuMark.astro" "$STUDIO/src/data/nufont-marks.ts"
 sed 's/--accent: #18e0c8;/--accent: #f59e0b;/' "$K/styles/global.css" > "$STUDIO/src/styles/global.css"
 cp "$HERE/studio/pages/index.astro" "$STUDIO/src/pages/index.astro"
 python3 - "$K/pages/index.astro" "$STUDIO/src/pages/khensu.astro" <<'PY'

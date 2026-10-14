@@ -36,7 +36,6 @@ export const CARDS: Record<string, Card> = {
   creators: { title: 'ñü.ċřêæțẽ', em: 'You own everything.', line: 'Your rights, your fans, and $10 per 1,000 plays with no cut.', bg: '/khensu/creators/hero.webp', screen: '/khensu/creators/fans-1080.webp', alt: 'A creator performing, streamed in 1080p with ñü.media on khėnsu.ñü' },
   nufi: { title: 'ñũ.Fî', em: 'A basic income first.', line: 'Creators paid for every view, nodes for every job. Private, with no cut.', bg: EARTH, alt: 'ñũ.Fî private payments on khėnsu.ñü' },
   bi: { title: 'ñũ.Bî', em: 'A basic income, paid by the network.', line: 'Node operators paid for real work at one worldwide rate, and an equal share for every person next.', bg: EARTH, alt: 'ñũ.Bî, the ñü basic income, over Earth wrapped in the khėnsu.ñü network' },
-  font: { title: 'ñü.Føňt', em: 'The dot is E.', line: 'A stroke font on the golden ratio: capsule ends, no stems where a letter can live without one, six weights and the italic in one file.', bg: EARTH, alt: 'ñü.Føňt, the khėnsu.ñü typeface, over Earth at night' },
   network: { title: 'The network', em: 'A gift to everyone.', line: 'Freedom, privacy and a basic income. Contracts for any work and nodes paid for real jobs.', bg: EARTH, alt: 'The khėnsu.ñü network wrapped around Earth at night' },
   shield: { title: 'šûñüłîñk.šħîēłð', em: 'made in morocco.', line: 'post-quantum E2EE stealth transceiver shield²', note: SHIELD_NOTE, foot: SHIELD_FOOT, bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
   buy: { title: 'šûñüłîñk.šħîēłð', em: 'made in morocco.', line: 'post-quantum E2EE stealth transceiver shield²', note: SHIELD_NOTE, foot: SHIELD_FOOT, bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
@@ -59,20 +58,27 @@ export const CARDS: Record<string, Card> = {
   'dev-specs': { title: 'Specifications', em: 'Every protocol, public.', line: 'webË, the protocol, the threat model, network work and compliance.', bg: EARTH, alt: 'khėnsu.ñü specifications' },
 };
 
-// Animated squares (tools/og-anim.sh): 3-second HEVC, 1080 x 1080, emitted as nu:preview beside og:image (WEBE.md 7.1).
+// Animated cards (tools/og-anim.sh): square HEVC as nu:preview, landscape as og:video (WEBE.md 7.1).
 // Bytes and hashes are written by tools/og-anim.sh so clients can check what they fetch.
-export const PREVIEWS: Record<string, { bytes: number; hash: string }> = {
-  "home": {
-    bytes: 2864793,
-    hash: "sha-256=a5c9a3c3e779073a5848f36a401357115053d182ff999942ba0a595a8bd199f4"
+export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: number; wideBytes?: number; wideHash?: string }> = {
+  home: {
+    bytes: 2858232,
+    hash: "sha-256=526228d453b98290f4503bc2bf539c4d5028bd3fe7a1f6d37ef18b51cd3fe5f6",
+    duration: 4,
+    wideBytes: 1297704,
+    wideHash: "sha-256=6e83f791d87f2cb707a568e47da30d44196fb91d1e4789168387c1b5b4154240"
   },
-  "buy": {
-    bytes: 3281996,
-    hash: "sha-256=76c064e4f4b49d7d8c09dfbf8908af3ca58dd80c12556ea53f9770e3a030f5ab"
+  buy: {
+    bytes: 3351860,
+    hash: "sha-256=8adeb922559aed146bf48e1c5fd2743c4e2af5470beba0496d31ef019baf6762",
+    duration: 4,
+    wideBytes: 1630229,
+    wideHash: "sha-256=47cb54f3dac5476eae92f50a98bdf3a21c8dd60b92e6a95800c0f465e422a80b"
   },
-  "thumb": {
-    bytes: 2925787,
-    hash: "sha-256=08729f962da33864fd6f1ce302fbaca7bffffe719214870f5e7c0bef24fb246f"
+  thumb: {
+    bytes: 2877555,
+    hash: "sha-256=5091e572e3a152af53b89020fef62bf6b26100656da333edc7f887ae4edfcf37",
+    duration: 4
   }
 };
 // The shield pages share the buy card's animation.

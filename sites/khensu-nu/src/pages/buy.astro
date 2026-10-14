@@ -7,16 +7,20 @@ import Highlights from '../components/khensu/Highlights.astro';
 import RevealText from '../components/khensu/RevealText.astro';
 import StatStrip from '../components/khensu/StatStrip.astro';
 
-// No card processor: reservations are free and go by email, so no server handles them. Payment opens in the
-// khėnsu.ñü app over the network's own shielded payments, and every reservation is invited to pay there first.
+// Pre-order by email (decided 13 Oct 2026). No charge at reserve; pay later with ñü.wallet (no Stripe / card
+// processor). Sell at cost (hardware + warranty, tax included) plus a flat $42 activation. Network fee only (estimate).
 const SHIPS = 'Q1 2027';
 // The only shipping option: overnight priority with Saturday delivery (FedEx Priority Overnight in the US; International
-// Priority elsewhere, 1–3 business days). Charged at cost on top of the price. Estimate from carrier list rates for a
-// 1 kg box; contract rates set it at launch.
-const SHIPPING = 95;
+// Priority elsewhere, 1–3 business days). Charged at cost on top of the price. Estimate at contract rates for a 1 kg box;
+// list rates are higher; final rate set at launch.
+const SHIPPING = 42;
+// Flat activation fee on every shield (tax included). Profit comes from this line after the network fee.
+const ACTIVATION = 42;
 // Prices include sales tax or VAT. The cost table assumes this blended rate to show what is left after tax.
 const TAX = 0.08;
-const RESERVE_TO = 'hello@elliottwave.studio';
+// Shielded-pool network fee to node operators (estimate; a fraction of a cent on small spends, shown as 1¢ ceiling).
+const NETWORK_FEE = 0.01;
+const ORDER_TO = 'hello@elliottwave.studio';
 
 const colours = [
   { id: 'maroon', name: 'Burgundy', hex: '#70222e' },
@@ -28,46 +32,67 @@ const models = [
   { id: 'pro', name: 'iPhone 18 Pro' },
   { id: 'max', name: 'iPhone 18 Pro Max' },
 ];
+type Model = 'pro' | 'max';
+
+// Expected cost per shield at the first production run, in US dollars:
+// [Core Pro, Core Max, Ti Pro, Ti Max, brass Pro, brass Pro Max].
+// Core drops Qi charging and the neural chips; Titanium and brass keep the full board.
+const parts = [
+  ['Machined housing', 87, 96, 87, 96, 62, 70],
+  ['Electronics and battery', 48, 48, 78, 78, 78, 78],
+  ['ñü.isheru, cut and set', 125, 125, 125, 125, 125, 125],
+  ['Platinum line, laid by hand', 15, 15, 15, 15, 15, 15],
+  ['Assembly and testing', 12, 12, 12, 12, 12, 12],
+  ['Packaging and USB-C cable', 8, 8, 8, 8, 8, 8],
+  ['Certification, per unit', 5, 5, 5, 5, 5, 5],
+] as const;
+
+const atCost = (unit: number) => Math.round((unit + unit * 0.05) * (1 + TAX));
+
 const editions = [
+  {
+    id: 'core',
+    tier: 'moldavite',
+    name: 'Core',
+    body: 'Ceramic powder-coated titanium in your iPhone’s colour. No Qi charging, no neural chips. Every stone, moldavite and Paraíba included, with a platinum line.',
+  },
   {
     id: 'titanium',
     tier: 'moldavite',
     name: 'Titanium',
-    price: { pro: 499, max: 529 },
-    body: 'Ceramic powder-coated titanium in your iPhone’s colour. Every stone, moldavite and Paraíba included, with a platinum line.',
+    body: 'Ceramic powder-coated titanium in your iPhone’s colour. Full board with Qi and neural chips. Every stone, moldavite and Paraíba included, with a platinum line.',
   },
   {
     id: 'brass',
     tier: 'moldavite',
     name: 'Solid brass',
-    price: { pro: 555, max: 589 },
-    body: 'Solid brass that darkens to a patina as you carry it, on an iPhone of any colour. The same full ñü.isheru and platinum line.',
+    body: 'Solid brass that darkens to a patina as you carry it, on an iPhone of any colour. Full board with Qi and neural chips. The same full ñü.isheru and platinum line.',
   },
-];
-type Model = 'pro' | 'max';
-const reserveHref = (edition: string, model: string, colour: string, price: number) =>
-  `mailto:${RESERVE_TO}?subject=${encodeURIComponent(`Buy suñůlink.shield: ${edition}, ${model}, ${colour}`)}&body=${encodeURIComponent(
-    `I’d like to buy one sunulink.shield.\n\nEdition: ${edition}\niPhone: ${model}\nFinish: ${colour}\nPrice: $${price} including tax, plus $${SHIPPING} overnight shipping, $${price + SHIPPING} total\n\nNo payment now. Invite me to pay in the khėnsu.ñü app when payment opens.`,
-  )}`;
+].map((e, ei) => {
+  const pro = atCost(parts.reduce((s, p) => s + (p[ei * 2 + 1] as number), 0));
+  const max = atCost(parts.reduce((s, p) => s + (p[ei * 2 + 2] as number), 0));
+  return { ...e, price: { pro, max } };
+});
 
-// Expected cost per shield at the first production run, in US dollars: [Ti Pro, Ti Pro Max, brass Pro, brass Pro Max].
-const parts = [
-  ['Machined housing', 87, 96, 62, 70],
-  ['Electronics and battery', 78, 78, 78, 78],
-  ['ñü.isheru, cut and set', 125, 125, 125, 125],
-  ['Platinum line, laid by hand', 15, 15, 15, 15],
-  ['Assembly and testing', 12, 12, 12, 12],
-  ['Packaging and USB-C cable', 8, 8, 8, 8],
-  ['Certification, per unit', 5, 5, 5, 5],
-] as const;
+const orderHref = (edition: string, model: string, colour: string, hardware: number) => {
+  const total = hardware + ACTIVATION + SHIPPING;
+  return `mailto:${ORDER_TO}?subject=${encodeURIComponent(`Pre-order suñůlink.shield: ${edition}, ${model}, ${colour}`)}&body=${encodeURIComponent(
+    `I’d like to pre-order one sunulink.shield. No payment yet — reserve my place in the queue.\n\nEdition: ${edition}\niPhone: ${model}\nFinish: ${colour}\nShield at cost: $${hardware} including tax\nActivation: $${ACTIVATION}\nOvernight shipping: $${SHIPPING}\nTotal when I pay: $${total}\n\nPlease confirm the pre-order. I’ll pay with ñü.wallet on the network when you invoice me.`,
+  )}`;
+};
+
 const columns = editions.flatMap((e) => models.map((m) => ({ edition: e, model: m, price: e.price[m.id as Model] })));
 const costs = columns.map((c, i) => {
   const unit = parts.reduce((s, p) => s + (p[i + 1] as number), 0);
   const warranty = unit * 0.05;
-  const tax = c.price - c.price / (1 + TAX);
-  const profit = c.price - tax - unit - warranty;
-  return { unit, warranty, tax, profit, net: c.price - tax };
+  const hardwareTax = c.price - c.price / (1 + TAX);
+  const activationTax = ACTIVATION - ACTIVATION / (1 + TAX);
+  const tax = hardwareTax + activationTax;
+  const fee = NETWORK_FEE;
+  const profit = c.price + ACTIVATION - tax - unit - warranty - fee;
+  return { unit, warranty, tax, fee, profit, net: c.price + ACTIVATION - tax };
 });
+const fromTotal = Math.min(...columns.map((c) => c.price)) + ACTIVATION;
 const usd = (n: number) => `$${n.toFixed(2).replace(/\.00$/, '')}`;
 
 const stones = [
@@ -106,14 +131,14 @@ const chakras = [
     Made in Morocco.<br /><em>Set with the ñü.isheru.</em>
   </ArHero>
 
-  <ProductBar name="suñůlink.shield" action="Buy" href="#order" explore="/shield" />
+  <ProductBar name="suñůlink.shield" action="Pre-order" href="#order" explore="https://shield.khensu.nu" />
 
   <section class="price-band">
     <div class="wrap price-in" data-reveal>
-      <p>A post-quantum node for your iPhone, set with the ñü.isheru.</p>
+      <p>A post-quantum node for your iPhone, set with the ñü.isheru. Pre-order now; pay later.</p>
       <div class="price-cta">
-        <span><b>From ${Math.min(...columns.map((c) => c.price))}</b> including tax · Ships {SHIPS}</span>
-        <a class="btn primary" href="#order">Buy</a>
+        <span><b>From ${fromTotal}</b> at cost + activation · Ships {SHIPS}</span>
+        <a class="btn primary" href="#order">Pre-order</a>
       </div>
     </div>
     <div class="wrap">
@@ -185,18 +210,20 @@ const chakras = [
         </ul>
 
         <dl class="total" aria-live="polite">
-          <div><dt>suñůlink.shield, tax included</dt><dd data-out="price">${editions[0].price.pro}</dd></div>
+          <div><dt>suñůlink.shield at cost, tax included</dt><dd data-out="price">${editions[0].price.pro}</dd></div>
+          <div><dt>Activation</dt><dd>${ACTIVATION}</dd></div>
           <div><dt>Overnight priority shipping, Saturday delivery</dt><dd>${SHIPPING}</dd></div>
-          <div class="sum"><dt>Total</dt><dd data-out="total">${editions[0].price.pro + SHIPPING}</dd></div>
+          <div class="sum"><dt>Total</dt><dd data-out="total">${editions[0].price.pro + ACTIVATION + SHIPPING}</dd></div>
         </dl>
-        <p class="opt-note">Platinum crescent line, every stone, moldavite and Paraíba included.</p>
-        <a class="btn primary reserve" data-shipping={SHIPPING} href={reserveHref(editions[0].name, models[0].name, colours[0].name, editions[0].price.pro)}>Buy · ${editions[0].price.pro + SHIPPING} total</a>
-        <p class="ships">Ships {SHIPS}</p>
+        <p class="opt-note">Sold at cost to make and warranty. Every shield pays the same ${ACTIVATION} activation. Platinum crescent line, every stone, moldavite and Paraíba included.</p>
+        <a class="btn primary reserve" data-shipping={SHIPPING} data-activation={ACTIVATION} href={orderHref(editions[0].name, models[0].name, colours[0].name, editions[0].price.pro)}>Pre-order · ${editions[0].price.pro + ACTIVATION + SHIPPING} when you pay</a>
+        <p class="ships">Ships {SHIPS} · No charge to reserve</p>
 
         <p class="fine">
-          Buying starts with an email and costs nothing up front: your order holds your place in line. Orders pay in the
-          khėnsu.ñü app, in the order they came in, over our own network with no card processor. Your shield ships in {SHIPS}; you can cancel
-          for a full refund at any time before it ships.
+          Pre-order locks your configuration in the queue. Nothing is charged today. When payment opens, you pay with
+          ñü.wallet on the network (shield at cost including tax, plus ${ACTIVATION} activation, plus overnight shipping).
+          No card processor. Tap Pre-order to email your configuration; we confirm your place. Cancel any time before
+          you pay. Ships in {SHIPS}.
         </p>
         <p class="more-phones">
           The 3D view shows iPhone 18 Pro; the Pro Max shield is the same design, sized to the larger phone. Shields for every iPhone back to iPhone X, and the equivalent Pixel
@@ -298,8 +325,9 @@ const chakras = [
       <p class="eyebrow">Cost and profit</p>
       <h2 class="big">Every cost, in the open.</h2>
       <p class="lede narrow">
-        What we expect a shield to cost to make and back with its warranty, the tax inside each price, and what is
-        left. These are the expected costs of the first production run; the actual costs are published when it ships.
+        Shields sell at the cost to make and back with the warranty. Everyone pays the same ${ACTIVATION} activation.
+        You pay with ñü.wallet on the network. What is left after tax and the network fee is the expected profit. These
+        are the expected costs of the first production run; the actual costs are published when it ships.
       </p>
       <div class="cost-wrap">
         <table class="cost">
@@ -312,22 +340,26 @@ const chakras = [
             ))}
             <tr class="sub"><th scope="row">Cost to make</th>{costs.map((c) => <td>{usd(c.unit)}</td>)}</tr>
             <tr><th scope="row">Warranty reserve (5%)</th>{costs.map((c) => <td>{usd(c.warranty)}</td>)}</tr>
-            <tr><th scope="row">Payment processing</th>{costs.map(() => <td>$0</td>)}</tr>
-            <tr class="sub"><th scope="row">Price, tax included</th>{columns.map((c) => <td>{usd(c.price)}</td>)}</tr>
-            <tr><th scope="row">Sales tax or VAT inside the price (estimate, {Math.round(TAX * 100)}%)</th>{costs.map((c) => <td>{usd(Math.round(c.tax * 100) / 100)}</td>)}</tr>
+            <tr class="sub"><th scope="row">Shield at cost, tax included</th>{columns.map((c) => <td>{usd(c.price)}</td>)}</tr>
+            <tr><th scope="row">Activation, tax included</th>{columns.map(() => <td>{usd(ACTIVATION)}</td>)}</tr>
+            <tr><th scope="row">Network fee (estimate, ≤{usd(NETWORK_FEE)})</th>{costs.map((c) => <td>{usd(c.fee)}</td>)}</tr>
+            <tr><th scope="row">Sales tax or VAT inside shield + activation (estimate, {Math.round(TAX * 100)}%)</th>{costs.map((c) => <td>{usd(Math.round(c.tax * 100) / 100)}</td>)}</tr>
             <tr class="profit">
               <th scope="row">Expected profit</th>
-              {costs.map((c) => <td>{usd(Math.round(c.profit * 100) / 100)} <small>({((c.profit / c.net) * 100).toFixed(0)}%)</small></td>)}
+              {costs.map((c) => <td>{usd(Math.round(c.profit * 100) / 100)}</td>)}
             </tr>
           </tbody>
         </table>
       </div>
       <p class="fine cost-note">
-        Prices include sales tax or VAT; the rate depends on where you live, so the tax line and the profit shift a
-        little by country and state. Shipping is extra and charged at cost: overnight priority with Saturday delivery,
-        the only option (FedEx Priority Overnight in the US; International Priority elsewhere, 1–3 business days),
-        ${SHIPPING} (estimate). Payment goes over khėnsu.ñü’s own network: no card fee, only a network fee of a fraction
-        of a cent (estimate), paid to the people who run the nodes. Import duty, where it applies, is shown before you pay.
+        The shield price is the cost to make plus the warranty reserve, with sales tax or VAT included; Core drops Qi
+        charging and the neural chips, so its board costs less. The ${ACTIVATION} activation is the same on every
+        edition. Tax rates depend on where you live, so the tax line and the profit shift a little by country and state.
+        Shipping is extra and charged at cost: overnight priority with Saturday delivery, the only option (FedEx
+        Priority Overnight in the US; International Priority elsewhere, 1–3 business days), ${SHIPPING} (estimate). There
+        is no card processor: you pay with ñü.wallet over the shielded pool. The only fee is the network fee to the
+        people who run the nodes (estimate: a fraction of a cent, shown here as {usd(NETWORK_FEE)}). Import duty, where
+        it applies, is shown before you pay.
       </p>
     </div>
   </section>
@@ -341,7 +373,7 @@ const chakras = [
         life and charge time vary with use and settings. The 3D view and AR use the CAD model, and
         the ñü.isheru is composed from stone photographs to show the design, not a specific shield. iPhone is a trademark of Apple Inc.
       </p>
-      <p><a href="/shield">Full sunulink.shield details</a></p>
+      <p><a href="https://shield.khensu.nu">Full sunulink.shield details</a></p>
     </div>
   </section>
 </Base>
@@ -353,7 +385,7 @@ const chakras = [
     items.forEach((el) => { if (el.getBoundingClientRect().top > innerHeight) io.observe(el); else el.classList.add('in'); });
     document.documentElement.classList.add('reveal-ready');
   }
-  const state = { finish: 'maroon', tier: 'moldavite', edition: 'titanium', model: 'pro' };
+  const state = { finish: 'maroon', tier: 'moldavite', edition: 'core', model: 'pro' };
   const closeup = document.querySelector<HTMLImageElement>('.inlay-closeup');
   const on = (sel: string) => document.querySelector<HTMLElement>(`${sel}.on`)!;
   const choose = (sel: string, el: Element) => {
@@ -370,12 +402,14 @@ const chakras = [
     for (const e of document.querySelectorAll<HTMLElement>('.edition')) e.querySelector('.price')!.textContent = `$${e.dataset[state.model]}`;
     const a = document.querySelector<HTMLAnchorElement>('.reserve')!;
     const ship = Number(a.dataset.shipping);
+    const activation = Number(a.dataset.activation);
+    const total = price + activation + ship;
     document.querySelector('[data-out="price"]')!.textContent = `$${price}`;
-    document.querySelector('[data-out="total"]')!.textContent = `$${price + ship}`;
-    a.textContent = `Buy · $${price + ship} total`;
-    const subject = `Buy suñůlink.shield: ${ed.dataset.name}, ${model.textContent}, ${colour}`;
-    const body = `I’d like to buy one sunulink.shield.\n\nEdition: ${ed.dataset.name}\niPhone: ${model.textContent}\nFinish: ${colour}\nPrice: $${price} including tax, plus $${ship} overnight shipping, $${price + ship} total\n\nNo payment now. Invite me to pay in the khėnsu.ñü app when payment opens.`;
-    a.href = `mailto:${new URL(a.href).pathname}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    document.querySelector('[data-out="total"]')!.textContent = `$${total}`;
+    a.textContent = `Pre-order · $${total} when you pay`;
+    const subject = `Pre-order suñůlink.shield: ${ed.dataset.name}, ${model.textContent}, ${colour}`;
+    const body = `I’d like to pre-order one sunulink.shield. No payment yet — reserve my place in the queue.\n\nEdition: ${ed.dataset.name}\niPhone: ${model.textContent}\nFinish: ${colour}\nShield at cost: $${price} including tax\nActivation: $${activation}\nOvernight shipping: $${ship}\nTotal when I pay: $${total}\n\nPlease confirm the pre-order. I’ll pay with ñü.wallet on the network when you invoice me.`;
+    a.href = `mailto:hello@elliottwave.studio?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     const finish = state.edition === 'brass' ? 'brass' : state.finish;
     dispatchEvent(new CustomEvent('shield:finish', { detail: { finish, tier: state.tier, phone: state.finish } }));
     if (closeup) closeup.src = `/khensu/stones/inlay-${state.tier}.png`;

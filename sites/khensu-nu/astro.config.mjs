@@ -16,7 +16,8 @@ policy.styleDirective.hashes = release.styleHashes;
 
 export default defineConfig({
   site: 'https://khensu.nu',
-  redirects: { '/sounds': '/waves' },
+  // Old /sounds path; product pages stay under dist/ for subdomain rewrites on the LB.
+  redirects: { '/sounds': 'https://waves.khensu.nu' },
   output: 'static',
   trailingSlash: 'ignore',
   build: { format: 'directory' },

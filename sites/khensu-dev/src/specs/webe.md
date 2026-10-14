@@ -1,13 +1,8 @@
----
-title: 'webË specification'
-source: 'WEBE.md'
----
-
 # webË
 
 Version 1.0, 11 Oct 2026. The basis for a family of Internet-Drafts.
 
-webË is an internet run by the people on the khensu.ñü node network: names without DNS, content without CDNs, websites, public feeds, forums and live media, all delivered over a post-quantum stealth network with no metered bandwidth. Nodes only relay, cache and count; encoding, encryption, ranking, moderation and rendering happen on devices. The khensu.ñü app is the first webË application: primarily a messenger, with a Feed tab, public forums, site hosting and contracts.
+webË is an internet run by the people on the khensu.nu node network: names without DNS, content without CDNs, websites, public feeds, forums and live media, all delivered over a post-quantum stealth network with no metered bandwidth. Nodes only relay, cache and count; encoding, encryption, ranking, moderation and rendering happen on devices. The khensu.nu app is the first webË application: primarily a messenger, with a Feed tab, public forums, site hosting and contracts.
 
 Wire primitives, encodings and the mixnet are as in `PROTOCOL.md` (sections 1, 3, 8, 9); this document adds the webË layers. Stealth rules are in `PLAN.md` (Stealth) and `design/stealth-relay.md`.
 
@@ -29,7 +24,7 @@ Wire primitives, encodings and the mixnet are as in `PROTOCOL.md` (sections 1, 3
 | Objects | Content-addressed chunks, manifests, signed roots | 4 |
 | Fetch and publish | Two-relay stealth fetch, publish through ticks or the owner's node | 5, 6 |
 | Applications | Sites, feeds, forums, live tracks | 7–10 |
-| Clients | khensu.ñü app viewer, Chromium extension and patch | 11 |
+| Clients | khensu.nu app viewer, Chromium extension and patch | 11 |
 | Contracts | Private, self-enforcing agreements, proved with STARKs and settled in the shielded pool | 14 |
 | Network work | Jobs nodes do for the network and for contracts, paid from work receipts | `WORK.md` |
 
@@ -173,14 +168,14 @@ Every object is verified against its address before use; manifests are verified 
 
 ### 7.1 Link previews
 
-A link shared into a chat, a feed or another site carries a preview. On the ordinary web a preview is one still image (`og:image`). On webË, and on the khensu.ñü sites today, a preview is **media**: anything the receiving client can show, play or open, declared by the page in `nu:preview` meta tags next to the Open Graph ones, which stay as the fallback for every client that doesn't read `nu:preview`.
+A link shared into a chat, a feed or another site carries a preview. On the ordinary web a preview is one still image (`og:image`). On webË, and on the khensu.nu sites today, a preview is **media**: anything the receiving client can show, play or open, declared by the page in `nu:preview` meta tags next to the Open Graph ones, which stay as the fallback for every client that doesn't read `nu:preview`.
 
 ```html
 <meta property="og:image" content="https://khensu.nu/og/buy.jpg" />
 <meta property="og:image:alt" content="…" />
 <meta property="nu:preview" content="https://khensu.nu/og/buy-square.mp4" />
 <meta property="nu:preview:type" content="video/mp4; codecs=hvc1" />
-<meta property="nu:preview:duration" content="3" />
+<meta property="nu:preview:duration" content="4" />
 <meta property="nu:preview:size" content="1080x1080" />
 <meta property="nu:preview:bytes" content="3279733" />
 <meta property="nu:preview:hash" content="sha-256=…" />
@@ -192,11 +187,11 @@ A link shared into a chat, a feed or another site carries a preview. On the ordi
 - **Fetch.** Preview media is fetched like any other object: on webË through the two-relay stealth fetch (5.1); on the ordinary web through the app's mixnet exit. Previews are capped at 8 MiB and 10 s unless the person taps to load more. `nu:preview:hash` must match or the preview is dropped and the `og:image` still is shown instead.
 - **Rendering on Apple platforms.** The app renders previews in SwiftUI. Video previews are decoded by VideoToolbox (HEVC with alpha where present) or by the nu.media decoder on the Neural Engine, then drawn through a Metal layer so a page can ask for one of a small set of named effects in `nu:preview:effect`: `ripple` (a touch sends a ring across the video), `tilt` (parallax with the device), `glass` (the Liquid Glass material over the frame) and `none`. The effect is a hint; a client may ignore it, and reduced-motion settings always do.
 - **Privacy.** Fetching a preview must not tell the page who looked: no cookies, no referrer, no per-person URL. Clients fetch previews through the mixnet, prefetch at most the first `nu:preview`, and strip `nu:preview:*` from pages they publish on a person's behalf unless the author set them.
-- **The khensu.ñü sites.** Every page on khensu.ñü and dev.khensu.nu emits `og:image` (1200 × 630), the square still for Instagram-style link pages, and, where one exists, `nu:preview` with the 3-second HEVC square (`tools/og-anim.sh`): Earth time-lapsed under the phone turning once, the card's words on top.
+- **The khensu.nu sites.** Every page on khensu.nu and dev.khensu.nu emits `og:image` (1200 × 630), `og:video` pointing at a direct landscape MP4 so Apple Messages autoplays the preview (TN3156; `design/indra.md`), the square still for Instagram-style link pages, and, where one exists, `nu:preview` with the HEVC square (`tools/og-anim.sh`, 4 s): Earth time-lapsed under the phone turning once, Indra's lattice over it, the card's words on top.
 
 ## 8. Feeds
 
-The Feed tab in the khensu.ñü app and the public square in `PLAN.md`.
+The Feed tab in the khensu.nu app and the public square in `PLAN.md`.
 
 ```
 struct {
@@ -253,13 +248,13 @@ struct {
 
 ## 11. Clients
 
-### 11.1 khensu.ñü app
+### 11.1 khensu.nu app
 
 Feed tab, forums inside Feed, and a site viewer: a `WKWebView` with a `WKURLSchemeHandler` for `webe://`, which serves verified objects from the local daemon in `khensu-core`. iOS doesn't let apps intercept `https` in web views, so shared `https://name.khensu.nu` links are rewritten to `webe://` when opened in the app.
 
 ### 11.2 Chromium
 
-- **Extension (first):** one WebExtensions codebase for Chrome, Edge, Firefox and Safari. It runs the webË client itself (`khensu-core` in WebAssembly over WebTransport; in Safari, the khensu.ñü app through native messaging), so no local daemon or proxy is needed. It catches `https://*.khensu.nu` and `webe://` before they reach the network and shows sites in its own viewer until browsers let extensions serve `webe://` origins. Design and the upstream proposal in `design/browser.md`.
+- **Extension (first):** one WebExtensions codebase for Chrome, Edge, Firefox and Safari. It runs the webË client itself (`khensu-core` in WebAssembly over WebTransport; in Safari, the khensu.nu app through native messaging), so no local daemon or proxy is needed. It catches `https://*.khensu.nu` and `webe://` before they reach the network and shows sites in its own viewer until browsers let extensions serve `webe://` origins. Design and the upstream proposal in `design/browser.md`.
 - **Patch (second):** a native webË network service, `webe://` as a standard secure scheme, and stealth defences: fixed window sizes, WebRTC off, restricted high-entropy APIs, no third-party requests.
 
 ### 11.3 Site policy
