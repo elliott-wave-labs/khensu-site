@@ -1,0 +1,40 @@
+---
+// Mute-loop player for Slack-class video blocks / custom unfurls.
+// Same-origin /og/*.mp4 only. Note: the sites LB currently sends
+// X-Frame-Options: DENY / frame-ancestors 'none', so Slack iframes need a
+// path exception before this embeds; until then paste the MP4 URL in Slack.
+const ALLOWED = new Set(['home', 'buy', 'creators', 'waves', 'thumb']);
+const raw = Astro.url.searchParams.get('src') || 'waves';
+const slug = ALLOWED.has(raw) ? raw : 'waves';
+const src = `/og/${slug}.mp4`;
+const poster = `/og/${slug}.jpg`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>khėnsu.ñü preview</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #0a0b0d;
+        overflow: hidden;
+      }
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        background: #0a0b0d;
+      }
+    </style>
+  </head>
+  <body>
+    <video src={src} poster={poster} muted autoplay loop playsinline></video>
+  </body>
+</html>

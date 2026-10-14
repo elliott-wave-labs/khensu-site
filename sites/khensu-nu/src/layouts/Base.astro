@@ -106,6 +106,18 @@ const navCurrent = (href: string) => {
         <meta property="og:video:type" content="video/mp4" />
         <meta property="og:video:width" content={ogVideoW} />
         <meta property="og:video:height" content={ogVideoH} />
+        {/* IETF link-preview-media profile: H.264 landscape for broad unfurlers. */}
+        <meta property="preview:url" content={previewWideUrl} />
+        <meta property="preview:type" content="video/mp4; codecs=avc1" />
+        <meta property="preview:duration" content={String(previewMeta.duration)} />
+        <meta property="preview:size" content={`${ogVideoW}x${ogVideoH}`} />
+        <meta
+          property="preview:bytes"
+          content={String(previewMeta.wideBytes ?? previewMeta.bytes)}
+        />
+        {previewMeta.wideHash && <meta property="preview:hash" content={previewMeta.wideHash} />}
+        <meta property="preview:policy" content="mute loop autoplay" />
+        {/* webË / Apple-quality square (WEBE.md 7.1); synonym of preview:* when clients prefer it. */}
         <meta property="nu:preview" content={previewSquareUrl} />
         <meta property="nu:preview:type" content="video/mp4; codecs=hvc1" />
         <meta property="nu:preview:duration" content={String(previewMeta.duration)} />
