@@ -7,6 +7,7 @@ import { VENUES, type Pos, type Track, type Venue, type Channel } from '../../da
 import { createVoice, clipBuffer, impulse, type Voice } from './gen';
 import { listenerVectors, type Pose } from './head';
 import { onAir } from './channels';
+import type { Scene } from './scene';
 
 export type Mode = 'orig' | 'bed' | 'waves';
 export type Repeat = 'off' | 'all' | 'one';
@@ -28,6 +29,8 @@ export type PlayTrack = Track & {
 };
 
 export type ObjKind = 'stem' | 'left' | 'right' | 'mono' | 'direct';
+/** nu.orbit: a sound walks a horizontal ellipse around a centre without re-encoding the audio. */
+export type ObjOrbit = { rate: number; radius: number; phase: number; center: Pos };
 export type Obj = {
   key: string;
   kind: ObjKind;
@@ -38,6 +41,8 @@ export type Obj = {
   clone: boolean;
   gone?: boolean;
   level: number;
+  /** Radians per second around `center` on a circle of `radius` metres (nu.orbit). */
+  orbit?: ObjOrbit | null;
   el?: HTMLAudioElement;
   voice?: Voice;
   panner?: PannerNode;
@@ -140,6 +145,9 @@ export class Engine {
   channel: Channel | null = null;
   private channelSlot = 0;
   sleepAt = 0;
+  /** When set, sleep collapses the room (nu.dim) over this many ms before pausing. */
+  private dimUntil = 0;
+  private dimFrom: { wet: number; volume: number; positions: Map<Obj, Pos> } | null = null;
   tone = { hold: 8, fade: 4, cross: 2 };
   pose: Pose = { yaw: 0, pitch: 0, roll: 0 };
   selected: Obj | null = null;
@@ -428,8 +436,46 @@ export class Engine {
   }
   moveObj(o: Obj, pos: Pos) {
     o.pos = { ...pos };
+    if (o.orbit) o.orbit.center = { ...pos };
     this.place(o);
     this.selected = o;
+  }
+
+  /** Starts or stops nu.orbit on a sound. Rate is revolutions per minute; 0 clears. */
+  setOrbit(o: Obj, rpm: number) {
+    if (o.kind === 'direct' || o.gone) return;
+    if (rpm <= 0) {
+      o.orbit = null;
+      this.emit();
+      return;
+    }
+    const r = Math.max(0.35, Math.min(2.2, Math.hypot(o.pos.x, o.pos.y) * 0.55 || 0.8));
+    o.orbit = {
+      rate: (rpm / 60) * Math.PI * 2,
+      radius: r,
+      phase: Math.atan2(o.pos.x, o.pos.y),
+      center: { x: 0, y: Math.max(0.4, o.pos.y * 0.35), z: o.pos.z },
+    };
+    this.emit();
+  }
+
+  applyScene(s: Scene) {
+    if (s.venue) this.setVenue(s.venue);
+    if (s.fx) this.setFx(s.fx, null);
+    if (s.mode) this.setMode(s.mode);
+    const d = this.deck;
+    if (!d) return;
+    for (const so of s.objs) {
+      const o = d.objs.find((x) => x.key === so.key || x.label === so.label || (so.key && x.stem && so.key.includes(x.stem)));
+      if (!o) continue;
+      o.pos = { ...so.pos };
+      this.place(o);
+      if (so.gone && !o.gone) this.removeObj(o);
+      if (so.orbit) {
+        o.orbit = { rate: so.orbit.rate, radius: so.orbit.radius, phase: so.orbit.phase, center: { x: 0, y: Math.max(0.4, so.pos.y * 0.35), z: so.pos.z } };
+      } else o.orbit = null;
+    }
+    this.emit();
   }
   select(o: Obj | null) {
     this.selected = o;
@@ -942,6 +988,18 @@ export class Engine {
   }
   setSleep(minutes: number) {
     this.sleepAt = minutes > 0 ? Date.now() + minutes * 60_000 : 0;
+    if (!minutes) {
+      this.dimUntil = 0;
+      this.dimFrom = null;
+    }
+    this.emit();
+  }
+
+  clearQueue() {
+    if (this.live) return;
+    const cur = this.track;
+    this.queue = cur ? [cur] : [];
+    this.index = cur ? 0 : -1;
     this.emit();
   }
   setTone(part: Partial<{ hold: number; fade: number; cross: number }>) {
@@ -1013,6 +1071,40 @@ export class Engine {
           v = Math.max(0, Math.min(1, (db + 62) / 44));
         }
         o.level = o.level * 0.7 + v * 0.3;
+        // nu.orbit: walk the ellipse; samples stay put, only the position numbers change.
+        if (o.orbit && d.playing && !o.gone && o.kind !== 'direct') {
+          const dt = 1 / 60;
+          o.orbit.phase += o.orbit.rate * dt;
+          const { center: c, radius: r, phase } = o.orbit;
+          o.pos = { x: c.x + Math.sin(phase) * r, y: c.y + Math.cos(phase) * r, z: c.z };
+          this.place(o);
+        }
+      }
+      // nu.dim: last 45 s of a sleep timer collapse the room toward you, then fade volume.
+      if (this.sleepAt && d.playing) {
+        const left = this.sleepAt - Date.now();
+        if (left <= 45_000 && left > 0) {
+          if (!this.dimFrom) {
+            this.dimFrom = {
+              wet: this.fx.wet,
+              volume: this.volume,
+              positions: new Map(d.objs.map((o) => [o, { ...o.pos }])),
+            };
+            this.dimUntil = this.sleepAt;
+          }
+          const k = Math.max(0, Math.min(1, left / 45_000));
+          const collapse = 1 - (1 - k) * (1 - k);
+          for (const o of d.objs) {
+            if (o.kind === 'direct' || o.gone) continue;
+            const from = this.dimFrom.positions.get(o) ?? o.pos;
+            o.pos = { x: from.x * collapse, y: from.y * collapse, z: from.z * collapse };
+            o.orbit = null;
+            this.place(o);
+          }
+          this.fx.wet = Math.round(this.dimFrom.wet * collapse);
+          this.volume = this.dimFrom.volume * (0.15 + 0.85 * k);
+          this.room();
+        }
       }
       if (d.playing && !d.ended && !this.channel) {
         const pos = d.position();

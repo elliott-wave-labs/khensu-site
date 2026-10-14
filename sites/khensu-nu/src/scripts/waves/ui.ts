@@ -9,6 +9,9 @@ import { HeadTracker, hasCamera, hasDeviceMotion, hasNative, type HeadSource } f
 import * as lib from './library';
 import * as store from './store';
 import { onAir, upcoming } from './channels';
+import { capture as captureScene, encodeShare, decodeShare, type Scene } from './scene';
+import { InkPen, inkSvg } from './ink';
+import { tide, resolveTide } from './tide';
 
 // MARK: Helpers
 
@@ -44,6 +47,13 @@ const ICON = {
   live: '<i class="wv-live-dot" aria-hidden="true"></i>',
 };
 
+declare global {
+  interface BeforeInstallPromptEvent extends Event {
+    prompt: () => Promise<void>;
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+  }
+}
+
 type Route = { name: string; id?: string; sub?: string; q?: string };
 const parseRoute = (): Route => {
   const raw = location.hash.replace(/^#\/?/, '');
@@ -76,6 +86,12 @@ export class App {
   private seeking = false;
   private menuFor: string | null = null;
   private toastTimer = 0;
+  private scenes: Scene[] = [];
+  private ink = new InkPen();
+  private inkTrack = '';
+  private wake: WakeLockSentinel | null = null;
+  private installEvt: BeforeInstallPromptEvent | null = null;
+  private barSwipe: { x: number; y: number } | null = null;
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -88,15 +104,22 @@ export class App {
   async boot() {
     const e = this.engine;
     e.loader = (t) => lib.resolve(t.id);
-    e.onPlayed((t, dur) => void store.history.add(t.id, dur));
+    e.onPlayed((t, dur) => {
+      void store.history.add(t.id, dur);
+      void this.sealInk();
+    });
     this.bubble = new Bubble(this.now.querySelector('[data-ring]')!, e, this.now.querySelector<HTMLInputElement>('[data-height]') ?? undefined, this.now.querySelector('[data-height-out]') ?? undefined);
     this.bubble.onSelect = () => this.paintShape();
     await this.loadState();
     this.bind();
-    e.on(() => this.paintNow());
+    e.on(() => {
+      this.paintNow();
+      void this.refreshWake();
+    });
     this.paintNow();
     addEventListener('hashchange', () => void this.render());
     await this.render();
+    this.consumeShareHash();
     const first = () => {
       e.unlock();
       removeEventListener('pointerdown', first, true);
@@ -107,11 +130,17 @@ export class App {
     const loop = (now: number) => {
       e.frame(now);
       this.head.frame();
-      if (this.head.source !== 'off' || Math.abs(this.head.pose.yaw) + Math.abs(this.head.pose.pitch) > 1e-3) e.setPose(this.head.pose);
+      if (this.head.source !== 'off' || Math.abs(this.head.pose.yaw) + Math.abs(this.head.pose.pitch) > 1e-3) {
+        e.setPose(this.head.pose);
+        this.ink.mark(this.head.pose.yaw / Math.PI, this.head.pose.pitch / Math.PI, 'head');
+      }
+      const sel = e.selected;
+      if (sel && !sel.gone) this.ink.mark(sel.pos.x / 4, sel.pos.y / 4, 'drag');
       if (!this.now.hidden) this.bubble.frame(now);
       if (now - this.lastPaint > 240) {
         this.lastPaint = now;
         this.paintTime();
+        this.paintInkLive();
       }
       requestAnimationFrame(loop);
     };
@@ -123,15 +152,25 @@ export class App {
       lib.requestNativeLibrary();
     }
     void store.persist();
+    this.bindInstall();
+    this.paintOffline();
   }
 
   private async loadState() {
-    const [kept, likes, follows, files, playlists] = await Promise.all([store.downloads.all(), store.likes.all(), store.follows.all(), store.files.all(), store.playlists.all()]).catch(() => [[], [], [], [], []] as const);
+    const [kept, likes, follows, files, playlists, scenes] = await Promise.all([
+      store.downloads.all(),
+      store.likes.all(),
+      store.follows.all(),
+      store.files.all(),
+      store.playlists.all(),
+      store.scenes.all(),
+    ]).catch(() => [[], [], [], [], [], []] as const);
     this.kept = new Set(kept.map((d) => d.trackId));
     this.liked = new Set(likes.map((l) => l.key));
     this.follows = new Set(follows.map((f) => f.id));
     this.files = files.sort((a, b) => b.added - a.added);
     this.playlists = playlists;
+    this.scenes = scenes;
     const s = store.settings;
     const e = this.engine;
     const venue = await s.get('venue', 'hall');
@@ -252,6 +291,18 @@ export class App {
       const t = air && trackOf(air.item.trackId);
       el.textContent = t ? `${t.title} · ${artistOf(t.artistId)?.name ?? ''}` : 'off air';
     }
+    const tideEl = this.view.querySelector<HTMLElement>('[data-home-tide]');
+    if (tideEl) {
+      const t = tide();
+      const r = resolveTide(t);
+      const cards = [
+        ...r.collections.map((c) => this.collectionCard(c)),
+        ...r.albums.map((a) => this.albumCard(a)),
+        ...r.channels.map((c) => this.channelCard(c)),
+        ...r.tracks.map((tr) => this.trackCard(lib.decorate(tr))),
+      ].slice(0, 8);
+      tideEl.innerHTML = `<section class="wv-sec wv-tide" data-tide="${esc(t.band)}">${h2(t.label)}<p class="wv-lib-note">${esc(t.lede)}</p>${this.rail(cards)}</section>`;
+    }
     const mine = this.view.querySelector<HTMLElement>('[data-home-mine]');
     if (!mine) return;
     const recent = await store.history.recent(12).catch(() => []);
@@ -259,6 +310,13 @@ export class App {
     const recentTracks = recent.filter((h) => (seen.has(h.key) ? false : seen.add(h.key))).map((h) => this.light(h.key)).filter((t): t is PlayTrack => !!t).slice(0, 8);
     let html = '';
     if (recentTracks.length) html += `<section class="wv-sec">${h2('Recently played')}${this.rail(recentTracks.map((t) => this.trackCard(t)))}</section>`;
+    const mixIds = [...this.liked, ...recent.map((h) => h.key)].filter((id, i, a) => a.indexOf(id) === i).slice(0, 24);
+    const mix = this.tracksOf(mixIds).slice(0, 12);
+    if (mix.length >= 3) {
+      html += `<section class="wv-sec">${h2('Made for you', `<button type="button" class="wv-h-link" data-act="play-all" data-ids="${esc(JSON.stringify(mix.map((t) => t.id)))}">Play</button>`)}<p class="wv-lib-note">From likes and what you played, shuffled on this device. Nothing leaves it.</p>${this.rail(mix.map((t) => this.trackCard(t)))}</section>`;
+    }
+    const followed = ARTISTS.filter((a) => this.follows.has(a.id));
+    if (followed.length) html += `<section class="wv-sec">${h2('Following')}${this.rail(followed.map((a) => this.artistCard(a)))}</section>`;
     const mineTracks = this.fileTracks();
     if (mineTracks.length) html += `<section class="wv-sec">${h2('Your files', `<a class="wv-h-link" href="#/library/files">${plural(mineTracks.length, 'file')}</a>`)}${this.list(mineTracks.slice(0, 5), { art: true })}</section>`;
     mine.innerHTML = html;
@@ -355,6 +413,8 @@ export class App {
       ['kept', 'Kept offline'],
       ['liked', 'Liked'],
       ['playlists', 'Playlists'],
+      ['scenes', 'Scenes'],
+      ['ink', 'Ink'],
       ['history', 'History'],
       ['following', 'Following'],
     ];
@@ -389,6 +449,31 @@ ${tracks.length ? this.headActions(ids) : ''}${this.list(tracks, { art: true, sh
     } else if (sub === 'playlists') {
       body = `<div class="wv-acts-row"><button type="button" class="wv-btn wv-btn-primary" data-act="new-playlist"><span>New playlist</span></button></div>
 ${this.playlists.length ? this.rail(this.playlists.map((p) => this.playlistCard(p))) : `<p class="wv-empty">No playlists yet.</p>`}`;
+    } else if (sub === 'scenes') {
+      const all = await store.scenes.all();
+      this.scenes = all;
+      body = all.length
+        ? `<p class="wv-lib-note">ñü.scene layouts stay on this device. Open a track, then recall a scene mid-listen.</p><ul class="wv-scene-lib">${all
+            .map(
+              (s) => `<li>
+  <b>${esc(s.name)}</b>
+  <small>${esc(s.trackId ? trackOf(s.trackId)?.title || s.trackId : 'any track')} · ${new Date(s.updated).toLocaleDateString()}</small>
+  <span class="wv-acts-row">
+    <button type="button" class="wv-btn" data-act="scene-apply" data-id="${esc(s.id)}"><span>Recall</span></button>
+    <button type="button" class="wv-btn" data-act="scene-share" data-id="${esc(s.id)}"><span>Copy code</span></button>
+    <button type="button" class="wv-btn" data-act="scene-delete" data-id="${esc(s.id)}"><span>Delete</span></button>
+  </span>
+</li>`,
+            )
+            .join('')}</ul>`
+        : `<p class="wv-empty">No scenes yet. Play something, arrange the spacetime bubble, then save a ñü.scene.</p>`;
+    } else if (sub === 'ink') {
+      const rows = await store.inks.recent(60);
+      body = rows.length
+        ? `<p class="wv-lib-note">ñü.ink glyphs of how you listened. Private to this device.</p><div class="wv-ink-grid">${rows
+            .map((ink) => `<figure class="wv-ink-card" title="${esc(ink.title)}">${inkSvg(ink.d, 120)}<figcaption><b>${esc(ink.title)}</b><small>${new Date(ink.at).toLocaleString()}</small></figcaption><button type="button" class="wv-btn" data-act="ink-delete" data-id="${esc(ink.id)}"><span>Delete</span></button></figure>`)
+            .join('')}</div><div class="wv-acts-row"><button type="button" class="wv-btn" data-act="ink-clear"><span>Clear all ink</span></button></div>`
+        : `<p class="wv-empty">No ink yet. Drag sounds or turn your head while something plays, then keep the glyph.</p>`;
     } else if (sub === 'history') {
       const rows = await store.history.recent(100);
       const tracks = rows.map((r) => this.light(r.key)).filter((t): t is PlayTrack => !!t);
@@ -538,9 +623,43 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       } else if (e.key === 'Escape' && !this.now.hidden) this.openNow(false);
       else if (e.key === 'ArrowRight' && e.shiftKey) this.engine.seek(this.engine.position() + 10);
       else if (e.key === 'ArrowLeft' && e.shiftKey) this.engine.seek(this.engine.position() - 10);
+      else if (e.key === 'n' || e.key === 'N') void this.engine.next();
+      else if (e.key === 'p' || e.key === 'P') void this.engine.prev();
+      else if (e.key === 'm' || e.key === 'M') {
+        this.engine.setVolume(this.engine.volume > 0 ? 0 : 1);
+        this.save();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.engine.setVolume(this.engine.volume + 0.05);
+        this.save();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        this.engine.setVolume(this.engine.volume - 0.05);
+        this.save();
+      } else if (e.key === 'f' || e.key === 'F') void this.like(this.engine.track?.id || '');
     });
-    addEventListener('online', () => this.toast('Back online.'));
-    addEventListener('offline', () => this.toast('Offline. Kept tracks, your files and generated sounds still play.'));
+    addEventListener('online', () => {
+      this.toast('Back online.');
+      this.paintOffline();
+    });
+    addEventListener('offline', () => {
+      this.toast('Offline. Kept tracks, your files and generated sounds still play.');
+      this.paintOffline();
+    });
+    // Swipe the mini bar: left = next, right = previous.
+    this.bar.addEventListener('pointerdown', (e) => {
+      this.barSwipe = { x: e.clientX, y: e.clientY };
+    });
+    this.bar.addEventListener('pointerup', (e) => {
+      if (!this.barSwipe) return;
+      const dx = e.clientX - this.barSwipe.x;
+      const dy = e.clientY - this.barSwipe.y;
+      this.barSwipe = null;
+      if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+      if (dx < 0) void this.engine.next();
+      else void this.engine.prev();
+    });
+    document.addEventListener('visibilitychange', () => void this.refreshWake());
   }
   private searchTimer = 0;
 
@@ -617,6 +736,20 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'queue-remove':
         eng.removeAt(Number(el.dataset.i));
         break;
+      case 'queue-clear':
+        eng.clearQueue();
+        this.toast('Queue cleared.');
+        break;
+      case 'queue-up': {
+        const i = Number(el.dataset.i);
+        eng.move(i, Math.max(0, i - 1));
+        break;
+      }
+      case 'queue-down': {
+        const i = Number(el.dataset.i);
+        eng.move(i, Math.min(eng.queue.length - 1, i + 1));
+        break;
+      }
       case 'queue-next':
       case 'queue-last': {
         const t = this.light(id);
@@ -790,6 +923,60 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'sleep-off':
         eng.setSleep(0);
         break;
+      case 'orbit': {
+        const o = eng.selected ?? eng.objs()[0];
+        if (o) eng.setOrbit(o, Number(el.dataset.rpm));
+        this.toast(Number(el.dataset.rpm) ? 'ñü.orbit on the selected sound.' : 'Orbit stopped.');
+        break;
+      }
+      case 'orbit-all': {
+        const rpm = Number(el.dataset.rpm);
+        for (const o of eng.objs()) if (o.kind !== 'direct' && !o.gone) eng.setOrbit(o, rpm);
+        this.toast('Every sound drifts.');
+        break;
+      }
+      case 'scene-save':
+        await this.saveScene();
+        break;
+      case 'scene-apply':
+        await this.applySceneId(id || el.dataset.id || '');
+        break;
+      case 'scene-share':
+        await this.shareScene(id || el.dataset.id || '');
+        break;
+      case 'scene-import':
+        await this.importScene();
+        break;
+      case 'scene-delete':
+        await store.scenes.remove(id);
+        this.scenes = this.scenes.filter((s) => s.id !== id);
+        this.toast('Scene deleted.');
+        await this.render();
+        break;
+      case 'ink-seal':
+        await this.sealInk(true);
+        break;
+      case 'ink-delete':
+        await store.inks.remove(id);
+        await this.render();
+        break;
+      case 'ink-clear':
+        if (confirm('Clear every ñü.ink glyph on this device?')) {
+          await store.inks.clear();
+          await this.render();
+        }
+        break;
+      case 'install':
+        if (this.installEvt) {
+          await this.installEvt.prompt();
+          this.installEvt = null;
+          this.paintInstall();
+        }
+        break;
+      case 'install-dismiss':
+        void store.settings.set('installDismissed', Date.now());
+        this.paintInstall(true);
+        break;
     }
   }
 
@@ -831,8 +1018,153 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       eng.setRepeat('all');
       eng.setCrossfade(Math.max(eng.crossfade, eng.tone.cross));
     }
+    void this.sealInk();
     eng.setQueue(tracks, start);
+    const t = tracks[Math.max(0, Math.min(start, tracks.length - 1))];
+    if (t) {
+      this.ink.begin(t.id, t.title);
+      this.inkTrack = t.id;
+    }
     this.openNow(true);
+  }
+
+  private async saveScene() {
+    const eng = this.engine;
+    const t = eng.track;
+    if (!t) return this.toast('Play something first.');
+    const name = prompt('Scene name', `${t.title} · ${eng.venue.label}`) || '';
+    if (!name.trim()) return;
+    const s = captureScene(t.id, name, eng.venue.id, eng.fx, eng.mode, eng.objs());
+    await store.scenes.put(s);
+    this.scenes = [s, ...this.scenes.filter((x) => x.id !== s.id)];
+    this.toast(`Saved “${s.name}”.`);
+    this.paintScenes();
+  }
+
+  private async applySceneId(id: string) {
+    const s = this.scenes.find((x) => x.id === id) || (await store.scenes.get(id));
+    if (!s) return;
+    if (s.trackId && this.engine.track && s.trackId !== this.engine.track.id) {
+      const tr = this.light(s.trackId);
+      if (tr) {
+        this.engine.enqueue([tr], true);
+        await this.engine.next();
+      }
+    }
+    this.engine.applyScene(s);
+    this.toast(`Recalled “${s.name}”.`);
+    this.openNow(true);
+  }
+
+  private async shareScene(id: string) {
+    const eng = this.engine;
+    let s = id ? this.scenes.find((x) => x.id === id) || (await store.scenes.get(id)) : null;
+    if (!s && eng.track) s = captureScene(eng.track.id, eng.track.title, eng.venue.id, eng.fx, eng.mode, eng.objs());
+    if (!s) return;
+    const code = encodeShare(s);
+    try {
+      await navigator.clipboard.writeText(code);
+      this.toast('Scene code copied. It is only numbers and letters — paste it into nu.waves.');
+    } catch {
+      prompt('Copy this scene code', code);
+    }
+  }
+
+  private async importScene() {
+    const code = prompt('Paste a ñü.scene share code');
+    if (!code) return;
+    const s = decodeShare(code.trim());
+    if (!s) return this.toast('That code could not be read.');
+    await store.scenes.put(s);
+    this.scenes.unshift(s);
+    this.engine.applyScene(s);
+    this.toast(`Imported “${s.name}”.`);
+    this.paintScenes();
+  }
+
+  private consumeShareHash() {
+    const q = new URLSearchParams(location.hash.split('?')[1] ?? '');
+    const code = q.get('scene');
+    if (!code) return;
+    const s = decodeShare(code);
+    if (!s) return;
+    void store.scenes.put(s).then(() => {
+      this.scenes.unshift(s);
+      this.toast(`Scene “${s.name}” ready. Play the track, then recall it.`);
+    });
+  }
+
+  private async sealInk(force = false) {
+    if (!force && this.ink.points.length < 8) {
+      this.ink.clear();
+      return;
+    }
+    const ink = this.ink.seal();
+    this.ink.clear();
+    this.inkTrack = '';
+    if (!ink) {
+      if (force) this.toast('Move a sound or turn your head a little first.');
+      return;
+    }
+    await store.inks.put(ink);
+    if (force) this.toast('ñü.ink kept on this device.');
+    this.paintInkLive();
+  }
+
+  private paintInkLive() {
+    const el = this.now.querySelector<HTMLElement>('[data-ink-live]');
+    if (!el) return;
+    const d = this.ink.previewD();
+    el.innerHTML = d ? inkSvg(d, 72) : '';
+  }
+
+  private bindInstall() {
+    addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      this.installEvt = e as BeforeInstallPromptEvent;
+      void this.paintInstall();
+    });
+    void this.paintInstall();
+  }
+
+  private async paintInstall(forceHide = false) {
+    const el = this.root.querySelector<HTMLElement>('[data-install]');
+    if (!el) return;
+    const dismissed = await store.settings.get('installDismissed', 0);
+    const hide = forceHide || !this.installEvt || (dismissed && Date.now() - dismissed < 14 * 864e5);
+    el.hidden = !!hide;
+  }
+
+  private paintOffline() {
+    const el = this.root.querySelector<HTMLElement>('[data-offline]');
+    if (el) el.hidden = navigator.onLine;
+  }
+
+  private async refreshWake() {
+    try {
+      if (this.engine.playing && document.visibilityState === 'visible') {
+        if (!this.wake && 'wakeLock' in navigator) this.wake = await navigator.wakeLock.request('screen');
+      } else {
+        await this.wake?.release();
+        this.wake = null;
+      }
+    } catch {
+      this.wake = null;
+    }
+  }
+
+  private paintScenes() {
+    const list = this.now.querySelector<HTMLElement>('[data-scene-list]');
+    if (!list) return;
+    const tid = this.engine.track?.id;
+    const rows = this.scenes.filter((s) => !s.trackId || s.trackId === tid).slice(0, 8);
+    list.innerHTML = rows.length
+      ? rows
+          .map(
+            (s) => `<button type="button" class="wv-chip" data-act="scene-apply" data-id="${esc(s.id)}">${esc(s.name)}</button>`,
+          )
+          .join('')
+      : '<span class="wv-lib-note">No scenes for this track yet.</span>';
   }
 
   private async tune(id: string) {
@@ -971,6 +1303,11 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     document.body.classList.toggle('wv-has-bar', !!t);
     bar.hidden = !t;
     if (!t) return;
+    if (t.id !== this.inkTrack) {
+      void this.sealInk();
+      this.ink.begin(t.id, t.title);
+      this.inkTrack = t.id;
+    }
     const artHtml = art(t.artUrl, this.cssArt(t), '', 128);
     const byLine = eng.live ? `${eng.channel!.name} · live` : [t.artistName, t.albumTitle].filter(Boolean).join(' · ');
     const set = (sel: string, text: string, scope: HTMLElement = this.root) => {
@@ -987,6 +1324,8 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       b.innerHTML = eng.playing ? ICON.pause : ICON.play;
       b.setAttribute('aria-label', eng.playing ? 'Pause' : 'Play');
     }
+    for (const b of bar.querySelectorAll<HTMLElement>('[data-act="prev"]')) b.innerHTML = ICON.prev;
+    for (const b of bar.querySelectorAll<HTMLElement>('[data-act="next"]')) b.innerHTML = ICON.next;
     bar.querySelector<HTMLElement>('[data-bar-live]')!.hidden = !eng.live;
     // The Now Playing view.
     const now = this.now;
@@ -1049,11 +1388,14 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     this.paintShape();
     this.paintQueue();
     this.paintHead();
+    this.paintScenes();
     const err = now.querySelector<HTMLElement>('[data-now-error]')!;
     err.hidden = !eng.error;
     err.textContent = eng.error ?? '';
     const sleep = now.querySelector<HTMLSelectElement>('[data-sleep]');
     if (sleep && !eng.sleepAt) sleep.value = '0';
+    const orbitBox = now.querySelector<HTMLElement>('[data-orbit-box]');
+    if (orbitBox) orbitBox.hidden = eng.mode === 'orig' || (t.kind === 'generator' && t.spatial === 'direct');
   }
 
   private paintTime() {
@@ -1156,7 +1498,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
           (t, i) => `<li class="${i === eng.index ? 'is-current' : ''}">
   <button type="button" class="wv-q-jump" data-act="queue-jump" data-i="${i}">${art(t.artUrl, this.cssArt(t), '', 64)}<span class="wv-q-text"><b>${esc(t.title)}</b><small>${esc(t.artistName ?? '')}</small></span></button>
   <span class="wv-row-dur">${t.loop ? '∞' : t.dur ? mmss(t.dur) : ''}</span>
-  ${i !== eng.index ? `<button type="button" class="wv-row-more" data-act="queue-remove" data-i="${i}" aria-label="Remove ${esc(t.title)} from the queue">×</button>` : ''}
+  ${i !== eng.index ? `<span class="wv-q-move"><button type="button" data-act="queue-up" data-i="${i}" aria-label="Move up">↑</button><button type="button" data-act="queue-down" data-i="${i}" aria-label="Move down">↓</button><button type="button" class="wv-row-more" data-act="queue-remove" data-i="${i}" aria-label="Remove ${esc(t.title)} from the queue">×</button></span>` : ''}
 </li>`,
         )
         .join('') || '<li class="wv-empty">The queue is empty.</li>';

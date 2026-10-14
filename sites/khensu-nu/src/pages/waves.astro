@@ -112,8 +112,15 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
         </div>
       </section>
 
+      <div data-home-tide></div>
       <div data-home-mine></div>
     </div>
+
+    <p class="wv-install" data-install hidden>
+      <button type="button" data-act="install"><span>Install nu.waves on this device</span></button>
+      <button type="button" data-act="install-dismiss" aria-label="Dismiss">×</button>
+    </p>
+    <p class="wv-offline" data-offline hidden role="status">Offline · kept tracks, your files and generated sounds still play</p>
 
     <!-- Now Playing bar -->
     <div class="wv-bar" data-bar hidden role="region" aria-label="Now playing">
@@ -124,7 +131,9 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
       </button>
       <div class="wv-bar-ctl">
         <span class="wv-bar-live" data-bar-live hidden>Live</span>
+        <button type="button" data-act="prev" aria-label="Previous"></button>
         <button type="button" data-act="toggle" aria-label="Play"></button>
+        <button type="button" data-act="next" aria-label="Next"></button>
       </div>
       <div class="wv-bar-prog" aria-hidden="true"><i data-bar-prog></i></div>
     </div>
@@ -202,6 +211,36 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
               <button type="button" class="wv-btn" data-act="restore" hidden><span>Restore sounds</span></button>
             </div>
           </div>
+          <fieldset class="wv-orbit" data-orbit-box>
+            <legend>ñü.orbit</legend>
+            <p class="wv-lib-note">The selected sound walks a path around you. The samples stay put; only the place numbers move.</p>
+            <div class="wv-acts-row">
+              <button type="button" class="wv-btn" data-act="orbit" data-rpm="0"><span>Still</span></button>
+              <button type="button" class="wv-btn" data-act="orbit" data-rpm="2"><span>Slow</span></button>
+              <button type="button" class="wv-btn" data-act="orbit" data-rpm="6"><span>Drift</span></button>
+              <button type="button" class="wv-btn" data-act="orbit" data-rpm="14"><span>Spin</span></button>
+              <button type="button" class="wv-btn" data-act="orbit-all" data-rpm="3"><span>All drift</span></button>
+            </div>
+          </fieldset>
+          <fieldset class="wv-scene" data-scene-box>
+            <legend>ñü.scene</legend>
+            <p class="wv-lib-note">Save where every sound sits, the room and ñü.ÊQ. Recall mid-listen. Share a code; nothing is uploaded.</p>
+            <div class="wv-acts-row">
+              <button type="button" class="wv-btn wv-btn-primary" data-act="scene-save"><span>Save scene</span></button>
+              <button type="button" class="wv-btn" data-act="scene-share"><span>Copy share code</span></button>
+              <button type="button" class="wv-btn" data-act="scene-import"><span>Paste scene</span></button>
+            </div>
+            <div class="wv-scene-list" data-scene-list></div>
+          </fieldset>
+          <fieldset class="wv-ink-box" data-ink-box>
+            <legend>ñü.ink</legend>
+            <p class="wv-lib-note">Your listening handwriting: how you dragged and turned, drawn as a private glyph on this device.</p>
+            <div class="wv-ink-live" data-ink-live aria-hidden="true"></div>
+            <div class="wv-acts-row">
+              <button type="button" class="wv-btn" data-act="ink-seal"><span>Keep this ink</span></button>
+              <a class="wv-btn" href="#/library/ink"><span>Your inks</span></a>
+            </div>
+          </fieldset>
           <fieldset class="wv-tone" data-tone-box hidden>
             <legend>Chakra tone</legend>
             <label>Hold <input type="range" min="1" max="20" step="0.5" value="8" data-tone="hold" /><output data-tone-out="hold">8.0 s</output></label>
@@ -246,7 +285,10 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
         </figure>
       </div>
       <div class="wv-queue" data-queue hidden>
-        <h3 class="wv-h">Queue</h3>
+        <div class="wv-queue-head">
+          <h3 class="wv-h">Queue</h3>
+          <button type="button" class="wv-btn" data-act="queue-clear"><span>Clear</span></button>
+        </div>
         <ol data-queue-list></ol>
       </div>
     </div>

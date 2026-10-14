@@ -4,6 +4,8 @@
 // chunk is bound to its file and position so chunks can't be swapped or reordered. Nothing here is sent anywhere.
 
 import type { Tags } from './tags';
+import type { Scene } from './scene';
+import type { Ink } from './ink';
 
 export type Ref = { kind: 'cat' | 'file'; id: string };
 export const refKey = (r: Ref) => `${r.kind}:${r.id}`;
@@ -41,7 +43,7 @@ export type Folder = { id: string; name: string; handle: FileSystemDirectoryHand
 
 const CHUNK = 64 * 1024;
 const DB = 'nu-waves';
-const VERSION = 1;
+const VERSION = 2;
 
 let dbp: Promise<IDBDatabase> | null = null;
 function db(): Promise<IDBDatabase> {
@@ -50,17 +52,24 @@ function db(): Promise<IDBDatabase> {
     const req = indexedDB.open(DB, VERSION);
     req.onupgradeneeded = () => {
       const d = req.result;
-      d.createObjectStore('keys', { keyPath: 'id' });
-      d.createObjectStore('files', { keyPath: 'id' });
-      d.createObjectStore('folders', { keyPath: 'id' });
-      const chunks = d.createObjectStore('chunks', { keyPath: 'key' });
-      chunks.createIndex('set', 'set');
-      d.createObjectStore('downloads', { keyPath: 'trackId' });
-      d.createObjectStore('playlists', { keyPath: 'id' });
-      d.createObjectStore('likes', { keyPath: 'key' });
-      d.createObjectStore('history', { keyPath: 'at' });
-      d.createObjectStore('follows', { keyPath: 'id' });
-      d.createObjectStore('settings', { keyPath: 'k' });
+      const make = (name: string, opts: IDBObjectStoreParameters) => {
+        if (!d.objectStoreNames.contains(name)) d.createObjectStore(name, opts);
+      };
+      make('keys', { keyPath: 'id' });
+      make('files', { keyPath: 'id' });
+      make('folders', { keyPath: 'id' });
+      if (!d.objectStoreNames.contains('chunks')) {
+        const chunks = d.createObjectStore('chunks', { keyPath: 'key' });
+        chunks.createIndex('set', 'set');
+      }
+      make('downloads', { keyPath: 'trackId' });
+      make('playlists', { keyPath: 'id' });
+      make('likes', { keyPath: 'key' });
+      make('history', { keyPath: 'at' });
+      make('follows', { keyPath: 'id' });
+      make('settings', { keyPath: 'k' });
+      make('scenes', { keyPath: 'id' });
+      make('inks', { keyPath: 'id' });
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -252,6 +261,30 @@ export const settings = {
     return row ? row.v : fallback;
   },
   set: (k: string, v: unknown) => put('settings', { k, v }),
+};
+
+export const scenes = {
+  all: async () => (await all<Scene>('scenes')).sort((a, b) => b.updated - a.updated),
+  forTrack: async (trackId: string) => (await scenes.all()).filter((s) => !s.trackId || s.trackId === trackId),
+  get: (id: string) => get<Scene>('scenes', id),
+  put: (s: Scene) => put('scenes', s),
+  remove: (id: string) => del('scenes', id),
+};
+
+export const inks = {
+  recent: async (n = 40) => {
+    const rows = await all<Ink>('inks');
+    rows.sort((a, b) => b.at - a.at);
+    return rows.slice(0, n);
+  },
+  put: (ink: Ink) => put('inks', ink),
+  remove: (id: string) => del('inks', id),
+  clear: async () => {
+    const d = await db();
+    const tx = d.transaction('inks', 'readwrite');
+    tx.objectStore('inks').clear();
+    await finished(tx);
+  },
 };
 
 /** Bytes used by sealed audio, for the Library's storage line. */
