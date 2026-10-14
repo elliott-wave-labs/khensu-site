@@ -1,0 +1,646 @@
+---
+// The story under the nu.waves player: the 2008 demo rebuilt in space, the format compared, and auto spatial for
+// everything else. Figures measured 12 October 2026 on the files the page plays.
+const sizes = [
+  { name: 'ñü.ŵævẽš', mb: 9.1, kbps: 174, us: true },
+  { name: 'Original 2008', mb: 9.6, kbps: 191, us: false },
+  { name: 'Opus 5.1', mb: 17.6, kbps: 352, us: false },
+  { name: 'Lossless FLAC', mb: 28.6, kbps: 571, us: false },
+];
+const split = [
+  { name: 'Winds & strings', kbps: 48 },
+  { name: 'Drums', kbps: 45 },
+  { name: 'Piano', kbps: 39 },
+  { name: 'Strings', kbps: 21 },
+  { name: 'Bass', kbps: 20 },
+];
+// ñü.ŵævẽš, stereo, Opus 5.1, Dolby Atmos: 1 yes, 0.5 partly, 0 no.
+const abilities = [
+  { what: 'Every instrument its own sound', has: [1, 0, 0, 0.5] },
+  { what: 'Move any instrument while it plays', has: [1, 0, 0, 0] },
+  { what: 'Sounds above and below you', has: [1, 0, 0, 1] },
+  { what: 'Distance: near or far, up to 4 m', has: [1, 0, 0, 0.5] },
+  { what: 'Pick the room as you listen', has: [1, 0, 0, 0] },
+  { what: 'ñü.ÊQ: gain, reverb, echo duration, delay and bounces', has: [1, 0, 0, 0] },
+  { what: 'Turns with your head, in the browser', has: [1, 0, 0, 0.5] },
+  { what: 'Plays on any headphones, in any browser', has: [1, 1, 0.5, 0.5] },
+  { what: 'Switch to the untouched original at any moment', has: [1, 1, 0, 0] },
+  { what: 'Smaller than the original stereo file', has: [1, 0, 0, 0] },
+  { what: 'Duplicate a sound and shift it in space', has: [1, 0, 0, 0] },
+  { what: 'Artist-locked sound per song', has: [1, 0, 0, 0], soon: true },
+];
+---
+
+<section class="section sp-file" id="file-section" aria-labelledby="sp-file-title">
+  <div class="wrap">
+    <p class="eyebrow">A 2008 demo</p>
+    <h2 id="sp-file-title">Rebuilt in space.</h2>
+    <p class="sp-lede">
+      First Attempt was made in GarageBand in 2008 and all that survived is a small stereo AAC file.
+      <strong> nu.waves picked out each instrument, split it from the others and set them in a concert hall.</strong> Put on headphones, press play, switch to the original to hear where it started, then drag the
+      instruments anywhere around you.
+    </p>
+    <dl class="sp-spec">
+      <div>
+        <dt>Original 2008</dt>
+        <dd>AAC-LC · stereo · 44.1 kHz · 191 kbit/s · 9.6 MB · 6:40</dd>
+      </div>
+      <div>
+        <dt>ñü.ŵævẽš</dt>
+        <dd>5 instruments in 3D · 48 kHz · 174 kbit/s · 9.1 MB · 6:40</dd>
+        <dd class="sp-each">winds & strings 48 · drums 45 · piano 39 · strings 21 · bass 20 kbit/s</dd>
+      </div>
+      <div>
+        <dt>Opus 5.1</dt>
+        <dd>6 channels · 48 kHz · 352 kbit/s · 17.6 MB · from the original stereo</dd>
+      </div>
+      <div>
+        <dt>Lossless FLAC of the original</dt>
+        <dd>stereo · 44.1 kHz · 16-bit · bit-exact · 28.6 MB</dd>
+      </div>
+    </dl>
+    <p class="sp-vs">
+      The nu.waves file on this page is 9.1 MB, 5% smaller than the 2008 stereo file and 48% smaller than the Opus 5.1
+      file encoded from that same original. Those are file sizes. Listening quality is nu.fidelity, scored by ear. nu.waves is the one you can move,
+      to any angle, distance and height. 5.1 fixes six speakers on one flat ring, with the instruments mixed together
+      inside them.
+    </p>
+  </div>
+  <div class="wrap sp-how">
+    <div>
+      <b>What we did to the 2008 file</b>
+      <p>
+        The source is a 6:40 stereo AAC from 2008. Demucs, an open-source separation model, ran on a Mac and found
+        five parts in it: drums, piano, strings (violin, viola and cello, many takes of each), winds with strings, and
+        bass. It stands in for the on-device model. Nothing was re-recorded and nothing was added: each instrument became its
+        own sound, set in the room and stored as a nu.waves object.
+      </p>
+    </div>
+    <div>
+      <b>Every other file</b>
+      <p>
+        A stereo file, yours or Chopin’s, plays as two sounds, left and right, that you can pull apart, swing around you
+        or lift overhead. The untouched file is one tap away. In the khėnsu.ñü app the same split runs for every
+        instrument, on the device.
+      </p>
+    </div>
+    <div>
+      <b>How to hear it</b>
+      <p>
+        Any headphones. This page renders the room for your two ears in the browser. Turn on head tracking and the
+        phone’s sensors, or the camera, steer the room as you turn; in the nu.waves app your AirPods do, so the sounds
+        stay put when you move.
+      </p>
+    </div>
+  </div>
+  <div class="wrap sp-room-copy" id="codec-section">
+    <h2 id="sp-codec-title">One sound, then where it sits.</h2>
+    <p>
+      nu.waves stores each instrument once. Where it sits, how high, how far, and the room around it, is a list of
+      numbers beside the sound. Moving it, or scheduling a move, does not encode the audio again and does not add
+      channels.
+    </p>
+    <p>
+      Opus 5.1 on this page is the original 2008 stereo upmixed to six fixed speakers and encoded with libopus:
+      352 kbit/s, 17.6 MB, measured. It is not made from the separated instruments. Opus at 48 kbit/s is a stereo
+      rate used when a song should still sound whole. A 5.1 mix packed into that same 48 kbit/s has about 8 kbit/s
+      for each speaker. nu.waves on this page is 174 kbit/s, measured, because each instrument here is still an
+      Opus stem. The listening score is nu.fidelity, scored by ear, and it is separate from that rate.
+    </p>
+    <p>
+      The aim is a much lower packing rate at the same listening score. That aim is an estimate until the listening
+      test is run. What is already true: a path through the room is lossless next to the samples. An artist can
+      schedule the move. A listener can schedule their own. The person stays put, the sound moves, and the samples
+      do not change, so the path costs a few numbers, not another mix.
+    </p>
+    <h2 id="sp-ears-title">In the ear.</h2>
+    <p>
+      nu.ears are in-ear. No camera. Voice access stays on the device. A call goes out through two relays run by
+      different operators, the same rule as every khėnsu.ñü call, and those relays carry voice and audio.
+    </p>
+    <p>
+      They play a nu.waves object in each ear, so height and distance are rendered there instead of folded into a
+      stereo mix first. The spec is louder than AirPods Pro 2, and a longer charge than its 6 hours of listening
+      with noise control on.
+    </p>
+    <p>
+      AirPods Pro 2 listening time is Apple’s published figure. Loudness and hours for nu.ears are the product
+      spec; measured figures replace them when a pair is tested. AirPods is a trademark of Apple Inc.
+    </p>
+    <h2>In the room.</h2>
+    <p>
+      Every sound has its own height, above or below your ears as well as all the way round. Stair Creek sits beside
+      you. Wilhelm Scream is the 1951 yell from Wikimedia Commons (CC0). The chakra tones run from the root, below
+      you, up to the crown: Muladhara 194.18 Hz, Svadhisthana 210.42 Hz, Manipura 126.22 Hz, Anahata 136.10 Hz,
+      Vishuddha 141.27 Hz, Ajna 221.23 Hz just in front of your forehead, Sahasrara 172.06 Hz. Each tone holds,
+      fades, then ends, or hands off to the next with a crossfade; the chakra journey walks them from the root to the
+      crown. Clone and remove sit on the sound you have selected in the spacetime bubble.
+    </p>
+    <p>
+      Drag a sound to move it anywhere in the spacetime bubble, up to 4 m away, above or below you; drag the bubble
+      itself to look around it. The height slider sets the selected sound’s height. With a keyboard, use the arrow
+      keys, and Page Up and Page Down for height. Each sound sends its own waves across the bubble as it plays.
+    </p>
+    <p>
+      Gain 0 dB keeps nu.waves as loud as the original file, measured as you listen. Reverb is the room.
+      Echo duration is how long it lasts, echo delay is the gap between repeats, and echo bounces is how many you hear.
+      Clean takes the room off. These five controls are nu.eq.
+    </p>
+  </div>
+</section>
+
+<section class="sp-story">
+  <div class="wrap sp-cmp" aria-labelledby="sp-cmp-title">
+    <p class="eyebrow">ñü.ŵævẽš · compared</p>
+    <h2 id="sp-cmp-title">Smaller than the original. <em>And it moves.</em></h2>
+    <p class="sp-cmp-lede">
+      The same 6:40 song, four ways. nu.waves carries every instrument as its own sound in 3D, in less space than the
+      2008 stereo file, and it’s the only one here you can rearrange while it plays.
+    </p>
+
+    <div class="sp-charts">
+      <figure class="sp-chart">
+        <figcaption><b>File size</b><span>for 6:40</span></figcaption>
+        <ul role="list">
+          {sizes.map((r) => (
+            <li class:list={{ us: r.us }}>
+              <span class="k">{r.name}</span>
+              <span class="bar"><i style={`--w:${(r.mb / 28.6) * 100}%`} /></span>
+              <span class="v">{r.mb.toFixed(1)} MB</span>
+            </li>
+          ))}
+        </ul>
+      </figure>
+      <figure class="sp-chart">
+        <figcaption><b>Bits stored each second</b><span>how the file is packed</span></figcaption>
+        <ul role="list">
+          {sizes.map((r) => (
+            <li class:list={{ us: r.us }}>
+              <span class="k">{r.name}</span>
+              <span class="bar"><i style={`--w:${(r.kbps / 571) * 100}%`} /></span>
+              <span class="v">{r.kbps}</span>
+            </li>
+          ))}
+        </ul>
+      </figure>
+    </div>
+
+    <figure class="sp-chart sp-stack">
+      <figcaption><b>Where the stored bits go</b><span>each instrument’s share of the 174 kbit/s file rate</span></figcaption>
+      <div class="stack" role="img" aria-label={split.map((p) => `${p.name} ${p.kbps} kbit/s`).join(', ')}>
+        {split.map((p, i) => <i style={`--w:${(p.kbps / 174) * 100}%;--c:${i}`} title={`${p.name} · ${p.kbps} kbit/s`} />)}
+      </div>
+      <ul class="legend" role="list">
+        {split.map((p, i) => <li style={`--c:${i}`}><i />{p.name} <span>{p.kbps}</span></li>)}
+      </ul>
+    </figure>
+
+    <div class="sp-matrix" role="region" aria-label="What each format can do" tabindex="0">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">What you can do</th>
+            <th scope="col" class="us">ñü.ŵævẽš</th>
+            <th scope="col">Stereo<small>AAC, FLAC</small></th>
+            <th scope="col">Opus 5.1</th>
+            <th scope="col">Dolby Atmos</th>
+          </tr>
+        </thead>
+        <tbody>
+          {abilities.map((a) => (
+            <tr>
+              <th scope="row">{a.what}{a.soon && <small>coming</small>}</th>
+              {a.has.map((h, i) => (
+                <td class:list={{ us: i === 0 }}>
+                  {h === 1 ? <span class="yes" aria-label="Yes">●</span> : h === 0.5 ? <span class="part" aria-label="Partly">◐</span> : <span class="no" aria-label="No">–</span>}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="sp-cmp-note">
+      Sizes and rates measured on the files this page plays, 12 October 2026. FLAC is the original losslessly
+      compressed, 16-bit, and bit-exact. Each nu.waves instrument on this page is Opus at 48 kHz inside the format.
+      The charts count bytes. nu.fidelity is the listening score, scored by ear, and it is separate from kbit/s.
+      Dolby Atmos places sounds in height too; its mix is set by the engineer. Dolby and Dolby Atmos
+      are trademarks of Dolby Laboratories; no affiliation.
+    </p>
+  </div>
+
+  <div class="wrap sp-auto" aria-labelledby="sp-auto-title">
+    <p class="eyebrow">ñü.ÊQ · Akashic</p>
+    <h2 id="sp-auto-title">All audio, placed in the room it was meant for.</h2>
+    <p class="sp-auto-lede">
+      What you just heard, done for every song, talk and film without a spatial mix of its own. nu.waves listens,
+      picks out every instrument and voice, works out the room, and places each one there, on your own iPhone, iPad
+      or Mac. Nothing is sent anywhere. For Akashic members.
+    </p>
+    <ul class="sp-venues" role="list">
+      <li><b>Concert hall</b><span>Strings and choir across the stage, two seconds of hall around you</span></li>
+      <li><b>Stadium</b><span>The band far ahead and high, the crowd and the echo all the way round</span></li>
+      <li><b>Festival</b><span>Kick and bass dead centre, synths wrapping around and above you</span></li>
+      <li><b>Club</b><span>Drums a few steps away, keys and guitar either side</span></li>
+      <li><b>Private room</b><span>A voice and a guitar an arm’s length away</span></li>
+      <li><b>Book reading</b><span>One voice across a quiet table, the room barely there</span></li>
+      <li><b>Interview</b><span>Two voices facing each other, the host on one side, the guest on the other</span></li>
+      <li><b>Film</b><span>Dialogue on the screen, music around you, effects where they happen</span></li>
+    </ul>
+    <div class="sp-auto-grid">
+      <div>
+        <b>It listens first</b>
+        <p>Sound recognition on the Neural Engine hears what is playing: which instruments, which voices, music or speech, and how big the room was. That decides the venue, and it tells you why. Never Private Cloud Compute.</p>
+      </div>
+      <div>
+        <b>Every instrument, every frequency</b>
+        <p>Each instrument and voice becomes its own object you can move, like the spacetime bubble above. Bass stays close and centred, and the air above 6 kHz opens up and rises, the way your ears expect.</p>
+      </div>
+      <div>
+        <b>Nothing added, nothing lost</b>
+        <p>The goal: the parts add back up to the original, so folding it to stereo gives you the artist’s master. Today’s split doesn’t reach that yet, so one tap always plays the original itself, and artists can switch nu.eq off for their work.</p>
+      </div>
+      <div>
+        <b>Locked to khėnsu.ñü</b>
+        <p>nu.waves files use the .nu container: the header saying what is inside is encrypted along with the sound, so a file looks like random bytes to anything except the app. Video works the same way.</p>
+      </div>
+    </div>
+    <a class="btn" href="https://github.com/elliott-wave-labs/khensu-specs/blob/main/design/nu-spatial.md">Read the design</a>
+  </div>
+</section>
+
+<style>
+  .sp-lede {
+    color: var(--muted, #9aa0a6);
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    line-height: 1.55;
+    max-width: 40rem;
+    margin: 0 auto;
+  }
+  .sp-lede strong {
+    color: #fff;
+  }
+  .sp-file {
+    padding: clamp(5rem, 12vw, 9rem) 0 clamp(2rem, 4vw, 3rem);
+    background: #000;
+  }
+  .sp-file h2 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    font-weight: 500;
+  }
+  .sp-file .sp-spec {
+    margin-top: 2.2rem;
+    max-width: 38rem;
+    font-size: 0.85rem;
+    gap: 0.9rem;
+  }
+  .sp-file .sp-spec > div {
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .sp-file .sp-vs {
+    max-width: 40rem;
+    margin-top: 1.4rem;
+  }
+  .sp-room-copy {
+    margin-top: 3.5rem;
+    max-width: 40rem;
+  }
+  .sp-room-copy h2 {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+  }
+  .sp-room-copy p {
+    color: var(--muted, #9aa0a6);
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+  .sp-spec {
+    margin: 0;
+    display: grid;
+    gap: 0.45rem;
+    font: 500 0.72rem/1.45 var(--font-mono);
+  }
+  .sp-spec > div {
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .sp-spec dt {
+    font-weight: 650;
+  }
+  .sp-spec dd {
+    margin: 0;
+  }
+  .sp-spec .sp-each {
+    font-size: 0.66rem;
+  }
+  .sp-vs {
+    margin: 0.7rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .sp-story {
+    background: #000;
+  }
+  .sp-cmp {
+    margin-top: clamp(3.5rem, 7vw, 5.5rem);
+  }
+  .sp-cmp h2 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    line-height: 1.15;
+    margin: 0.4rem 0 0.8rem;
+  }
+  .sp-cmp h2 em,
+  .sp-chart li.us .k,
+  .sp-matrix th.us {
+    font-style: normal;
+    background: var(--aura);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sp-cmp-lede {
+    max-width: 44rem;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.55;
+  }
+  .sp-charts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
+    margin-top: 2rem;
+  }
+  .sp-chart {
+    margin: 0;
+    padding: 1.2rem 1.3rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.2rem;
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .sp-chart figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .sp-chart figcaption span {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .sp-chart ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+  .sp-chart li {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr 4.2rem;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.85rem;
+  }
+  .sp-chart .k {
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .sp-chart li.us .k {
+    font-weight: 700;
+  }
+  .sp-chart .bar {
+    height: 0.7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+  }
+  .sp-chart .bar i {
+    display: block;
+    height: 100%;
+    width: var(--w);
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.35);
+  }
+  .sp-chart li.us .bar i {
+    background: linear-gradient(90deg, #22f59a, #1e8fff, #8b5cff);
+    box-shadow: 0 0 14px rgba(30, 143, 255, 0.55);
+  }
+  .sp-chart .v {
+    font: 500 0.78rem var(--font-mono);
+    text-align: right;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .sp-stack {
+    margin-top: clamp(1rem, 3vw, 2rem);
+  }
+  .sp-stack .stack {
+    display: flex;
+    height: 1.1rem;
+    border-radius: 999px;
+    overflow: hidden;
+    gap: 2px;
+  }
+  .sp-stack .stack i,
+  .sp-stack .legend i {
+    background: hsl(calc(150 + var(--c) * 30) 90% 60%);
+  }
+  .sp-stack .stack i {
+    width: var(--w);
+  }
+  .sp-stack .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    margin-top: 0.9rem;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .sp-stack .legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .sp-stack .legend i {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+  }
+  .sp-stack .legend span {
+    font: 500 0.75rem var(--font-mono);
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .sp-matrix {
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.2rem;
+  }
+  .sp-matrix table {
+    width: 100%;
+    min-width: 36rem;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .sp-matrix th,
+  .sp-matrix td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    text-align: center;
+  }
+  .sp-matrix tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  .sp-matrix th[scope='row'],
+  .sp-matrix thead th:first-child {
+    text-align: left;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .sp-matrix thead th {
+    font-weight: 650;
+    vertical-align: bottom;
+  }
+  .sp-matrix small {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .sp-matrix th[scope='row'] small {
+    display: inline;
+    margin-left: 0.5rem;
+    padding: 0.1rem 0.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+  }
+  .sp-matrix td.us {
+    background: rgba(30, 143, 255, 0.07);
+  }
+  .sp-matrix .yes {
+    color: #6dffbf;
+  }
+  .sp-matrix td.us .yes {
+    background: linear-gradient(90deg, #22f59a, #1e8fff, #8b5cff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sp-matrix .part {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .sp-matrix .no {
+    color: rgba(255, 255, 255, 0.25);
+  }
+  .sp-cmp-note {
+    margin-top: 1rem;
+    max-width: 52rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.45);
+  }
+  @media (max-width: 760px) {
+    .sp-charts {
+      grid-template-columns: 1fr;
+    }
+    .sp-chart li {
+      grid-template-columns: 6.5rem 1fr 3.8rem;
+    }
+  }
+  .sp-how {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
+  }
+  .sp-how b {
+    display: block;
+    font-size: 1.02rem;
+    margin-bottom: 0.4rem;
+  }
+  .sp-how p {
+    color: var(--muted, #9aa0a6);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .sp-auto {
+    margin-top: clamp(5rem, 10vw, 8rem);
+    text-align: center;
+  }
+  .sp-auto h2 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    max-width: 48rem;
+    margin: 0.4rem auto 1rem;
+  }
+  .sp-auto-lede {
+    color: var(--muted, #9aa0a6);
+    max-width: 38rem;
+    margin: 0 auto 2.4rem;
+    line-height: 1.55;
+  }
+  .sp-venues {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2.6rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+  .sp-venues li {
+    padding: 1.2rem 1.1rem;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    text-align: left;
+  }
+  .sp-venues b {
+    display: block;
+    margin-bottom: 0.35rem;
+    background: var(--aura);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sp-venues span {
+    color: var(--muted, #9aa0a6);
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  .sp-auto-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.6rem 2.4rem;
+    text-align: left;
+    max-width: 60rem;
+    margin: 0 auto 2.4rem;
+  }
+  .sp-auto-grid b {
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .sp-auto-grid p {
+    color: var(--muted, #9aa0a6);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+  @media (max-width: 860px) {
+    .sp-venues {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .sp-auto-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 720px) {
+    .sp-how {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

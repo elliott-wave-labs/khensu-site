@@ -13,6 +13,9 @@ policy.directives = policy.directives.map((d) =>
   d.startsWith('img-src ') ? d.replace("img-src 'self'", "img-src 'self' blob:") : d.startsWith('connect-src ') ? d.replace("connect-src 'self'", "connect-src 'self' blob:") : d,
 );
 policy.styleDirective.hashes = release.styleHashes;
+// nu.waves plays the files you add (blob: object URLs from the sealed library) and, inside the nu.waves app, the
+// music on the device, served by the app over its own nu-local: scheme. Nothing is fetched from another origin.
+policy.directives.push("media-src 'self' blob: nu-local:");
 
 export default defineConfig({
   site: 'https://khensu.nu',

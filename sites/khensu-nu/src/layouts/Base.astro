@@ -16,13 +16,15 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  /** A product's own web manifest (nu.waves installs as its own app). */
+  manifest?: string;
 }
 
 const SITE_NAME = 'khėnsu.ñü';
 const DEFAULT_DESC =
   'khėnsu.ñü is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device.';
 
-const { title, description = DEFAULT_DESC, noindex = false } = Astro.props;
+const { title, description = DEFAULT_DESC, noindex = false, manifest = '/site.webmanifest' } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — webË, private by design. Post-quantum. Run profitably by the people.`;
 const pathForCanon = Astro.url.pathname.replace(/\/$/, '') || '/';
 const canonical = PATH_TO_PRODUCT[pathForCanon]
@@ -79,7 +81,7 @@ const navCurrent = (href: string) => {
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="manifest" href={manifest} />
     <meta name="theme-color" content="#0a0b0d" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 

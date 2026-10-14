@@ -126,6 +126,14 @@ export function createOrb(canvas: HTMLCanvasElement, radius: number) {
   const threads = new LineSegments(threadGeo, new LineBasicMaterial({ color: '#9fd0ff', transparent: true, opacity: 0.35 }));
   world.add(threads);
 
+  // Where your head points: a short arrow from the centre, shown while head tracking is on.
+  const facePos = new Float32Array(3 * 2 * 3);
+  const faceGeo = new BufferGeometry();
+  faceGeo.setAttribute('position', new BufferAttribute(facePos, 3));
+  const face = new LineSegments(faceGeo, new LineBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.85 }));
+  face.visible = false;
+  world.add(face);
+
   let yaw = 0.0;
   let pitch = 0.42;
   const dist = radius * 3.3;
@@ -175,6 +183,20 @@ export function createOrb(canvas: HTMLCanvasElement, radius: number) {
       yaw -= dx * 0.008;
       pitch = Math.max(-1.2, Math.min(1.35, pitch + dy * 0.006));
       placeCamera();
+    },
+    /** Points the arrow where the listener faces (radians; yaw right-positive, pitch up-positive), or hides it. */
+    facing(pose: { yaw: number; pitch: number } | null) {
+      face.visible = !!pose;
+      if (!pose) return;
+      const len = radius * 0.55;
+      const f = new Vector3(Math.sin(pose.yaw) * Math.cos(pose.pitch), Math.sin(pose.pitch), -Math.cos(pose.yaw) * Math.cos(pose.pitch));
+      const tip = f.clone().multiplyScalar(len);
+      const side = new Vector3(-f.z, 0, f.x).normalize().multiplyScalar(radius * 0.07);
+      const back = f.clone().multiplyScalar(len - radius * 0.12);
+      const l = back.clone().add(side);
+      const r = back.clone().sub(side);
+      facePos.set([0, 0, 0, tip.x, tip.y, tip.z, tip.x, tip.y, tip.z, l.x, l.y, l.z, tip.x, tip.y, tip.z, r.x, r.y, r.z]);
+      faceGeo.attributes.position.needsUpdate = true;
     },
     frame(t: number, sources: Source[], swell: number) {
       uniforms.uTime.value = t;

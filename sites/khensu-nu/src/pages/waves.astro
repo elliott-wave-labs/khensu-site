@@ -2,1816 +2,291 @@
 import Base from '../layouts/Base.astro';
 import ProductBar from '../components/khensu/ProductBar.astro';
 import Sounds from '../components/creators/Sounds.astro';
-import SocialCredits from '../components/khensu/SocialCredits.astro';
+import Story from '../components/waves/Story.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
+import { ALBUMS, ARTISTS, CHANNELS, COLLECTIONS, TRACKS, VENUES, artistOf, mmss } from '../data/waves';
+import '../styles/waves-app.css';
 
-const S = '/khensu/sounds';
 const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
-const credits = [
-  { href: 'https://www.instagram.com/khensu.nu/', credit: 'khensu.nu', kind: 'instagram' as const },
-];
-const instruments = [
-  { id: 'drums', label: 'Drums' },
-  { id: 'piano', label: 'Piano' },
-  { id: 'synths', label: 'Winds & strings' },
-  { id: 'guitar', label: 'Strings' },
-  { id: 'bass', label: 'Bass' },
-];
-const venues = [
-  { id: 'room', label: 'Private room' },
-  { id: 'club', label: 'Club' },
-  { id: 'hall', label: 'Concert hall' },
-  { id: 'stadium', label: 'Stadium' },
-  { id: 'festival', label: 'Festival' },
-];
-// Bottom to top, same symbols and names as the shield page.
-const chakras = [
-  { id: 'root', name: 'Muladhara', en: 'Root', hex: '#ff4b4b', petals: 4, shape: 'square' },
-  { id: 'sacral', name: 'Svadhisthana', en: 'Sacral', hex: '#ff8a3c', petals: 6, shape: 'crescent' },
-  { id: 'solar', name: 'Manipura', en: 'Solar plexus', hex: '#ffd23c', petals: 10, shape: 'tri-down' },
-  { id: 'heart', name: 'Anahata', en: 'Heart', hex: '#3ccf7a', petals: 12, shape: 'hexagram' },
-  { id: 'throat', name: 'Vishuddha', en: 'Throat', hex: '#38a8ff', petals: 16, shape: 'circle-tri' },
-  { id: 'eye', name: 'Ajna', en: 'Third eye', hex: '#6c6cff', petals: 2, shape: 'tri-down' },
-  { id: 'crown', name: 'Sahasrara', en: 'Crown', hex: '#b07cff', petals: 24, shape: 'dot' },
-].map((c) => ({
-  ...c,
-  petalPaths: Array.from({ length: c.petals }, (_, i) => (360 / c.petals) * i),
-}));
-// Measured 12 October 2026 on the files the page plays; FLAC is the original at 16-bit, compression level 12.
-const sizes = [
-  { name: 'ñü.ŵævẽš', mb: 9.1, kbps: 174, us: true },
-  { name: 'Original 2008', mb: 9.6, kbps: 191, us: false },
-  { name: 'Opus 5.1', mb: 17.6, kbps: 352, us: false },
-  { name: 'Lossless FLAC', mb: 28.6, kbps: 571, us: false },
-];
-const split = [
-  { name: 'Winds & strings', kbps: 48 },
-  { name: 'Drums', kbps: 45 },
-  { name: 'Piano', kbps: 39 },
-  { name: 'Strings', kbps: 21 },
-  { name: 'Bass', kbps: 20 },
-];
-// ñü.ŵævẽš, stereo, Opus 5.1, Dolby Atmos: 1 yes, 0.5 partly, 0 no.
-const abilities = [
-  { what: 'Every instrument its own sound', has: [1, 0, 0, 0.5] },
-  { what: 'Move any instrument while it plays', has: [1, 0, 0, 0] },
-  { what: 'Sounds above and below you', has: [1, 0, 0, 1] },
-  { what: 'Distance: near or far, up to 4 m', has: [1, 0, 0, 0.5] },
-  { what: 'Pick the room as you listen', has: [1, 0, 0, 0] },
-  { what: 'ñü.ÊQ: gain, reverb, echo duration, delay and bounces', has: [1, 0, 0, 0] },
-  { what: 'Plays on any headphones, in any browser', has: [1, 1, 0.5, 0.5] },
-  { what: 'Switch to the untouched original at any moment', has: [1, 1, 0, 0] },
-  { what: 'Smaller than the original stereo file', has: [1, 0, 0, 0] },
-  { what: 'Duplicate a track and shift it in space and time', has: [1, 0, 0, 0], soon: true },
-  { what: 'Artist-locked sound per song', has: [1, 0, 0, 0], soon: true },
-];
+const featured = TRACKS.find((t) => t.id === 'first-attempt')!;
+const featuredArtist = artistOf(featured.artistId)!;
+const live = CHANNELS.filter((c) => c.kind === 'live');
+const healingAlbums = ALBUMS.filter((a) => a.artistId === 'waves');
+const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
 ---
 
 <Base
   title="ñü.ŵævẽš"
-  description="A 2008 demo saved as a small stereo file, split into its instruments and placed around you in spatial audio by nu.waves. Switch to the original, pick the room, and drag every instrument where you want it."
+  description="Music and healing sounds you can move. Live channels, your files on this device, spacetime bubble mid-listen, and head tracking — on waves.khensu.nu."
+  manifest="/waves.webmanifest"
 >
-  <div class="khensu sp">
-    <section class="sp-hero" data-scene="stage" aria-labelledby="sp-title">
-      <div class="sp-stage">
-      <div class="wrap sp-head">
+  <div class="wv khensu" data-waves>
+    <section class="wv-hero" data-hero aria-labelledby="wv-title">
+      <div class="wrap wv-hero-inner">
         <p class="eyebrow">ñü.ŵævẽš</p>
-        <h1 id="sp-title">Every instrument, <em>where it belongs.</em></h1>
+        <h1 id="wv-title">Every sound, <em>where you put it.</em></h1>
+        <p class="wv-hero-lede">
+          Live channels, your files, Chopin in the public domain, and healing sounds generated on this device. Drag them in the spacetime bubble while they play. Turn your head and the room turns with you.
+        </p>
       </div>
+    </section>
 
-      <div class="wrap sp-player" data-spatial data-mode="media" data-track="attempt">
-        <div class="sp-glass">
-          <img class="sp-bloom" src={`${S}/first-attempt.webp`} alt="" aria-hidden="true" width="273" height="466" />
-          <div class="sp-card">
-            <div class="sp-cover">
-              <img class="sp-art" data-art src={`${S}/first-attempt.webp`} alt="Cover of More Of The Same by khėnsu.ñü" width="273" height="466" />
-              <div class="sp-mark" data-mark>
-                <b data-mark-name>First Attempt</b>
-                <span data-mark-hz></span>
-              </div>
-            </div>
-            <div class="sp-meta">
-              <p class="sp-k" data-label aria-live="polite">Next up</p>
-              <p class="sp-t" data-title>First Attempt (Demo)</p>
-              <p class="sp-by" data-by>khėnsu.ñü · More Of The Same · 2008</p>
-              <p class="sp-line" data-spec>5 instruments in 3D · 48 kHz · 9.1 MB · 6:40</p>
-              <div class="sp-ctl">
-                <button class="sp-play" type="button" data-play data-state="play" aria-label="Play">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path class="i-play" d="M8 5.5v13l10.5-6.5z" />
-                    <path class="i-pause" d="M7.5 5h3v14h-3zM13.5 5h3v14h-3z" />
-                    <path class="i-replay" d="M12 5V2L7.5 6 12 10V7a5.5 5.5 0 1 1-5.5 5.5H4.5A7.5 7.5 0 1 0 12 5z" />
-                  </svg>
-                </button>
-                <div class="sp-time">
-                  <label class="sr" for="sp-seek">Position in the song</label>
-                  <input id="sp-seek" type="range" min="0" max="400" step="0.1" value="0" data-seek style="--p:0%" />
-                  <span><span data-cur>0:00</span><span data-dur>6:40</span></span>
-                </div>
-                <button class="sp-loop" type="button" data-loop aria-pressed="false" aria-label="Loop">
-                  <i aria-hidden="true"></i>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4" /></svg>
-                </button>
-              </div>
-              <div class="sp-mode" data-song-modes role="group" aria-label="What to play">
-                <button type="button" data-mode="orig" aria-pressed="false">original</button>
-                <button type="button" data-mode="opus" aria-pressed="false">opus 5.1</button>
-                <button type="button" data-mode="media" aria-pressed="true">nu.media</button>
-              </div>
-            </div>
-            <audio preload="none" crossorigin="anonymous" data-orig src={`${S}/first-attempt-original.m4a`}></audio>
-            <audio preload="none" crossorigin="anonymous" data-opus>
-              <source src={`${S}/first-attempt-51.mp4`} type='audio/mp4; codecs="opus"' />
-              <source src={`${S}/first-attempt-51.m4a`} type='audio/mp4; codecs="mp4a.40.2"' />
-            </audio>
-            {instruments.map((i) => <audio preload="none" crossorigin="anonymous" data-stem={i.id} src={`${S}/stems/${i.id}.mp4`} />)}
+    <nav class="wv-tabs" aria-label="nu.waves">
+      <a href="#/" data-tab="home">Home</a>
+      <a href="#/search" data-tab="search">Search</a>
+      <a href="#/library/files" data-tab="library">Library</a>
+      <a href="#/channels" data-tab="channels">Channels</a>
+    </nav>
+
+    <div class="wrap wv-view" data-view>
+      <section class="wv-sec" aria-labelledby="wv-featured">
+        <h2 class="wv-h" id="wv-featured">Featured</h2>
+        <div class="wv-rail">
+          <button type="button" class="wv-card" data-act="play-one" data-id={featured.id}>
+            <img class="wv-art" src={featuredArtist.art} alt="" width="320" height="320" />
+            <b>{featured.title}</b>
+            <small>{featuredArtist.name} · {mmss(featured.dur)}</small>
+          </button>
+          {musicAlbums.map((a) => {
+            const by = artistOf(a.artistId);
+            return (
+              <a class="wv-card" href={`#/album/${a.id}`}>
+                {a.art ? <img class="wv-art" src={a.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />}
+                <b>{a.title}</b>
+                <small>{by?.name} · {a.year}</small>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+
+      <section class="wv-sec" aria-labelledby="wv-live">
+        <h2 class="wv-h" id="wv-live">Live now</h2>
+        <div class="wv-rail">
+          {live.map((c) => (
+            <a class="wv-card wv-card-ch" href={`#/channel/${c.id}`}>
+              {c.art ? <img class="wv-art" src={c.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${c.artClass || 'h1'}`} aria-hidden="true" />}
+              <b><i class="wv-live-dot" aria-hidden="true" />{c.name}</b>
+              <small data-onair={c.id}>on air</small>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section class="wv-sec" aria-labelledby="wv-collections">
+        <h2 class="wv-h" id="wv-collections">Collections</h2>
+        <div class="wv-rail">
+          {COLLECTIONS.map((c) => (
+            <a class="wv-card" href={`#/collection/${c.id}`}>
+              {c.art ? <img class="wv-art" src={c.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${c.artClass || 'h1'}`} aria-hidden="true" />}
+              <b>{c.title}</b>
+              <small>{c.desc}</small>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section class="wv-sec" aria-labelledby="wv-healing">
+        <h2 class="wv-h" id="wv-healing">Healing</h2>
+        <div class="wv-rail">
+          {healingAlbums.map((a) => (
+            <a class="wv-card" href={`#/album/${a.id}`}>
+              <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />
+              <b>{a.title}</b>
+              <small>{a.note || 'Generated on your device'}</small>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section class="wv-sec" aria-labelledby="wv-artists">
+        <h2 class="wv-h" id="wv-artists">Artists</h2>
+        <div class="wv-rail">
+          {ARTISTS.map((a) => (
+            <a class="wv-card wv-card-round" href={`#/artist/${a.id}`}>
+              {a.art ? <img class="wv-art" src={a.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />}
+              <b>{a.name}</b>
+              <small>{a.kind}</small>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <div data-home-mine></div>
+    </div>
+
+    <!-- Now Playing bar -->
+    <div class="wv-bar" data-bar hidden role="region" aria-label="Now playing">
+      <button type="button" class="wv-bar-art" data-act="open-now" data-bar-art aria-label="Open now playing"></button>
+      <button type="button" class="wv-bar-text" data-act="open-now" aria-label="Open now playing">
+        <b data-bar-title></b>
+        <small data-bar-by></small>
+      </button>
+      <div class="wv-bar-ctl">
+        <span class="wv-bar-live" data-bar-live hidden>Live</span>
+        <button type="button" data-act="toggle" aria-label="Play"></button>
+      </div>
+      <div class="wv-bar-prog" aria-hidden="true"><i data-bar-prog></i></div>
+    </div>
+
+    <!-- Now Playing overlay -->
+    <div class="wv-now" data-now hidden role="dialog" aria-modal="true" aria-labelledby="wv-now-title">
+      <div class="wv-now-top">
+        <button type="button" data-act="close-now" data-now-close>Close</button>
+        <p class="wv-now-from" data-now-from>Playing</p>
+        <button type="button" data-act="queue-toggle" aria-pressed="false">Queue</button>
+      </div>
+      <div class="wv-now-grid">
+        <div class="wv-now-meta">
+          <div class="wv-now-art" data-now-art></div>
+          <h2 class="wv-now-title" id="wv-now-title" data-now-title></h2>
+          <p class="wv-now-by" data-now-by></p>
+          <p class="wv-now-spec" data-now-spec></p>
+          <div class="wv-now-ctl">
+            <button type="button" data-act="shuffle" aria-pressed="false" aria-label="Shuffle"></button>
+            <button type="button" data-act="prev" aria-label="Previous"></button>
+            <button type="button" data-act="toggle" aria-label="Play"></button>
+            <button type="button" data-act="next" aria-label="Next"></button>
+            <button type="button" data-act="repeat" aria-pressed="false" data-state="off" aria-label="Repeat off"></button>
+            <button type="button" data-act="like" aria-pressed="false" aria-label="Like"></button>
+            <button type="button" data-act="keep-current" aria-pressed="false"><span>Keep</span></button>
+          </div>
+          <div class="wv-time">
+            <label class="sr" for="wv-seek">Position</label>
+            <input id="wv-seek" type="range" min="0" max="1" step="0.1" value="0" data-seek style="--p:0%" />
+            <span><span data-cur>0:00</span><span data-dur>0:00</span></span>
+          </div>
+          <div class="wv-modes" data-modes role="group" aria-label="What to play">
+            <button type="button" data-act="mode" data-mode="orig" aria-pressed="false">original</button>
+            <button type="button" data-act="mode" data-mode="bed" aria-pressed="false" hidden>opus 5.1</button>
+            <button type="button" data-act="mode" data-mode="waves" aria-pressed="true">nu.waves</button>
+          </div>
+          <p class="wv-now-error" data-now-error hidden></p>
+          <div data-leave hidden>
+            <button type="button" class="wv-btn" data-act="leave"><span>Leave channel</span></button>
           </div>
         </div>
 
-        <figure class="sp-room">
-          <p class="sp-orb-brand" id="sp-orb-name">spacetime bubble™</p>
-          <div class="sp-ring" data-ring aria-labelledby="sp-orb-name" data-idle="1">
-            <canvas data-orb aria-hidden="true"></canvas>
-            <div class="sp-gestures" data-gestures aria-hidden="true">
-              <span class="sp-g" data-g="drag">
-                <i aria-hidden="true"></i>
-                <b>drag</b>
-              </span>
-              <span class="sp-g" data-g="tap">
-                <i aria-hidden="true"></i>
-                <b>tap</b>
-              </span>
-              <span class="sp-g" data-g="swipe">
-                <i aria-hidden="true"></i>
-                <b>swipe</b>
-              </span>
+        <figure class="wv-room">
+          <p class="wv-orb-brand">spacetime bubble™</p>
+          <div class="wv-ring" data-ring data-idle="1" aria-label="spacetime bubble">
+            <canvas aria-hidden="true"></canvas>
+            <div class="wv-gestures" aria-hidden="true">
+              <span class="wv-g" data-g="drag"><i></i><b>drag</b></span>
+              <span class="wv-g" data-g="tap"><i></i><b>tap</b></span>
+              <span class="wv-g" data-g="swipe"><i></i><b>swipe</b></span>
             </div>
-            <span class="sp-dir" data-dir="ahead">ahead</span>
-            <span class="sp-dir" data-dir="behind">behind</span>
-            <span class="sp-dir" data-dir="above">above</span>
-            <span class="sp-dir" data-dir="below">below</span>
-            {instruments.map((i) => (
-              <div class="sp-bubble">
-                <button type="button" class="sp-node" data-node={i.id} data-label={i.label} data-kind="stem" aria-pressed="false">
-                  <i aria-hidden="true"></i>
-                  <span>{i.label}</span>
-                </button>
-                <span class="sp-tools">
-                  <button type="button" data-clone>Clone</button>
-                  <button type="button" data-remove>Remove</button>
-                </span>
-              </div>
-            ))}
-            <template data-node-template>
-              <div class="sp-bubble">
-                <button type="button" class="sp-node" aria-pressed="false"><i aria-hidden="true"></i><span></span></button>
-                <span class="sp-tools">
-                  <button type="button" data-clone>Clone</button>
-                  <button type="button" data-remove>Remove</button>
-                </span>
-              </div>
-            </template>
+            <span class="wv-dir" data-dir="ahead">ahead</span>
+            <span class="wv-dir" data-dir="behind">behind</span>
+            <span class="wv-dir" data-dir="above">above</span>
+            <span class="wv-dir" data-dir="below">below</span>
           </div>
-          <div class="sp-venues-pick" role="group" aria-label="Room">
-            {venues.map((v) => (
-              <button type="button" data-venue={v.id} aria-pressed={String(v.id === 'hall')}>{v.label}</button>
+          <div class="wv-venues" role="group" aria-label="Room">
+            {VENUES.map((v) => (
+              <button type="button" data-act="venue" data-venue={v.id} aria-pressed={String(v.id === 'hall')}>{v.label}</button>
             ))}
           </div>
-          <p class="sp-picked" data-picked>Concert hall. Strings, winds and piano, written as a film score.</p>
-          <div class="sp-tracks" role="group" aria-label="Track">
-            <button type="button" data-track="attempt" aria-pressed="true">nu.aura</button>
-            <button type="button" data-track="creek" aria-pressed="false">Stair Creek</button>
-            <button type="button" data-track="scream" aria-pressed="false">Wilhelm Scream</button>
-            <div class="sp-chakra">
-              <button type="button" data-chakra-open aria-expanded="false" aria-pressed="false" aria-haspopup="true">Chakras</button>
-              <div class="sp-chakra-menu" data-chakra-menu hidden>
-                <button type="button" data-cycle aria-pressed="false">Auto-cycle · bottom to top</button>
-                {chakras.map((c) => (
-                  <button type="button" data-track={c.id} aria-pressed="false">
-                    <svg viewBox="-50 -50 100 100" aria-hidden="true" class="lotus" style={`--c:${c.hex}`}>
-                      {c.petalPaths.map((a) => (
-                        <ellipse cx="0" cy={c.petals === 2 ? -30 : -34} rx={c.petals === 2 ? 16 : c.petals > 16 ? 4 : 9} ry={c.petals === 2 ? 12 : 13} transform={`rotate(${c.petals === 2 ? a + 90 : a})`} />
-                      ))}
-                      <circle r="22" class="core" />
-                      {c.shape === 'square' && <rect x="-12" y="-12" width="24" height="24" />}
-                      {c.shape === 'crescent' && <path d="M-12 -4 A13 13 0 0 0 12 -4 A10 10 0 0 1 -12 -4 Z" />}
-                      {c.shape === 'tri-down' && <path d="M-14 -8 L14 -8 L0 15 Z" />}
-                      {c.shape === 'hexagram' && <path d="M0 -15 L13 7.5 L-13 7.5 Z M0 15 L13 -7.5 L-13 -7.5 Z" />}
-                      {c.shape === 'circle-tri' && <><circle r="13" /><path d="M-10 -5 L10 -5 L0 11 Z" /></>}
-                      {c.shape === 'dot' && <circle r="6" />}
-                    </svg>
-                    <span><b>{c.name}</b><small>{c.en}</small></span>
-                  </button>
-                ))}
-              </div>
+          <p class="wv-picked" data-picked>Concert hall. Strings, winds and piano, written as a film score.</p>
+          <p class="wv-picked" data-obj-count></p>
+          <div class="wv-height">
+            <label for="wv-height">Height</label>
+            <input id="wv-height" type="range" min="-3" max="3" step="0.1" value="0" data-height />
+            <output for="wv-height" data-height-out>·</output>
+          </div>
+          <div class="wv-shape" data-width-box hidden>
+            <legend>Stereo width</legend>
+            <label>Width <input type="range" min="0" max="200" step="1" value="100" data-width /><output data-width-out>100%</output></label>
+            <div class="wv-acts-row">
+              <button type="button" class="wv-btn" data-act="rotate" data-deg="-30"><span>Swing left</span></button>
+              <button type="button" class="wv-btn" data-act="rotate" data-deg="30"><span>Swing right</span></button>
+              <button type="button" class="wv-btn" data-act="restore" hidden><span>Restore sounds</span></button>
             </div>
           </div>
-          <fieldset class="sp-tone" data-tone>
+          <fieldset class="wv-tone" data-tone-box hidden>
             <legend>Chakra tone</legend>
-            <label>Hold <input type="range" min="1" max="20" step="0.5" value="8" data-tone-hold /><output data-tone-out="hold">8.0 s</output></label>
-            <label>Fade <input type="range" min="0.5" max="12" step="0.5" value="4" data-tone-fade /><output data-tone-out="fade">4.0 s</output></label>
-            <label>Crossfade <input type="range" min="0" max="8" step="0.1" value="2" data-tone-cross /><output data-tone-out="cross">2.0 s</output></label>
+            <label>Hold <input type="range" min="1" max="20" step="0.5" value="8" data-tone="hold" /><output data-tone-out="hold">8.0 s</output></label>
+            <label>Fade <input type="range" min="0.5" max="12" step="0.5" value="4" data-tone="fade" /><output data-tone-out="fade">4.0 s</output></label>
+            <label>Crossfade <input type="range" min="0" max="8" step="0.1" value="2" data-tone="cross" /><output data-tone-out="cross">2.0 s</output></label>
           </fieldset>
-          <div class="sp-height">
-            <label for="sp-height">Height</label>
-            <input id="sp-height" type="range" min="-3" max="3" step="0.1" value="0" data-height />
-            <output for="sp-height" data-height-out>Drums · +0.0 m</output>
-          </div>
-          <fieldset class="sp-fx" data-fx>
+          <fieldset class="wv-fx">
             <legend>ñü.ÊQ</legend>
-            <div class="sp-fx-presets" role="group" aria-label="ñü.ÊQ presets">
-              <button type="button" data-preset="original" aria-pressed="false">Match original</button>
-              <button type="button" data-preset="clean" aria-pressed="false">Clean</button>
+            <div class="wv-fx-presets" role="group" aria-label="ñü.ÊQ presets">
+              <button type="button" data-act="preset" data-preset="original" aria-pressed="false">Match original</button>
+              <button type="button" data-act="preset" data-preset="clean" aria-pressed="false">Clean</button>
             </div>
-            <label>Gain <input type="range" min="-12" max="12" step="0.5" value="0" data-fx-gain /><output data-fx-out="gain">0 dB</output></label>
-            <label>Reverb <input type="range" min="0" max="100" step="1" value="40" data-fx-wet /><output data-fx-out="wet">40%</output></label>
-            <label>Echo duration <input type="range" min="0.2" max="6" step="0.1" value="2.1" data-fx-rt /><output data-fx-out="rt">2.1 s</output></label>
-            <label>Echo delay <input type="range" min="0" max="400" step="1" value="25" data-fx-pre /><output data-fx-out="pre">25 ms</output></label>
-            <label>Echo bounces <input type="range" min="0" max="8" step="1" value="0" data-fx-bounces /><output data-fx-out="bounces">0</output></label>
+            <label>Gain <input type="range" min="-12" max="12" step="0.5" value="0" data-fx="gain" /><output data-fx-out="gain">0 dB</output></label>
+            <label>Reverb <input type="range" min="0" max="100" step="1" value="40" data-fx="wet" /><output data-fx-out="wet">40%</output></label>
+            <label>Echo duration <input type="range" min="0.2" max="6" step="0.1" value="2.1" data-fx="rt" /><output data-fx-out="rt">2.1 s</output></label>
+            <label>Echo delay <input type="range" min="0" max="400" step="1" value="25" data-fx="pre" /><output data-fx-out="pre">25 ms</output></label>
+            <label>Echo bounces <input type="range" min="0" max="8" step="1" value="0" data-fx="bounces" /><output data-fx-out="bounces">0</output></label>
+            <label>Volume <input type="range" min="0" max="100" step="1" value="100" data-volume /><output></output></label>
+            <label>Crossfade <input type="range" min="0" max="12" step="1" value="0" data-crossfade /><output data-crossfade-out>off</output></label>
+            <label>Sleep
+              <select data-sleep>
+                <option value="0">Off</option>
+                <option value="15">15 min</option>
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+              </select>
+            </label>
           </fieldset>
-          <figcaption>Drag a sound. Drag the spacetime bubble to look around.</figcaption>
+          <fieldset class="wv-head" data-head-box>
+            <legend>Head tracking</legend>
+            <div class="wv-head-srcs" role="group" aria-label="Head tracking source">
+              <button type="button" data-act="head" data-src="off" aria-pressed="true">Off</button>
+              <button type="button" data-act="head" data-src="device" aria-pressed="false">Phone</button>
+              <button type="button" data-act="head" data-src="camera" aria-pressed="false">Camera</button>
+              <button type="button" data-act="head" data-src="airpods" aria-pressed="false">AirPods</button>
+            </div>
+            <p class="wv-head-status" data-head-status></p>
+            <button type="button" class="wv-btn" data-act="recentre" hidden><span>Recentre</span></button>
+          </fieldset>
+          <figcaption>Drag a sound. Drag the spacetime bubble to look around. Turn on head tracking and the room turns with you.</figcaption>
         </figure>
       </div>
-      <div class="wrap sp-social">
-        <SocialCredits items={credits} fallbackAvatar="/og/waves.jpg" />
+      <div class="wv-queue" data-queue hidden>
+        <h3 class="wv-h">Queue</h3>
+        <ol data-queue-list></ol>
       </div>
-      </div>
-    </section>
+    </div>
 
-    <section class="section sp-file" id="file-section" aria-labelledby="sp-file-title">
-      <div class="wrap">
-        <p class="eyebrow">A 2008 demo</p>
-        <h2 id="sp-file-title">Rebuilt in space.</h2>
-        <p class="sp-lede">
-          First Attempt was made in GarageBand in 2008 and all that survived is a small stereo AAC file.
-          <strong> nu.waves picked out each instrument, split it from the others and set them in a concert hall.</strong> Put on headphones, press play, switch to the original to hear where it started, then drag the
-          instruments anywhere around you.
-        </p>
-        <dl class="sp-spec">
-          <div>
-            <dt>Original 2008</dt>
-            <dd>AAC-LC · stereo · 44.1 kHz · 191 kbit/s · 9.6 MB · 6:40</dd>
-          </div>
-          <div>
-            <dt>ñü.ŵævẽš</dt>
-            <dd>5 instruments in 3D · 48 kHz · 174 kbit/s · 9.1 MB · 6:40</dd>
-            <dd class="sp-each">winds & strings 48 · drums 45 · piano 39 · strings 21 · bass 20 kbit/s</dd>
-          </div>
-          <div>
-            <dt>Opus 5.1</dt>
-            <dd>6 channels · 48 kHz · 352 kbit/s · 17.6 MB · from the original stereo</dd>
-          </div>
-          <div>
-            <dt>Lossless FLAC of the original</dt>
-            <dd>stereo · 44.1 kHz · 16-bit · bit-exact · 28.6 MB</dd>
-          </div>
-        </dl>
-        <p class="sp-vs">
-          The nu.waves file on this page is 9.1 MB, 5% smaller than the 2008 stereo file and 48% smaller than the Opus 5.1
-          file encoded from that same original. Those are file sizes. Listening quality is nu.fidelity, scored by ear. nu.waves is the one you can move,
-          to any angle, distance and height. 5.1 fixes six speakers on one flat ring, with the instruments mixed together
-          inside them.
-        </p>
+    <p class="wv-toast" data-toast hidden role="status"></p>
+
+    <dialog class="wv-dialog" data-menu>
+      <div class="wv-dialog-inner">
+        <h3 data-menu-title></h3>
+        <p data-menu-sub></p>
+        <div data-menu-items></div>
+        <button type="button" class="wv-dialog-close" data-act="close-menu">Close</button>
       </div>
-      <div class="wrap sp-how">
-        <div>
-          <b>What we did to the 2008 file</b>
+    </dialog>
+    <dialog class="wv-dialog" data-pick>
+      <div class="wv-dialog-inner">
+        <h3>Add to playlist</h3>
+        <p>Playlists stay on this device.</p>
+        <div data-pick-items></div>
+        <button type="button" class="wv-dialog-close" onclick="this.closest('dialog').close()">Close</button>
+      </div>
+    </dialog>
+
+    <div class="wv-about">
+      <Story />
+      <ProductBar name="ñü.ŵævẽš" action={appLabel} href={APP_STORE_URL} />
+      <Sounds />
+      <section class="wv-close">
+        <div class="wrap">
           <p>
-            The source is a 6:40 stereo AAC from 2008. Demucs, an open-source separation model, ran on a Mac and found
-            five parts in it: drums, piano, strings (violin, viola and cello, many takes of each), winds with strings, and
-            bass. It stands in for the on-device model. Nothing was re-recorded and nothing was added: each instrument became its
-            own sound, set in the room and stored as a nu.waves object.
+            Every play pays the artist 1¢ with no cut, and what you buy is yours to keep offline.
+            <a href="https://create.khensu.nu">See what creators keep</a>
           </p>
         </div>
-        <div>
-          <b>Fewer bits</b>
-          <p>
-            Five instruments you can move anywhere take 9.1 MB, less than the 9.6 MB original stereo file and 48% less
-            than the Opus 5.1 file encoded from that original. Each instrument is one sound at one point, so it needs one
-            channel, not six.
-          </p>
-        </div>
-        <div>
-          <b>How to hear it</b>
-          <p>
-            Any headphones. This page renders the room for your two ears in the browser, with no head tracking. In the
-            khėnsu.ñü app, nu.waves hands the same objects to Apple’s spatial audio on AirPods, so they stay put when you
-            turn your head.
-          </p>
-        </div>
-      </div>
-      <div class="wrap sp-room-copy" id="codec-section">
-          <h2 id="sp-codec-title">One sound, then where it sits.</h2>
-          <p>
-            nu.waves stores each instrument once. Where it sits, how high, how far, and the room around it, is a list of
-            numbers beside the sound. Moving it, or scheduling a move, does not encode the audio again and does not add
-            channels.
-          </p>
-          <p>
-            Opus 5.1 on this page is the original 2008 stereo upmixed to six fixed speakers and encoded with libopus:
-            352 kbit/s, 17.6 MB, measured. It is not made from the separated instruments. Opus at 48 kbit/s is a stereo
-            rate used when a song should still sound whole. A 5.1 mix packed into that same 48 kbit/s has about 8 kbit/s
-            for each speaker. nu.waves on this page is 174 kbit/s, measured, because each instrument here is still an
-            Opus stem. The listening score is nu.fidelity, scored by ear, and it is separate from that rate.
-          </p>
-          <p>
-            The aim is a much lower packing rate at the same listening score. That aim is an estimate until the listening
-            test is run. What is already true: a path through the room is lossless next to the samples. An artist can
-            schedule the move. A listener can schedule their own. The person stays put, the sound moves, and the samples
-            do not change, so the path costs a few numbers, not another mix.
-          </p>
-          <h2 id="sp-ears-title">In the ear.</h2>
-          <p>
-            nu.ears are in-ear. No camera. Voice access stays on the device. A call goes out through two relays run by
-            different operators, the same rule as every khėnsu.ñü call, and those relays carry voice and audio.
-          </p>
-          <p>
-            They play a nu.waves object in each ear, so height and distance are rendered there instead of folded into a
-            stereo mix first. The spec is louder than AirPods Pro 2, and a longer charge than its 6 hours of listening
-            with noise control on.
-          </p>
-          <p>
-            AirPods Pro 2 listening time is Apple’s published figure. Loudness and hours for nu.ears are the product
-            spec; measured figures replace them when a pair is tested. AirPods is a trademark of Apple Inc.
-          </p>
-          <h2>In the room.</h2>
-          <p>
-            Every sound has its own height, above or below your ears as well as all the way round. Pick a track and
-            the player follows it. Stair Creek sits beside you. Wilhelm Scream is the 1951 yell from Wikimedia Commons (CC0).
-            The chakra tones run from the root, below you, up to the crown: Muladhara 194.18 Hz, Svadhisthana 210.42 Hz,
-            Manipura 126.22 Hz, Anahata 136.10 Hz, Vishuddha 141.27 Hz, Ajna 221.23 Hz just in front of your forehead,
-            Sahasrara 172.06 Hz. Each tone holds, fades, then ends, or hands off to the next with a crossfade. Auto-cycle
-            walks them from the root to the crown. Clone and remove sit on the sound you have selected in the spacetime bubble.
-          </p>
-          <p>
-            Drag a sound to move it anywhere in the spacetime bubble, up to 4 m away, above or below you; drag the bubble
-            itself to look around it. The height slider sets the selected sound’s height. With a keyboard, use the arrow
-            keys, and Page Up and Page Down for height. Each sound sends its own waves across the bubble as it plays.
-          </p>
-          <p>
-            Gain 0 dB keeps nu.waves as loud as the original 2008 file, measured as you listen. Reverb is the room.
-            Echo duration is how long it lasts, echo delay is the gap between repeats, and echo bounces is how many you hear.
-            Clean takes the room off. These five controls are nu.eq.
-          </p>
-        </div>
-    </section>
-
-    <section class="sp-story">
-      <div class="wrap sp-cmp" aria-labelledby="sp-cmp-title">
-        <p class="eyebrow">ñü.ŵævẽš · compared</p>
-        <h2 id="sp-cmp-title">Smaller than the original. <em>And it moves.</em></h2>
-        <p class="sp-cmp-lede">
-          The same 6:40 song, four ways. nu.waves carries every instrument as its own sound in 3D, in less space than the
-          2008 stereo file, and it’s the only one here you can rearrange while it plays.
-        </p>
-
-        <div class="sp-charts">
-          <figure class="sp-chart">
-            <figcaption><b>File size</b><span>for 6:40</span></figcaption>
-            <ul role="list">
-              {sizes.map((r) => (
-                <li class:list={{ us: r.us }}>
-                  <span class="k">{r.name}</span>
-                  <span class="bar"><i style={`--w:${(r.mb / 28.6) * 100}%`} /></span>
-                  <span class="v">{r.mb.toFixed(1)} MB</span>
-                </li>
-              ))}
-            </ul>
-          </figure>
-          <figure class="sp-chart">
-            <figcaption><b>Bits stored each second</b><span>how the file is packed</span></figcaption>
-            <ul role="list">
-              {sizes.map((r) => (
-                <li class:list={{ us: r.us }}>
-                  <span class="k">{r.name}</span>
-                  <span class="bar"><i style={`--w:${(r.kbps / 571) * 100}%`} /></span>
-                  <span class="v">{r.kbps}</span>
-                </li>
-              ))}
-            </ul>
-          </figure>
-        </div>
-
-        <figure class="sp-chart sp-stack">
-          <figcaption><b>Where the stored bits go</b><span>each instrument’s share of the 174 kbit/s file rate</span></figcaption>
-          <div class="stack" role="img" aria-label={split.map((p) => `${p.name} ${p.kbps} kbit/s`).join(', ')}>
-            {split.map((p, i) => <i style={`--w:${(p.kbps / 174) * 100}%;--c:${i}`} title={`${p.name} · ${p.kbps} kbit/s`} />)}
-          </div>
-          <ul class="legend" role="list">
-            {split.map((p, i) => <li style={`--c:${i}`}><i />{p.name} <span>{p.kbps}</span></li>)}
-          </ul>
-        </figure>
-
-        <div class="sp-matrix" role="region" aria-label="What each format can do" tabindex="0">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">What you can do</th>
-                <th scope="col" class="us">ñü.ŵævẽš</th>
-                <th scope="col">Stereo<small>AAC, FLAC</small></th>
-                <th scope="col">Opus 5.1</th>
-                <th scope="col">Dolby Atmos</th>
-              </tr>
-            </thead>
-            <tbody>
-              {abilities.map((a) => (
-                <tr>
-                  <th scope="row">{a.what}{a.soon && <small>coming</small>}</th>
-                  {a.has.map((h, i) => (
-                    <td class:list={{ us: i === 0 }}>
-                      {h === 1 ? <span class="yes" aria-label="Yes">●</span> : h === 0.5 ? <span class="part" aria-label="Partly">◐</span> : <span class="no" aria-label="No">–</span>}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p class="sp-cmp-note">
-          Sizes and rates measured on the files this page plays, 12 October 2026. FLAC is the original losslessly
-          compressed, 16-bit, and bit-exact. Each nu.waves instrument on this page is Opus at 48 kHz inside the format.
-          The charts count bytes. nu.fidelity is the listening score, scored by ear, and it is separate from kbit/s.
-          Dolby Atmos places sounds in height too; its mix is set by the engineer. Dolby and Dolby Atmos
-          are trademarks of Dolby Laboratories; no affiliation.
-        </p>
-      </div>
-
-      <div class="wrap sp-auto" aria-labelledby="sp-auto-title">
-        <p class="eyebrow">ñü.ÊQ · Akashic</p>
-        <h2 id="sp-auto-title">All audio, placed in the room it was meant for.</h2>
-        <p class="sp-auto-lede">
-          What you just heard, done for every song, talk and film without a spatial mix of its own. nu.waves listens,
-          picks out every instrument and voice, works out the room, and places each one there, on your own iPhone, iPad
-          or Mac. Nothing is sent anywhere. For Akashic members.
-        </p>
-        <ul class="sp-venues" role="list">
-          <li><b>Concert hall</b><span>Strings and choir across the stage, two seconds of hall around you</span></li>
-          <li><b>Stadium</b><span>The band far ahead and high, the crowd and the echo all the way round</span></li>
-          <li><b>Festival</b><span>Kick and bass dead centre, synths wrapping around and above you</span></li>
-          <li><b>Club</b><span>Drums a few steps away, keys and guitar either side</span></li>
-          <li><b>Private room</b><span>A voice and a guitar an arm’s length away</span></li>
-          <li><b>Book reading</b><span>One voice across a quiet table, the room barely there</span></li>
-          <li><b>Interview</b><span>Two voices facing each other, the host on one side, the guest on the other</span></li>
-          <li><b>Film</b><span>Dialogue on the screen, music around you, effects where they happen</span></li>
-        </ul>
-        <div class="sp-auto-grid">
-          <div>
-            <b>It listens first</b>
-            <p>Sound recognition on the Neural Engine hears what is playing: which instruments, which voices, music or speech, and how big the room was. That decides the venue, and it tells you why. Never Private Cloud Compute.</p>
-          </div>
-          <div>
-            <b>Every instrument, every frequency</b>
-            <p>Each instrument and voice becomes its own object you can move, like the spacetime bubble above. Bass stays close and centred, and the air above 6 kHz opens up and rises, the way your ears expect.</p>
-          </div>
-          <div>
-            <b>Nothing added, nothing lost</b>
-            <p>The goal: the parts add back up to the original, so folding it to stereo gives you the artist’s master. Today’s split doesn’t reach that yet, so one tap always plays the original itself, and artists can switch nu.eq off for their work.</p>
-          </div>
-          <div>
-            <b>Locked to khėnsu.ñü</b>
-            <p>nu.waves files use the .nu container: the header saying what is inside is encrypted along with the sound, so a file looks like random bytes to anything except the app. Video works the same way.</p>
-          </div>
-        </div>
-        <a class="btn" href="https://github.com/elliott-wave-labs/khensu-specs/blob/main/design/nu-spatial.md">Read the design</a>
-      </div>
-    </section>
-
-    <ProductBar name="ñü.ŵævẽš" action={appLabel} href={APP_STORE_URL} />
-    <Sounds />
-
-    <section class="sp-close">
-      <div class="wrap">
-        <p>
-          Every play pays the artist 1¢ with no cut, and what you buy is yours to keep offline.
-          <a href="https://create.khensu.nu">See what creators keep</a>
-        </p>
-      </div>
-    </section>
+      </section>
+    </div>
   </div>
 </Base>
 
 <script>
+  import '../scripts/waves/main.ts';
   import '../scripts/creators.ts';
-  import '../scripts/spatial.ts';
-  import '../scripts/scenes.ts';
 </script>
-
-<style>
-  .sp {
-    background: #000;
-  }
-  .sp-hero {
-    --p: 0;
-    min-height: 0;
-    padding-bottom: 2.5rem;
-    background:
-      radial-gradient(60rem 30rem at 50% 30%, rgba(79, 176, 255, 0.12), transparent 70%),
-      radial-gradient(40rem 24rem at 80% 70%, rgba(139, 92, 255, 0.1), transparent 70%),
-      #000;
-  }
-  .sp-stage {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    min-height: 0;
-    padding-top: 5.5rem;
-  }
-  .sp-social {
-    position: relative;
-    z-index: 2;
-    margin-top: 1.25rem;
-    display: flex;
-    justify-content: center;
-  }
-  .sp-head {
-    text-align: center;
-    max-width: 52rem;
-    margin-inline: auto;
-    transform: translateY(calc(var(--p) * -1.6rem));
-    opacity: calc(1 - var(--p) * 0.45);
-  }
-  .sp-glass {
-    perspective: 1200px;
-    perspective-origin: 50% 40%;
-    transform-style: preserve-3d;
-    transform: translate3d(0, calc(var(--p) * 1.4rem), 0);
-  }
-  .sp-room {
-    transform: translate3d(0, calc(var(--p) * -2.4rem), 0) scale(calc(1 + var(--p) * 0.045));
-  }
-  .sp-head h1 {
-    font-size: clamp(1.8rem, 3.6vw, 3.1rem);
-    line-height: 1.15;
-    letter-spacing: -0.035em;
-    margin: 0.15rem 0 0.2rem;
-    overflow: visible;
-  }
-  .sp-head h1 em {
-    display: block;
-    font-style: normal;
-    background: linear-gradient(90deg, #22f59a, #1e8fff 50%, #8b5cff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .sp-lede {
-    color: var(--muted, #9aa0a6);
-    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-    line-height: 1.55;
-    max-width: 40rem;
-    margin: 0 auto;
-  }
-  .sp-lede strong {
-    color: #fff;
-  }
-  .sp-file {
-    padding: clamp(5rem, 12vw, 9rem) 0 clamp(2rem, 4vw, 3rem);
-    background: #000;
-  }
-  .sp-file h2 {
-    font-size: clamp(2.2rem, 5vw, 3.6rem);
-    letter-spacing: -0.035em;
-    line-height: 1.15;
-    margin: 0 0 1rem;
-    font-weight: 500;
-  }
-  .sp-file .sp-spec {
-    margin-top: 2.2rem;
-    max-width: 38rem;
-    font-size: 0.85rem;
-    gap: 0.9rem;
-  }
-  .sp-file .sp-spec > div {
-    color: rgba(255, 255, 255, 0.82);
-  }
-  .sp-file .sp-vs {
-    max-width: 40rem;
-    margin-top: 1.4rem;
-  }
-  .sp-room-copy {
-    margin-top: 3.5rem;
-    max-width: 40rem;
-  }
-  .sp-room-copy h2 {
-    font-size: clamp(1.8rem, 3vw, 2.4rem);
-  }
-  .sp-room-copy p {
-    color: var(--muted, #9aa0a6);
-    font-size: 1.05rem;
-    line-height: 1.55;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .sp-head,
-    .sp-glass,
-    .sp-room {
-      transform: none;
-      opacity: 1;
-    }
-  }
-  @media (max-width: 860px) {
-    .sp-hero { padding-bottom: 0; }
-    .sp-stage {
-      padding-top: 5.5rem;
-    }
-  }
-  .sp-player {
-    margin-top: 0.35rem;
-    display: grid;
-    grid-template-columns: minmax(16rem, 28rem) minmax(18rem, 24rem);
-    justify-content: center;
-    gap: clamp(1.2rem, 3vw, 2.4rem);
-    align-items: start;
-  }
-  .sp-glass {
-    position: relative;
-    isolation: isolate;
-  }
-  .sp-bloom {
-    position: absolute;
-    inset: 8% 4% 8% 10%;
-    width: 86%;
-    height: 84%;
-    object-fit: cover;
-    border-radius: 50%;
-    filter: blur(48px) saturate(1.6);
-    opacity: 0.55;
-    z-index: -1;
-  }
-  .sp-glass::before {
-    content: '';
-    position: absolute;
-    inset: 20% -6% -8% 40%;
-    border-radius: 50%;
-    background: var(--aura);
-    background-size: 300% 100%;
-    animation: aura-flow var(--aura-flow-dur) linear infinite;
-    filter: blur(60px);
-    opacity: 0.35;
-    z-index: -1;
-  }
-  .sp-card {
-    position: relative;
-    display: grid;
-    grid-template-columns: 9rem minmax(0, 1fr);
-    gap: 1.4rem;
-    align-items: center;
-    transform-style: preserve-3d;
-    transform-origin: 50% 55%;
-    transform: rotateX(14deg) rotateY(34deg) rotateZ(7deg) translateZ(-40px) scale(0.88);
-    padding: 1.4rem;
-    border-radius: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.07)),
-      rgba(30, 32, 40, 0.18);
-    backdrop-filter: blur(28px) saturate(1.9) brightness(1.08);
-    -webkit-backdrop-filter: blur(28px) saturate(1.9) brightness(1.08);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.38),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 0 40px rgba(255, 255, 255, 0.05),
-      0 30px 80px rgba(0, 0, 0, 0.45);
-    overflow: hidden;
-  }
-  .sp-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: radial-gradient(120% 60% at 20% 0%, rgba(255, 255, 255, 0.14), transparent 55%);
-    pointer-events: none;
-  }
-  .sp-cover {
-    position: relative;
-  }
-  .sp-art,
-  .sp-mark {
-    width: 100%;
-    aspect-ratio: 273 / 466;
-    border-radius: 18px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
-  .sp-art {
-    display: block;
-    object-fit: cover;
-  }
-  .sp-mark {
-    display: none;
-    position: absolute;
-    inset: 0;
-    place-items: center;
-    align-content: center;
-    gap: 0.35rem;
-    padding: 0.8rem;
-    text-align: center;
-    background:
-      radial-gradient(circle at 40% 28%, color-mix(in srgb, var(--mark, #7ee0c8) 55%, white), var(--mark, #7ee0c8) 36%, #12141a 78%);
-  }
-  .sp-mark b {
-    font-size: 0.95rem;
-    font-weight: 560;
-    letter-spacing: -0.02em;
-  }
-  .sp-mark span {
-    font: 500 0.72rem var(--font-mono);
-    color: rgba(255, 255, 255, 0.78);
-  }
-  .sp-player:not([data-track='attempt']) .sp-art,
-  .sp-player:not([data-track='attempt']) .sp-bloom {
-    opacity: 0;
-  }
-  .sp-player:not([data-track='attempt']) .sp-mark {
-    display: grid;
-  }
-  .sp-player:not([data-track='attempt']) [data-song-modes] {
-    display: none;
-  }
-  .sp-line {
-    margin: 0.35rem 0 0.7rem;
-    font: 500 0.72rem/1.4 var(--font-mono);
-    color: rgba(255, 255, 255, 0.62);
-  }
-  .sp-k {
-    font-size: 0.78rem;
-    margin: 0;
-    background: var(--aura);
-    background-size: 300% 100%;
-    animation: aura-flow var(--aura-flow-dur) linear infinite;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .sp-t {
-    font-size: 1.45rem;
-    font-weight: 650;
-    letter-spacing: -0.02em;
-    margin: 0.25rem 0 0.2rem;
-  }
-  .sp-by {
-    color: rgba(255, 255, 255, 0.62);
-    font-size: 0.92rem;
-    margin: 0;
-  }
-  .sp-ctl {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    margin: 1.3rem 0 0.9rem;
-  }
-  .sp-play,
-  .sp-loop {
-    position: relative;
-    flex: none;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    cursor: pointer;
-    color: #fff;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .sp-play {
-    width: 3.6rem;
-    height: 3.6rem;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    background: var(--aura);
-    background-size: 300% 100%;
-    animation: aura-flow var(--aura-flow-dur) linear infinite;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.55),
-      inset 0 -8px 16px rgba(0, 0, 0, 0.18),
-      0 10px 30px rgba(30, 143, 255, 0.45),
-      0 0 40px rgba(139, 92, 255, 0.3);
-    transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.3s, background-color 0.3s;
-  }
-  .sp-play[data-state='pause'],
-  .sp-play[data-state='replay'] {
-    animation: none;
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04) 55%, rgba(255, 255, 255, 0.1));
-    backdrop-filter: blur(16px) saturate(1.8);
-    -webkit-backdrop-filter: blur(16px) saturate(1.8);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.5),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.12),
-      inset 0 0 18px rgba(255, 255, 255, 0.08),
-      0 8px 24px rgba(0, 0, 0, 0.35);
-  }
-  .sp-play:hover {
-    transform: scale(1.06);
-  }
-  .sp-play:active {
-    transform: scale(0.94);
-  }
-  .sp-play:focus-visible,
-  .sp-loop:focus-visible {
-    outline: 2px solid #4fb0ff;
-    outline-offset: 3px;
-  }
-  .sp-play svg {
-    width: 1.45rem;
-    height: 1.45rem;
-    fill: currentColor;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
-  }
-  .sp-play path {
-    display: none;
-  }
-  .sp-play[data-state='play'] .i-play,
-  .sp-play[data-state='pause'] .i-pause,
-  .sp-play[data-state='replay'] .i-replay {
-    display: inline;
-  }
-  .sp-loop {
-    width: 2.6rem;
-    height: 2.6rem;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    color: rgba(255, 255, 255, 0.55);
-    transition: color 0.2s;
-  }
-  .sp-loop svg {
-    width: 1.15rem;
-    height: 1.15rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .sp-loop i {
-    position: absolute;
-    top: 0.3rem;
-    left: 50%;
-    width: 4px;
-    height: 4px;
-    margin-left: -2px;
-    border-radius: 50%;
-    background: var(--aura-blue);
-    box-shadow: 0 0 6px var(--aura-blue);
-    opacity: 0;
-    transform: scale(0.4);
-    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
-  }
-  .sp-loop[aria-pressed='true'] {
-    color: #fff;
-  }
-  .sp-loop[aria-pressed='true'] i {
-    opacity: 1;
-    transform: scale(1);
-  }
-  .sp-time {
-    flex: 1;
-    min-width: 0;
-  }
-  .sp-time input {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 6px;
-    margin: 0;
-    border-radius: 999px;
-    background:
-      linear-gradient(90deg, var(--aura-green), var(--aura-blue) 50%, var(--aura-purple)) 0 / var(--p) 100% no-repeat,
-      rgba(255, 255, 255, 0.14);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
-    cursor: pointer;
-  }
-  .sp-time input::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4), inset 0 -1px 2px rgba(0, 0, 0, 0.15);
-  }
-  .sp-time input::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border: 0;
-    border-radius: 50%;
-    background: #fff;
-  }
-  .sp-time > span {
-    display: flex;
-    justify-content: space-between;
-    font: 500 0.78rem/1.25 var(--font-mono);
-    color: rgba(255, 255, 255, 0.55);
-    margin-top: 0.5rem;
-  }
-  .sp-spec {
-    margin: 0;
-    display: grid;
-    gap: 0.45rem;
-    font: 500 0.72rem/1.45 var(--font-mono);
-  }
-  .sp-spec > div {
-    color: rgba(255, 255, 255, 0.45);
-    transition: color 0.25s;
-  }
-  .sp-spec dt {
-    font-weight: 650;
-  }
-  .sp-spec dd {
-    margin: 0;
-  }
-  .sp-spec .sp-each {
-    font-size: 0.66rem;
-  }
-  [data-mode='orig'] .sp-spec [data-for='orig'],
-  [data-mode='opus'] .sp-spec [data-for='opus'],
-  [data-mode='media'] .sp-spec [data-for='media'],
-  [data-mode='wave'] .sp-spec [data-for='wave'] {
-    color: #fff;
-  }
-  [data-mode='media'] .sp-spec [data-for='media'] dt,
-  [data-mode='wave'] .sp-spec [data-for='wave'] dt {
-    background: var(--aura);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .sp-spec .ref + .ref {
-    padding-top: 0;
-    border-top: 0;
-  }
-  .sp-spec .ref {
-    padding-top: 0.45rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.38);
-  }
-  .sp-vs {
-    margin: 0.7rem 0 0;
-    font-size: 0.8rem;
-    line-height: 1.45;
-    color: rgba(255, 255, 255, 0.7);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .sp-play,
-    .sp-k,
-    .sp-mode button,
-    .sp-glass::before {
-      animation: none;
-    }
-  }
-  .sp-room {
-    margin: 0;
-    text-align: center;
-  }
-  .sp-orb-brand {
-    margin: 0;
-    font-weight: 650;
-    font-size: 0.95rem;
-    letter-spacing: -0.03em;
-    color: #fff;
-  }
-  .sp-room figcaption {
-    color: var(--muted, #9aa0a6);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    max-width: 26rem;
-    margin: 0.8rem auto 0;
-  }
-  .sp-mode {
-    display: inline-flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.25rem;
-    padding: 0.25rem;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26);
-  }
-  .sp-mode {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 28rem;
-    margin: 0 0 0.8rem;
-  }
-  .sp-mode button {
-    flex: 1 1 auto;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: visible;
-    padding-inline: 0.6rem;
-  }
-  @media (max-width: 560px) {
-    .sp-mode button {
-      font-size: 0.7rem;
-      padding-inline: 0.3rem;
-    }
-  }
-  .sp-venues-pick {
-    display: flex;
-    flex-wrap: nowrap;
-    width: 100%;
-    margin-top: 1.15rem;
-    padding: 3px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  }
-  .sp-mode button {
-    font: 600 0.8rem/1.25 var(--font, inherit);
-    color: rgba(255, 255, 255, 0.62);
-    background: none;
-    border: 0;
-    border-radius: 999px;
-    padding: 0.55rem 0.85rem;
-    cursor: pointer;
-    transition: color 0.2s, background-color 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .sp-venues-pick button {
-    flex: 1 1 0;
-    min-width: 0;
-    font-weight: 600;
-    font-size: 0.68rem;
-    line-height: 1.15;
-    color: rgba(255, 255, 255, 0.72);
-    background: transparent;
-    border: 0;
-    border-radius: 9px;
-    padding: 0.5rem 0.25rem;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: color 0.2s, background-color 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .sp-venues-pick button + button {
-    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.14);
-  }
-  .sp-mode button[aria-pressed='true'] {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-  .sp-venues-pick button[aria-pressed='true'],
-  .sp-venues-pick button[aria-pressed='true'] + button {
-    box-shadow: none;
-  }
-  .sp-venues-pick button[aria-pressed='true'] {
-    color: #0a0b0d;
-    background: #fff;
-  }
-  .sp-mode button[data-mode='media'][aria-pressed='true'],
-  .sp-mode button[data-mode='wave'][aria-pressed='true'] {
-    background: var(--aura);
-    background-size: 300% 100%;
-    animation: aura-flow var(--aura-flow-dur) linear infinite;
-  }
-  .sp-mode button:focus-visible,
-  .sp-venues-pick button:focus-visible,
-  .sp-node:focus-visible {
-    outline: 2px solid #4fb0ff;
-    outline-offset: 2px;
-  }
-  .sp-picked {
-    color: var(--muted, #9aa0a6);
-    font-size: 0.82rem;
-    margin: 0.7rem 0 0;
-  }
-  .sp-ring {
-    position: relative;
-    width: min(100%, 24rem);
-    aspect-ratio: 1;
-    margin: 0.55rem auto 0;
-    touch-action: none;
-  }
-  .sp-ring canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    cursor: grab;
-  }
-  .sp-gestures {
-    position: absolute;
-    inset: 12%;
-    pointer-events: none;
-    z-index: 4;
-    opacity: 0;
-    transition: opacity 0.55s ease;
-  }
-  .sp-ring[data-idle='1'] .sp-gestures {
-    opacity: 1;
-  }
-  .sp-g {
-    position: absolute;
-    display: grid;
-    justify-items: center;
-    gap: 0.35rem;
-    opacity: 0;
-    color: #fff;
-    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
-  }
-  .sp-g b {
-    font: 650 0.72rem/1.25 var(--font-mono);
-    letter-spacing: 0.04em;
-    padding: 0.32rem 0.55rem;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    background: rgba(8, 10, 14, 0.72);
-    backdrop-filter: blur(8px);
-  }
-  .sp-g i {
-    position: relative;
-    width: 1.35rem;
-    height: 1.35rem;
-    border-radius: 50%;
-    border: 1.5px solid rgba(255, 255, 255, 0.85);
-    background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95), rgba(180, 200, 220, 0.35) 55%, rgba(80, 100, 120, 0.15));
-    box-shadow: 0 0 0 0 rgba(126, 224, 255, 0.45);
-  }
-  .sp-g[data-g='drag'] {
-    left: 22%;
-    top: 38%;
-  }
-  .sp-g[data-g='tap'] {
-    left: 50%;
-    top: 48%;
-    transform: translate(-50%, -50%);
-  }
-  .sp-g[data-g='swipe'] {
-    left: 28%;
-    top: 62%;
-  }
-  .sp-ring[data-idle='1'] .sp-g[data-g='drag'] {
-    animation: sp-g-drag 7.2s ease-in-out infinite;
-  }
-  .sp-ring[data-idle='1'] .sp-g[data-g='tap'] {
-    animation: sp-g-tap 7.2s ease-in-out infinite;
-  }
-  .sp-ring[data-idle='1'] .sp-g[data-g='swipe'] {
-    animation: sp-g-swipe 7.2s ease-in-out infinite;
-  }
-  @keyframes sp-g-drag {
-    0%, 4% { opacity: 0; transform: translate(0, 0) scale(0.92); }
-    8%, 22% { opacity: 1; }
-    10% { transform: translate(0, 0) scale(1); }
-    26% { transform: translate(4.2rem, -2.6rem) scale(1); opacity: 1; }
-    32%, 100% { opacity: 0; transform: translate(4.2rem, -2.6rem) scale(0.92); }
-  }
-  @keyframes sp-g-tap {
-    0%, 32% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
-    36%, 54% { opacity: 1; }
-    38% { transform: translate(-50%, -50%) scale(1); }
-    42% { transform: translate(-50%, -50%) scale(0.88); }
-    46% { transform: translate(-50%, -50%) scale(1); }
-    60%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
-  }
-  .sp-ring[data-idle='1'] .sp-g[data-g='tap'] i {
-    animation: sp-g-tap-ring 7.2s ease-out infinite;
-  }
-  @keyframes sp-g-tap-ring {
-    0%, 36% { box-shadow: 0 0 0 0 rgba(126, 224, 255, 0); }
-    40% { box-shadow: 0 0 0 0 rgba(126, 224, 255, 0.55); }
-    52% { box-shadow: 0 0 0 18px rgba(126, 224, 255, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(126, 224, 255, 0); }
-  }
-  @keyframes sp-g-swipe {
-    0%, 60% { opacity: 0; transform: translate(0, 0); }
-    64%, 86% { opacity: 1; }
-    66% { transform: translate(0, 0); }
-    84% { transform: translate(5.5rem, -0.4rem); }
-    92%, 100% { opacity: 0; transform: translate(5.5rem, -0.4rem); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .sp-gestures,
-    .sp-ring[data-idle='1'] .sp-g,
-    .sp-ring[data-idle='1'] .sp-g[data-g='tap'] i {
-      animation: none !important;
-      opacity: 0 !important;
-    }
-  }
-  [data-mode='orig'] .sp-ring,
-  [data-mode='opus'] .sp-ring {
-    opacity: 0.45;
-    filter: saturate(0.3);
-    transition: opacity 0.3s, filter 0.3s;
-  }
-  .sp-dir {
-    position: absolute;
-    left: 0;
-    top: 0;
-    transform: translate(-50%, -50%);
-    font: 500 0.62rem var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.45);
-    pointer-events: none;
-  }
-  .sp-tracks {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.4rem;
-    max-width: 40rem;
-    margin: 1.1rem auto 0;
-  }
-  .sp-tracks > button,
-  .sp-chakra > button {
-    padding: 0.42rem 0.8rem;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.04);
-    color: rgba(255, 255, 255, 0.8);
-    font: 500 0.8rem inherit;
-    font-family: inherit;
-    cursor: pointer;
-  }
-  .sp-tracks > button[aria-pressed='true'],
-  .sp-chakra > button[aria-pressed='true'] {
-    background: #fff;
-    color: #000;
-    border-color: #fff;
-  }
-  .sp-chakra { position: relative; }
-  .sp-chakra-menu {
-    position: absolute;
-    z-index: 6;
-    top: calc(100% + 0.35rem);
-    left: 50%;
-    transform: translateX(-50%);
-    width: 16.5rem;
-    padding: 0.3rem;
-    border-radius: 14px;
-    background: rgba(8, 10, 14, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-    display: grid;
-    gap: 0.1rem;
-  }
-  .sp-chakra-menu[hidden] { display: none; }
-  .sp-chakra-menu button {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    width: 100%;
-    text-align: left;
-    border-radius: 10px;
-    padding: 0.32rem 0.45rem;
-    border: 0;
-    background: transparent;
-    color: #fff;
-    font: 500 0.82rem inherit;
-    cursor: pointer;
-  }
-  .sp-chakra-menu button[aria-pressed='true'] { background: rgba(255, 255, 255, 0.12); }
-  .sp-chakra-menu button:hover { background: rgba(255, 255, 255, 0.08); }
-  .sp-chakra-menu small { display: block; color: rgba(255, 255, 255, 0.5); font-size: 0.7rem; font-weight: 500; }
-  .sp-chakra-menu .lotus { width: 28px; height: 28px; flex: none; }
-  .sp-chakra-menu .lotus ellipse,
-  .sp-chakra-menu .lotus path,
-  .sp-chakra-menu .lotus rect,
-  .sp-chakra-menu .lotus circle { fill: none; stroke: var(--c, #fff); stroke-width: 2.2; }
-  .sp-chakra-menu .lotus .core { fill: color-mix(in srgb, var(--c, #fff) 28%, transparent); }
-  .sp-tone {
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    max-width: 22rem;
-    margin: 0.9rem auto 0;
-    padding: 0.7rem 0.9rem 0.85rem;
-    display: grid;
-    gap: 0.45rem;
-  }
-  .sp-tone legend {
-    padding: 0 0.35rem;
-    font-size: 0.78rem;
-  }
-  .sp-tone label {
-    display: grid;
-    grid-template-columns: 5.2rem 1fr auto;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.75);
-  }
-  .sp-tone output {
-    font: 500 0.75rem var(--font-mono);
-    min-width: 3.4rem;
-    text-align: right;
-  }
-  .sp-tracks button:focus-visible,
-  .sp-tools button:focus-visible {
-    outline: 2px solid #4fb0ff;
-    outline-offset: 2px;
-  }
-  .sp-orb-note {
-    max-width: 30rem;
-    margin: 0.8rem auto 0;
-    font-size: 0.8rem;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.6);
-    text-align: center;
-  }
-  .sp-bubble {
-    --near: 0.5;
-    --lvl: 0;
-    --s: calc(1rem + var(--near) * 0.9rem);
-    position: absolute;
-    left: 0;
-    top: 0;
-    transform: translate(-50%, calc(var(--s) / -2));
-    z-index: 1;
-  }
-  .sp-bubble[hidden] { display: none; }
-  .sp-tools {
-    display: none;
-    position: absolute;
-    left: 50%;
-    top: calc(100% + 0.2rem);
-    transform: translateX(-50%);
-    gap: 0.25rem;
-    z-index: 2;
-    white-space: nowrap;
-  }
-  .sp-bubble:has(.sp-node[aria-pressed='true']) .sp-tools {
-    display: flex;
-  }
-  .sp-tools button {
-    padding: 0.28rem 0.5rem;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    background: rgba(8, 10, 14, 0.88);
-    color: #fff;
-    font: 600 0.68rem/1.25 var(--font-mono);
-    cursor: pointer;
-  }
-  .sp-tools button:disabled {
-    opacity: 0.35;
-    cursor: default;
-  }
-  .sp-node {
-    position: relative;
-    opacity: calc(0.55 + var(--near) * 0.45);
-    display: grid;
-    justify-items: center;
-    gap: 0.3rem;
-    padding: 0;
-    background: none;
-    border: 0;
-    border-radius: 12px;
-    color: #fff;
-    cursor: grab;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    z-index: 1;
-  }
-  .sp-node.drag {
-    cursor: grabbing;
-    z-index: 2;
-  }
-  .sp-node i {
-    width: var(--s);
-    height: var(--s);
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.38);
-    background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.72), rgba(170, 180, 190, 0.22) 46%, rgba(90, 100, 110, 0.08) 72%);
-    box-shadow: inset 0 1px 6px rgba(255, 255, 255, 0.35), 0 4px 10px rgba(0, 0, 0, 0.45);
-    transform: scale(calc(1 + var(--lvl) * 0.18));
-    transition: transform 0.28s ease, background 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-  }
-  .sp-node[data-live='1'] i {
-    border-color: var(--mark, #7ee0ff);
-    background: radial-gradient(circle at 35% 30%, #fff, var(--mark, #6dffbf) 40%, color-mix(in srgb, var(--mark, #4fb0ff) 55%, #061018) 74%);
-    animation: sp-ripple 1.15s ease-out infinite;
-  }
-  @keyframes sp-ripple {
-    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--mark, #4fb0ff) 50%, transparent), inset 0 1px 6px rgba(255, 255, 255, 0.4); }
-    100% { box-shadow: 0 0 0 16px transparent, inset 0 1px 6px rgba(255, 255, 255, 0.4); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .sp-node[data-live='1'] i { animation: none; }
-  }
-  .sp-node span {
-    font: 600 0.72rem/1.25 var(--font-mono);
-    padding: 0.3rem 0.45rem;
-    border-radius: 999px;
-    background: rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    white-space: nowrap;
-  }
-  .sp-node[aria-pressed='true'] span {
-    border-color: rgba(79, 176, 255, 0.8);
-  }
-  .sp-height {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    max-width: 22rem;
-    margin: 1.2rem auto 0;
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
-  .sp-height input {
-    flex: 1;
-    accent-color: #4fb0ff;
-  }
-  .sp-height output {
-    font: 500 0.75rem var(--font-mono);
-    min-width: 8.5rem;
-    text-align: right;
-  }
-  .sp-cmp {
-    margin-top: clamp(3.5rem, 7vw, 5.5rem);
-  }
-  .sp-cmp h2 {
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    line-height: 1.15;
-    margin: 0.4rem 0 0.8rem;
-  }
-  .sp-cmp h2 em,
-  .sp-chart li.us .k,
-  .sp-matrix th.us {
-    font-style: normal;
-    background: var(--aura);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .sp-cmp-lede {
-    max-width: 44rem;
-    color: rgba(255, 255, 255, 0.72);
-    line-height: 1.55;
-  }
-  .sp-charts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1rem, 3vw, 2rem);
-    margin-top: 2rem;
-  }
-  .sp-chart {
-    margin: 0;
-    padding: 1.2rem 1.3rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1.2rem;
-    background: rgba(255, 255, 255, 0.03);
-  }
-  .sp-chart figcaption {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-  }
-  .sp-chart figcaption span {
-    font-size: 0.78rem;
-    color: rgba(255, 255, 255, 0.5);
-  }
-  .sp-chart ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 0.7rem;
-  }
-  .sp-chart li {
-    display: grid;
-    grid-template-columns: 7.5rem 1fr 4.2rem;
-    align-items: center;
-    gap: 0.8rem;
-    font-size: 0.85rem;
-  }
-  .sp-chart .k {
-    color: rgba(255, 255, 255, 0.75);
-  }
-  .sp-chart li.us .k {
-    font-weight: 700;
-  }
-  .sp-chart .bar {
-    height: 0.7rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.06);
-    overflow: hidden;
-  }
-  .sp-chart .bar i {
-    display: block;
-    height: 100%;
-    width: var(--w);
-    border-radius: inherit;
-    background: rgba(255, 255, 255, 0.35);
-  }
-  .sp-chart li.us .bar i {
-    background: linear-gradient(90deg, #22f59a, #1e8fff, #8b5cff);
-    box-shadow: 0 0 14px rgba(30, 143, 255, 0.55);
-  }
-  .sp-chart .v {
-    font: 500 0.78rem var(--font-mono);
-    text-align: right;
-    color: rgba(255, 255, 255, 0.7);
-  }
-  .sp-stack {
-    margin-top: clamp(1rem, 3vw, 2rem);
-  }
-  .sp-stack .stack {
-    display: flex;
-    height: 1.1rem;
-    border-radius: 999px;
-    overflow: hidden;
-    gap: 2px;
-  }
-  .sp-stack .stack i,
-  .sp-stack .legend i {
-    background: hsl(calc(150 + var(--c) * 30) 90% 60%);
-  }
-  .sp-stack .stack i {
-    width: var(--w);
-  }
-  .sp-stack .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.2rem;
-    margin-top: 0.9rem;
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.75);
-  }
-  .sp-stack .legend li {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-  }
-  .sp-stack .legend i {
-    width: 0.7rem;
-    height: 0.7rem;
-    border-radius: 50%;
-  }
-  .sp-stack .legend span {
-    font: 500 0.75rem var(--font-mono);
-    color: rgba(255, 255, 255, 0.5);
-  }
-  .sp-matrix {
-    margin-top: clamp(1.5rem, 4vw, 2.5rem);
-    overflow-x: auto;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1.2rem;
-  }
-  .sp-matrix table {
-    width: 100%;
-    min-width: 36rem;
-    border-collapse: collapse;
-    font-size: 0.88rem;
-  }
-  .sp-matrix th,
-  .sp-matrix td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    text-align: center;
-  }
-  .sp-matrix tbody tr:last-child > * {
-    border-bottom: 0;
-  }
-  .sp-matrix th[scope='row'],
-  .sp-matrix thead th:first-child {
-    text-align: left;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.85);
-  }
-  .sp-matrix thead th {
-    font-weight: 650;
-    vertical-align: bottom;
-  }
-  .sp-matrix small {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.45);
-  }
-  .sp-matrix th[scope='row'] small {
-    display: inline;
-    margin-left: 0.5rem;
-    padding: 0.1rem 0.45rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 999px;
-  }
-  .sp-matrix td.us {
-    background: rgba(30, 143, 255, 0.07);
-  }
-  .sp-matrix .yes {
-    color: #6dffbf;
-  }
-  .sp-matrix td.us .yes {
-    background: linear-gradient(90deg, #22f59a, #1e8fff, #8b5cff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .sp-matrix .part {
-    color: rgba(255, 255, 255, 0.6);
-  }
-  .sp-matrix .no {
-    color: rgba(255, 255, 255, 0.25);
-  }
-  .sp-cmp-note {
-    margin-top: 1rem;
-    max-width: 52rem;
-    font-size: 0.75rem;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.45);
-  }
-  @media (max-width: 760px) {
-    .sp-charts {
-      grid-template-columns: 1fr;
-    }
-    .sp-chart li {
-      grid-template-columns: 6.5rem 1fr 3.8rem;
-    }
-  }
-  .sp-fx {
-    max-width: 26rem;
-    margin: 1.4rem auto 0;
-    padding: 0.9rem 1rem 0.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 1rem;
-    display: grid;
-    gap: 0.55rem;
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
-  .sp-fx legend {
-    padding: 0 0.4rem;
-    font-weight: 650;
-    color: #fff;
-  }
-  .sp-fx label {
-    display: grid;
-    grid-template-columns: 7.6rem 1fr 4rem;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .sp-fx input {
-    accent-color: #4fb0ff;
-    min-width: 0;
-  }
-  .sp-fx output {
-    font: 500 0.75rem var(--font-mono);
-    text-align: right;
-  }
-  .sp-fx-presets {
-    display: flex;
-    gap: 0.4rem;
-  }
-  .sp-fx-presets button {
-    flex: 1;
-    padding: 0.4rem 0.6rem;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: transparent;
-    color: rgba(255, 255, 255, 0.75);
-    font: inherit;
-    cursor: pointer;
-  }
-  .sp-fx-presets button[aria-pressed='true'] {
-    background: #fff;
-    color: #000;
-  }
-  .sp-fx-note {
-    margin: 0.2rem 0 0;
-    font-size: 0.72rem;
-    line-height: 1.45;
-    color: rgba(255, 255, 255, 0.5);
-  }
-  .head ellipse,
-  .head rect {
-    fill: rgba(255, 255, 255, 0.1);
-    stroke: rgba(255, 255, 255, 0.55);
-  }
-  .head path {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.55);
-    stroke-linejoin: round;
-  }
-  .sp-how {
-    margin-top: clamp(3rem, 6vw, 4.5rem);
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1rem, 3vw, 2rem);
-  }
-  .sp-how b {
-    display: block;
-    font-size: 1.02rem;
-    margin-bottom: 0.4rem;
-  }
-  .sp-how p {
-    color: var(--muted, #9aa0a6);
-    font-size: 0.92rem;
-    line-height: 1.55;
-    margin: 0;
-  }
-  .sp-auto {
-    margin-top: clamp(5rem, 10vw, 8rem);
-    text-align: center;
-  }
-  .sp-auto h2 {
-    font-size: clamp(2rem, 5vw, 3.6rem);
-    letter-spacing: -0.03em;
-    line-height: 1.15;
-    max-width: 48rem;
-    margin: 0.4rem auto 1rem;
-  }
-  .sp-auto-lede {
-    color: var(--muted, #9aa0a6);
-    max-width: 38rem;
-    margin: 0 auto 2.4rem;
-    line-height: 1.55;
-  }
-  .sp-venues {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 2.6rem;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.9rem;
-  }
-  .sp-venues li {
-    padding: 1.2rem 1.1rem;
-    border-radius: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
-    text-align: left;
-  }
-  .sp-venues b {
-    display: block;
-    margin-bottom: 0.35rem;
-    background: var(--aura);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .sp-venues span {
-    color: var(--muted, #9aa0a6);
-    font-size: 0.9rem;
-    line-height: 1.45;
-  }
-  .sp-auto-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.6rem 2.4rem;
-    text-align: left;
-    max-width: 60rem;
-    margin: 0 auto 2.4rem;
-  }
-  .sp-auto-grid b {
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-  .sp-auto-grid p {
-    color: var(--muted, #9aa0a6);
-    font-size: 0.95rem;
-    line-height: 1.55;
-    margin: 0;
-  }
-  @media (max-width: 860px) {
-    .sp-venues {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .sp-auto-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-  .sp-close {
-    padding: clamp(4rem, 8vw, 6rem) 0;
-    text-align: center;
-    color: var(--muted, #9aa0a6);
-  }
-  .sp-close a {
-    color: #fff;
-    margin-left: 0.4em;
-  }
-  .sr {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
-  @media (max-width: 720px) {
-    .sp-player,
-    .sp-how {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .sp-card {
-      transform: none;
-    }
-  }
-  @media (max-width: 480px) {
-    .sp-card {
-      grid-template-columns: 6rem minmax(0, 1fr);
-      padding: 1rem;
-    }
-    .sp-venues-pick button {
-      font-size: 0.62rem;
-      padding-inline: 0.15rem;
-    }
-  }
-</style>
