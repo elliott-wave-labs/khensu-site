@@ -1,0 +1,85 @@
+---
+import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
+
+const MAIL =
+  'mailto:e@khensu.nu?subject=FounderCheckIn&body=khensu%20dead-man%20check-in%20alive%0A%0AUTC%3A%20' +
+  encodeURIComponent(new Date().toISOString());
+const SMS = 'sms:+13103514089&body=FounderCheckIn%20alive';
+const SPECS = 'https://github.com/elliott-wave-labs/khensu-specs/blob/main/DEAD-MANS-SWITCH.md';
+const ORG = 'https://github.com/elliott-wave-labs';
+---
+
+<Base
+  title="Dead-man's switch"
+  description="khėnsu.ñü founder dead-man's switch is live. Weekly keep-alive by email to e@khensu.nu or text to 310-351-4089. All khensu code is public open source."
+>
+  <div class="khensu">
+    <section class="page-head" id="check-in">
+      <div class="wrap">
+        <p class="eyebrow">dead-man's switch</p>
+        <h1>Active.<br /><span class="dim">Keep alive every week.</span></h1>
+        <StatStrip
+          items={[
+            { n: 7, unit: 'd', label: 'Keep-alive period' },
+            { n: 42, unit: 'd', label: 'Silence before notice escalation' },
+            { n: 0, label: 'Founder powers left — handover already fired' },
+            { n: 8, label: 'khensu repositories public on GitHub' },
+          ]}
+        />
+        <p class="lede">
+          Code is already open source. The switch stays live so silence still escalates the archive notice to the press, friends, Wikimedia and the Internet Archive.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href={MAIL}>Email check-in → e@khensu.nu</a>
+          <a class="btn" href={SMS}>Text check-in → 310-351-4089</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap prose">
+        <h2>How to check in</h2>
+        <ul>
+          <li>
+            <strong>Email:</strong>
+            <a href={MAIL}>e@khensu.nu</a> — subject <code>FounderCheckIn</code>, body includes <code>alive</code>.
+          </li>
+          <li>
+            <strong>SMS:</strong>
+            <a href={SMS}>310-351-4089</a> — text <code>FounderCheckIn alive</code>.
+          </li>
+        </ul>
+        <p>Either channel resets the 42-day clock. A check-in never restores founder powers.</p>
+
+        <h2>Already fired</h2>
+        <p>
+          On 14 October 2026 the FounderHandover released every <code>khensu-*</code> repository and ended founder powers for good.
+          Org: <a href={ORG}>{ORG}</a>.
+        </p>
+
+        <h2>Full record</h2>
+        <p>
+          Spec and keep-alive rules:
+          <a href={SPECS}>DEAD-MANS-SWITCH.md</a>
+          ·
+          <a href="https://github.com/elliott-wave-labs/khensu-specs/blob/main/FOUNDER-HANDOVER.md">FOUNDER-HANDOVER.md</a>
+          ·
+          <a href="https://github.com/elliott-wave-labs/khensu-specs/blob/main/OPEN-SOURCE.md">OPEN-SOURCE.md</a>
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: clamp(1.6rem, 4vw, 2.4rem);
+  }
+</style>
