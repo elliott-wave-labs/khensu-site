@@ -80,7 +80,7 @@ h2,
 h3 {
   font-family: var(--font-display);
   font-weight: var(--heading-weight, 300);
-  line-height: 1.06;
+  line-height: 1.15;
   letter-spacing: -0.03em;
   margin: 0 0 0.5em;
   text-wrap: balance;
@@ -404,7 +404,7 @@ input[type='range']::-moz-range-thumb { width: 18px; height: 18px; border: 0; bo
 input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgba(34, 245, 154, 0.55), 0 0 18px rgba(30, 143, 255, 0.8); }
 
 .k-name { font-family: var(--font-display); white-space: nowrap; }
-.k-name .edot { position: relative; display: inline-block; font-style: normal; line-height: 1; }
+.k-name .edot { position: relative; display: inline-block; font-style: normal; line-height: 1.15; }
 .k-name .edot::after { content: ''; position: absolute; left: 50%; top: var(--edot-top, 0.11em); width: var(--edot-size, 0.125em); height: var(--edot-size, 0.125em); margin-left: calc(var(--edot-size, 0.125em) / -2); border-radius: 50%; background: var(--aura-green); animation: edot-pulse 2.8s ease-in-out infinite, edot-aura 9s linear infinite; }
 @keyframes edot-pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 transparent; } 50% { transform: scale(1.28); box-shadow: 0 0 0.35em currentColor; } }
 @keyframes edot-aura { 0% { background-color: var(--aura-green); color: var(--aura-green); } 33% { background-color: var(--aura-blue); color: var(--aura-blue); } 66% { background-color: var(--aura-purple); color: var(--aura-purple); } 100% { background-color: var(--aura-green); color: var(--aura-green); } }

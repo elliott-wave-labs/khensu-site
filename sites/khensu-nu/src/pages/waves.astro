@@ -2,10 +2,14 @@
 import Base from '../layouts/Base.astro';
 import ProductBar from '../components/khensu/ProductBar.astro';
 import Sounds from '../components/creators/Sounds.astro';
+import SocialCredits from '../components/khensu/SocialCredits.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 
 const S = '/khensu/sounds';
 const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
+const credits = [
+  { href: 'https://www.instagram.com/khensu.nu/', credit: 'khensu.nu', kind: 'instagram' as const },
+];
 const instruments = [
   { id: 'drums', label: 'Drums' },
   { id: 'piano', label: 'Piano' },
@@ -37,7 +41,7 @@ const chakras = [
 const sizes = [
   { name: 'ñü.ŵævẽš', mb: 9.1, kbps: 174, us: true },
   { name: 'Original 2008', mb: 9.6, kbps: 191, us: false },
-  { name: 'Opus 5.1', mb: 13.0, kbps: 258, us: false },
+  { name: 'Opus 5.1', mb: 17.6, kbps: 352, us: false },
   { name: 'Lossless FLAC', mb: 28.6, kbps: 571, us: false },
 ];
 const split = [
@@ -75,7 +79,7 @@ const abilities = [
         <h1 id="sp-title">Every instrument, <em>where it belongs.</em></h1>
       </div>
 
-      <div class="wrap sp-player" data-spatial data-mode="wave" data-track="attempt">
+      <div class="wrap sp-player" data-spatial data-mode="media" data-track="attempt">
         <div class="sp-glass">
           <img class="sp-bloom" src={`${S}/first-attempt.webp`} alt="" aria-hidden="true" width="273" height="466" />
           <div class="sp-card">
@@ -111,10 +115,15 @@ const abilities = [
               </div>
               <div class="sp-mode" data-song-modes role="group" aria-label="What to play">
                 <button type="button" data-mode="orig" aria-pressed="false">original</button>
-                <button type="button" data-mode="wave" aria-pressed="true">ñü.ŵævẽš</button>
+                <button type="button" data-mode="opus" aria-pressed="false">opus 5.1</button>
+                <button type="button" data-mode="media" aria-pressed="true">nu.media</button>
               </div>
             </div>
             <audio preload="none" crossorigin="anonymous" data-orig src={`${S}/first-attempt-original.m4a`}></audio>
+            <audio preload="none" crossorigin="anonymous" data-opus>
+              <source src={`${S}/first-attempt-51.mp4`} type='audio/mp4; codecs="opus"' />
+              <source src={`${S}/first-attempt-51.m4a`} type='audio/mp4; codecs="mp4a.40.2"' />
+            </audio>
             {instruments.map((i) => <audio preload="none" crossorigin="anonymous" data-stem={i.id} src={`${S}/stems/${i.id}.mp4`} />)}
           </div>
         </div>
@@ -223,6 +232,9 @@ const abilities = [
           <figcaption>Drag a sound. Drag the spacetime bubble to look around.</figcaption>
         </figure>
       </div>
+      <div class="wrap sp-social">
+        <SocialCredits items={credits} fallbackAvatar="/og/waves.jpg" />
+      </div>
       </div>
     </section>
 
@@ -247,7 +259,7 @@ const abilities = [
           </div>
           <div>
             <dt>Opus 5.1</dt>
-            <dd>6 channels · 48 kHz · 258 kbit/s · 13.0 MB</dd>
+            <dd>6 channels · 48 kHz · 352 kbit/s · 17.6 MB · from the original stereo</dd>
           </div>
           <div>
             <dt>Lossless FLAC of the original</dt>
@@ -255,8 +267,8 @@ const abilities = [
           </div>
         </dl>
         <p class="sp-vs">
-          The nu.waves file on this page is 9.1 MB, 9% smaller than the 2008 stereo file and 33% smaller than the Opus 5.1
-          file. Those are file sizes. Listening quality is nu.fidelity, scored by ear. nu.waves is the one you can move,
+          The nu.waves file on this page is 9.1 MB, 5% smaller than the 2008 stereo file and 48% smaller than the Opus 5.1
+          file encoded from that same original. Those are file sizes. Listening quality is nu.fidelity, scored by ear. nu.waves is the one you can move,
           to any angle, distance and height. 5.1 fixes six speakers on one flat ring, with the instruments mixed together
           inside them.
         </p>
@@ -274,8 +286,8 @@ const abilities = [
         <div>
           <b>Fewer bits</b>
           <p>
-            Five instruments you can move anywhere take 9.1 MB, less than the 9.6 MB original stereo file and 30% less
-            than the fixed 5.1 mix this page used to play. Each instrument is one sound at one point, so it needs one
+            Five instruments you can move anywhere take 9.1 MB, less than the 9.6 MB original stereo file and 48% less
+            than the Opus 5.1 file encoded from that original. Each instrument is one sound at one point, so it needs one
             channel, not six.
           </p>
         </div>
@@ -296,11 +308,11 @@ const abilities = [
             channels.
           </p>
           <p>
-            Opus 5.1 on this page is the same song folded into six fixed speakers: 258 kbit/s, 13.0 MB, measured. Opus at
-            48 kbit/s is a stereo rate used when a song should still sound whole. A 5.1 mix packed into that same 48
-            kbit/s has about 8 kbit/s for each speaker. nu.waves on this page is 174 kbit/s, measured, because each
-            instrument here is still an Opus stem. The listening score is nu.fidelity, scored by ear, and it is separate
-            from that rate.
+            Opus 5.1 on this page is the original 2008 stereo upmixed to six fixed speakers and encoded with libopus:
+            352 kbit/s, 17.6 MB, measured. It is not made from the separated instruments. Opus at 48 kbit/s is a stereo
+            rate used when a song should still sound whole. A 5.1 mix packed into that same 48 kbit/s has about 8 kbit/s
+            for each speaker. nu.waves on this page is 174 kbit/s, measured, because each instrument here is still an
+            Opus stem. The listening score is nu.fidelity, scored by ear, and it is separate from that rate.
           </p>
           <p>
             The aim is a much lower packing rate at the same listening score. That aim is an estimate until the listening
@@ -505,6 +517,13 @@ const abilities = [
     min-height: 0;
     padding-top: 5.5rem;
   }
+  .sp-social {
+    position: relative;
+    z-index: 2;
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: center;
+  }
   .sp-head {
     text-align: center;
     max-width: 52rem;
@@ -523,9 +542,10 @@ const abilities = [
   }
   .sp-head h1 {
     font-size: clamp(1.8rem, 3.6vw, 3.1rem);
-    line-height: 1.02;
+    line-height: 1.15;
     letter-spacing: -0.035em;
     margin: 0.15rem 0 0.2rem;
+    overflow: visible;
   }
   .sp-head h1 em {
     display: block;
@@ -552,7 +572,7 @@ const abilities = [
   .sp-file h2 {
     font-size: clamp(2.2rem, 5vw, 3.6rem);
     letter-spacing: -0.035em;
-    line-height: 1.05;
+    line-height: 1.15;
     margin: 0 0 1rem;
     font-weight: 500;
   }
@@ -875,7 +895,7 @@ const abilities = [
   .sp-time > span {
     display: flex;
     justify-content: space-between;
-    font: 500 0.78rem/1 var(--font-mono);
+    font: 500 0.78rem/1.25 var(--font-mono);
     color: rgba(255, 255, 255, 0.55);
     margin-top: 0.5rem;
   }
@@ -899,9 +919,12 @@ const abilities = [
     font-size: 0.66rem;
   }
   [data-mode='orig'] .sp-spec [data-for='orig'],
+  [data-mode='opus'] .sp-spec [data-for='opus'],
+  [data-mode='media'] .sp-spec [data-for='media'],
   [data-mode='wave'] .sp-spec [data-for='wave'] {
     color: #fff;
   }
+  [data-mode='media'] .sp-spec [data-for='media'] dt,
   [data-mode='wave'] .sp-spec [data-for='wave'] dt {
     background: var(--aura);
     background-size: 300% 100%;
@@ -971,8 +994,7 @@ const abilities = [
     flex: 1 1 auto;
     min-width: 0;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
     padding-inline: 0.6rem;
   }
   @media (max-width: 560px) {
@@ -993,7 +1015,7 @@ const abilities = [
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   }
   .sp-mode button {
-    font: 600 0.8rem/1 var(--font, inherit);
+    font: 600 0.8rem/1.25 var(--font, inherit);
     color: rgba(255, 255, 255, 0.62);
     background: none;
     border: 0;
@@ -1035,6 +1057,7 @@ const abilities = [
     color: #0a0b0d;
     background: #fff;
   }
+  .sp-mode button[data-mode='media'][aria-pressed='true'],
   .sp-mode button[data-mode='wave'][aria-pressed='true'] {
     background: var(--aura);
     background-size: 300% 100%;
@@ -1086,9 +1109,9 @@ const abilities = [
     filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
   }
   .sp-g b {
-    font: 650 0.72rem/1 var(--font-mono);
+    font: 650 0.72rem/1.25 var(--font-mono);
     letter-spacing: 0.04em;
-    padding: 0.28rem 0.55rem;
+    padding: 0.32rem 0.55rem;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: rgba(8, 10, 14, 0.72);
@@ -1164,7 +1187,8 @@ const abilities = [
       opacity: 0 !important;
     }
   }
-  [data-mode='orig'] .sp-ring {
+  [data-mode='orig'] .sp-ring,
+  [data-mode='opus'] .sp-ring {
     opacity: 0.45;
     filter: saturate(0.3);
     transition: opacity 0.3s, filter 0.3s;
@@ -1309,12 +1333,12 @@ const abilities = [
     display: flex;
   }
   .sp-tools button {
-    padding: 0.22rem 0.5rem;
+    padding: 0.28rem 0.5rem;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: rgba(8, 10, 14, 0.88);
     color: #fff;
-    font: 600 0.68rem/1 var(--font-mono);
+    font: 600 0.68rem/1.25 var(--font-mono);
     cursor: pointer;
   }
   .sp-tools button:disabled {
@@ -1366,8 +1390,8 @@ const abilities = [
     .sp-node[data-live='1'] i { animation: none; }
   }
   .sp-node span {
-    font: 600 0.72rem/1 var(--font-mono);
-    padding: 0.25rem 0.45rem;
+    font: 600 0.72rem/1.25 var(--font-mono);
+    padding: 0.3rem 0.45rem;
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -1399,7 +1423,7 @@ const abilities = [
   }
   .sp-cmp h2 {
     font-size: clamp(1.8rem, 4vw, 2.8rem);
-    line-height: 1.1;
+    line-height: 1.15;
     margin: 0.4rem 0 0.8rem;
   }
   .sp-cmp h2 em,
@@ -1687,7 +1711,7 @@ const abilities = [
   .sp-auto h2 {
     font-size: clamp(2rem, 5vw, 3.6rem);
     letter-spacing: -0.03em;
-    line-height: 1.05;
+    line-height: 1.15;
     max-width: 48rem;
     margin: 0.4rem auto 1rem;
   }

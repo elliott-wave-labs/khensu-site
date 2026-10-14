@@ -10,8 +10,13 @@ import Payouts from '../components/creators/Payouts.astro';
 import FansSee from '../components/creators/FansSee.astro';
 import DataSaving from '../components/creators/DataSaving.astro';
 import OwnIt from '../components/creators/OwnIt.astro';
+import SocialCredits from '../components/khensu/SocialCredits.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 import data from '../data/creator-pay.json';
+
+const videoCredit = [
+  { href: 'https://www.instagram.com/deemsterhotline/', credit: 'deemsterhotline', kind: 'instagram' as const },
+];
 
 type Src = { name: string; url: string; checked: string };
 const film = data.film;
@@ -175,7 +180,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
           <a class="btn primary" href={APP_STORE_URL}>{appLabel}</a>
           <a class="btn" href="https://media.khensu.nu">See ñü.media</a>
         </div>
-        <p class="close-credit">Video: @deemsterhotline on Instagram, used with thanks.</p>
+        <SocialCredits class="close-social" items={videoCredit} fallbackAvatar="/og/creators.jpg" />
       </div>
     </section>
 
@@ -319,7 +324,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
     font-size: clamp(2.6rem, 5vw, 3.8rem);
     font-weight: 700;
     letter-spacing: -0.04em;
-    line-height: 1.05;
+    line-height: 1.15;
   }
   .old-s {
     font-weight: 500;
@@ -389,7 +394,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
     font-size: clamp(2rem, 3.6vw, 3rem);
     font-weight: 700;
     letter-spacing: -0.035em;
-    line-height: 1.05;
+    line-height: 1.15;
     font-variant-numeric: tabular-nums;
   }
   .duo-big small {
@@ -434,10 +439,9 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
     gap: 0.7rem;
     margin-top: 1rem;
   }
-  .close-credit {
+  .close-social {
     margin-top: 1.5rem;
-    font-size: 0.74rem;
-    color: var(--text-faint);
+    justify-content: center;
   }
 
   .prose p {

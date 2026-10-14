@@ -32,7 +32,7 @@ const card = cardFor(Astro.url.pathname);
 const ogImage = new URL(`/og/${card}.jpg`, Astro.site);
 const preview = previewFor(card);
 const previewMeta = preview ? PREVIEWS[preview] : undefined;
-// Landscape HEVC for Messages (og:video) when present; else the square. Square always backs nu:preview.
+// Landscape H.264 for og:video (Apple Messages + Android); square HEVC for nu:preview (indra.md).
 const previewSquareUrl = preview ? `https://khensu.nu/og/${preview}-square.mp4` : undefined;
 const previewWideUrl =
   preview && previewMeta?.wideBytes ? `https://khensu.nu/og/${preview}.mp4` : previewSquareUrl;

@@ -39,7 +39,7 @@ cp "$out/home.png" "$site/public/og.png"
 # Square cards for Instagram link pages and posts, plus the thumbnail card.
 insta="$HOME/Desktop/khensu-instagram"
 mkdir -p "$insta"
-for slug in home buy shield bi thumb; do
+for slug in home buy shield bi thumb creators waves; do
   shot 1080,1080 "$slug" "$out/$slug-square.png"
   sips -s format jpeg -s formatOptions 88 "$out/$slug-square.png" --out "$site/public/og/$slug-square.jpg" >/dev/null
   echo "wrote public/og/$slug-square.jpg"
@@ -52,11 +52,13 @@ desk home khensu-nu-square
 desk buy khensu-nu-buy-square
 desk bi khensu-bi-square
 desk thumb khensu-nu-link-thumb
+desk creators khensu-nu-creators-square
+desk waves khensu-nu-waves-square
 for px in 128 256 512; do
   sips -Z "$px" "$out/thumb-square.png" --out "$insta/khensu-nu-link-thumb-$px.png" >/dev/null
 done
-# Word overlays: square (anim squares) and wide (iMessage landscape).
-for slug in home buy thumb; do
+# Word overlays: square (anim squares) and wide (iMessage / Android landscape).
+for slug in home buy thumb creators waves; do
   for try in 1 2 3; do
     rm -f "$out/$slug-overlay.png"
     "$chrome" --headless=new --hide-scrollbars --force-device-scale-factor=1 --default-background-color=00000000 \

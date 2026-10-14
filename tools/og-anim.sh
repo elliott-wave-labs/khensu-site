@@ -1,10 +1,13 @@
 #!/bin/sh
-# Animated cards for posts and chats: Earth time-lapsed under the phone turning once, the card's words on top.
+# Animated Indra cards for posts and chats: Earth time-lapsed under the phone turning once, the card's words on top.
 # Inter overlays, phone fully in frame, 4 s at 30 fps with motion-interpolated turn,
-# landscape 1200×630 for iMessage (og:video) and square 1080×1080 for nu:preview / Instagram.
+# landscape 1200×630 for og:video and square 1080×1080 for nu:preview / Instagram.
 #
-# Writes for each of home, buy and thumb:
-#   public/og/<slug>.mp4              landscape HEVC (og:video)
+# Landscape og:video is H.264 (avc1) so Apple Messages, Android, and most unfurlers can play it.
+# Square nu:preview stays HEVC (hvc1) for webË / Apple quality. design/indra.md.
+#
+# Writes for each of home, buy, thumb, creators, waves:
+#   public/og/<slug>.mp4              landscape H.264 (og:video)
 #   public/og/<slug>-square.mp4       square HEVC (nu:preview)
 #   ~/Desktop/khensu-instagram/…      gif / h264 / hevc copies
 set -eu
@@ -73,15 +76,18 @@ EOF
     -framerate "$turn_rate" -i "$turn" \
     -loop 1 -framerate "$fps" -t "$dur" -i "$overlay" \
     -filter_complex "[0:v]setpts=PTS*$speed,fps=$fps,scale=${out_w}:${out_h}:force_original_aspect_ratio=increase,crop=${out_w}:${out_h}[bg];[1:v]${phone_filter}[ph];[bg][ph]overlay=$x:$y:shortest=1[a];[a][2:v]overlay=0:0:shortest=1,format=yuv420p" \
-    -t "$dur" -r "$fps" -c:v libx264 -preset slow -crf 15 -movflags +faststart "$base.mp4"
+    -t "$dur" -r "$fps" -c:v libx264 -preset slow -crf 15 -pix_fmt yuv420p -movflags +faststart -tag:v avc1 "$base.mp4"
   ffmpeg -y -v error -i "$base.mp4" -c:v hevc_videotoolbox -q:v 65 -tag:v hvc1 -movflags +faststart "$base-hevc.mp4"
   ffmpeg -y -v error -i "$base.mp4" -vf "fps=$fps,split[a][b];[a]palettegen=max_colors=256:stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle" -loop 0 "$base.gif"
   if [ "$out_w" = "$out_h" ]; then
     ffmpeg -y -v error -i "$base.mp4" -vf "fps=$fps,scale=540:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=256:stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle" -loop 0 "$base-540.gif"
     cp "$base-540.gif" "$insta_dir/$name-540.gif"
+    # Square nu:preview: HEVC for Apple / webË.
     cp "$base-hevc.mp4" "$pub_dir/$slug-square.mp4"
   else
-    cp "$base-hevc.mp4" "$pub_dir/$slug.mp4"
+    # Landscape og:video: H.264 so Android and Slack-class unfurlers can decode it; Apple Messages plays it too.
+    cp "$base.mp4" "$pub_dir/$slug.mp4"
+    cp "$base-hevc.mp4" "$pub_dir/$slug-hevc.mp4"
   fi
   cp "$base.mp4" "$insta_dir/$name.mp4"
   cp "$base-hevc.mp4" "$insta_dir/$name-hevc.mp4"
@@ -93,9 +99,13 @@ EOF
 anim_one buy khensu-nu-buy-square 420 72 1080 1080 square
 anim_one thumb khensu-nu-link-thumb 400 56 1080 1080 square
 anim_one home khensu-nu-square 420 72 1080 1080 square
-# Landscape for Messages og:video (phone on the right, fully in the 630-tall frame).
+anim_one creators khensu-nu-creators-square 420 72 1080 1080 square
+anim_one waves khensu-nu-waves-square 420 72 1080 1080 square
+# Landscape for Messages / Android og:video (phone on the right, fully in the 630-tall frame).
 anim_one buy khensu-nu-buy 400 115 1200 630 wide
 anim_one home khensu-nu-home 400 115 1200 630 wide
+anim_one creators khensu-nu-creators 400 115 1200 630 wide
+anim_one waves khensu-nu-waves 400 115 1200 630 wide
 
 
 # Record byte counts and hashes in src/data/og.ts for the shipped previews.
@@ -105,7 +115,7 @@ from pathlib import Path
 site = Path(sys.argv[1])
 dur = int(float(sys.argv[2]))
 previews = {}
-for slug in ("home", "buy", "thumb"):
+for slug in ("home", "buy", "thumb", "creators", "waves"):
     square = site / "public/og" / f"{slug}-square.mp4"
     wide = site / "public/og" / f"{slug}.mp4"
     if square.exists():
@@ -122,8 +132,6 @@ for slug in ("home", "buy", "thumb"):
         previews[slug] = entry
 ts = site / "src/data/og.ts"
 s = ts.read_text()
-block = json.dumps(previews, indent=2)
-# Keep TypeScript object shape without quoted keys where the old file used bare keys — use a TS-ish dump.
 def to_ts(obj, indent=2):
     def walk(o, level):
         sp = " " * (indent * level)

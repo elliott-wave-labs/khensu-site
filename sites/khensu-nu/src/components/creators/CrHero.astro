@@ -3,7 +3,11 @@
 import Phone from './Phone.astro';
 import Net from '../khensu/Net.astro';
 import StatStrip from '../khensu/StatStrip.astro';
+import SocialCredits from '../khensu/SocialCredits.astro';
 const V = '/khensu/creators';
+const credits = [
+  { href: 'https://www.instagram.com/deemsterhotline/', credit: 'deemsterhotline', kind: 'instagram' as const },
+];
 // Headline words, split here so each can rise in on its own and drift with scroll.
 const lines = [
   { em: false, words: 'Your fans pay you.'.split(' ') },
@@ -79,7 +83,14 @@ const floats = [
       ))}
     </div>
   </div>
-  <p class="wrap crh-credit">Video: @deemsterhotline on Instagram, used with thanks. The phone compares the 720p original with its 4K nu.media upscale, made on the Neural Engine, at iPhone 18 Pro resolution. Tap Sound to listen; it plays in 5.1, upmixed from the stereo original, so AirPods Pro, AirPods 3 and later, and AirPods Max render it as spatial audio.</p>
+  <div class="wrap crh-social">
+    <SocialCredits items={credits} fallbackAvatar="/og/creators.jpg" />
+    <p class="crh-credit">
+      The phone compares the 720p original with its 4K nu.media upscale, made on the Neural Engine, at iPhone 18 Pro
+      resolution. Tap Sound to listen; it plays in 5.1, upmixed from the stereo original, so AirPods Pro, AirPods 3 and
+      later, and AirPods Max render it as spatial audio.
+    </p>
+  </div>
 </section>
 
 <style>
@@ -182,7 +193,7 @@ const floats = [
     font-size: clamp(2.8rem, 4.7vw, 4.8rem);
     font-weight: 600;
     letter-spacing: -0.035em;
-    line-height: 0.98;
+    line-height: 1.15;
     margin-bottom: 1.6rem;
   }
   h1 em {
@@ -387,7 +398,7 @@ const floats = [
     background: rgba(255, 255, 255, 0.16);
     border: 1px solid rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(10px);
-    line-height: 1;
+    line-height: 1.15;
   }
   .rb.tip small {
     position: absolute;
@@ -433,12 +444,19 @@ const floats = [
   @keyframes float-in {
     from { opacity: 0; transform: translateY(24px) scale(0.96); }
   }
-  .crh-credit {
+  .crh-social {
     position: relative;
     margin-top: 1.5rem;
-    max-width: none;
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+  .crh-credit {
+    margin: 0;
+    max-width: 52rem;
     font-size: 0.74rem;
     color: var(--text-faint);
+    line-height: 1.45;
   }
 
   @media (max-width: 860px) {

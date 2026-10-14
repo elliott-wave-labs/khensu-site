@@ -34,6 +34,7 @@ export const CARDS: Record<string, Card> = {
   quality: { title: 'How we measure', em: 'Check every number.', line: 'The tests behind ñü.media, with public tools you can run yourself.', bg: '/khensu/codec/compare-aurora.jpg', alt: 'An aurora clip compared across codecs' },
   memory: { title: 'ñü.řåł', em: 'Your private AI.', line: 'It learns what you’re looking forward to, on your device. No tracking, ever.', bg: EARTH, product: '/khensu/memory/phone_burgundy.webp', alt: 'iPhone showing khėnsu.ñü ñü.řåł planning a sailing trip in Greece' },
   creators: { title: 'ñü.ċřêæțẽ', em: 'You own everything.', line: 'Your rights, your fans, and $10 per 1,000 plays with no cut.', bg: '/khensu/creators/hero.webp', screen: '/khensu/creators/fans-1080.webp', alt: 'A creator performing, streamed in 1080p with ñü.media on khėnsu.ñü' },
+  waves: { title: 'ñü.ŵævẽš', em: 'Every instrument, where it belongs.', line: 'Stereo becomes objects you can drag around you. Switch to the original or Opus 5.1 any time.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: 'ñü.ŵævẽš spatial audio on khėnsu.ñü, instruments placed around you over Earth' },
   nufi: { title: 'ñũ.Fî', em: 'A basic income first.', line: 'Creators paid for every view, nodes for every job. Private, with no cut.', bg: EARTH, alt: 'ñũ.Fî private payments on khėnsu.ñü' },
   bi: { title: 'ñũ.Bî', em: 'A basic income, paid by the network.', line: 'Node operators paid for real work at one worldwide rate, and an equal share for every person next.', bg: EARTH, alt: 'ñũ.Bî, the ñü basic income, over Earth wrapped in the khėnsu.ñü network' },
   network: { title: 'The network', em: 'A gift to everyone.', line: 'Freedom, privacy and a basic income. Contracts for any work and nodes paid for real jobs.', bg: EARTH, alt: 'The khėnsu.ñü network wrapped around Earth at night' },
@@ -58,31 +59,47 @@ export const CARDS: Record<string, Card> = {
   'dev-specs': { title: 'Specifications', em: 'Every protocol, public.', line: 'webË, the protocol, the threat model, network work and compliance.', bg: EARTH, alt: 'khėnsu.ñü specifications' },
 };
 
-// Animated cards (tools/og-anim.sh): square HEVC as nu:preview, landscape as og:video (WEBE.md 7.1).
+// Animated cards (tools/og-anim.sh): square HEVC as nu:preview; landscape H.264 as og:video
+// (Apple Messages, Android, and clients that ignore HEVC). WEBE.md 7.1 / design/indra.md.
 // Bytes and hashes are written by tools/og-anim.sh so clients can check what they fetch.
 export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: number; wideBytes?: number; wideHash?: string }> = {
   home: {
-    bytes: 2858232,
-    hash: "sha-256=526228d453b98290f4503bc2bf539c4d5028bd3fe7a1f6d37ef18b51cd3fe5f6",
+    bytes: 2857046,
+    hash: "sha-256=fea78d73e87182a3ef0f013af8952dd67ac977fdbe800b9c0bf5403b517d6182",
     duration: 4,
-    wideBytes: 1297704,
-    wideHash: "sha-256=6e83f791d87f2cb707a568e47da30d44196fb91d1e4789168387c1b5b4154240"
+    wideBytes: 3670940,
+    wideHash: "sha-256=eeed704eb3be72fe0db11d33e1e16505ee03586f95c7f1b17fd438b236cf8b70"
   },
   buy: {
-    bytes: 3351860,
-    hash: "sha-256=8adeb922559aed146bf48e1c5fd2743c4e2af5470beba0496d31ef019baf6762",
+    bytes: 3350813,
+    hash: "sha-256=8dd3733d21e396d063da2a058cfb85609eef12e0762a780bcc125088cf1e5457",
     duration: 4,
-    wideBytes: 1630229,
-    wideHash: "sha-256=47cb54f3dac5476eae92f50a98bdf3a21c8dd60b92e6a95800c0f465e422a80b"
+    wideBytes: 3816001,
+    wideHash: "sha-256=a68f7fd69e8ffc30f0a504fb61d762c25d441dd66f9457159a7e7387cced0b81"
   },
   thumb: {
-    bytes: 2877555,
-    hash: "sha-256=5091e572e3a152af53b89020fef62bf6b26100656da333edc7f887ae4edfcf37",
+    bytes: 2878670,
+    hash: "sha-256=20b4a080630516d37cc3dd90a1c2d2a0213d213d87b3b787f3f610a47a63944a",
     duration: 4
+  },
+  creators: {
+    bytes: 2800495,
+    hash: "sha-256=125bc286593ecd87b391db595ead9a1a805f185ad93ff1d45a9ec8328399b7ce",
+    duration: 4,
+    wideBytes: 3667482,
+    wideHash: "sha-256=366f6cd54d07107ba6fd7ccdb44879a0a7b06fc6e66325c340b7a6bcc25aedd2"
+  },
+  waves: {
+    bytes: 2915854,
+    hash: "sha-256=24c1856ca29dfdc16f090c92157747f4d7227cac0219c85440ab5e4619ae26d4",
+    duration: 4,
+    wideBytes: 3677893,
+    wideHash: "sha-256=3a646c502387a4d0c1fd2494dff15eb701231286ee3c56644d5d42ed5c2f0e76"
   }
 };
 // The shield pages share the buy card's animation.
-export const previewFor = (card: string) => (card === 'shield' || card === 'dev-shell' ? 'buy' : card in PREVIEWS ? card : undefined);
+export const previewFor = (card: string) =>
+  card === 'shield' || card === 'dev-shell' ? 'buy' : card in PREVIEWS ? card : undefined;
 
 export const cardFor = (path: string, prefix = '') => {
   const parts = path.replace(/^\/|\/$/g, '').split('/');

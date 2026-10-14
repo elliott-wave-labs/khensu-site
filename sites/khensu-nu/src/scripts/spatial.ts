@@ -99,6 +99,9 @@ const TRACKS: Record<string, Track> = {
 };
 const CHAKRA_ORDER = ['root', 'sacral', 'solar', 'heart', 'throat', 'eye', 'crown'];
 const ORIG_SPEC = 'AAC-LC · stereo · 44.1 kHz · 9.6 MB · 6:40';
+const OPUS_SPEC = 'Opus · 5.1 · 48 kHz · 17.6 MB · 6:40';
+const MEDIA_SPEC = '5 instruments in 3D · 48 kHz · 9.1 MB · 6:40';
+type SongMode = 'orig' | 'opus' | 'media' | 'wave';
 const MAX_R = 4; // metres to the edge of the orb
 const MAX_CLONES = 12;
 const FADE_S = 2; // a cloned or removed sound fades in or out over this long, so there is no tick
@@ -209,6 +212,7 @@ type Obj = {
 const root = document.querySelector<HTMLElement>('[data-spatial]');
 if (root) {
   const orig = root.querySelector<HTMLAudioElement>('[data-orig]')!;
+  const opus = root.querySelector<HTMLAudioElement>('[data-opus]')!;
   const play = root.querySelector<HTMLButtonElement>('[data-play]')!;
   const seek = root.querySelector<HTMLInputElement>('[data-seek]')!;
   const loopBtn = root.querySelector<HTMLButtonElement>('[data-loop]')!;
@@ -223,7 +227,7 @@ if (root) {
   const markHz = root.querySelector<HTMLElement>('[data-mark-hz]')!;
   const bloom = root.querySelector<HTMLImageElement>('.sp-bloom')!;
   const card = root.querySelector<HTMLElement>('.sp-card')!;
-  const modeBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-mode]')];
+  const modeBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-song-modes] [data-mode]')];
   const trackBtns = [...root.querySelectorAll<HTMLButtonElement>('.sp-tracks [data-track]')];
   const venueBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-venue]')];
   const ring = root.querySelector<HTMLElement>('[data-ring]')!;
@@ -258,7 +262,8 @@ if (root) {
   };
   const fx: Fx = { gain: 0, bounces: 0, ...venueFx(venue) };
 
-  let mode: 'wave' | 'orig' = 'wave';
+  let mode: SongMode = (root.dataset.mode as SongMode) || 'media';
+  if (mode === 'wave') mode = 'media';
   let trackId = 'attempt';
   let started = false;
   let playing = false;
@@ -300,7 +305,7 @@ if (root) {
   const track = () => TRACKS[trackId];
 
   let ctx: AudioContext | null = null;
-  let origGain: GainNode, waveGain: GainNode, dry: GainNode, wet: GainNode, verb: ConvolverNode;
+  let origGain: GainNode, opusGain: GainNode, waveGain: GainNode, dry: GainNode, wet: GainNode, verb: ConvolverNode;
   let bus: GainNode, sum: GainNode, makeup: GainNode, user: GainNode, preDelay: DelayNode, extrasDry: GainNode, echoIn: GainNode;
   let echoDelays: DelayNode[], echoGains: GainNode[];
   let origMeter: AnalyserNode, waveMeter: AnalyserNode;
@@ -354,6 +359,7 @@ if (root) {
     if (ctx) return ctx;
     ctx = new AudioContext({ latencyHint: 'playback' });
     origGain = ctx.createGain();
+    opusGain = ctx.createGain();
     waveGain = ctx.createGain();
     dry = ctx.createGain();
     wet = ctx.createGain();
@@ -388,6 +394,8 @@ if (root) {
     const o = ctx.createMediaElementSource(orig);
     o.connect(origGain).connect(ctx.destination);
     o.connect(origMeter);
+    const op = ctx.createMediaElementSource(opus);
+    op.connect(opusGain).connect(ctx.destination);
     // Instruments → room (dry + pre-delay → reverb) → loudness match → your gain → mode crossfade.
     bus.connect(dry).connect(sum);
     bus.connect(preDelay).connect(verb).connect(wet).connect(sum);
@@ -472,8 +480,10 @@ if (root) {
     if (!ctx) return;
     const t = ctx.currentTime;
     const k = now ? 0.001 : 0.12;
+    const stemsOn = mode === 'media' || mode === 'wave';
     origGain.gain.setTargetAtTime(mode === 'orig' ? 1 : 0, t, k);
-    waveGain.gain.setTargetAtTime(mode === 'wave' ? 1 : 0, t, k);
+    opusGain.gain.setTargetAtTime(mode === 'opus' ? 1 : 0, t, k);
+    waveGain.gain.setTargetAtTime(stemsOn ? 1 : 0, t, k);
   };
 
   // MARK: Placing sounds
@@ -710,7 +720,11 @@ if (root) {
     const t = track();
     titleEl.textContent = t.title;
     byEl.textContent = t.by;
-    specEl.textContent = t.kind === 'song' && mode === 'orig' ? ORIG_SPEC : t.spec;
+    if (t.kind === 'song') {
+      specEl.textContent = mode === 'orig' ? ORIG_SPEC : mode === 'opus' ? OPUS_SPEC : MEDIA_SPEC;
+    } else {
+      specEl.textContent = t.spec;
+    }
     root.dataset.track = t.id;
     root.style.setProperty('--mark', t.mark || '#7ee0c8');
     markName.textContent = t.title;
@@ -813,7 +827,7 @@ if (root) {
 
   // MARK: Transport
 
-  const songEls = () => [orig, ...objs.filter((o) => o.kind === 'stem' && !o.gone && o.el).map((o) => o.el!)];
+  const songEls = () => [orig, opus, ...objs.filter((o) => o.kind === 'stem' && !o.gone && o.el).map((o) => o.el!)];
 
   const showLabel = () => {
     const live = trackId === 'attempt' ? !orig.paused : playing;
@@ -889,7 +903,8 @@ if (root) {
     let total = 0;
     for (const o of shown()) {
       let v = 0;
-      const live = o.kind === 'stem' ? mode === 'wave' && !orig.paused : playing;
+      const stemsOn = mode === 'media' || mode === 'wave';
+      const live = o.kind === 'stem' ? stemsOn && !orig.paused : playing;
       if (o.meter && live) {
         const db = 10 * Math.log10(level(o.meter) + 1e-12);
         v = Math.max(0, Math.min(1, (db + 62) / 44));
@@ -1016,7 +1031,8 @@ if (root) {
 
   for (const b of modeBtns)
     b.addEventListener('click', () => {
-      mode = b.dataset.mode as 'wave' | 'orig';
+      mode = (b.dataset.mode as SongMode) || 'media';
+      if (mode === 'wave') mode = 'media';
       for (const x of modeBtns) x.setAttribute('aria-pressed', String(x === b));
       root.dataset.mode = mode;
       paintCard();

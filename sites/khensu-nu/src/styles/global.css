@@ -81,10 +81,12 @@ h2,
 h3 {
   font-family: var(--font-display);
   font-weight: var(--heading-weight, 300);
-  line-height: 1.06;
+  /* ≥1.15 keeps Inter descenders (g, y, j…) inside the line box */
+  line-height: 1.15;
   letter-spacing: -0.03em;
   margin: 0 0 0.5em;
   text-wrap: balance;
+  overflow: visible;
 }
 h1 em,
 h2 em,
@@ -430,7 +432,7 @@ main [id] {
   -webkit-backdrop-filter: blur(10px);
   color: rgba(255, 255, 255, 0.7);
   -webkit-text-fill-color: currentColor;
-  font: 500 0.75rem/1 var(--font-body, system-ui);
+  font: 500 0.75rem/1.25 var(--font-body, system-ui);
   letter-spacing: 0;
   text-transform: none;
   cursor: pointer;
