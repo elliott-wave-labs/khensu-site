@@ -63,7 +63,7 @@ Draft claim language and assessments remain in [`PATENTS.md`](https://github.com
 | [https://khensu.nu/](https://khensu.nu/) | Marketing site |
 | [https://waves.khensu.nu/](https://waves.khensu.nu/) | nu.waves player (incl. ñü.scene, ñü.orbit, ñü.tide, ñü.ink, ñü.dim) |
 | [https://khensu.nu/waves](https://khensu.nu/waves) | Same player on the apex host |
-| Product hosts under `khensu.nu` | webe, void, media, memory, create, fi, bi, shield, network (see `AGENTS.md`) |
+| Product hosts under `khensu.nu` | webe, void, media, moments, memory, create, waves, fi, bi, shield, network (see `AGENTS.md`) |
 
 Specs on the public site track this repo (dev.khensu.nu/specs when synced).
 

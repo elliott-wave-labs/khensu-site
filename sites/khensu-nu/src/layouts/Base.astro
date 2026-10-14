@@ -1,6 +1,6 @@
 ---
 import { CARDS, PREVIEWS, cardFor, previewFor } from '../data/og';
-import { PATH_TO_PRODUCT } from '../data/hosts';
+import { PATH_TO_PRODUCT, PRODUCTS } from '../data/hosts';
 import Crescent from '../components/khensu/Crescent.astro';
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
@@ -43,19 +43,20 @@ const ogVideoH = previewMeta?.wideBytes ? '630' : '1080';
 const ogAlt = CARDS[card].alt;
 
 const nav = [
-  { href: 'https://webe.khensu.nu', label: 'webË' },
-  { href: 'https://void.khensu.nu', label: 'nu.void' },
-  { href: 'https://media.khensu.nu', label: 'nu.media' },
-  { href: 'https://memory.khensu.nu', label: 'nu.ral' },
-  { href: 'https://create.khensu.nu', label: 'nu.create' },
-  { href: 'https://waves.khensu.nu', label: 'nu.waves' },
-  { href: 'https://fi.khensu.nu', label: 'nu.Fi' },
-  { href: 'https://bi.khensu.nu', label: 'nu.bi' },
-  { href: 'https://shield.khensu.nu', label: 'suñůlink.shield' },
-  { href: 'https://network.khensu.nu', label: 'nu.network' },
+  { href: PRODUCTS.webe, label: 'webË' },
+  { href: PRODUCTS.void, label: 'nu.void' },
+  { href: PRODUCTS.media, label: 'nu.media' },
+  { href: PRODUCTS.moments, label: 'nu.moments' },
+  { href: PRODUCTS.memory, label: 'nu.ral' },
+  { href: PRODUCTS.create, label: 'nu.create' },
+  { href: PRODUCTS.waves, label: 'nu.waves' },
+  { href: PRODUCTS.fi, label: 'nu.Fi' },
+  { href: PRODUCTS.bi, label: 'nu.bi' },
+  { href: PRODUCTS.shield, label: 'suñůlink.shield' },
+  { href: PRODUCTS.network, label: 'nu.network' },
   { href: '/compliance', label: 'Compliance', minor: true },
   { href: '/security', label: 'Security', minor: true },
-  { href: 'https://webe.khensu.nu#run-a-node-section', label: 'Run a node' },
+  { href: `${PRODUCTS.webe}#run-a-node-section`, label: 'Run a node' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const currentProduct = PATH_TO_PRODUCT[path];
@@ -191,18 +192,19 @@ const navCurrent = (href: string) => {
           <p class="foot-tag">The first app on webe. From <a href="https://elliottwave.studio">elliottwave.studio lab</a>.</p>
         </div>
         <ul class="foot-links">
-          <li><a href="https://webe.khensu.nu">webË</a></li>
-          <li><a href="https://void.khensu.nu">ñü.vœîð</a></li>
-          <li><a href="https://media.khensu.nu">ñü.media</a></li>
-          <li><a href="https://memory.khensu.nu">ñü.řåł</a></li>
-          <li><a href="https://create.khensu.nu">ñü.ċřêæțẽ</a></li>
-          <li><a href="https://waves.khensu.nu">ñü.ŵævẽš</a></li>
-          <li><a href="https://fi.khensu.nu">ñũ.Fî</a></li>
-          <li><a href="https://shield.khensu.nu">suñůlink.shield</a></li>
+          <li><a href={PRODUCTS.webe}>webË</a></li>
+          <li><a href={PRODUCTS.void}>ñü.vœîð</a></li>
+          <li><a href={PRODUCTS.media}>ñü.media</a></li>
+          <li><a href={PRODUCTS.moments}>ñü.mømëntš</a></li>
+          <li><a href={PRODUCTS.memory}>ñü.řåł</a></li>
+          <li><a href={PRODUCTS.create}>ñü.ċřêæțẽ</a></li>
+          <li><a href={PRODUCTS.waves}>ñü.ŵævẽš</a></li>
+          <li><a href={PRODUCTS.fi}>ñũ.Fî</a></li>
+          <li><a href={PRODUCTS.shield}>suñůlink.shield</a></li>
           <li><a href="/transfer">Send big files</a></li>
           <li><a href="/quality">How we measure</a></li>
-          <li><a href="https://network.khensu.nu">ñü.ñetwork</a></li>
-          <li><a href="https://bi.khensu.nu">ñũ.Bî basic income</a></li>
+          <li><a href={PRODUCTS.network}>ñü.ñetwork</a></li>
+          <li><a href={PRODUCTS.bi}>ñũ.Bî basic income</a></li>
           <li><a href="/privacy">Privacy</a></li>
           <li><a href="/compliance">Compliance</a></li>
           <li><a href="https://dev.khensu.nu">Developers</a></li>

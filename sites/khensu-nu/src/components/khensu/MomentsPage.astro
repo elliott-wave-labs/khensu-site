@@ -1,0 +1,474 @@
+---
+import RevealText from './RevealText.astro';
+import { APP_STORE_URL } from '../../data/app';
+
+const features = [
+  {
+    id: 'video',
+    title: 'Video editor',
+    body: 'Cut, grade and finish on your iPhone, iPad or Mac. Everyday clips become a story you would post, with the original kept so every edit can be undone.',
+  },
+  {
+    id: 'beat',
+    title: 'Beat sync',
+    body: 'Drop in clips and a track you have the rights to. nu.moments finds the beats and the shots on your device, and lays them out without a timeline.',
+  },
+  {
+    id: 'matte',
+    title: 'Remove background',
+    body: 'Lift a subject with a soft edge for stickers, collages and template slots. The matte travels with the file; the original stays untouched.',
+  },
+  {
+    id: 'overlays',
+    title: 'Overlays and stickers',
+    body: 'Packs from creators on webË: overlays, stickers and looks as a signed effect graph. No remote code, and nobody learns which pack you opened.',
+  },
+  {
+    id: 'photo',
+    title: 'Photo editor',
+    body: 'Filters, soft retouch and curated presets. Every change is a recipe over the original, so you can re-render later with a better model.',
+  },
+  {
+    id: 'templates',
+    title: 'Designer templates',
+    body: 'Layouts for the way people post today: minimal, bold, editorial. Drop your clips in; the template adapts to your shots, not the other way round.',
+  },
+  {
+    id: 'carousels',
+    title: 'Carousels',
+    body: 'Swipeable scrapbook stories for trip dumps, tutorials and portfolios. Built as multi-slide templates you can rearrange on the phone.',
+  },
+  {
+    id: 'captions',
+    title: 'Captions',
+    body: 'Scroll-stopping type styles you can tune. Caption text and timing stay on your device; nothing is sent to a caption server.',
+  },
+];
+
+const effects = ['PhotoBooth', 'Paper', 'Digital', 'Haze', 'Fish eye', 'Printed', 'Film', 'VHS'];
+
+const carouselUses = [
+  'Educational posts',
+  'Trip recaps',
+  'Tutorials',
+  'Portfolio highlights',
+  'Storytelling slides',
+];
+---
+
+<div class="moments">
+  <section class="mo-hero" data-scene="stage" data-hero aria-labelledby="mo-title">
+    <div class="mo-stage">
+      <div class="mo-visual" aria-hidden="true">
+        <video
+          class="mo-reel"
+          src="/khensu/creators/hero.mp4"
+          poster="/khensu/creators/hero.webp"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        ></video>
+        <div class="mo-phone">
+          <span class="mo-island"></span>
+          <div class="mo-screen">
+            <b>10:10</b>
+            <span class="mo-label">ñü.mømëntš</span>
+            <ul class="mo-beats" role="presentation">
+              <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+            </ul>
+            <span class="mo-chip">beat sync · on device</span>
+          </div>
+        </div>
+      </div>
+      <div class="wrap mo-copy">
+        <p class="eyebrow">ñü.mømëntš</p>
+        <h1 id="mo-title">Boost the moments<br /><em>you actually keep.</em></h1>
+        <RevealText
+          parts={[
+            ['Templates, beat sync, captions and a full editor. ', false],
+            ['Everything runs on your device.', true],
+            [' Nobody else sees your clips.', true],
+          ]}
+        />
+        <div class="btn-row">
+          <a class="btn primary" href={APP_STORE_URL}>Get the app</a>
+          <a class="btn" href="#features-section">Explore</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features-section" data-scene="reveal">
+    <div class="wrap">
+      <p class="eyebrow">Features</p>
+      <h2>From idea to post.<br /><span class="dim">Minutes, not hours.</span></h2>
+      <p class="lede">
+        nu.moments is a creator-first editor: templates, beat sync, captions, effects and a full video and photo
+        path. Design automation and AI editing stay on your Neural Engine. Nothing is processed on a server.
+      </p>
+      <ul class="feat" role="list">
+        {features.map((f, i) => (
+          <li style={`--i:${i}`} id={`${f.id}-section`}>
+            <b>{f.title}</b>
+            <span>{f.body}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section mo-effects" id="effects-section" data-scene="reveal">
+    <div class="wrap">
+      <p class="eyebrow">Effects shop</p>
+      <h2>Looks that stop the scroll.<br /><span class="dim">Signed packs, private fetch.</span></h2>
+      <p class="lede">
+        Curated presets from film to print to haze. Creators publish packs on webË; you fetch them over the
+        mixnet, so the network never learns which look you used.
+      </p>
+      <ul class="fx" role="list">
+        {effects.map((name, i) => (
+          <li style={`--i:${i}`}><b>{name}</b></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="carousels-section" data-scene="reveal">
+    <div class="wrap">
+      <p class="eyebrow">The art of carousels</p>
+      <h2>Carousels that feel like you.<br /><span class="dim">Scrapbooks, not slides.</span></h2>
+      <p class="lede">
+        Swipeable, story-driven templates inspired by junk journals, photo dumps and visual diaries. Drop your
+        photos in; rearrange on the phone; export to the Feed or outside.
+      </p>
+      <div class="split">
+        <div>
+          <h3>From…</h3>
+          <ul class="plain" role="list">
+            {carouselUses.map((u) => <li>{u}</li>)}
+          </ul>
+        </div>
+        <div class="mo-carousel" aria-hidden="true">
+          <span class="slide s1"><i>01</i><b>recap</b></span>
+          <span class="slide s2"><i>02</i><b>detail</b></span>
+          <span class="slide s3"><i>03</i><b>close</b></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="templates-section" data-scene="reveal">
+    <div class="wrap">
+      <p class="eyebrow">Templates</p>
+      <h2>Built for your clips.<br /><span class="dim">Not one size fits all.</span></h2>
+      <RevealText
+        parts={[
+          ['Every template adapts to your shots, your vibe and your mood. ', false],
+          ['The same pack never looks the same twice.', true],
+          [' Customize everything, and keep the original under the recipe.', false],
+        ]}
+      />
+      <ul class="cards" role="list">
+        <li><b>On your device</b><span>Shot detection, faces, motion, beats and aesthetic scoring run locally. No upload to score a clip.</span></li>
+        <li><b>Private packs</b><span>Templates are content-addressed over webË. Relays see ciphertext, not which template you chose.</span></li>
+        <li><b>Creators earn</b><span>Anyone can publish a template as a persona. Tips and sales go to them; app commerce stays a flat 10%.</span></li>
+        <li><b>Export your way</b><span>nu.media inside khėnsu.ñü, or HEVC, ProRes, H.264 and HEIC for everywhere else.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="privacy-section">
+    <div class="wrap">
+      <p class="eyebrow">Privacy</p>
+      <h2>Your moments stay yours.</h2>
+      <p class="lede">
+        No Siri, no Private Cloud Compute, no Writing Tools in the composer, no iCloud for this path. Edits,
+        captions and templates resolve on the phone you hold. Generated detail is a choice you turn on, never a
+        default when you send with nu.media.
+      </p>
+      <div class="btn-row">
+        <a class="btn primary" href={APP_STORE_URL}>Get the app</a>
+        <a class="btn" href="https://media.khensu.nu">See nu.media</a>
+        <a class="btn" href="https://create.khensu.nu">For creators</a>
+      </div>
+      <p class="footnote">
+        nu.moments is the product name for the on-device editor described in
+        <a href="https://dev.khensu.nu/specs/">khensu-specs</a> (<span class="mono">design/nu-moments.md</span>,
+        <span class="mono">design/editor.md</span>). Address: <span class="mono">nu:moments.khensu.nu</span>.
+      </p>
+    </div>
+  </section>
+</div>
+
+<style>
+  .moments { --mo: #f0a8c8; --mo-deep: #7ee0c8; }
+  .mo-hero {
+    position: relative;
+    min-height: min(92vh, 920px);
+    padding: clamp(3rem, 8vw, 6rem) 0 clamp(2rem, 5vw, 4rem);
+    overflow: hidden;
+  }
+  .mo-hero.has-hero-net :global(.net) { opacity: 0.35; }
+  .mo-stage {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.5rem);
+    align-items: center;
+    max-width: var(--wrap);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+  @media (min-width: 880px) {
+    .mo-stage {
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 2rem;
+    }
+    .mo-copy { order: 2; }
+    .mo-visual { order: 1; }
+  }
+  .mo-copy .eyebrow { margin-bottom: 1rem; }
+  .mo-copy h1 {
+    font-size: clamp(2.6rem, 7vw, 4.6rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    margin: 0 0 1.25rem;
+  }
+  .mo-copy :global(.reveal-text) { text-align: left; margin: 0 0 1.75rem; max-width: 36rem; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }
+  .dim { color: var(--text-dim); font-weight: 300; }
+
+  .mo-visual {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    max-width: 420px;
+    margin: 0 auto;
+    border-radius: 28px;
+    overflow: hidden;
+    background: #0b0b0d;
+    isolation: isolate;
+  }
+  .mo-reel {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(1.05) contrast(1.05);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent);
+  }
+  .mo-phone {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    translate: -50% 0;
+    width: min(58%, 210px);
+    aspect-ratio: 9 / 19.5;
+    border-radius: 28px;
+    padding: 8px;
+    background: linear-gradient(160deg, #2a2a2e, #0e0e10);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  }
+  .mo-island {
+    display: block;
+    width: 38%;
+    height: 10px;
+    margin: 6px auto 8px;
+    border-radius: 999px;
+    background: #050505;
+  }
+  .mo-screen {
+    height: calc(100% - 24px);
+    border-radius: 20px;
+    background:
+      radial-gradient(120% 80% at 20% 0%, rgba(240, 168, 200, 0.35), transparent 55%),
+      radial-gradient(100% 70% at 90% 30%, rgba(126, 224, 200, 0.28), transparent 50%),
+      #12141a;
+    padding: 1rem 0.85rem;
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
+    color: #fff;
+  }
+  .mo-screen > b { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.04em; opacity: 0.7; }
+  .mo-label { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.02em; }
+  .mo-beats {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 3px;
+    align-items: end;
+    height: 48px;
+  }
+  .mo-beats li {
+    border-radius: 3px 3px 0 0;
+    background: linear-gradient(180deg, var(--mo), var(--mo-deep));
+    height: calc(30% + (var(--h, 40%) ));
+    animation: beat 1.1s ease-in-out infinite;
+    animation-delay: calc(var(--d, 0) * 1s);
+  }
+  .mo-beats li:nth-child(1) { --h: 35%; --d: 0; }
+  .mo-beats li:nth-child(2) { --h: 70%; --d: 0.08; }
+  .mo-beats li:nth-child(3) { --h: 45%; --d: 0.16; }
+  .mo-beats li:nth-child(4) { --h: 90%; --d: 0.04; }
+  .mo-beats li:nth-child(5) { --h: 55%; --d: 0.2; }
+  .mo-beats li:nth-child(6) { --h: 75%; --d: 0.12; }
+  .mo-beats li:nth-child(7) { --h: 40%; --d: 0.18; }
+  .mo-beats li:nth-child(8) { --h: 65%; --d: 0.06; }
+  @keyframes beat {
+    0%, 100% { transform: scaleY(0.75); opacity: 0.75; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+  .mo-chip {
+    margin-top: auto;
+    justify-self: start;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    padding: 0.35rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(10, 12, 16, 0.45);
+    backdrop-filter: blur(12px);
+  }
+
+  .feat {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  @media (min-width: 900px) {
+    .feat { grid-template-columns: repeat(4, 1fr); }
+  }
+  .feat li {
+    display: grid;
+    gap: 0.45rem;
+    padding: 1.35rem 1.25rem;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+    min-height: 11rem;
+  }
+  .feat b { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.02em; }
+  .feat span { color: var(--text-dim); font-size: 0.95rem; line-height: 1.45; }
+
+  .fx {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
+  }
+  .fx li {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: min(42vw, 160px);
+    aspect-ratio: 3 / 4;
+    border-radius: 22px;
+    display: grid;
+    place-items: end start;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background:
+      radial-gradient(120% 90% at 20% 10%, rgba(240, 168, 200, 0.45), transparent 55%),
+      radial-gradient(100% 80% at 90% 80%, rgba(126, 224, 200, 0.35), transparent 50%),
+      #14161c;
+  }
+  .fx li:nth-child(2n) {
+    background:
+      radial-gradient(120% 90% at 80% 0%, rgba(126, 224, 200, 0.4), transparent 55%),
+      radial-gradient(100% 80% at 10% 90%, rgba(240, 168, 200, 0.3), transparent 50%),
+      #14161c;
+  }
+  .fx b { font-size: 0.95rem; font-weight: 600; }
+
+  .split {
+    margin-top: 2.5rem;
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+  @media (min-width: 800px) {
+    .split { grid-template-columns: 0.9fr 1.1fr; }
+  }
+  .plain {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .plain li {
+    padding: 0.65rem 0.9rem;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+  .mo-carousel {
+    position: relative;
+    height: 280px;
+  }
+  .slide {
+    position: absolute;
+    width: min(52%, 220px);
+    aspect-ratio: 3 / 4;
+    border-radius: 20px;
+    padding: 1rem;
+    display: grid;
+    align-content: space-between;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+    background: #1a1c22;
+  }
+  .slide i { font-style: normal; font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.55; }
+  .slide b { font-size: 1.2rem; font-weight: 600; }
+  .s1 { left: 4%; top: 18%; rotate: -8deg; background: linear-gradient(160deg, #3a2a32, #14161c); }
+  .s2 { left: 28%; top: 6%; rotate: 2deg; z-index: 2; background: linear-gradient(160deg, #2a3a36, #14161c); }
+  .s3 { left: 52%; top: 22%; rotate: 9deg; background: linear-gradient(160deg, #2a3040, #14161c); }
+
+  .cards {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 1rem;
+  }
+  .cards li {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.4rem 1.25rem;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+  .cards b { font-weight: 600; }
+  .cards span { color: var(--text-dim); font-size: 0.95rem; }
+  .footnote { margin-top: 2.5rem; color: var(--text-faint); font-size: 0.88rem; max-width: 70ch; }
+  .mono { font-family: var(--font-mono); font-size: 0.9em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mo-beats li { animation: none; }
+    .mo-reel { display: none; }
+  }
+  @media (max-width: 560px) {
+    .feat { grid-template-columns: 1fr; }
+    .feat li { min-height: 0; }
+  }
+</style>
+
+<script>
+  const v = document.querySelector<HTMLVideoElement>('.mo-reel');
+  if (v && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    v.removeAttribute('autoplay');
+    v.pause();
+  }
+</script>

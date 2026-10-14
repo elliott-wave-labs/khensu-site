@@ -4,6 +4,8 @@ export const PRODUCTS = {
   webe: 'https://webe.khensu.nu',
   void: 'https://void.khensu.nu',
   media: 'https://media.khensu.nu',
+  // Apex until Hover has moments.khensu.nu A → sites LB and product_hosts is re-enabled.
+  moments: 'https://khensu.nu/moments',
   memory: 'https://memory.khensu.nu',
   create: 'https://create.khensu.nu',
   waves: 'https://waves.khensu.nu',
@@ -18,6 +20,7 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/webe': PRODUCTS.webe,
   '/void': PRODUCTS.void,
   '/media': PRODUCTS.media,
+  '/moments': PRODUCTS.moments,
   '/memory': PRODUCTS.memory,
   '/creators': PRODUCTS.create,
   '/waves': PRODUCTS.waves,
