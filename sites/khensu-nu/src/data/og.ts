@@ -104,6 +104,7 @@ export const previewFor = (card: string) =>
 export const cardFor = (path: string, prefix = '') => {
   const parts = path.replace(/^\/|\/$/g, '').split('/');
   const slug = prefix + (parts[0] || 'index');
-  const key = slug === 'index' ? 'home' : slug;
+  // /sounds redirects to nu.waves; share its card and Indra preview.
+  const key = slug === 'index' ? 'home' : slug === 'sounds' ? 'waves' : slug;
   return CARDS[key] ? key : prefix ? `${prefix}index` : 'home';
 };

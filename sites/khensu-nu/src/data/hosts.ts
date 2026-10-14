@@ -21,6 +21,7 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/memory': PRODUCTS.memory,
   '/creators': PRODUCTS.create,
   '/waves': PRODUCTS.waves,
+  '/sounds': PRODUCTS.waves,
   '/nufi': PRODUCTS.fi,
   '/bi': PRODUCTS.bi,
   '/shield': PRODUCTS.shield,

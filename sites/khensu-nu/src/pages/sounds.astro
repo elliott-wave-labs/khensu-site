@@ -1,0 +1,32 @@
+---
+// Old path. Same OG / Indra meta as waves.khensu.nu so unfurlers that stop on the
+// first HTML (or only follow after parsing) still get the right preview.
+import Base from '../layouts/Base.astro';
+import { PRODUCTS } from '../data/hosts';
+
+const dest = `${PRODUCTS.waves}/`;
+const desc =
+  'A 2008 demo saved as a small stereo file, split into its instruments and placed around you in spatial audio by nu.waves. Switch to the original, pick the room, and drag every instrument where you want it.';
+---
+
+<Base title="ñü.ŵævẽš" description={desc} noindex>
+  <meta http-equiv="refresh" content={`0;url=${dest}`} slot="head" />
+  <script slot="head" is:inline define:vars={{ dest }}>
+    location.replace(dest);
+  </script>
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow">ñü.ŵævẽš</p>
+      <h1>Moved to nu.waves.</h1>
+      <p class="lede">
+        <a href={dest}>Continue to waves.khensu.nu</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
+</style>

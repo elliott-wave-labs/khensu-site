@@ -16,11 +16,17 @@ policy.styleDirective.hashes = release.styleHashes;
 
 export default defineConfig({
   site: 'https://khensu.nu',
-  // Old /sounds path; product pages stay under dist/ for subdomain rewrites on the LB.
-  redirects: { '/sounds': 'https://waves.khensu.nu' },
+  // Old /sounds path is a real page (sounds.astro) so crawlers get the same OG/Indra
+  // meta as waves.khensu.nu before the browser refresh. Product pages stay under dist/
+  // for subdomain rewrites on the LB.
   output: 'static',
   trailingSlash: 'ignore',
   build: { format: 'directory' },
   security: { csp: policy },
-  integrations: [sitemap({ filter: (page) => !page.includes('/404') }), sri(), lowercaseHeadings(), externalLinks()],
+  integrations: [
+    sitemap({ filter: (page) => !page.includes('/404') && !page.includes('/sounds') }),
+    sri(),
+    lowercaseHeadings(),
+    externalLinks(),
+  ],
 });
