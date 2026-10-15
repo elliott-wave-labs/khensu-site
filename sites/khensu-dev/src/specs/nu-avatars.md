@@ -76,9 +76,9 @@ Nothing in the AR path requires a style SaaS.
 | [avatars.khensu.nu](https://avatars.khensu.nu) | Product page + live browser studio (`AvatarStudio`): getUserMedia, five styles, bit estimate |
 | Header nav | `nu.avatars` (page chrome: ñü.ævätåřş) |
 | Spec | This file on [dev.khensu.nu/specs/nu-avatars](https://dev.khensu.nu/specs/nu-avatars/) |
-| App / Neural Engine packs | Next: Core ML style nets + call integration in `khensu-apple` |
+| App | Call UI style menu (`AvatarStyle` + Core Image) on the local camera before encode — ink, toon, pixel, glass |
 
-Present tense for the page and studio. App integration language stays honest: the site demo is the shipped v1; phone packs follow the same wire shapes.
+Present tense for the page, studio and call styles. Neural Engine packs and style-pack wire mode follow the same shapes.
 
 ## 8. Patent assessment
 
