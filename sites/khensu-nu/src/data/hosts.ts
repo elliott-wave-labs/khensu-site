@@ -13,7 +13,7 @@ export const PRODUCTS = {
   bi: 'https://bi.khensu.nu',
   shield: 'https://shield.khensu.nu',
   network: 'https://network.khensu.nu',
-  // Apex until sla.khensu.nu is on the products cert without blocking peers.
+  // Apex until Hover has sla.khensu.nu A → 34.107.228.246 (currently NXDOMAIN).
   sla: 'https://khensu.nu/sla',
 } as const;
 

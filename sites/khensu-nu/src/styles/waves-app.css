@@ -1341,37 +1341,166 @@ body.wv-has-bar .wv {
   min-width: 2.4rem;
 }
 
+/* Mobile only — desktop stage above is untouched. Player, then bubble, then fluid cards. */
 @media (max-width: 860px) {
+  .wv-stage {
+    padding: 4.35rem 0 0.35rem;
+  }
+  .wv-stage-head {
+    margin-bottom: 0.15rem;
+  }
+  .wv-now-stage {
+    padding-bottom: 0.25rem;
+  }
   .wv-now-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .wv-room {
-    order: -1;
+    gap: 0.85rem;
+    padding: 0 var(--gutter);
   }
   .wv-now-meta {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+    gap: 0.2rem 0.75rem;
     text-align: left;
+    overflow: visible;
   }
   .wv-now-art {
-    width: 6.25rem;
+    width: 5.25rem;
     margin: 0;
+    overflow: visible;
   }
   .wv-now-art .wv-art {
-    max-height: 10.5rem;
+    max-height: none;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+  .wv-now-title {
+    font-size: 1.05rem;
+    line-height: 1.2;
+    overflow: visible;
+  }
+  .wv-now-by,
+  .wv-now-spec,
+  .wv-now-from {
+    font-size: 0.78rem;
+    overflow: visible;
+    overflow-wrap: anywhere;
+  }
+  .wv-now-ctl {
+    margin-top: 0.45rem;
+    gap: 0.2rem;
+  }
+  .wv-now-ctl button {
+    width: 2.45rem;
+    height: 2.45rem;
+  }
+  .wv-now-ctl button[data-act='toggle'] {
+    width: 3.1rem;
+    height: 3.1rem;
   }
   .wv-now-ctl,
   .wv-modes {
     justify-content: flex-start;
   }
+  .wv-modes {
+    margin-top: 0.35rem;
+  }
   .wv-queue-btn {
     justify-self: start;
+    margin-top: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.78rem;
+  }
+  .wv-room {
+    order: 0;
+  }
+  .wv-orb-brand {
+    font-size: 0.85rem;
   }
   .wv-ring {
-    width: min(100%, 18rem);
+    width: min(100%, 15.5rem);
+    margin-top: 0.15rem;
+  }
+  .wv-venues {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.35rem;
+    padding: 0.15rem 0 0.25rem;
+    scrollbar-width: none;
+  }
+  .wv-venues::-webkit-scrollbar {
+    display: none;
+  }
+  .wv-venues button {
+    flex: 0 0 auto;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.72rem;
+  }
+  .wv-picked {
+    font-size: 0.75rem;
+    margin: 0.25rem 0 0;
+  }
+  .wv-height,
+  .wv-shape {
+    display: none;
+  }
+  .wv-more {
+    margin-top: 0.45rem;
+    padding-top: 0.35rem;
+  }
+  .wv-view {
+    padding-top: 0.45rem;
+  }
+  .wv-sec {
+    margin-top: 0.65rem;
+  }
+  .wv-h {
+    margin-bottom: 0.45rem;
+    font-size: 1.05rem;
+  }
+  .wv-rail {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    gap: 0.45rem;
+    padding-bottom: 0.35rem;
+    margin: 0 calc(-1 * var(--gutter));
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+    scrollbar-width: none;
+  }
+  .wv-rail::-webkit-scrollbar {
+    display: none;
   }
   .wv-card {
-    flex-basis: calc(33.333% - 0.5rem);
-    max-width: none;
+    flex: 0 0 6.4rem;
+    max-width: 6.4rem;
+    min-width: 6.4rem;
+    scroll-snap-align: start;
+    padding: 0.25rem;
+    gap: 0.2rem;
+  }
+  .wv-card .wv-art {
+    aspect-ratio: 1;
+    border-radius: 0.55rem;
+    object-fit: contain;
+  }
+  .wv-card b {
+    font-size: 0.72rem;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .wv-card small {
+    font-size: 0.65rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .wv-page-head {
     grid-template-columns: minmax(0, 1fr);
@@ -1382,8 +1511,19 @@ body.wv-has-bar .wv {
   }
 }
 @media (max-width: 520px) {
+  .wv-now-meta {
+    grid-template-columns: 4.75rem minmax(0, 1fr);
+  }
+  .wv-now-art {
+    width: 4.75rem;
+  }
+  .wv-ring {
+    width: min(100%, 14rem);
+  }
   .wv-card {
-    flex-basis: calc(50% - 0.4rem);
+    flex-basis: 5.85rem;
+    max-width: 5.85rem;
+    min-width: 5.85rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {

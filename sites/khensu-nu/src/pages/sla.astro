@@ -5,24 +5,41 @@ import StatStrip from '../components/khensu/StatStrip.astro';
 const MAIL =
   'mailto:e@khensu.nu?subject=FounderCheckIn&body=khensu%20dead-man%20check-in%20alive%0A%0Asla.khensu.nu';
 const SMS = 'sms:+13103514089&body=FounderCheckIn%20alive';
-const SPECS = 'https://github.com/elliott-wave-labs/khensu-specs/blob/main/DEAD-MANS-SWITCH.md';
+const SPECS = 'https://github.com/elliott-wave-labs/khensu-specs';
+const PUBLIC_MD = `${SPECS}/blob/main/PUBLIC.md`;
+const DMS = `${SPECS}/blob/main/DEAD-MANS-SWITCH.md`;
 const ORG = 'https://github.com/elliott-wave-labs';
+const APPLE = 'https://github.com/elliott-wave-labs/khensu-apple';
+const RELEASES = `${APPLE}/releases`;
+const INSTALL = `${APPLE}/blob/main/docs/INSTALL.md`;
+const WAVES = 'https://waves.khensu.nu';
+const APP = 'https://khensu.nu/app';
 
-// 2:22 pm PDT, 14 October 2026, Venice, California
 const ACTIVATED_LOCAL = '14 October 2026 · 2:22 pm PDT';
 const ACTIVATED_UTC = '2026-10-14T21:22:00Z';
 const PLACE = 'Venice, California';
+
+const REPOS = [
+  { name: 'khensu-specs', licence: 'CC BY 4.0', what: 'Plan, protocol, threat model, PUBLIC.md', href: `${ORG}/khensu-specs` },
+  { name: 'khensu-core', licence: 'Apache-2.0', what: 'MLS, Outfox, UniFFI', href: `${ORG}/khensu-core` },
+  { name: 'khensu-apple', licence: 'AGPL-3.0', what: 'nu.khensu.ptah, nu.khensu.waves', href: APPLE },
+  { name: 'khensu-tatenan', licence: 'AGPL-3.0', what: 'Node for Mac and Pi 5', href: `${ORG}/khensu-tatenan` },
+  { name: 'khensu-chain', licence: 'AGPL-3.0', what: 'Chain, token, shielded pool', href: `${ORG}/khensu-chain` },
+  { name: 'khensu-services', licence: 'AGPL-3.0', what: 'KT log, credentials, push', href: `${ORG}/khensu-services` },
+  { name: 'khensu-devnet', licence: 'AGPL-3.0', what: 'One-machine network', href: `${ORG}/khensu-devnet` },
+  { name: 'khensu-site', licence: 'AGPL-3.0', what: 'Sites, including this one', href: `${ORG}/khensu-site` },
+];
 ---
 
 <Base
   title="SLA"
-  description="khėnsu.ñü service level: 100% uptime. Dead-man's switch activated 14 October 2026 at 2:22 pm in Venice, California. We did it."
+  description="khėnsu.ñü service level: 100% uptime. Dead-man's switch on. Public code. Install without Apple or Google stores."
 >
   <div class="khensu">
     <section class="page-head" data-hero>
       <div class="wrap">
-        <p class="eyebrow">sla.khensu.nu</p>
-        <h1>100% uptime.<br /><span class="dim">Dead-man's switch: on.</span></h1>
+        <p class="eyebrow">khensu.nu/sla · nu:sla.khensu.nu</p>
+        <h1>100% uptime.<br /><span class="dim">Code public. Install without stores.</span></h1>
         <StatStrip
           items={[
             { n: 100, unit: '%', label: 'Uptime — the promise' },
@@ -32,13 +49,13 @@ const PLACE = 'Venice, California';
           ]}
         />
         <p class="lede">
-          Activated {ACTIVATED_LOCAL} in {PLACE}, on vacation.
-          <br />
-          We did it.
+          Activated {ACTIVATED_LOCAL} in {PLACE}.
+          Dead-man's switch active. Every first-party repo is public.
         </p>
         <div class="btn-row">
-          <a class="btn primary" href="#check-in">Keep alive</a>
-          <a class="btn" href={ORG}>Open source</a>
+          <a class="btn primary" href="#install">Install without stores</a>
+          <a class="btn" href={ORG}>Open source on GitHub</a>
+          <a class="btn" href="#check-in">Keep alive</a>
         </div>
       </div>
     </section>
@@ -47,11 +64,80 @@ const PLACE = 'Venice, California';
       <div class="wrap prose">
         <h2>100% uptime</h2>
         <p>
-          The SLA is simple: the public site, the product hosts and the open archive stay up.
-          Static pages on the edge, every <code>khensu-*</code> repository public, and a network designed so nobody holds a single off switch.
+          The public site, the product hosts and the open archive stay up.
+          Static pages on the edge, every <code>khensu-*</code> repository public, and a network designed so nobody holds a single off switch for the commons.
         </p>
         <p>
-          Nodes, mix hops and the shielded pool share the work. When the chain ships, epoch headers carry the archive root so anyone can rebuild from the network itself.
+          The network is a gift: freedom, privacy and a basic income, so people everywhere can create, build and live securely.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="code">
+      <div class="wrap prose">
+        <h2>Public code</h2>
+        <p>
+          All first-party work lives under <a href={ORG}>elliott-wave-labs</a>.
+          Spec text: <a href={PUBLIC_MD}>PUBLIC.md</a>.
+        </p>
+        <ul class="repo-list">
+          {REPOS.map((r) => (
+            <li>
+              <a href={r.href}><code>{r.name}</code></a>
+              <span class="lic">{r.licence}</span>
+              <span class="what">{r.what}</span>
+            </li>
+          ))}
+        </ul>
+        <div class="btn-row">
+          <a class="btn primary" href={ORG}>Browse the org</a>
+          <a class="btn" href={SPECS}>khensu-specs</a>
+          <a class="btn" href={RELEASES}>Apple Releases (IPA)</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band" id="install">
+      <div class="wrap prose">
+        <h2>Install without Apple or Google stores</h2>
+        <p>
+          The App Store and Play Store are optional. The web app, the IPA and the source stay on GitHub.
+          Hub: <a href={APP}>khensu.nu/app</a>.
+        </p>
+
+        <h3>nu.waves in Safari (no install)</h3>
+        <ol>
+          <li>Open <a href={WAVES}>waves.khensu.nu</a> in Safari on iPhone or iPad.</li>
+          <li>Share → <strong>Add to Home Screen</strong>.</li>
+          <li>Play; drag sounds in the spacetime bubble. Nothing is processed on servers.</li>
+        </ol>
+
+        <h3>Sideload an IPA (iPhone)</h3>
+        <ol>
+          <li>On a Mac, install <a href="https://sideloadly.io/">Sideloadly</a> or <a href="https://altstore.io/">AltServer</a>.</li>
+          <li>Download <code>nu.waves.ipa</code> from <a href={RELEASES}>khensu-apple Releases</a>.</li>
+          <li>Plug in the unlocked iPhone and sideload with your Apple ID. Signing stays on your Mac.</li>
+          <li>Free Apple IDs need a re-sign about every 7 days; a paid Developer account lasts a year for registered devices.</li>
+        </ol>
+        <p>
+          Current release: <a href={`${RELEASES}/tag/waves-0.1.0`}>waves-0.1.0</a>.
+        </p>
+
+        <h3>Build from source (Xcode 26.2+)</h3>
+        <pre class="code"><code>{`git clone https://github.com/elliott-wave-labs/khensu-apple.git
+git clone https://github.com/elliott-wave-labs/khensu-core.git
+cd khensu-apple
+xcodegen generate
+open Ptah.xcodeproj`}</code></pre>
+        <p>
+          Select scheme <strong>Waves</strong> (<code>nu.khensu.waves</code>) or <strong>Ptah</strong> (<code>nu.khensu.ptah</code>), your team, a device, Run.
+          Full steps: <a href={INSTALL}>docs/INSTALL.md</a>.
+        </p>
+
+        <h3>Android / Google Play</h3>
+        <p>
+          No Play listing is required to listen. Use <a href={WAVES}>waves.khensu.nu</a> in Chrome; Add to Home screen for a PWA icon.
+          Native Android builds ship from the same public org when the tree is ready — watch Releases.
         </p>
       </div>
     </section>
@@ -74,11 +160,11 @@ const PLACE = 'Venice, California';
           </div>
           <div>
             <dt>Place</dt>
-            <dd>{PLACE} · on vacation</dd>
+            <dd>{PLACE}</dd>
           </div>
           <div>
             <dt>Record</dt>
-            <dd><a href={SPECS}>DEAD-MANS-SWITCH.md</a></dd>
+            <dd><a href={DMS}>DEAD-MANS-SWITCH.md</a></dd>
           </div>
         </dl>
       </div>
@@ -101,11 +187,17 @@ const PLACE = 'Venice, California';
 
     <section class="section">
       <div class="wrap prose">
-        <h2>We did it</h2>
+        <h2>Live products</h2>
+        <ul class="host-list">
+          <li><a href="https://khensu.nu">khensu.nu</a> — home</li>
+          <li><a href={WAVES}>waves.khensu.nu</a> — nu.waves</li>
+          <li><a href="https://khensu.nu/sla">khensu.nu/sla</a> — this page (sla.khensu.nu when DNS is live)</li>
+          <li><a href="https://dev.khensu.nu">dev.khensu.nu</a> — specs</li>
+          <li><a href="https://create.khensu.nu">create.khensu.nu</a> — nu.create</li>
+          <li><a href="https://fi.khensu.nu">fi.khensu.nu</a> / <a href="https://bi.khensu.nu">bi.khensu.nu</a> — nu.Fi / nu.bi</li>
+        </ul>
         <p>
-          Open source under <a href={ORG}>elliott-wave-labs</a>.
-          Handover recorded. Switch live. SLA public.
-          Built so people everywhere can create, have fun and live — on Earth, and beyond.
+          Address form: <code>nu:</code> plus the host — <code>nu:waves.khensu.nu</code>, <code>nu:sla.khensu.nu</code>.
         </p>
       </div>
     </section>
@@ -147,5 +239,42 @@ const PLACE = 'Venice, California';
   .meta dd {
     margin: 0;
     color: var(--text, #fff);
+  }
+  .repo-list,
+  .host-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.4rem 0 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .repo-list li {
+    display: grid;
+    gap: 0.15rem;
+    border-top: 1px solid var(--line-strong, #ffffff29);
+    padding-top: 0.75rem;
+  }
+  .repo-list .lic {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-faint, #fff6);
+  }
+  .repo-list .what {
+    color: var(--text-dim, #fffc);
+    font-size: 0.92rem;
+  }
+  .code {
+    overflow-x: auto;
+    padding: 1rem 1.1rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font: 0.82rem/1.45 var(--font-mono);
+  }
+  .code code {
+    white-space: pre;
+  }
+  #install h3 {
+    margin-top: 1.75rem;
   }
 </style>
