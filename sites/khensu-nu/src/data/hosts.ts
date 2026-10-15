@@ -13,6 +13,7 @@ export const PRODUCTS = {
   bi: 'https://bi.khensu.nu',
   shield: 'https://shield.khensu.nu',
   network: 'https://network.khensu.nu',
+  sla: 'https://sla.khensu.nu',
 } as const;
 
 /** Old path on khensu.nu → product URL (no trailing slash). */
@@ -29,4 +30,6 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/bi': PRODUCTS.bi,
   '/shield': PRODUCTS.shield,
   '/network': PRODUCTS.network,
+  '/sla': PRODUCTS.sla,
+  '/deadman': PRODUCTS.sla,
 };

@@ -1,0 +1,151 @@
+---
+import Base from '../layouts/Base.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
+
+const MAIL =
+  'mailto:e@khensu.nu?subject=FounderCheckIn&body=khensu%20dead-man%20check-in%20alive%0A%0Asla.khensu.nu';
+const SMS = 'sms:+13103514089&body=FounderCheckIn%20alive';
+const SPECS = 'https://github.com/elliott-wave-labs/khensu-specs/blob/main/DEAD-MANS-SWITCH.md';
+const ORG = 'https://github.com/elliott-wave-labs';
+
+// 2:22 pm PDT, 14 October 2026, Venice, California
+const ACTIVATED_LOCAL = '14 October 2026 · 2:22 pm PDT';
+const ACTIVATED_UTC = '2026-10-14T21:22:00Z';
+const PLACE = 'Venice, California';
+---
+
+<Base
+  title="SLA"
+  description="khėnsu.ñü service level: 100% uptime. Dead-man's switch activated 14 October 2026 at 2:22 pm in Venice, California. We did it."
+>
+  <div class="khensu">
+    <section class="page-head" data-hero>
+      <div class="wrap">
+        <p class="eyebrow">sla.khensu.nu</p>
+        <h1>100% uptime.<br /><span class="dim">Dead-man's switch: on.</span></h1>
+        <StatStrip
+          items={[
+            { n: 100, unit: '%', label: 'Uptime — the promise' },
+            { n: 7, unit: 'd', label: 'Keep-alive every week' },
+            { n: 42, unit: 'd', label: 'Silence before notice fires' },
+            { n: 0, label: 'Founder powers left' },
+          ]}
+        />
+        <p class="lede">
+          Activated {ACTIVATED_LOCAL} in {PLACE}, on vacation.
+          <br />
+          We did it.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href="#check-in">Keep alive</a>
+          <a class="btn" href={ORG}>Open source</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band" id="uptime-section">
+      <div class="wrap prose">
+        <h2>100% uptime</h2>
+        <p>
+          The SLA is simple: the public site, the product hosts and the open archive stay up.
+          Static pages on the edge, every <code>khensu-*</code> repository public, and a network designed so nobody holds a single off switch.
+        </p>
+        <p>
+          Nodes, mix hops and the shielded pool share the work. When the chain ships, epoch headers carry the archive root so anyone can rebuild from the network itself.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="deadman-section">
+      <div class="wrap prose">
+        <h2>Dead-man's switch</h2>
+        <p>
+          Fired and kept live from Venice. Code already open. Founder powers already ended.
+          Weekly keep-alive proves someone is still attending the notice list; forty-two days of silence escalates the archive to the press, friends, Wikimedia and the Internet Archive.
+        </p>
+        <dl class="meta">
+          <div>
+            <dt>Activated</dt>
+            <dd>{ACTIVATED_LOCAL}</dd>
+          </div>
+          <div>
+            <dt>UTC</dt>
+            <dd><code>{ACTIVATED_UTC}</code></dd>
+          </div>
+          <div>
+            <dt>Place</dt>
+            <dd>{PLACE} · on vacation</dd>
+          </div>
+          <div>
+            <dt>Record</dt>
+            <dd><a href={SPECS}>DEAD-MANS-SWITCH.md</a></dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section band" id="check-in">
+      <div class="wrap prose">
+        <h2>Keep alive</h2>
+        <p>Either channel resets the forty-two day clock. A check-in never restores founder powers.</p>
+        <div class="btn-row">
+          <a class="btn primary" href={MAIL}>Email → e@khensu.nu</a>
+          <a class="btn" href={SMS}>Text → 310-351-4089</a>
+        </div>
+        <ul>
+          <li>Subject <code>FounderCheckIn</code>, body includes <code>alive</code>.</li>
+          <li>SMS: <code>FounderCheckIn alive</code>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap prose">
+        <h2>We did it</h2>
+        <p>
+          Open source under <a href={ORG}>elliott-wave-labs</a>.
+          Handover recorded. Switch live. SLA public.
+          Built so people everywhere can create, have fun and live — on Earth, and beyond.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  }
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: clamp(1.4rem, 3vw, 2rem);
+  }
+  .meta {
+    display: grid;
+    gap: 1rem;
+    margin: 1.6rem 0 0;
+  }
+  @media (width >= 700px) {
+    .meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .meta div {
+    border-top: 1px solid var(--line-strong, #ffffff29);
+    padding-top: 0.75rem;
+  }
+  .meta dt {
+    font-family: var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint, #fff6);
+    font-size: 0.7rem;
+    margin: 0 0 0.35rem;
+  }
+  .meta dd {
+    margin: 0;
+    color: var(--text, #fff);
+  }
+</style>
