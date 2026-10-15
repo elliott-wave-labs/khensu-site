@@ -28,6 +28,8 @@ export const PRODUCTS = {
   skillsMusicTheory: 'https://khensu.nu/skills-music-theory',
   /** nu.glass — Quantum × Liquid Glass. Apex until Hover A + own_certificate ACTIVE. */
   nuGlass: 'https://khensu.nu/design-quantumglass',
+  /** ñü.åůřâ — fashion house. Apex until Hover A for aura.khensu.nu + own_certificate ACTIVE. */
+  aura: 'https://khensu.nu/aura',
 } as const;
 
 /** Old path on khensu.nu → product URL (no trailing slash). */
@@ -56,4 +58,5 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/skills-agent-weekly': PRODUCTS.skillsWeeklyUpdates,
   '/skills-music-theory': PRODUCTS.skillsMusicTheory,
   '/design-quantumglass': PRODUCTS.nuGlass,
+  '/aura': PRODUCTS.aura,
 };

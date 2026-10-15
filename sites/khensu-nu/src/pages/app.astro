@@ -1,50 +1,192 @@
 ---
 import Base from '../layouts/Base.astro';
 import StatStrip from '../components/khensu/StatStrip.astro';
-import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
+import { APP_STORE_ID, APP_STORE_URL, GET_APPS, GET_APPS_NU } from '../data/app';
+import { PRODUCTS } from '../data/hosts';
 
 const GH = 'https://github.com/elliott-wave-labs/khensu-apple';
 const INSTALL = `${GH}/blob/main/docs/INSTALL.md`;
 const RELEASES = `${GH}/releases`;
+
+/** Main apps at the top — free to install. */
+const apps = [
+  {
+    name: 'khensu.nu',
+    shown: 'khėnsu.ñü',
+    role: 'Messenger, feed, calls, go live, gifts',
+    bundle: 'nu.khensu.ptah',
+    ipa: `${RELEASES}/download/0.1.0-build3/khensu.nu.ipa`,
+    href: GET_APPS,
+  },
+  {
+    name: 'nu.waves',
+    shown: 'ñü.ŵævẽš',
+    role: 'Spatial music — spacetime bubble™',
+    bundle: 'nu.khensu.waves',
+    ipa: `${RELEASES}/download/0.1.0-build3/nu.waves.ipa`,
+    href: PRODUCTS.waves,
+  },
+  {
+    name: 'nu.moments',
+    shown: 'ñü.mømëntš',
+    role: 'Templates, beat sync, on-device editor',
+    bundle: 'nu.khensu.moments',
+    ipa: null as string | null,
+    href: PRODUCTS.moments,
+  },
+];
+
+const products = [
+  { href: PRODUCTS.webe, label: 'webË', note: 'People-run internet' },
+  { href: PRODUCTS.memory, label: 'nu.ral', note: 'Private AI on device' },
+  { href: PRODUCTS.moments, label: 'nu.moments', note: 'Creator editor' },
+  { href: PRODUCTS.create, label: 'nu.create', note: 'Rights, fans, pay' },
+  { href: PRODUCTS.waves, label: 'nu.waves', note: 'Spatial audio' },
+  { href: PRODUCTS.fi, label: 'nu.Fi', note: 'Private money' },
+  { href: PRODUCTS.bi, label: 'nu.bi', note: 'Basic income' },
+  { href: PRODUCTS.sla, label: 'SLA', note: '100% uptime' },
+  { href: PRODUCTS.indra, label: 'nu.indra.og', note: 'Moving cards' },
+  { href: PRODUCTS.shield, label: 'suñůlink.shield', note: 'Hardware transceiver' },
+  { href: PRODUCTS.void, label: 'nu.void', note: 'Stealth storage' },
+  { href: PRODUCTS.avatars, label: 'nu.avatars', note: 'On-device styles' },
+  { href: PRODUCTS.network, label: 'nu.network', note: 'The gift network' },
+  { href: PRODUCTS.media, label: 'nu.media', note: 'Fewer bits, same look' },
+];
+
+const tiers = [
+  { name: 'Free', price: 'Free', body: 'Limited access. Video up to 540p. No cloud storage. Everything else in the apps stays open.' },
+  { name: 'Pro', price: '$5 / month / user', body: 'IAP, Stripe or nu.Fi. Full spectrum nu.aura. Higher resolution and storage.' },
+  { name: 'Ultra', price: '$200', body: 'Higher tier for power creators and nodes.' },
+  { name: 'Akashic', price: '$1,111 / year', body: 'Full spectrum + annual Akashic. Lifetime buy: $2,222 — no storage or resolution limits.' },
+];
 ---
 
-<Base title="Get the apps" description="Install khėnsu.ñü and nu.waves from the App Store when listed, or build and sideload from GitHub.">
+<Base
+  title="Get the apps"
+  description="Free apps for khėnsu.ñü: messenger, nu.waves, nu.moments. Install from GitHub or the App Store when listed. Address nu:get.apps.khensu.nu."
+>
   {APP_STORE_ID && <meta http-equiv="refresh" content={`0; url=${APP_STORE_URL}`} slot="head" />}
-  <section class="page-head">
+  <section class="page-head" data-hero>
     <div class="wrap">
-      <p class="eyebrow">install</p>
-      <h1>khėnsu.ñü and nu.waves.<br />App Store when Apple lists them. GitHub either way.</h1>
+      <p class="eyebrow">{GET_APPS_NU}</p>
+      <h1>Free apps.<br /><span class="dim">Install without a store if you want.</span></h1>
       <StatStrip
         items={[
-          { n: 2, label: 'Apps in one public repo: messenger and nu.waves' },
-          { n: 0, label: 'Servers that process your data' },
-          { n: 26, label: 'iOS, iPadOS or macOS version they need' },
+          { n: 0, label: 'Dollars to download any app' },
+          { n: 3, label: 'Apps: messenger, waves, moments' },
+          { n: 100, unit: '%', label: 'Of tips and gifts to the person' },
         ]}
       />
       <p class="lede">
-        Source is public under <a href="https://github.com/elliott-wave-labs">elliott-wave-labs</a>.
-        If the App Store is empty or refuses a build, install from GitHub or run nu.waves in Safari.
+        Address <code>{GET_APPS_NU}</code> · <a href={GET_APPS}>{GET_APPS.replace('https://', '')}</a>.
+        Source under <a href="https://github.com/elliott-wave-labs">elliott-wave-labs</a>.
       </p>
       <div class="btn-row">
-        {APP_STORE_ID
-          ? <a class="btn primary" href={APP_STORE_URL}>App Store</a>
-          : <a class="btn primary" href={INSTALL}>Install from GitHub</a>}
+        <a class="btn primary" href={INSTALL}>Install from GitHub</a>
         <a class="btn" href={RELEASES}>Releases / IPA</a>
-        <a class="btn" href="https://waves.khensu.nu">nu.waves PWA</a>
-        <a class="btn" href="https://dev.khensu.nu/repositories">All repositories</a>
+        <a class="btn" href={PRODUCTS.waves}>nu.waves PWA</a>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="apps-section">
+    <div class="wrap">
+      <p class="eyebrow">Apps</p>
+      <h2>Main apps</h2>
+      <ul class="app-list" role="list">
+        {apps.map((a) => (
+          <li>
+            <div>
+              <b>{a.shown}</b>
+              <span class="mono">{a.bundle}</span>
+              <p>{a.role}</p>
+            </div>
+            <div class="actions">
+              <a class="btn primary" href={a.href}>Open</a>
+              {a.ipa
+                ? <a class="btn" href={a.ipa}>IPA</a>
+                : <span class="soon">Site live · IPA next</span>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section band" id="products-section">
+    <div class="wrap">
+      <p class="eyebrow">nu.*</p>
+      <h2>Everything in the family</h2>
+      <ul class="prod-grid" role="list">
+        {products.map((p) => (
+          <li>
+            <a href={p.href}>
+              <b>{p.label}</b>
+              <span>{p.note}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="tiers-section">
+    <div class="wrap">
+      <p class="eyebrow">Membership</p>
+      <h2>Apps stay free.<br /><span class="dim">Optional tiers for resolution and storage.</span></h2>
+      <ul class="tier-grid" role="list">
+        {tiers.map((t) => (
+          <li>
+            <b>{t.name}</b>
+            <span class="price">{t.price}</span>
+            <p>{t.body}</p>
+          </li>
+        ))}
+      </ul>
+      <p class="note">
+        Tips and gifts to streamers are always 100% to the person. Flat 10% only on in-app purchases and subscriptions
+        (never on tips). Pay with IAP, Stripe or <a href={PRODUCTS.fi}>nu.Fi</a>.
+      </p>
     </div>
   </section>
 </Base>
 
 <style>
-  .page-head .lede {
-    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+  .page-head .lede { margin: clamp(1.6rem, 4vw, 2.4rem) 0 0; }
+  .btn-row { margin-top: 1.6rem; display: flex; flex-wrap: wrap; gap: 0.65rem; }
+  .app-list { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 1rem; }
+  .app-list li {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem;
+    padding: 1.25rem 1.4rem; border-radius: 1.2rem;
+    background: color-mix(in oklab, var(--fg) 6%, transparent);
   }
-  .btn-row {
-    margin-top: 1.6rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
+  .app-list b { display: block; font-size: 1.25rem; }
+  .app-list .mono { font-size: 0.8rem; opacity: 0.65; }
+  .app-list p { margin: 0.35rem 0 0; opacity: 0.85; }
+  .app-list .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+  .soon { font-size: 0.85rem; opacity: 0.7; }
+  .prod-grid {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.75rem;
   }
+  .prod-grid a {
+    display: block; padding: 1rem 1.1rem; border-radius: 1rem; text-decoration: none; color: inherit;
+    background: color-mix(in oklab, var(--fg) 5%, transparent);
+  }
+  .prod-grid b { display: block; }
+  .prod-grid span { font-size: 0.85rem; opacity: 0.7; }
+  .tier-grid {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 0.85rem;
+  }
+  .tier-grid li {
+    padding: 1.2rem; border-radius: 1.1rem;
+    background: color-mix(in oklab, var(--fg) 5%, transparent);
+  }
+  .tier-grid .price {
+    display: block; margin: 0.35rem 0 0.6rem;
+    background: var(--aura); -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-weight: 650;
+  }
+  .note { margin-top: 1.5rem; font-size: 0.95rem; opacity: 0.8; max-width: 40rem; }
 </style>

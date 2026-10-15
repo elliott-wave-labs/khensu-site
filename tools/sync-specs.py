@@ -22,9 +22,12 @@ DOCS = {
     "design/nu-media.md": ("nu-media", "ñü.media design"),
     "design/indra.md": ("indra", "îňðřæ.ōġ"),
     "design/nu-avatars.md": ("nu-avatars", "ñü.ævätåřş"),
+    "design/nu-aura.md": ("nu-aura", "ñü.åůřâ"),
+    "design/nu-glass.md": ("nu-glass", "nu.glass"),
     "FOUNDER-HANDOVER.md": ("founder-handover", "Founder handover"),
     "OPEN-SOURCE.md": ("open-source", "Open source"),
     "LICENSING.md": ("licensing", "Licensing"),
+    "nu.harness.md": ("nu.harness", "nu.harness"),
 }
 
 

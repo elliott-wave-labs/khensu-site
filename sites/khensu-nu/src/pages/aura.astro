@@ -1,0 +1,375 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import Name from '../components/khensu/Name.astro';
+import { PRODUCTS } from '../data/hosts';
+
+const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
+---
+
+<Base
+  title="ñü.åůřâ"
+  description="ñü.åůřâ (nu.aura): Elliott’s first fashion show — $444 sets, $44k gem cuts, diamond $4.4m, moldavite $44m (three only). Quiet sensing as jewelry. Venice → the age of N/U."
+>
+  <div class="khensu aura-page">
+    <ProductBar name="ñü.åůřâ" action="The collection" href="#collection" explore="#sensing" />
+
+    <section class="aura-hero" data-hero>
+      <div class="aura-hero-media" aria-hidden="true">
+        <video
+          class="aura-reel"
+          src="/khensu/aura/legacy.aura.mp4"
+          poster="/khensu/aura/legacy.aura.jpg"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+        <div class="aura-hero-veil"></div>
+      </div>
+      <div class="wrap aura-hero-in">
+        <p class="eyebrow">ñü.åůřâ · first show · Venice Beach</p>
+        <p class="aura-mark" aria-hidden="true">ÑÜ.ÅŮŘÂ</p>
+        <h1>
+          I’m the designer.<br />
+          <em>It’s my first show.</em>
+        </h1>
+        <p class="lede">
+          Legacy Aura was the beach house. This is <strong>nu.aura</strong> — fashion and design styles for the age of N/U.
+          Light dresses the body. Jewelry that doesn’t look like tech. <Name tld={false} /> holds the desk.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href="#collection">See the collection</a>
+          <a class="btn" href="#sensing">Quiet sensing</a>
+          <a class="btn" href={SPEC}>ñü.åůřâ spec</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section aura-legacy wrap" id="legacy">
+      <p class="aura-k">00 · legacy</p>
+      <h2>From Aura to nu.aura</h2>
+      <p class="body">
+        Happy to announce the brand from California — that was the old profile. Ibiza Swim Week energy, Venice Beach pin.
+        The beads on the string were the tell. Now the stones are the product, and the name carries the ñü mark.
+      </p>
+    </section>
+
+    <section class="section band" id="collection">
+      <div class="wrap">
+        <p class="aura-k">01 · collection</p>
+        <h2>The first show</h2>
+        <p class="body aura-lede">
+          Four lines. One house. Prices fixed — no scaling up or down for drama.
+        </p>
+        <div class="aura-tiers" role="list">
+          <article class="aura-tier" role="listitem" data-tone="set">
+            <p class="aura-tier-k">Set</p>
+            <h3>Non–gem cut</h3>
+            <p class="aura-price"><span>$</span>444</p>
+            <p>Every non–gem-cut set. Rings, links, glasses frames — the everyday wardrobe.</p>
+          </article>
+          <article class="aura-tier" role="listitem" data-tone="emerald">
+            <p class="aura-tier-k">Gem cut</p>
+            <h3>Emerald · or peer</h3>
+            <p class="aura-price"><span>$</span>44k</p>
+            <p>$44,000 emerald with gem-cut stones — or any other stone at this price point.</p>
+          </article>
+          <article class="aura-tier" role="listitem" data-tone="diamond">
+            <p class="aura-tier-k">Diamond</p>
+            <h3>The clear one</h3>
+            <p class="aura-price"><span>$</span>4.4m</p>
+            <p>$4,400,000. One diamond line. Quiet fire.</p>
+          </article>
+          <article class="aura-tier aura-tier-rare" role="listitem" data-tone="moldavite">
+            <p class="aura-tier-k">Moldavite · only 3</p>
+            <h3>Sky glass</h3>
+            <p class="aura-price"><span>$</span>44m</p>
+            <p>
+              $44,000,000. Three made: one Elliott’s for display, one for a museum, one for public sale.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="sensing">
+      <div class="wrap">
+        <p class="aura-k">02 · quiet sensing</p>
+        <h2>Think it. Wear it. Nothing looks like gear.</h2>
+        <p class="body aura-lede">
+          Non-invasive EEG, EKG-class pulse, and optical dim — as a ring, sunglasses, necklace, bracelet.
+          Lasers stay skin-surface. Signals stay on your device. Kronos collabs on what you create; humans stay loved, not suppressed.
+        </p>
+        <ul class="aura-wear" role="list">
+          <li>
+            <b>Ring</b>
+            <span>Dry contacts in the band. Stone on top. Pulse + intention cues on device.</span>
+          </li>
+          <li>
+            <b>Sunglasses</b>
+            <span>Dim shift — daylight softens without a gadget face. Optical path, no implant.</span>
+          </li>
+          <li>
+            <b>Necklace</b>
+            <span>Links that read heart and throat quietly. Looks like chain.</span>
+          </li>
+          <li>
+            <b>Bracelet</b>
+            <span>Wrist cuff. Motion + pulse. Same family of stones as the sets.</span>
+          </li>
+        </ul>
+        <p class="body">
+          Runtime lane when the desk is ready: <strong>Qwen 3.8 MoE</strong> on your iron — never a cloud that owns your head.
+          Until disk says yes for heavier brains, Kronos stays on the harness you already run.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href={PRODUCTS.kronos}>Kronos desk</a>
+          <a class="btn" href={PRODUCTS.nuGlass}>nu.glass</a>
+          <a class="btn" href={PRODUCTS.waves}>nu.waves</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band aura-close" id="age">
+      <div class="wrap prose">
+        <p class="aura-k">03 · age of N/U</p>
+        <h2>Love was never the problem.</h2>
+        <p>
+          People have been suppressed for eons. That time is over. The network is a gift — freedom, privacy, basic income —
+          so everyone can create, build and live. Fashion is how light meets the body. nu.aura is how that light dresses the age.
+        </p>
+        <p>
+          SLA stays at <a href={PRODUCTS.sla}>100% uptime</a>. The gift that carries it is
+          <a href={PRODUCTS.network}>nu.network</a>.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .aura-page {
+    color: #f4f0ea;
+    background: #0a0b0d;
+  }
+  .aura-hero {
+    position: relative;
+    min-height: min(94vh, 58rem);
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    padding: clamp(4rem, 12vh, 7rem) 0 clamp(3rem, 8vh, 5rem);
+  }
+  .aura-hero-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .aura-reel {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    filter: saturate(0.92) contrast(1.05);
+  }
+  .aura-hero-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(10, 11, 13, 0.25) 0%, rgba(10, 11, 13, 0.55) 45%, rgba(10, 11, 13, 0.92) 100%),
+      radial-gradient(ellipse 80% 50% at 70% 20%, rgba(34, 245, 154, 0.12), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(139, 92, 255, 0.1), transparent 50%);
+  }
+  .aura-hero-in {
+    position: relative;
+    z-index: 1;
+    max-width: 42rem;
+  }
+  .aura-mark {
+    margin: 0.4rem 0 0.6rem;
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(2.4rem, 8vw, 4.6rem);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur, 8s) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .aura-hero h1 {
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    font-size: clamp(2rem, 5.5vw, 3.4rem);
+    line-height: 1.08;
+    margin: 0 0 1rem;
+  }
+  .aura-hero h1 em {
+    font-style: normal;
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur, 8s) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .aura-hero .lede {
+    color: rgba(244, 240, 234, 0.88);
+    max-width: 36rem;
+  }
+  .aura-k {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(244, 240, 234, 0.55);
+    margin: 0 0 0.75rem;
+  }
+  .aura-legacy h2,
+  .aura-page .section h2 {
+    letter-spacing: -0.025em;
+  }
+  .aura-lede {
+    max-width: 36rem;
+    margin-bottom: 1.75rem;
+  }
+  .aura-tiers {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  @media (min-width: 960px) {
+    .aura-tiers {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .aura-tier {
+    position: relative;
+    padding: 1.35rem 1.25rem 1.5rem;
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    min-height: 14rem;
+  }
+  .aura-tier::before {
+    content: '';
+    position: absolute;
+    inset: auto -20% -40% -20%;
+    height: 70%;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .aura-tier[data-tone='set']::before {
+    background: #1e8fff;
+  }
+  .aura-tier[data-tone='emerald']::before {
+    background: #22f59a;
+  }
+  .aura-tier[data-tone='diamond']::before {
+    background: #e8f4ff;
+  }
+  .aura-tier[data-tone='moldavite']::before {
+    background: #6bff4a;
+  }
+  .aura-tier-rare {
+    border-color: rgba(107, 255, 74, 0.35);
+    box-shadow: 0 0 0 1px rgba(107, 255, 74, 0.12), 0 20px 60px rgba(0, 0, 0, 0.35);
+  }
+  .aura-tier-k {
+    position: relative;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(244, 240, 234, 0.55);
+    margin: 0 0 0.5rem;
+  }
+  .aura-tier h3 {
+    position: relative;
+    margin: 0 0 0.75rem;
+    font-size: 1.15rem;
+    font-weight: 550;
+  }
+  .aura-price {
+    position: relative;
+    margin: 0 0 0.85rem;
+    font-family: var(--font-display), Inter, sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+  }
+  .aura-price span {
+    font-size: 0.55em;
+    opacity: 0.7;
+    margin-right: 0.08em;
+  }
+  .aura-tier p:last-child {
+    position: relative;
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: rgba(244, 240, 234, 0.78);
+  }
+  .aura-wear {
+    list-style: none;
+    margin: 0 0 1.75rem;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  @media (min-width: 720px) {
+    .aura-wear {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .aura-wear li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1.1rem 1.15rem;
+    border-radius: 1.1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .aura-wear b {
+    font-size: 1.02rem;
+  }
+  .aura-wear span {
+    color: rgba(244, 240, 234, 0.75);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+  .aura-close p a {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+  @media (max-width: 719px) {
+    .aura-hero {
+      min-height: min(88vh, 44rem);
+    }
+    .aura-mark {
+      letter-spacing: 0.12em;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aura-mark,
+    .aura-hero h1 em {
+      animation: none;
+      background: none;
+      color: #22f59a;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+    }
+    .aura-reel {
+      display: none;
+    }
+    .aura-hero-media {
+      background: #12141a url('/khensu/aura/legacy.aura.jpg') center / cover no-repeat;
+    }
+  }
+</style>

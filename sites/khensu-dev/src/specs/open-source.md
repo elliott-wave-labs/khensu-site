@@ -35,7 +35,7 @@ Keep them side by side under one directory (see [`AGENTS.md`](https://github.com
 
 ## Install the apps from GitHub (App Store optional)
 
-Walkthroughs (PWA, sideload, Xcode) live on [khensu.nu/sla](https://khensu.nu/sla) and in [`PUBLIC.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/PUBLIC.md). Agent harness: [`nu.harness.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/nu.harness.md).
+Walkthroughs (PWA, sideload, Xcode) live on [khensu.nu/sla](https://khensu.nu/sla) and in [`PUBLIC.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/PUBLIC.md). Agent harness: [`nu.harness.md`](/specs/nu.harness).
 
 Apple’s store is one path. The code stays public either way.
 
