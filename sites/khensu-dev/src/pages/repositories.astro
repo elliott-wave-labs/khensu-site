@@ -3,27 +3,27 @@ import Base from '../layouts/Base.astro';
 import StatStrip from '../components/khensu/StatStrip.astro';
 ---
 
-<Base title="Repositories and licences" description="Where khėnsu.ñü’s code lives, its licences, and when each repository opens.">
+<Base title="Repositories and licences" description="Every khėnsu.ñü repository is public: clone, build, and install from GitHub.">
   <p class="eyebrow">Repositories and licences</p>
-  <h1>Open source, component by component</h1>
+  <h1>Open source, every repository</h1>
   <StatStrip
     items={[
-      { n: 8, label: 'Repositories, each with its own licence' },
-      { n: 4, label: 'Specifications public now' },
+      { n: 8, label: 'Public repositories under elliott-wave-labs' },
       { n: 3, label: 'Licences: Apache-2.0, AGPL-3.0 and CC BY 4.0' },
+      { n: 100, unit: '%', label: 'Uptime SLA + founder dead-man’s switch' },
     ]}
   />
   <p class="lede">
-    The <a href="/specs/protocol">protocol</a>, <a href="/specs/webe">webË</a>, the
-    <a href="/specs/threat-model">threat model</a> and <a href="/specs/nu-media">ñü.media</a> specifications are public now.
+    Founder handover fired 14 October 2026. Clone anything below, build the apps from
+    <a href="https://github.com/elliott-wave-labs/khensu-apple">khensu-apple</a>, or install nu.waves as a PWA at
+    <a href="https://waves.khensu.nu">waves.khensu.nu</a> if the App Store is slow or refuses a build.
   </p>
-  <p>Each repository opens once its design review is finished; until then they’re private.</p>
 
   <table>
     <thead><tr><th>Repository</th><th>Contents</th><th>Licence</th></tr></thead>
     <tbody>
       <tr><td><a href="https://github.com/elliott-wave-labs/khensu-core"><code>khensu-core</code></a></td><td>Post-quantum MLS, credentials, mix network packets, on-device search, test vectors</td><td>Apache-2.0</td></tr>
-      <tr><td><a href="https://github.com/elliott-wave-labs/khensu-apple"><code>khensu-apple</code></a></td><td>The app for iPhone, iPad and Mac</td><td>AGPL-3.0</td></tr>
+      <tr><td><a href="https://github.com/elliott-wave-labs/khensu-apple"><code>khensu-apple</code></a></td><td>khėnsu.ñü (<code>nu.khensu.ptah</code>) and nu.waves (<code>nu.khensu.waves</code>)</td><td>AGPL-3.0</td></tr>
       <tr><td><a href="https://github.com/elliott-wave-labs/khensu-tatenan"><code>khensu-tatenan</code></a></td><td>Node software for Mac and Raspberry Pi 5</td><td>AGPL-3.0</td></tr>
       <tr><td><a href="https://github.com/elliott-wave-labs/khensu-chain"><code>khensu-chain</code></a></td><td>Post-quantum chain, token and shielded payments</td><td>AGPL-3.0</td></tr>
       <tr><td><a href="https://github.com/elliott-wave-labs/khensu-services"><code>khensu-services</code></a></td><td>Key transparency log, credential issuer, push gateway</td><td>AGPL-3.0</td></tr>
@@ -32,5 +32,22 @@ import StatStrip from '../components/khensu/StatStrip.astro';
       <tr><td><a href="https://github.com/elliott-wave-labs/khensu-site"><code>khensu-site</code></a></td><td>khėnsu.ñü and these docs</td><td>AGPL-3.0</td></tr>
     </tbody>
   </table>
-  <p>All repositories live under <a href="https://github.com/elliott-wave-labs"><code>elliott-wave-labs</code></a> on GitHub. A link shows GitHub’s 404 page until that repository opens.</p>
+
+  <h2>Install the apps from GitHub</h2>
+  <p>
+    Full steps:
+    <a href="https://github.com/elliott-wave-labs/khensu-apple/blob/main/docs/INSTALL.md"><code>docs/INSTALL.md</code></a>
+    in khensu-apple. Short version:
+  </p>
+  <ul>
+    <li><b>nu.waves in the browser:</b> <a href="https://waves.khensu.nu">waves.khensu.nu</a> → Share → Add to Home Screen.</li>
+    <li><b>Build on your iPhone:</b> clone khensu-apple, <code>xcodegen generate</code>, open <code>Ptah.xcodeproj</code>, run the <b>Waves</b> or <b>Ptah</b> scheme with your Apple ID.</li>
+    <li><b>Sideload an IPA:</b> download from
+      <a href="https://github.com/elliott-wave-labs/khensu-apple/releases">Releases</a>, then Sideloadly or AltStore on your Mac.</li>
+  </ul>
+  <p>
+    Org: <a href="https://github.com/elliott-wave-labs"><code>elliott-wave-labs</code></a>.
+    Open-source notice: <a href="/specs/open-source">OPEN-SOURCE</a>.
+    Dead-man’s switch: <a href="https://khensu.nu/sla">khensu.nu/sla</a>.
+  </p>
 </Base>

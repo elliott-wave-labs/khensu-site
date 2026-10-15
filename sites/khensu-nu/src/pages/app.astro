@@ -2,24 +2,37 @@
 import Base from '../layouts/Base.astro';
 import StatStrip from '../components/khensu/StatStrip.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
+
+const GH = 'https://github.com/elliott-wave-labs/khensu-apple';
+const INSTALL = `${GH}/blob/main/docs/INSTALL.md`;
+const RELEASES = `${GH}/releases`;
 ---
 
-<Base title="khėnsu.ñü on the App Store" description="khėnsu.ñü for iPhone, iPad and Mac, on the App Store.">
+<Base title="Get the apps" description="Install khėnsu.ñü and nu.waves from the App Store when listed, or build and sideload from GitHub.">
   {APP_STORE_ID && <meta http-equiv="refresh" content={`0; url=${APP_STORE_URL}`} slot="head" />}
   <section class="page-head">
     <div class="wrap">
-      <p class="eyebrow">app store</p>
-      <h1>khėnsu.ñü for iPhone, iPad and Mac.<br />Everything runs on your device.</h1>
+      <p class="eyebrow">install</p>
+      <h1>khėnsu.ñü and nu.waves.<br />App Store when Apple lists them. GitHub either way.</h1>
       <StatStrip
         items={[
-          { n: 5, label: 'Mix network hops for every message' },
-          { n: 2, unit: 's', label: 'One steady burst while the app is open, typing or not' },
-          { n: 0, label: 'Servers that process your data: no iCloud, no Siri' },
-          { n: 26, label: 'iOS, iPadOS or macOS, the version it needs' },
+          { n: 2, label: 'Apps in one public repo: messenger and nu.waves' },
+          { n: 0, label: 'Servers that process your data' },
+          { n: 26, label: 'iOS, iPadOS or macOS version they need' },
         ]}
       />
-      <p class="lede">This page opens khėnsu.ñü on the App Store the moment Apple lists it, so it is safe to share.</p>
-      <div class="btn-row"><a class="btn primary" href="https://webe.khensu.nu#run-a-node-section">Run a node</a></div>
+      <p class="lede">
+        Source is public under <a href="https://github.com/elliott-wave-labs">elliott-wave-labs</a>.
+        If the App Store is empty or refuses a build, install from GitHub or run nu.waves in Safari.
+      </p>
+      <div class="btn-row">
+        {APP_STORE_ID
+          ? <a class="btn primary" href={APP_STORE_URL}>App Store</a>
+          : <a class="btn primary" href={INSTALL}>Install from GitHub</a>}
+        <a class="btn" href={RELEASES}>Releases / IPA</a>
+        <a class="btn" href="https://waves.khensu.nu">nu.waves PWA</a>
+        <a class="btn" href="https://dev.khensu.nu/repositories">All repositories</a>
+      </div>
     </div>
   </section>
 </Base>
@@ -30,5 +43,8 @@ import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
   }
   .btn-row {
     margin-top: 1.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
   }
 </style>

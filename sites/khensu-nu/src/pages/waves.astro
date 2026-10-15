@@ -7,7 +7,10 @@ import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 import { ALBUMS, ARTISTS, CHANNELS, COLLECTIONS, TRACKS, VENUES, artistOf, mmss } from '../data/waves';
 import '../styles/waves-app.css';
 
-const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
+const appHref = APP_STORE_ID
+  ? APP_STORE_URL
+  : 'https://github.com/elliott-wave-labs/khensu-apple/blob/main/docs/INSTALL.md';
+const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Install from GitHub';
 const featured = TRACKS.find((t) => t.id === 'first-attempt')!;
 const featuredArtist = artistOf(featured.artistId)!;
 const live = CHANNELS.filter((c) => c.kind === 'live');
@@ -21,13 +24,172 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
   manifest="/waves.webmanifest"
 >
   <div class="wv khensu" data-waves>
-    <section class="wv-hero" data-hero aria-labelledby="wv-title">
-      <div class="wrap wv-hero-inner">
+    <section class="wv-stage" aria-labelledby="wv-now-title">
+      <div class="wrap wv-stage-head">
         <p class="eyebrow">ñü.ŵævẽš</p>
-        <h1 id="wv-title">Every sound, <em>where you put it.</em></h1>
-        <p class="wv-hero-lede">
-          Live channels, your files, Chopin in the public domain, and healing sounds generated on this device. Drag them in the spacetime bubble while they play. Turn your head and the room turns with you.
-        </p>
+      </div>
+
+      <!-- Player + spacetime bubble stay on the page (not a modal), like the original waves stage. -->
+      <div class="wv-now wv-now-stage" data-now role="region" aria-labelledby="wv-now-title">
+        <div class="wv-now-grid">
+          <div class="wv-now-meta">
+            <div class="wv-now-art" data-now-art data-for={featured.id}>
+              <img
+                class="wv-art"
+                src={featuredArtist.art}
+                alt={`Cover of ${featured.title}`}
+                width="273"
+                height="466"
+              />
+            </div>
+            <p class="wv-now-from" data-now-from>Next up</p>
+            <h1 class="wv-now-title" id="wv-now-title" data-now-title>{featured.title}</h1>
+            <p class="wv-now-by" data-now-by>{featuredArtist.name} · More Of The Same · 2008</p>
+            <p class="wv-now-spec" data-now-spec>{featured.spec}</p>
+            <div class="wv-now-ctl">
+              <button type="button" data-act="shuffle" aria-pressed="false" aria-label="Shuffle"></button>
+              <button type="button" data-act="prev" aria-label="Previous"></button>
+              <button type="button" data-act="toggle" aria-label="Play"></button>
+              <button type="button" data-act="next" aria-label="Next"></button>
+              <button type="button" data-act="repeat" aria-pressed="false" data-state="off" aria-label="Repeat off"></button>
+              <button type="button" data-act="like" aria-pressed="false" aria-label="Like"></button>
+              <button type="button" data-act="keep-current" aria-pressed="false"><span>Keep</span></button>
+            </div>
+            <div class="wv-time">
+              <label class="sr" for="wv-seek">Position</label>
+              <input id="wv-seek" type="range" min="0" max="1" step="0.1" value="0" data-seek style="--p:0%" />
+              <span><span data-cur>0:00</span><span data-dur>{mmss(featured.dur)}</span></span>
+            </div>
+            <div class="wv-modes" data-modes role="group" aria-label="What to play">
+              <button type="button" data-act="mode" data-mode="orig" aria-pressed="false">original</button>
+              <button type="button" data-act="mode" data-mode="bed" aria-pressed="false" hidden>opus 5.1</button>
+              <button type="button" data-act="mode" data-mode="waves" aria-pressed="true">nu.waves</button>
+            </div>
+            <button type="button" class="wv-queue-btn" data-act="queue-toggle" aria-pressed="false">Queue</button>
+            <p class="wv-now-error" data-now-error hidden></p>
+            <div data-leave hidden>
+              <button type="button" class="wv-btn" data-act="leave"><span>Leave channel</span></button>
+            </div>
+          </div>
+
+          <figure class="wv-room">
+            <p class="wv-orb-brand">spacetime bubble™</p>
+            <div class="wv-ring" data-ring data-idle="1" aria-label="spacetime bubble">
+              <canvas aria-hidden="true"></canvas>
+              <div class="wv-gestures" aria-hidden="true">
+                <span class="wv-g" data-g="drag"><i></i><b>drag</b></span>
+                <span class="wv-g" data-g="tap"><i></i><b>tap</b></span>
+                <span class="wv-g" data-g="swipe"><i></i><b>swipe</b></span>
+              </div>
+              <span class="wv-dir" data-dir="ahead">ahead</span>
+              <span class="wv-dir" data-dir="behind">behind</span>
+              <span class="wv-dir" data-dir="above">above</span>
+              <span class="wv-dir" data-dir="below">below</span>
+            </div>
+            <div class="wv-venues" role="group" aria-label="Room">
+              {VENUES.map((v) => (
+                <button type="button" data-act="venue" data-venue={v.id} aria-pressed={String(v.id === 'hall')}>{v.label}</button>
+              ))}
+            </div>
+            <p class="wv-picked" data-picked>Concert hall. Strings, winds and piano, written as a film score.</p>
+            <p class="wv-picked" data-obj-count></p>
+            <div class="wv-height">
+              <label for="wv-height">Height</label>
+              <input id="wv-height" type="range" min="-3" max="3" step="0.1" value="0" data-height />
+              <output for="wv-height" data-height-out>·</output>
+            </div>
+            <div class="wv-shape" data-width-box hidden>
+              <legend>Stereo width</legend>
+              <label>Width <input type="range" min="0" max="200" step="1" value="100" data-width /><output data-width-out>100%</output></label>
+              <div class="wv-acts-row">
+                <button type="button" class="wv-btn" data-act="rotate" data-deg="-30"><span>Swing left</span></button>
+                <button type="button" class="wv-btn" data-act="rotate" data-deg="30"><span>Swing right</span></button>
+                <button type="button" class="wv-btn" data-act="restore" hidden><span>Restore sounds</span></button>
+              </div>
+            </div>
+            <details class="wv-more">
+              <summary>Room, orbit, scene, ñü.ÊQ and head tracking</summary>
+              <fieldset class="wv-orbit" data-orbit-box>
+                <legend>ñü.orbit</legend>
+                <p class="wv-lib-note">The selected sound walks a path around you. The samples stay put; only the place numbers move.</p>
+                <div class="wv-acts-row">
+                  <button type="button" class="wv-btn" data-act="orbit" data-rpm="0"><span>Still</span></button>
+                  <button type="button" class="wv-btn" data-act="orbit" data-rpm="2"><span>Slow</span></button>
+                  <button type="button" class="wv-btn" data-act="orbit" data-rpm="6"><span>Drift</span></button>
+                  <button type="button" class="wv-btn" data-act="orbit" data-rpm="14"><span>Spin</span></button>
+                  <button type="button" class="wv-btn" data-act="orbit-all" data-rpm="3"><span>All drift</span></button>
+                </div>
+              </fieldset>
+              <fieldset class="wv-scene" data-scene-box>
+                <legend>ñü.scene</legend>
+                <p class="wv-lib-note">Save where every sound sits, the room and ñü.ÊQ. Recall mid-listen. Share a code; nothing is uploaded.</p>
+                <div class="wv-acts-row">
+                  <button type="button" class="wv-btn wv-btn-primary" data-act="scene-save"><span>Save scene</span></button>
+                  <button type="button" class="wv-btn" data-act="scene-share"><span>Copy share code</span></button>
+                  <button type="button" class="wv-btn" data-act="scene-import"><span>Paste scene</span></button>
+                </div>
+                <div class="wv-scene-list" data-scene-list></div>
+              </fieldset>
+              <fieldset class="wv-ink-box" data-ink-box>
+                <legend>ñü.ink</legend>
+                <p class="wv-lib-note">Your listening handwriting: how you dragged and turned, drawn as a private glyph on this device.</p>
+                <div class="wv-ink-live" data-ink-live aria-hidden="true"></div>
+                <div class="wv-acts-row">
+                  <button type="button" class="wv-btn" data-act="ink-seal"><span>Keep this ink</span></button>
+                  <a class="wv-btn" href="#/library/ink"><span>Your inks</span></a>
+                </div>
+              </fieldset>
+              <fieldset class="wv-tone" data-tone-box hidden>
+                <legend>Chakra tone</legend>
+                <label>Hold <input type="range" min="1" max="20" step="0.5" value="8" data-tone="hold" /><output data-tone-out="hold">8.0 s</output></label>
+                <label>Fade <input type="range" min="0.5" max="12" step="0.5" value="4" data-tone="fade" /><output data-tone-out="fade">4.0 s</output></label>
+                <label>Crossfade <input type="range" min="0" max="8" step="0.1" value="2" data-tone="cross" /><output data-tone-out="cross">2.0 s</output></label>
+              </fieldset>
+              <fieldset class="wv-fx">
+                <legend>ñü.ÊQ</legend>
+                <div class="wv-fx-presets" role="group" aria-label="ñü.ÊQ presets">
+                  <button type="button" data-act="preset" data-preset="original" aria-pressed="false">Match original</button>
+                  <button type="button" data-act="preset" data-preset="clean" aria-pressed="false">Clean</button>
+                </div>
+                <label>Gain <input type="range" min="-12" max="12" step="0.5" value="0" data-fx="gain" /><output data-fx-out="gain">0 dB</output></label>
+                <label>Reverb <input type="range" min="0" max="100" step="1" value="40" data-fx="wet" /><output data-fx-out="wet">40%</output></label>
+                <label>Echo duration <input type="range" min="0.2" max="6" step="0.1" value="2.1" data-fx="rt" /><output data-fx-out="rt">2.1 s</output></label>
+                <label>Echo delay <input type="range" min="0" max="400" step="1" value="25" data-fx="pre" /><output data-fx-out="pre">25 ms</output></label>
+                <label>Echo bounces <input type="range" min="0" max="8" step="1" value="0" data-fx="bounces" /><output data-fx-out="bounces">0</output></label>
+                <label>Volume <input type="range" min="0" max="100" step="1" value="100" data-volume /><output></output></label>
+                <label>Crossfade <input type="range" min="0" max="12" step="1" value="0" data-crossfade /><output data-crossfade-out>off</output></label>
+                <label>Sleep
+                  <select data-sleep>
+                    <option value="0">Off</option>
+                    <option value="15">15 min</option>
+                    <option value="30">30 min</option>
+                    <option value="45">45 min</option>
+                    <option value="60">60 min</option>
+                  </select>
+                </label>
+              </fieldset>
+              <fieldset class="wv-head" data-head-box>
+                <legend>Head tracking</legend>
+                <div class="wv-head-srcs" role="group" aria-label="Head tracking source">
+                  <button type="button" data-act="head" data-src="off" aria-pressed="true">Off</button>
+                  <button type="button" data-act="head" data-src="device" aria-pressed="false">Phone</button>
+                  <button type="button" data-act="head" data-src="camera" aria-pressed="false">Camera</button>
+                  <button type="button" data-act="head" data-src="airpods" aria-pressed="false">AirPods</button>
+                </div>
+                <p class="wv-head-status" data-head-status></p>
+                <button type="button" class="wv-btn" data-act="recentre" hidden><span>Recentre</span></button>
+              </fieldset>
+            </details>
+            <figcaption>Drag a sound. Drag the spacetime bubble to look around. Turn on head tracking and the room turns with you.</figcaption>
+          </figure>
+        </div>
+        <div class="wv-queue wrap" data-queue hidden>
+          <div class="wv-queue-head">
+            <h3 class="wv-h">Queue</h3>
+            <button type="button" class="wv-btn" data-act="queue-clear"><span>Clear</span></button>
+          </div>
+          <ol data-queue-list></ol>
+        </div>
       </div>
     </section>
 
@@ -40,10 +202,10 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
 
     <div class="wrap wv-view" data-view>
       <section class="wv-sec" aria-labelledby="wv-featured">
-        <h2 class="wv-h" id="wv-featured">Featured</h2>
+        <h2 class="wv-h" id="wv-featured">Listen</h2>
         <div class="wv-rail">
           <button type="button" class="wv-card" data-act="play-one" data-id={featured.id}>
-            <img class="wv-art" src={featuredArtist.art} alt="" width="320" height="320" />
+            <img class="wv-art" src={featuredArtist.art} alt="" width="273" height="466" />
             <b>{featured.title}</b>
             <small>{featuredArtist.name} · {mmss(featured.dur)}</small>
           </button>
@@ -57,12 +219,6 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
               </a>
             );
           })}
-        </div>
-      </section>
-
-      <section class="wv-sec" aria-labelledby="wv-live">
-        <h2 class="wv-h" id="wv-live">Live now</h2>
-        <div class="wv-rail">
           {live.map((c) => (
             <a class="wv-card wv-card-ch" href={`#/channel/${c.id}`}>
               {c.art ? <img class="wv-art" src={c.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${c.artClass || 'h1'}`} aria-hidden="true" />}
@@ -70,12 +226,6 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
               <small data-onair={c.id}>on air</small>
             </a>
           ))}
-        </div>
-      </section>
-
-      <section class="wv-sec" aria-labelledby="wv-collections">
-        <h2 class="wv-h" id="wv-collections">Collections</h2>
-        <div class="wv-rail">
           {COLLECTIONS.map((c) => (
             <a class="wv-card" href={`#/collection/${c.id}`}>
               {c.art ? <img class="wv-art" src={c.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${c.artClass || 'h1'}`} aria-hidden="true" />}
@@ -83,12 +233,6 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
               <small>{c.desc}</small>
             </a>
           ))}
-        </div>
-      </section>
-
-      <section class="wv-sec" aria-labelledby="wv-healing">
-        <h2 class="wv-h" id="wv-healing">Healing</h2>
-        <div class="wv-rail">
           {healingAlbums.map((a) => (
             <a class="wv-card" href={`#/album/${a.id}`}>
               <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />
@@ -96,12 +240,6 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
               <small>{a.note || 'Generated on your device'}</small>
             </a>
           ))}
-        </div>
-      </section>
-
-      <section class="wv-sec" aria-labelledby="wv-artists">
-        <h2 class="wv-h" id="wv-artists">Artists</h2>
-        <div class="wv-rail">
           {ARTISTS.map((a) => (
             <a class="wv-card wv-card-round" href={`#/artist/${a.id}`}>
               {a.art ? <img class="wv-art" src={a.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />}
@@ -122,10 +260,10 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
     </p>
     <p class="wv-offline" data-offline hidden role="status">Offline · kept tracks, your files and generated sounds still play</p>
 
-    <!-- Now Playing bar -->
+    <!-- Mini bar when scrolled away from the stage -->
     <div class="wv-bar" data-bar hidden role="region" aria-label="Now playing">
-      <button type="button" class="wv-bar-art" data-act="open-now" data-bar-art aria-label="Open now playing"></button>
-      <button type="button" class="wv-bar-text" data-act="open-now" aria-label="Open now playing">
+      <button type="button" class="wv-bar-art" data-act="open-now" data-bar-art aria-label="Show player"></button>
+      <button type="button" class="wv-bar-text" data-act="open-now" aria-label="Show player">
         <b data-bar-title></b>
         <small data-bar-by></small>
       </button>
@@ -134,163 +272,9 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
         <button type="button" data-act="prev" aria-label="Previous"></button>
         <button type="button" data-act="toggle" aria-label="Play"></button>
         <button type="button" data-act="next" aria-label="Next"></button>
-      </div>
-      <div class="wv-bar-prog" aria-hidden="true"><i data-bar-prog></i></div>
-    </div>
-
-    <!-- Now Playing overlay -->
-    <div class="wv-now" data-now hidden role="dialog" aria-modal="true" aria-labelledby="wv-now-title">
-      <div class="wv-now-top">
-        <button type="button" data-act="close-now" data-now-close>Close</button>
-        <p class="wv-now-from" data-now-from>Playing</p>
         <button type="button" data-act="queue-toggle" aria-pressed="false">Queue</button>
       </div>
-      <div class="wv-now-grid">
-        <div class="wv-now-meta">
-          <div class="wv-now-art" data-now-art></div>
-          <h2 class="wv-now-title" id="wv-now-title" data-now-title></h2>
-          <p class="wv-now-by" data-now-by></p>
-          <p class="wv-now-spec" data-now-spec></p>
-          <div class="wv-now-ctl">
-            <button type="button" data-act="shuffle" aria-pressed="false" aria-label="Shuffle"></button>
-            <button type="button" data-act="prev" aria-label="Previous"></button>
-            <button type="button" data-act="toggle" aria-label="Play"></button>
-            <button type="button" data-act="next" aria-label="Next"></button>
-            <button type="button" data-act="repeat" aria-pressed="false" data-state="off" aria-label="Repeat off"></button>
-            <button type="button" data-act="like" aria-pressed="false" aria-label="Like"></button>
-            <button type="button" data-act="keep-current" aria-pressed="false"><span>Keep</span></button>
-          </div>
-          <div class="wv-time">
-            <label class="sr" for="wv-seek">Position</label>
-            <input id="wv-seek" type="range" min="0" max="1" step="0.1" value="0" data-seek style="--p:0%" />
-            <span><span data-cur>0:00</span><span data-dur>0:00</span></span>
-          </div>
-          <div class="wv-modes" data-modes role="group" aria-label="What to play">
-            <button type="button" data-act="mode" data-mode="orig" aria-pressed="false">original</button>
-            <button type="button" data-act="mode" data-mode="bed" aria-pressed="false" hidden>opus 5.1</button>
-            <button type="button" data-act="mode" data-mode="waves" aria-pressed="true">nu.waves</button>
-          </div>
-          <p class="wv-now-error" data-now-error hidden></p>
-          <div data-leave hidden>
-            <button type="button" class="wv-btn" data-act="leave"><span>Leave channel</span></button>
-          </div>
-        </div>
-
-        <figure class="wv-room">
-          <p class="wv-orb-brand">spacetime bubble™</p>
-          <div class="wv-ring" data-ring data-idle="1" aria-label="spacetime bubble">
-            <canvas aria-hidden="true"></canvas>
-            <div class="wv-gestures" aria-hidden="true">
-              <span class="wv-g" data-g="drag"><i></i><b>drag</b></span>
-              <span class="wv-g" data-g="tap"><i></i><b>tap</b></span>
-              <span class="wv-g" data-g="swipe"><i></i><b>swipe</b></span>
-            </div>
-            <span class="wv-dir" data-dir="ahead">ahead</span>
-            <span class="wv-dir" data-dir="behind">behind</span>
-            <span class="wv-dir" data-dir="above">above</span>
-            <span class="wv-dir" data-dir="below">below</span>
-          </div>
-          <div class="wv-venues" role="group" aria-label="Room">
-            {VENUES.map((v) => (
-              <button type="button" data-act="venue" data-venue={v.id} aria-pressed={String(v.id === 'hall')}>{v.label}</button>
-            ))}
-          </div>
-          <p class="wv-picked" data-picked>Concert hall. Strings, winds and piano, written as a film score.</p>
-          <p class="wv-picked" data-obj-count></p>
-          <div class="wv-height">
-            <label for="wv-height">Height</label>
-            <input id="wv-height" type="range" min="-3" max="3" step="0.1" value="0" data-height />
-            <output for="wv-height" data-height-out>·</output>
-          </div>
-          <div class="wv-shape" data-width-box hidden>
-            <legend>Stereo width</legend>
-            <label>Width <input type="range" min="0" max="200" step="1" value="100" data-width /><output data-width-out>100%</output></label>
-            <div class="wv-acts-row">
-              <button type="button" class="wv-btn" data-act="rotate" data-deg="-30"><span>Swing left</span></button>
-              <button type="button" class="wv-btn" data-act="rotate" data-deg="30"><span>Swing right</span></button>
-              <button type="button" class="wv-btn" data-act="restore" hidden><span>Restore sounds</span></button>
-            </div>
-          </div>
-          <fieldset class="wv-orbit" data-orbit-box>
-            <legend>ñü.orbit</legend>
-            <p class="wv-lib-note">The selected sound walks a path around you. The samples stay put; only the place numbers move.</p>
-            <div class="wv-acts-row">
-              <button type="button" class="wv-btn" data-act="orbit" data-rpm="0"><span>Still</span></button>
-              <button type="button" class="wv-btn" data-act="orbit" data-rpm="2"><span>Slow</span></button>
-              <button type="button" class="wv-btn" data-act="orbit" data-rpm="6"><span>Drift</span></button>
-              <button type="button" class="wv-btn" data-act="orbit" data-rpm="14"><span>Spin</span></button>
-              <button type="button" class="wv-btn" data-act="orbit-all" data-rpm="3"><span>All drift</span></button>
-            </div>
-          </fieldset>
-          <fieldset class="wv-scene" data-scene-box>
-            <legend>ñü.scene</legend>
-            <p class="wv-lib-note">Save where every sound sits, the room and ñü.ÊQ. Recall mid-listen. Share a code; nothing is uploaded.</p>
-            <div class="wv-acts-row">
-              <button type="button" class="wv-btn wv-btn-primary" data-act="scene-save"><span>Save scene</span></button>
-              <button type="button" class="wv-btn" data-act="scene-share"><span>Copy share code</span></button>
-              <button type="button" class="wv-btn" data-act="scene-import"><span>Paste scene</span></button>
-            </div>
-            <div class="wv-scene-list" data-scene-list></div>
-          </fieldset>
-          <fieldset class="wv-ink-box" data-ink-box>
-            <legend>ñü.ink</legend>
-            <p class="wv-lib-note">Your listening handwriting: how you dragged and turned, drawn as a private glyph on this device.</p>
-            <div class="wv-ink-live" data-ink-live aria-hidden="true"></div>
-            <div class="wv-acts-row">
-              <button type="button" class="wv-btn" data-act="ink-seal"><span>Keep this ink</span></button>
-              <a class="wv-btn" href="#/library/ink"><span>Your inks</span></a>
-            </div>
-          </fieldset>
-          <fieldset class="wv-tone" data-tone-box hidden>
-            <legend>Chakra tone</legend>
-            <label>Hold <input type="range" min="1" max="20" step="0.5" value="8" data-tone="hold" /><output data-tone-out="hold">8.0 s</output></label>
-            <label>Fade <input type="range" min="0.5" max="12" step="0.5" value="4" data-tone="fade" /><output data-tone-out="fade">4.0 s</output></label>
-            <label>Crossfade <input type="range" min="0" max="8" step="0.1" value="2" data-tone="cross" /><output data-tone-out="cross">2.0 s</output></label>
-          </fieldset>
-          <fieldset class="wv-fx">
-            <legend>ñü.ÊQ</legend>
-            <div class="wv-fx-presets" role="group" aria-label="ñü.ÊQ presets">
-              <button type="button" data-act="preset" data-preset="original" aria-pressed="false">Match original</button>
-              <button type="button" data-act="preset" data-preset="clean" aria-pressed="false">Clean</button>
-            </div>
-            <label>Gain <input type="range" min="-12" max="12" step="0.5" value="0" data-fx="gain" /><output data-fx-out="gain">0 dB</output></label>
-            <label>Reverb <input type="range" min="0" max="100" step="1" value="40" data-fx="wet" /><output data-fx-out="wet">40%</output></label>
-            <label>Echo duration <input type="range" min="0.2" max="6" step="0.1" value="2.1" data-fx="rt" /><output data-fx-out="rt">2.1 s</output></label>
-            <label>Echo delay <input type="range" min="0" max="400" step="1" value="25" data-fx="pre" /><output data-fx-out="pre">25 ms</output></label>
-            <label>Echo bounces <input type="range" min="0" max="8" step="1" value="0" data-fx="bounces" /><output data-fx-out="bounces">0</output></label>
-            <label>Volume <input type="range" min="0" max="100" step="1" value="100" data-volume /><output></output></label>
-            <label>Crossfade <input type="range" min="0" max="12" step="1" value="0" data-crossfade /><output data-crossfade-out>off</output></label>
-            <label>Sleep
-              <select data-sleep>
-                <option value="0">Off</option>
-                <option value="15">15 min</option>
-                <option value="30">30 min</option>
-                <option value="45">45 min</option>
-                <option value="60">60 min</option>
-              </select>
-            </label>
-          </fieldset>
-          <fieldset class="wv-head" data-head-box>
-            <legend>Head tracking</legend>
-            <div class="wv-head-srcs" role="group" aria-label="Head tracking source">
-              <button type="button" data-act="head" data-src="off" aria-pressed="true">Off</button>
-              <button type="button" data-act="head" data-src="device" aria-pressed="false">Phone</button>
-              <button type="button" data-act="head" data-src="camera" aria-pressed="false">Camera</button>
-              <button type="button" data-act="head" data-src="airpods" aria-pressed="false">AirPods</button>
-            </div>
-            <p class="wv-head-status" data-head-status></p>
-            <button type="button" class="wv-btn" data-act="recentre" hidden><span>Recentre</span></button>
-          </fieldset>
-          <figcaption>Drag a sound. Drag the spacetime bubble to look around. Turn on head tracking and the room turns with you.</figcaption>
-        </figure>
-      </div>
-      <div class="wv-queue" data-queue hidden>
-        <div class="wv-queue-head">
-          <h3 class="wv-h">Queue</h3>
-          <button type="button" class="wv-btn" data-act="queue-clear"><span>Clear</span></button>
-        </div>
-        <ol data-queue-list></ol>
-      </div>
+      <div class="wv-bar-prog" aria-hidden="true"><i data-bar-prog></i></div>
     </div>
 
     <p class="wv-toast" data-toast hidden role="status"></p>
@@ -314,7 +298,7 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
 
     <div class="wv-about">
       <Story />
-      <ProductBar name="ñü.ŵævẽš" action={appLabel} href={APP_STORE_URL} />
+      <ProductBar name="ñü.ŵævẽš" action={appLabel} href={appHref} />
       <Sounds />
       <section class="wv-close">
         <div class="wrap">

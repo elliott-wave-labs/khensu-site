@@ -11,44 +11,20 @@
 body.wv-has-bar .wv {
   padding-bottom: calc(var(--wv-tabs) + var(--wv-bar) + 1.5rem);
 }
-body.wv-now-open {
-  overflow: hidden;
-}
-
-.wv-hero {
+.wv-stage {
   position: relative;
-  padding: 5.5rem 0 1.5rem;
+  padding: 4.75rem 0 0.75rem;
   background:
-    radial-gradient(60rem 30rem at 50% 20%, rgba(79, 176, 255, 0.14), transparent 70%),
-    radial-gradient(40rem 24rem at 80% 70%, rgba(139, 92, 255, 0.1), transparent 70%),
+    radial-gradient(56rem 28rem at 50% 10%, rgba(79, 176, 255, 0.12), transparent 70%),
+    radial-gradient(36rem 22rem at 82% 68%, rgba(139, 92, 255, 0.08), transparent 70%),
     #000;
 }
-.wv-hero-inner {
+.wv-stage-head {
   text-align: center;
-  max-width: 40rem;
-  margin: 0 auto;
+  margin-bottom: 0.35rem;
 }
-.wv-hero h1 {
-  font-size: clamp(2rem, 4.5vw, 3.4rem);
-  letter-spacing: -0.035em;
-  line-height: 1.12;
-  margin: 0.2rem 0 0.6rem;
-  font-weight: 500;
-}
-.wv-hero h1 em {
-  display: block;
-  font-style: normal;
-  background: linear-gradient(90deg, #22f59a, #1e8fff 50%, #8b5cff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.wv-hero-lede {
-  color: var(--text-dim, #9aa0a6);
-  font-size: clamp(1rem, 1.5vw, 1.2rem);
-  line-height: 1.5;
-  margin: 0 auto 1.4rem;
-  max-width: 34rem;
+.wv-stage-head .eyebrow {
+  margin: 0;
 }
 
 .wv-tabs {
@@ -79,11 +55,11 @@ body.wv-now-open {
 }
 
 .wv-view {
-  padding: 1.25rem 0 2rem;
-  min-height: 40vh;
+  padding: 0.85rem 0 1.5rem;
+  min-height: 20vh;
 }
 .wv-sec {
-  margin-top: 1.8rem;
+  margin-top: 1.1rem;
 }
 .wv-sec:first-child {
   margin-top: 0;
@@ -148,53 +124,57 @@ body.wv-now-open {
 }
 
 .wv-rail {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(8.5rem, 10.5rem);
-  gap: 0.85rem;
-  overflow-x: auto;
-  padding-bottom: 0.35rem;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-.wv-rail::-webkit-scrollbar {
-  height: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.65rem;
+  padding-bottom: 0.15rem;
 }
 .wv-card {
-  scroll-snap-align: start;
+  flex: 1 1 7.25rem;
+  max-width: 8.75rem;
+  min-width: 6.5rem;
   display: grid;
-  gap: 0.35rem;
+  grid-template-rows: auto auto 1fr;
+  gap: 0.3rem;
+  align-content: start;
   text-align: left;
-  padding: 0;
+  padding: 0.35rem;
   border: 0;
-  background: none;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
   color: inherit;
   font: inherit;
   cursor: pointer;
   text-decoration: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.wv-card:hover,
+.wv-card:focus-visible {
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-1px);
 }
 .wv-card .wv-art {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 0.75rem;
+  border-radius: 0.65rem;
+  object-fit: contain;
+  background: #101218;
 }
 .wv-card-round .wv-art {
   border-radius: 50%;
+  object-fit: cover;
 }
 .wv-card b {
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 .wv-card small {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
+  line-height: 1.3;
   color: rgba(255, 255, 255, 0.55);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .wv-card-ch b {
   display: flex;
@@ -204,7 +184,7 @@ body.wv-now-open {
 
 .wv-art {
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   background: #15171c;
 }
 .wv-art-css {
@@ -510,6 +490,7 @@ body.wv-now-open {
   overflow: hidden;
 }
 .wv-bar-art .wv-art {
+  object-fit: cover;
   width: 100%;
   height: 100%;
 }
@@ -576,28 +557,73 @@ body.wv-now-open {
   color: #ff6b6b;
 }
 
-/* Now Playing overlay */
-.wv-now {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  overflow: auto;
-  background:
-    radial-gradient(50rem 30rem at 50% 0%, rgba(30, 143, 255, 0.16), transparent 60%),
-    #050608;
-  padding: max(1rem, env(safe-area-inset-top)) var(--gutter) 2.5rem;
+/* Player stage: art + controls beside the spacetime bubble */
+.wv-now-stage {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+  padding: 0 0 0.5rem;
+  background: transparent;
 }
-.wv-now[hidden] {
-  display: none !important;
+.wv-now-grid {
+  display: grid;
+  grid-template-columns: minmax(18rem, 26rem) minmax(16rem, 24rem);
+  justify-content: center;
+  align-items: start;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
 }
-.wv-now-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
+.wv-now-meta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.35rem 1rem;
+  align-content: start;
+  align-items: start;
 }
-.wv-now-top button {
+.wv-now-art {
+  grid-row: 1 / span 5;
+  width: 7.25rem;
+  margin: 0;
+  border-radius: 0.85rem;
+  overflow: visible;
+  background: transparent;
+}
+.wv-now-art .wv-art {
+  width: 100%;
+  height: auto;
+  max-height: 12.5rem;
+  aspect-ratio: auto;
+  object-fit: contain;
+  object-position: top center;
+  border-radius: 0.85rem;
+  background: #101218;
+}
+.wv-now-from,
+.wv-now-title,
+.wv-now-by,
+.wv-now-spec {
+  grid-column: 2;
+}
+.wv-now-ctl,
+.wv-time,
+.wv-modes,
+.wv-queue-btn,
+.wv-now-error,
+.wv-now-meta [data-leave] {
+  grid-column: 1 / -1;
+}
+.wv-now-title {
+  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.wv-queue-btn {
+  justify-self: start;
+  margin-top: 0.65rem;
   border: 0;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
@@ -606,35 +632,25 @@ body.wv-now-open {
   font: 600 0.82rem var(--font-sans);
   cursor: pointer;
 }
-.wv-now-grid {
-  display: grid;
-  grid-template-columns: minmax(14rem, 22rem) minmax(16rem, 26rem);
-  justify-content: center;
-  gap: clamp(1.2rem, 3vw, 2.4rem);
-  max-width: 56rem;
-  margin: 0 auto;
+.wv-more {
+  margin-top: 0.85rem;
+  text-align: left;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.55rem;
 }
-.wv-now-meta {
-  display: grid;
-  gap: 0.35rem;
-  align-content: start;
+.wv-more > summary {
+  cursor: pointer;
+  list-style: none;
+  font: 600 0.82rem var(--font-sans);
+  color: rgba(255, 255, 255, 0.72);
+  padding: 0.35rem 0;
 }
-.wv-now-art {
-  width: min(100%, 18rem);
-  aspect-ratio: 1;
-  border-radius: 1.1rem;
-  overflow: hidden;
-  margin-bottom: 0.8rem;
+.wv-more > summary::-webkit-details-marker {
+  display: none;
 }
-.wv-now-art .wv-art {
-  width: 100%;
-  height: 100%;
-}
-.wv-now-title {
-  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  margin: 0;
+.wv-more[open] > summary {
+  color: #fff;
+  margin-bottom: 0.35rem;
 }
 .wv-now-by,
 .wv-now-spec,
@@ -754,9 +770,9 @@ body.wv-now-open {
 }
 .wv-ring {
   position: relative;
-  width: min(100%, 24rem);
+  width: min(100%, 22rem);
   aspect-ratio: 1;
-  margin: 0.55rem auto 0;
+  margin: 0.35rem auto 0;
   touch-action: none;
 }
 .wv-ring canvas {
@@ -1329,22 +1345,45 @@ body.wv-now-open {
   .wv-now-grid {
     grid-template-columns: minmax(0, 1fr);
   }
-  .wv-now-art {
-    width: min(100%, 14rem);
-    margin-inline: auto;
+  .wv-room {
+    order: -1;
   }
   .wv-now-meta {
-    text-align: center;
+    grid-template-columns: auto minmax(0, 1fr);
+    text-align: left;
+  }
+  .wv-now-art {
+    width: 6.25rem;
+    margin: 0;
+  }
+  .wv-now-art .wv-art {
+    max-height: 10.5rem;
   }
   .wv-now-ctl,
   .wv-modes {
-    justify-content: center;
+    justify-content: flex-start;
+  }
+  .wv-queue-btn {
+    justify-self: start;
+  }
+  .wv-ring {
+    width: min(100%, 18rem);
+  }
+  .wv-card {
+    flex-basis: calc(33.333% - 0.5rem);
+    max-width: none;
   }
   .wv-page-head {
     grid-template-columns: minmax(0, 1fr);
   }
   .wv-page-head .wv-art {
     max-width: 12rem;
+    object-fit: contain;
+  }
+}
+@media (max-width: 520px) {
+  .wv-card {
+    flex-basis: calc(50% - 0.4rem);
   }
 }
 @media (prefers-reduced-motion: reduce) {

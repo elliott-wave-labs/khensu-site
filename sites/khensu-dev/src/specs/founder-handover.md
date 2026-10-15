@@ -9,7 +9,7 @@ source: 'FOUNDER-HANDOVER.md'
 **UTC:** 2026-10-14T14:27:57Z  
 **Local (PDT):** 2026-10-14 07:27  
 
-Elliott Wave LLC, by Elliott, triggers the founder succession path in `PROTOCOL.md` §12.5–12.7 as a **FounderHandover**: every founder power ends; every khėnsu.ñü repository that was private is public; patented material in those repos is released with the code.
+Elliott Wave LLC, by Elliott, triggers the founder succession path in `PROTOCOL.md` §12.5–12.7 as a **FounderHandover**: every founder power ends; every khėnsu.ñü repository that was private is public; patented material in those repos is released with the code. The dead-man's switch is **ACTIVE** (Venice CA, 2:22 pm PDT, 14 October 2026) with keep-alive on [e@khensu.nu](mailto:e@khensu.nu) and SMS [310-351-4089](sms:+13103514089); SLA: [sla.khensu.nu](https://khensu.nu/sla); record: [`DEAD-MANS-SWITCH.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/DEAD-MANS-SWITCH.md).
 
 The on-chain committee escrow and epoch header transition are not yet running. This document is the human-readable handover that those mechanisms will later record. Until the network can countersign, **GitHub public visibility and this notice are the release.**
 
@@ -63,7 +63,8 @@ Draft claim language and assessments remain in [`PATENTS.md`](https://github.com
 | [https://khensu.nu/](https://khensu.nu/) | Marketing site |
 | [https://waves.khensu.nu/](https://waves.khensu.nu/) | nu.waves player (incl. ñü.scene, ñü.orbit, ñü.tide, ñü.ink, ñü.dim) |
 | [https://khensu.nu/waves](https://khensu.nu/waves) | Same player on the apex host |
-| Product hosts under `khensu.nu` | webe, void, media, moments, memory, create, waves, fi, bi, shield, network (see `AGENTS.md`) |
+| Product hosts under `khensu.nu` | webe, void, media, moments, memory, create, waves, fi, bi, shield, network, sla (see `AGENTS.md`) |
+| [https://khensu.nu/sla/](https://khensu.nu/sla/) | SLA: 100% uptime + dead-man's switch |
 
 Specs on the public site track this repo (dev.khensu.nu/specs when synced).
 

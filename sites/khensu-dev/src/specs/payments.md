@@ -33,7 +33,7 @@ The key words MUST, MUST NOT, SHOULD and MAY are used as in RFC 2119 and RFC 817
 
 1. **Post-quantum everywhere.** No elliptic curves, pairings or RSA. Commitments, nullifiers and Merkle trees are hash-based (Poseidon2); proofs are STARKs (hash-based); note encryption is ML-KEM-1024 (FIPS 203) with AES-256-GCM; signatures, where any are needed, are ML-DSA-87 (FIPS 204).
 2. **Fixed shapes.** Every spend has the same size, the same number of inputs and outputs, and travels in the same fixed-size mixnet packets, so a payment of 1¢ and one of $10,000 look identical.
-3. **Non-custodial.** Value moves only with a proof made on the owner's device. The committee checks proofs and nullifiers; it can't move, freeze or see notes.
+3. **Non-custodial.** Value moves only with a proof made on the owner's device. The committee checks proofs and nullifiers; it can't move, freeze or see notes. A nu.media ban (`design/nu-media-bans.md`) must not freeze spendable notes: it only routes new media inbound into a held envelope the owner can release after the ban lifts.
 4. **Forgetful.** Eras close and their trees and nullifier lists are deleted (section 6.3). History is kept only on the owner's devices, and only as long as the owner keeps it.
 5. **Boundaries are the only public points.** Deposits into and withdrawals out of the pool are visible as amounts on public accounts; nothing inside the pool is.
 

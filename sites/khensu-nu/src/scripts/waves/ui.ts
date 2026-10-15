@@ -136,7 +136,7 @@ export class App {
       }
       const sel = e.selected;
       if (sel && !sel.gone) this.ink.mark(sel.pos.x / 4, sel.pos.y / 4, 'drag');
-      if (!this.now.hidden) this.bubble.frame(now);
+      this.bubble.frame(now);
       if (now - this.lastPaint > 240) {
         this.lastPaint = now;
         this.paintTime();
@@ -701,7 +701,8 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         eng.leaveChannel();
         break;
       case 'toggle':
-        await eng.toggle();
+        if (!eng.track) this.playIds(['first-attempt'], 0);
+        else await eng.toggle();
         break;
       case 'next':
         await eng.next();
@@ -1288,22 +1289,26 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
   // MARK: Now playing
 
   openNow(open: boolean) {
-    this.now.hidden = !open;
-    document.body.classList.toggle('wv-now-open', open);
+    // The player stays on the page; open scrolls it into view, close leaves it alone.
+    document.body.classList.remove('wv-now-open');
+    this.now.hidden = false;
     if (open) {
       this.bubble.sync();
-      this.now.querySelector<HTMLElement>('[data-now-close]')?.focus({ preventScroll: true });
+      this.now.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
   private paintNow() {
     const eng = this.engine;
-    const t = eng.track;
-    const bar = this.bar;
-    document.body.classList.toggle('wv-has-bar', !!t);
-    bar.hidden = !t;
+    const live = eng.track;
+    const idle = !live;
+    const t = live ?? this.light('first-attempt');
     if (!t) return;
-    if (t.id !== this.inkTrack) {
+    const bar = this.bar;
+    document.body.classList.toggle('wv-has-bar', !!live);
+    bar.hidden = !live;
+    this.now.hidden = false;
+    if (live && t.id !== this.inkTrack) {
       void this.sealInk();
       this.ink.begin(t.id, t.title);
       this.inkTrack = t.id;
@@ -1313,26 +1318,40 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const set = (sel: string, text: string, scope: HTMLElement = this.root) => {
       for (const el of scope.querySelectorAll<HTMLElement>(sel)) if (el.textContent !== text) el.textContent = text;
     };
-    set('[data-bar-title]', t.title);
-    set('[data-bar-by]', byLine);
-    const barArt = bar.querySelector<HTMLElement>('[data-bar-art]')!;
-    if (barArt.dataset.for !== t.id) {
-      barArt.innerHTML = artHtml;
-      barArt.dataset.for = t.id;
+    if (live) {
+      set('[data-bar-title]', t.title);
+      set('[data-bar-by]', byLine);
+      const barArt = bar.querySelector<HTMLElement>('[data-bar-art]')!;
+      if (barArt.dataset.for !== t.id) {
+        barArt.innerHTML = artHtml;
+        barArt.dataset.for = t.id;
+      }
+      for (const b of bar.querySelectorAll<HTMLElement>('[data-act="prev"]')) b.innerHTML = ICON.prev;
+      for (const b of bar.querySelectorAll<HTMLElement>('[data-act="next"]')) b.innerHTML = ICON.next;
+      bar.querySelector<HTMLElement>('[data-bar-live]')!.hidden = !eng.live;
     }
     for (const b of this.root.querySelectorAll<HTMLElement>('[data-act="toggle"]')) {
       b.innerHTML = eng.playing ? ICON.pause : ICON.play;
       b.setAttribute('aria-label', eng.playing ? 'Pause' : 'Play');
     }
-    for (const b of bar.querySelectorAll<HTMLElement>('[data-act="prev"]')) b.innerHTML = ICON.prev;
-    for (const b of bar.querySelectorAll<HTMLElement>('[data-act="next"]')) b.innerHTML = ICON.next;
-    bar.querySelector<HTMLElement>('[data-bar-live]')!.hidden = !eng.live;
-    // The Now Playing view.
+    // The stage always shows the current (or next-up) track.
     const now = this.now;
     set('[data-now-title]', t.title, now);
     set('[data-now-by]', byLine, now);
-    set('[data-now-spec]', [t.spec, t.local ? 'your file' : this.kept.has(t.id) ? 'kept on this device' : '', t.licence].filter(Boolean).join(' · '), now);
-    set('[data-now-from]', eng.live ? `Live · ${eng.channel!.name}` : t.albumTitle ? `Playing from ${t.albumTitle}` : t.local ? 'Playing from your files' : 'Playing', now);
+    set('[data-now-spec]', [t.spec, t.local ? 'your file' : this.kept.has(t.id) ? 'kept on this device' : ''].filter(Boolean).join(' · '), now);
+    set(
+      '[data-now-from]',
+      idle
+        ? 'Next up'
+        : eng.live
+          ? `Live · ${eng.channel!.name}`
+          : t.albumTitle
+            ? `Playing from ${t.albumTitle}`
+            : t.local
+              ? 'Playing from your files'
+              : 'Playing',
+      now,
+    );
     const nowArt = now.querySelector<HTMLElement>('[data-now-art]')!;
     if (nowArt.dataset.for !== t.id) {
       nowArt.innerHTML = art(t.artUrl, this.cssArt(t), `Cover of ${t.albumTitle ?? t.title}`, 480);
