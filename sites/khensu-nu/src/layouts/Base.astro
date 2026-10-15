@@ -43,20 +43,20 @@ const ogVideoH = previewMeta?.wideBytes ? '630' : '1080';
 const ogAlt = CARDS[card].alt;
 
 const nav = [
-  { href: PRODUCTS.webe, label: 'webË' },
-  { href: PRODUCTS.void, label: 'nu.void' },
+  { href: PRODUCTS.bi, label: 'nu.bi' },
+  { href: PRODUCTS.create, label: 'nu.create' },
+  { href: PRODUCTS.fi, label: 'nu.Fi' },
   { href: PRODUCTS.media, label: 'nu.media' },
   { href: PRODUCTS.moments, label: 'nu.moments' },
-  { href: PRODUCTS.memory, label: 'nu.ral' },
-  { href: PRODUCTS.create, label: 'nu.create' },
-  { href: PRODUCTS.waves, label: 'nu.waves' },
-  { href: PRODUCTS.fi, label: 'nu.Fi' },
-  { href: PRODUCTS.bi, label: 'nu.bi' },
-  { href: PRODUCTS.shield, label: 'suñůlink.shield' },
   { href: PRODUCTS.network, label: 'nu.network' },
+  { href: PRODUCTS.memory, label: 'nu.ral' },
+  { href: PRODUCTS.void, label: 'nu.void' },
+  { href: PRODUCTS.waves, label: 'nu.waves' },
+  { href: PRODUCTS.shield, label: 'suñůlink.shield' },
+  { href: PRODUCTS.webe, label: 'webË' },
   { href: '/compliance', label: 'Compliance', minor: true },
-  { href: '/security', label: 'Security', minor: true },
   { href: `${PRODUCTS.webe}#run-a-node-section`, label: 'Run a node' },
+  { href: '/security', label: 'Security', minor: true },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const currentProduct = PATH_TO_PRODUCT[path];

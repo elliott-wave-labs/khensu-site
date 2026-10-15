@@ -1,6 +1,11 @@
+---
+title: 'Open source'
+source: 'OPEN-SOURCE.md'
+---
+
 # Open source — khėnsu.ñü
 
-All first-party khėnsu.ñü repositories are **public** as of the founder handover on **14 October 2026**. Full notice: [`FOUNDER-HANDOVER.md`](FOUNDER-HANDOVER.md). Dead-man's switch: [`DEAD-MANS-SWITCH.md`](DEAD-MANS-SWITCH.md). Licences: [`LICENSING.md`](LICENSING.md).
+All first-party khėnsu.ñü repositories are **public** as of the founder handover on **14 October 2026**. Full notice: [`FOUNDER-HANDOVER.md`](/specs/founder-handover). Dead-man's switch: [`DEAD-MANS-SWITCH.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/DEAD-MANS-SWITCH.md). Licences: [`LICENSING.md`](/specs/licensing).
 
 ## Clone
 
@@ -15,7 +20,7 @@ git clone https://github.com/elliott-wave-labs/khensu-devnet.git
 git clone https://github.com/elliott-wave-labs/khensu-site.git
 ```
 
-Keep them side by side under one directory (see [`AGENTS.md`](AGENTS.md)).
+Keep them side by side under one directory (see [`AGENTS.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/AGENTS.md)).
 
 ## Org
 
@@ -29,6 +34,8 @@ Keep them side by side under one directory (see [`AGENTS.md`](AGENTS.md)).
 - Public SLA + dead-man's switch: [https://khensu.nu/sla](https://khensu.nu/sla)
 
 ## Install the apps from GitHub (App Store optional)
+
+Walkthroughs (PWA, sideload, Xcode) live on [khensu.nu/sla](https://khensu.nu/sla) and in [`PUBLIC.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/PUBLIC.md). Agent harness: [`nu.harness.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/nu.harness.md).
 
 Apple’s store is one path. The code stays public either way.
 

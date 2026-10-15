@@ -24,13 +24,31 @@ for (const scene of document.querySelectorAll<HTMLElement>('[data-burst]:not([da
   let H = 0;
   let dpr = 1;
 
-  // Glyphs fill the band between the heading and the label, with room for the particle glow at both edges.
+  // Glyphs fill the band between the heading and the label. On short viewports, keep a tall centred band so the numbers still read.
   const band = (h: number) => {
     const top = scene.querySelector('.burst-head')!.getBoundingClientRect().bottom - canvas.getBoundingClientRect().top;
     const bottom = scene.querySelector('.burst-list')!.getBoundingClientRect().top - canvas.getBoundingClientRect().top;
-    if (!(bottom - top > 40)) return { top: h * 0.3, bottom: h * 0.75 };
-    const pad = Math.min(36, Math.max(10, (bottom - top) * 0.12));
-    return { top: top + pad, bottom: bottom - pad };
+    let t = top;
+    let b = bottom;
+    if (b - t > 40) {
+      const pad = Math.min(36, Math.max(10, (b - t) * 0.12));
+      t += pad;
+      b -= pad;
+    } else {
+      t = h * 0.28;
+      b = h * 0.72;
+    }
+    const minH = Math.max(160, h * 0.34);
+    if (b - t < minH) {
+      const mid = h * 0.48;
+      t = Math.max(h * 0.2, mid - minH / 2);
+      b = Math.min(h * 0.8, t + minH);
+      if (b - t < minH) {
+        t = h * 0.24;
+        b = h * 0.76;
+      }
+    }
+    return { top: t, bottom: b };
   };
 
   const sample = (text: string, w: number, h: number, step: number) => {
@@ -156,9 +174,24 @@ for (const scene of document.querySelectorAll<HTMLElement>('[data-burst]:not([da
     running = e.isIntersecting && !reduce.matches;
     if (running) requestAnimationFrame(loop);
   });
+  const openAt = (frac: number) => {
+    const span = Math.max(1, scene.offsetHeight - innerHeight);
+    scrollTo({ top: scene.offsetTop + span * frac, behavior: 'auto' });
+    running = !reduce.matches;
+    if (running) requestAnimationFrame(loop);
+  };
+  const goHash = () => {
+    if (location.hash !== `#${scene.id}`) return;
+    // After the browser's own hash jump, land where the first glyph has formed.
+    const place = () => openAt(0.22);
+    place();
+    requestAnimationFrame(() => requestAnimationFrame(place));
+    setTimeout(place, 80);
+  };
   const start = () => {
     if (reduce.matches) return;
     build();
+    draw(progress());
     vis.observe(scene);
     let rt = 0;
     addEventListener('resize', () => {
@@ -167,6 +200,8 @@ for (const scene of document.querySelectorAll<HTMLElement>('[data-burst]:not([da
         if (Math.round(canvas.getBoundingClientRect().width) !== W) build();
       }, 150);
     });
+    addEventListener('hashchange', goHash);
+    goHash();
   };
   document.fonts.ready.then(start, start);
 }
