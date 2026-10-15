@@ -1,0 +1,185 @@
+---
+// Root → Crown: each chakra's line paths draw in, then morph into the next while its tone plays.
+// On-device only (Web Audio). Reduced motion: show the final Crown glyph, no sound.
+const chakras = [
+  { name: 'Root', sanskrit: 'Muladhara', hz: 396, color: '#e11d48' },
+  { name: 'Sacral', sanskrit: 'Svadhisthana', hz: 417, color: '#f97316' },
+  { name: 'Solar plexus', sanskrit: 'Manipura', hz: 528, color: '#eab308' },
+  { name: 'Heart', sanskrit: 'Anahata', hz: 639, color: '#22c55e' },
+  { name: 'Throat', sanskrit: 'Vishuddha', hz: 741, color: '#0ea5e9' },
+  { name: 'Third eye', sanskrit: 'Ajna', hz: 852, color: '#6366f1' },
+  { name: 'Crown', sanskrit: 'Sahasrara', hz: 963, color: '#a855f7' },
+];
+// Simplified stroke paths in a 100×100 viewBox (line art of each yantra).
+const PATHS = [
+  'M20 80 L50 20 L80 80 Z M35 55 H65', // root — triangle / square feel
+  'M20 70 Q50 10 80 70 Q50 95 20 70 Z M50 40 V75', // sacral — crescent bowl
+  'M50 15 L85 75 L15 75 Z M50 35 V70', // solar — down triangle
+  'M50 20 L70 40 L50 80 L30 40 Z M35 45 L65 45', // heart — diamond
+  'M50 20 A30 30 0 1 1 49.9 20 M35 50 H65 M50 35 V65', // throat — circle + cross
+  'M30 55 Q50 15 70 55 Q50 85 30 55 Z M42 48 L58 48', // third eye — vesica
+  'M50 50 m-32 0 a32 32 0 1 0 64 0 a32 32 0 1 0 -64 0 M50 18 V82 M18 50 H82 M28 28 L72 72 M72 28 L28 72', // crown — circle + rays
+];
+---
+
+<div class="indra-chakra" data-indra-chakra aria-label="Chakra symbols morphing from Root to Crown">
+  <svg class="ic-svg" viewBox="0 0 100 100" aria-hidden="true">
+    <path class="ic-path" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+  <p class="ic-label"><span class="ic-name">Root</span><span class="ic-hz">396 Hz</span></p>
+  <ol class="ic-dots" role="list">
+    {chakras.map((c) => (
+      <li style={`--c:${c.color}`} title={`${c.name} · ${c.hz} Hz`} />
+    ))}
+  </ol>
+  <button class="ic-sound btn" type="button" data-ic-sound aria-pressed="false">Sound</button>
+</div>
+
+<script define:vars={{ PATHS, chakras }}>
+  (() => {
+    for (const root of document.querySelectorAll('[data-indra-chakra]')) {
+      if (root.dataset.on) continue;
+      root.dataset.on = '1';
+      const path = root.querySelector('.ic-path');
+      const nameEl = root.querySelector('.ic-name');
+      const hzEl = root.querySelector('.ic-hz');
+      const dots = [...root.querySelectorAll('.ic-dots li')];
+      const soundBtn = root.querySelector('[data-ic-sound]');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      let soundOn = false;
+      let ctx = null;
+      let i = 0;
+      let raf = 0;
+
+      const setGlyph = (idx, t = 1) => {
+        const a = PATHS[idx];
+        const b = PATHS[Math.min(idx + 1, PATHS.length - 1)];
+        path.setAttribute('d', t < 0.55 ? a : b);
+        path.style.stroke = chakras[t < 0.55 ? idx : Math.min(idx + 1, chakras.length - 1)].color;
+        const len = typeof path.getTotalLength === 'function' ? path.getTotalLength() : 400;
+        path.style.strokeDasharray = String(len);
+        path.style.strokeDashoffset = String(
+          t < 0.55 ? len * (1 - t / 0.55) : len * (1 - (t - 0.55) / 0.45),
+        );
+        const c = chakras[idx];
+        nameEl.textContent = c.name;
+        hzEl.textContent = `${c.hz} Hz`;
+        dots.forEach((d, k) => d.classList.toggle('on', k === idx));
+      };
+
+      const tone = (hz) => {
+        if (!soundOn) return;
+        ctx ||= new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = hz;
+        g.gain.value = 0.0001;
+        o.connect(g);
+        g.connect(ctx.destination);
+        const now = ctx.currentTime;
+        g.gain.exponentialRampToValueAtTime(0.08, now + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.85);
+        o.start(now);
+        o.stop(now + 0.9);
+      };
+
+      const step = () => {
+        if (reduce.matches) {
+          setGlyph(PATHS.length - 1, 1);
+          return;
+        }
+        const dur = 1400;
+        const start = performance.now();
+        const from = i;
+        tone(chakras[from].hz);
+        const tick = (now) => {
+          const t = Math.min(1, (now - start) / dur);
+          setGlyph(from, t);
+          if (t < 1) raf = requestAnimationFrame(tick);
+          else {
+            i = (from + 1) % PATHS.length;
+            raf = requestAnimationFrame(step);
+          }
+        };
+        raf = requestAnimationFrame(tick);
+      };
+
+      soundBtn?.addEventListener('click', () => {
+        soundOn = !soundOn;
+        soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+        soundBtn.textContent = soundOn ? 'Sound on' : 'Sound';
+        if (soundOn) tone(chakras[i].hz);
+      });
+
+      setGlyph(0, 0);
+      const vis = new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) {
+          if (!raf) step();
+        } else {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      }, { threshold: 0.25 });
+      vis.observe(root);
+    }
+  })();
+</script>
+
+<style>
+  .indra-chakra {
+    --ic: #22f59a;
+    display: grid;
+    justify-items: center;
+    gap: 0.85rem;
+    padding: 1.5rem 1rem 1.2rem;
+  }
+  .ic-svg {
+    width: min(220px, 55vw);
+    height: min(220px, 55vw);
+    filter: drop-shadow(0 0 24px color-mix(in srgb, var(--ic) 45%, transparent));
+  }
+  .ic-path {
+    stroke-width: 2.2;
+    stroke: var(--ic);
+    transition: stroke 0.3s ease;
+  }
+  .ic-label {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .ic-name { font-weight: 600; }
+  .ic-hz {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .ic-dots {
+    list-style: none;
+    display: flex;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+  }
+  .ic-dots li {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--c) 35%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 70%, transparent);
+  }
+  .ic-dots li.on {
+    background: var(--c);
+    box-shadow: 0 0 12px var(--c);
+  }
+  .ic-sound {
+    margin-top: 0.25rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ic-path { transition: none; }
+  }
+</style>

@@ -47,6 +47,7 @@ export const CARDS: Record<string, Card> = {
   privacy: { title: 'Privacy', em: 'Nothing to collect.', line: 'No accounts on servers, no cookies, no tracking, no data to sell.', bg: EARTH, alt: 'The khėnsu.ñü mark over Earth at night' },
   security: { title: 'Security', em: 'Nothing to read.', line: 'Post-quantum encryption, a five-hop mixnet, and no server that can read anything.', bg: EARTH, alt: 'khėnsu.ñü security, over Earth at night' },
   compliance: { title: 'Compliance', em: 'GDPR and every major privacy law.', line: 'Nothing on servers to request, breach or hand over. FIPS 203 and 204, CNSA 2.0.', bg: EARTH, alt: 'khėnsu.ñü privacy law and standards compliance' },
+  indra: { title: 'nu.indra.og', em: 'The card that moves in Messages.', line: 'Indra’s Net over Earth. Chakra climb Root to Crown. Direct MP4 beside every still.', bg: EARTH, alt: 'nu.indra.og — Indra’s Net and chakra morph over Earth on khėnsu.ñü' },
   sla: { title: 'SLA', em: '100% uptime.', line: 'Dead-man\'s switch on. Activated 14 October 2026, 2:22 pm, Venice CA. We did it.', bg: EARTH, alt: 'khėnsu.ñü SLA: 100% uptime and dead-man\'s switch' },
   'dev-index': { title: 'Developers', em: 'Build on webË.', line: 'Specs, repositories and the post-quantum stack behind khėnsu.ñü.', bg: EARTH, alt: 'khėnsu.ñü developers' },
   'dev-architecture': { title: 'Architecture', em: 'How khėnsu.ñü works.', line: 'MLS with ML-KEM-1024, a mixnet, and a network run by people.', bg: EARTH, alt: 'khėnsu.ñü architecture' },
@@ -101,7 +102,7 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
 };
 // The shield pages share the buy card's animation.
 export const previewFor = (card: string) =>
-  card === 'shield' || card === 'dev-shell' ? 'buy' : card in PREVIEWS ? card : undefined;
+  card === 'shield' || card === 'dev-shell' ? 'buy' : card === 'indra' ? 'home' : card in PREVIEWS ? card : undefined;
 
 export const cardFor = (path: string, prefix = '') => {
   const parts = path.replace(/^\/|\/$/g, '').split('/');

@@ -20,7 +20,7 @@ DOCS = {
     "THREAT-MODEL.md": ("threat-model", "Threat model"),
     "PAYMENTS.md": ("payments", "ñü.wallet specification"),
     "design/nu-media.md": ("nu-media", "ñü.media design"),
-    "design/indra.md": ("indra", "Indra link previews"),
+    "design/indra.md": ("indra", "nu.indra.og"),
     "FOUNDER-HANDOVER.md": ("founder-handover", "Founder handover"),
     "OPEN-SOURCE.md": ("open-source", "Open source"),
     "LICENSING.md": ("licensing", "Licensing"),

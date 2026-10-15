@@ -1,0 +1,104 @@
+---
+import Base from '../layouts/Base.astro';
+import IndraChakra from '../components/khensu/IndraChakra.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+
+const SPEC = 'https://dev.khensu.nu/specs/indra/';
+const TT205 = 'https://developer.apple.com/videos/play/tech-talks/205/';
+const TN3156 = 'https://developer.apple.com/documentation/technotes/tn3156-create-rich-previews-for-messages';
+const IETF = 'https://github.com/elliott-wave-labs/khensu-specs/blob/main/proposals/draft-staffer-link-preview-media-00.md';
+---
+
+<Base
+  title="nu.indra.og"
+  description="nu.indra.og: mute-loop link previews for Messages — Indra’s Net over Earth, chakra symbols Root to Crown. Direct MP4 beside every og:image."
+>
+  <div class="khensu">
+    <ProductBar name="nu.indra" action="Read the spec" href={SPEC} explore="#preview-section" />
+
+    <section class="page-head indra-hero" data-hero>
+      <div class="wrap indra-grid">
+        <div>
+          <p class="eyebrow">nu.indra.og · indra.khensu.nu</p>
+          <h1>The network card<br /><em>that moves in Messages.</em></h1>
+          <p class="lede">
+            Paste a khėnsu.ñü link. The bubble is Indra’s Net over Earth — mute-looping on iOS, iPadOS, macOS and visionOS —
+            because the page ships a direct MP4 next to every still.
+          </p>
+          <div class="btn-row">
+            <a class="btn primary" href={SPEC}>nu.indra.og spec</a>
+            <a class="btn" href="#chakra-section">Chakra climb</a>
+            <a class="btn" href={TT205}>Tech Talk 205</a>
+          </div>
+        </div>
+        <IndraChakra />
+      </div>
+    </section>
+
+    <section class="section" id="preview-section">
+      <div class="wrap prose">
+        <h2>How Messages plays it</h2>
+        <p>
+          Apple documented direct-MP4 rich previews in
+          <a href={TN3156}>TN3156</a>
+          and
+          <a href={TT205}>Tech Talk 205 — Ensuring Beautiful Rich Links (21 December 2017)</a>.
+          Put a short downloadable H.264 file in <code>og:video</code>; Messages downloads it and can autoplay muted.
+          That path works across Apple Messages on iPhone, iPad, Mac and Vision Pro — not a private API.
+        </p>
+        <p>
+          Slack, Android Messages, Instagram DMs and TikTok DMs still show the still for most sites.
+          The contract that asks them to play the same mute-loop is the informational IETF draft
+          <a href={IETF}>draft-staffer-link-preview-media-00</a>
+          (read before submit).
+        </p>
+      </div>
+    </section>
+
+    <section class="section band" id="chakra-section">
+      <div class="wrap prose">
+        <h2>Root to Crown</h2>
+        <p>
+          On this page the seven chakra symbols draw in stroke by stroke, then morph into the next —
+          Root through Crown — while optional on-device tones sound at 396 → 963 Hz. Nothing leaves the device.
+          The OG motion twin carries the same climb for the chat bubble.
+        </p>
+      </div>
+      <div class="wrap">
+        <IndraChakra />
+      </div>
+    </section>
+
+    <section class="section" id="try-section">
+      <div class="wrap prose">
+        <h2>Try it</h2>
+        <ol>
+          <li>Text someone <code>https://khensu.nu/</code>, <code>https://create.khensu.nu/</code> or <code>https://waves.khensu.nu/</code>.</li>
+          <li>Wait a second for the mute-loop card.</li>
+          <li>If you see a still: new thread, or add <code>?v=2</code>, and check Low Data Mode / Reduce Motion.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .indra-hero .indra-grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .indra-hero .indra-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+  }
+  .indra-hero h1 em {
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>
