@@ -14,8 +14,9 @@ export const PRODUCTS = {
   shield: 'https://shield.khensu.nu',
   network: 'https://network.khensu.nu',
   sla: 'https://sla.khensu.nu',
-  // Apex path until dig indra.khensu.nu A → 34.107.228.246, then own_certificate host.
-  indra: 'https://khensu.nu/indra',
+  // Own-cert hosts (dig A → 34.107.228.246 verified 15 Oct 2026).
+  avatars: 'https://avatars.khensu.nu',
+  indra: 'https://indra.og.khensu.nu',
 } as const;
 
 /** Old path on khensu.nu → product URL (no trailing slash). */
@@ -34,5 +35,6 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/network': PRODUCTS.network,
   '/sla': PRODUCTS.sla,
   '/deadman': PRODUCTS.sla,
+  '/avatars': PRODUCTS.avatars,
   '/indra': PRODUCTS.indra,
 };

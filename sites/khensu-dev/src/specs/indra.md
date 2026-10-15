@@ -1,16 +1,16 @@
 ---
-title: 'nu.indra.og'
+title: 'îňðřæ.ōġ'
 source: 'design/indra.md'
 ---
 
-# nu.indra.og: the network card that moves in Messages
+# îňðřæ.ōġ (nu.indra.og): the network card that moves in Messages
 
-**Product name:** nu.indra.og (code / host: `indra`, `indra.khensu.nu`, page `/indra`).  
-**Status: shipped on khensu.ñü, 12–13 October 2026; product page and header live 15 October 2026.**
+**Product name:** îňðřæ.ōġ (code / host / nav: `nu.indra.og`, `indra`, `indra.og.khensu.nu`, page `/indra`). Shown as **îňðřæ.ōġ** in headings, titles, labels and the footer; header nav stays `nu.indra.og`.  
+**Status: shipped on khensu.ñü, 12–13 October 2026; product page and header live 15 October 2026; host `indra.og.khensu.nu` live 15 October 2026.**
 
 The white lattice over Earth in the link-preview cards is Indra's Net (`design/lore.md` 2): every jewel reflects every other. The same net pulses behind every hero on the site (`Net.astro`). The living card also climbs the seven chakras — Root through Crown — with each symbol's line paths drawing in, then morphing into the next, while the matching tone sounds on the product page. This doc is the product we want people to feel when they share a link — and a patent assessment of what is actually new.
 
-Public spec: [dev.khensu.nu/specs/indra](https://dev.khensu.nu/specs/indra/) · product: [khensu.nu/indra](https://khensu.nu/indra) (and `indra.khensu.nu` once DNS points at the sites LB).
+Public spec: [dev.khensu.nu/specs/indra](https://dev.khensu.nu/specs/indra/) · product: [indra.og.khensu.nu](https://indra.og.khensu.nu) (`/indra` on the apex redirects via product host).
 
 ## 1. The thing we want
 
@@ -22,7 +22,7 @@ That is the product. Not a private Messages API. Not a sticker pack. The gift ma
 
 No special app, no stickers, no `LPLinkMetadata` code on our side. Messages already does this when the page is honest about video — on **iOS, iPadOS, macOS and visionOS**.
 
-1. Paste a khėnsu.ñü URL that emits video previews — today home, buy, shield, **create** (`create.khensu.nu`), **waves** (`waves.khensu.nu`), and **nu.indra** (`/indra` · `indra.khensu.nu`).
+1. Paste a khėnsu.ñü URL that emits video previews — today home, buy, shield, **create** (`create.khensu.nu`), **waves** (`waves.khensu.nu`), and **nu.indra.og** (`indra.og.khensu.nu`).
 2. Wait a second. The card should **autoplay muted and loop**.
 3. If you still see a still: Messages caches hard. New thread, or `https://khensu.nu/?v=2`, or remove the old bubble and paste again. The receiver downloads the MP4 on their own connection.
 
@@ -153,7 +153,7 @@ sh tools/og-anim.sh
 ## 7. nu.indra in the product
 
 - **Lore.** Indra's Net — `design/lore.md` 2.
-- **Site.** `Net.astro` on every first hero; **nu.indra** header → `/indra` · `indra.khensu.nu`.
+- **Site.** `Net.astro` on every first hero; header nav **nu.indra.og** → `indra.og.khensu.nu`; page chrome shows **îňðřæ.ōġ**.
 - **Cards.** The OG animation is that same net (and chakra climb) in the chat bubble.
 - **webË.** Ordinary clients get `og:video`; the app prefers `nu:preview` when built (`WEBE.md` 7.1).
 - **Interop.** Until Slack, Android Messages, Instagram DMs and TikTok DMs honour the draft, keep shipping H.264 `og:video` + `preview:*` tags so the day they adopt it, every page is already honest.

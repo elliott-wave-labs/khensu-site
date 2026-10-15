@@ -43,10 +43,11 @@ const ogVideoH = previewMeta?.wideBytes ? '630' : '1080';
 const ogAlt = CARDS[card].alt;
 
 const nav = [
+  { href: PRODUCTS.avatars, label: 'nu.avatars' },
   { href: PRODUCTS.bi, label: 'nu.bi' },
   { href: PRODUCTS.create, label: 'nu.create' },
   { href: PRODUCTS.fi, label: 'nu.Fi' },
-  { href: PRODUCTS.indra, label: 'nu.indra' },
+  { href: PRODUCTS.indra, label: 'nu.indra.og' },
   { href: PRODUCTS.media, label: 'nu.media' },
   { href: PRODUCTS.moments, label: 'nu.moments' },
   { href: PRODUCTS.network, label: 'nu.network' },
@@ -195,11 +196,13 @@ const navCurrent = (href: string) => {
         <ul class="foot-links">
           <li><a href={PRODUCTS.webe}>webË</a></li>
           <li><a href={PRODUCTS.void}>ñü.vœîð</a></li>
+          <li><a href={PRODUCTS.avatars}>ñü.ævätåřş</a></li>
           <li><a href={PRODUCTS.media}>ñü.media</a></li>
           <li><a href={PRODUCTS.moments}>ñü.mømëntš</a></li>
           <li><a href={PRODUCTS.memory}>ñü.řåł</a></li>
           <li><a href={PRODUCTS.create}>ñü.ċřêæțẽ</a></li>
           <li><a href={PRODUCTS.waves}>ñü.ŵævẽš</a></li>
+          <li><a href={PRODUCTS.indra}>îňðřæ.ōġ</a></li>
           <li><a href={PRODUCTS.fi}>ñũ.Fî</a></li>
           <li><a href={PRODUCTS.shield}>suñůlink.shield</a></li>
           <li><a href="/transfer">Send big files</a></li>

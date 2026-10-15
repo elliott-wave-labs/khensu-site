@@ -1,0 +1,87 @@
+---
+import Base from '../layouts/Base.astro';
+import AvatarStudio from '../components/khensu/AvatarStudio.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import { PRODUCTS } from '../data/hosts';
+
+const SPEC = 'https://dev.khensu.nu/specs/nu-avatars/';
+---
+
+<Base
+  title="ñü.ævätåřş"
+  description="ñü.ævätåřş (nu.avatars): on-device style filters for calls and streams — ink, toon, pixel, glass — packed by nu.media over nu.network. Smaller bits. Ready for AR wearables."
+>
+  <div class="khensu">
+    <ProductBar name="ñü.ævätåřş" action="Open the studio" href="#studio-section" explore="#why-section" />
+
+    <section class="page-head av-hero" data-hero>
+      <div class="wrap">
+        <p class="eyebrow">ñü.ævätåřş · avatars.khensu.nu</p>
+        <h1>Stream with an avatar.<br /><em>Your face never leaves the device.</em></h1>
+        <p class="lede">
+          Style filters like the cloud apps — ink, toon, pixel, glass — run here, on your GPU.
+          nu.media packs the flat look into fewer bits; nu.network carries the call. Same stream fits AR glasses.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href="#studio-section">Try the studio</a>
+          <a class="btn" href={SPEC}>ñü.ævätåřş spec</a>
+          <a class="btn" href={PRODUCTS.media}>nu.media</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="studio-section">
+      <div class="wrap">
+        <h2>Live studio</h2>
+        <p class="body av-lede">
+          Pick a style. Start the camera. Nothing is uploaded — the meter is an example of how a stylized
+          nu.media base layer sits under a normal photo encode.
+        </p>
+        <AvatarStudio />
+      </div>
+    </section>
+
+    <section class="section band" id="why-section">
+      <div class="wrap prose">
+        <h2>Why this beats the cloud styler</h2>
+        <ul class="facts">
+          <li><b>On device.</b> Devut-class apps and Live Styler send frames to a GPU farm. nu.avatars styles locally.</li>
+          <li><b>Smaller bits.</b> Flat colour and edges pack tighter than a photo. The wire budget is the same stealth tick and call tiers as nu.media.</li>
+          <li><b>Private path.</b> Styled video rides encrypted calls on nu.network — not a style CDN that sees your face.</li>
+          <li><b>AR ready.</b> Mesh + style pack, or the stylized base layer, is thin enough for glasses and visionOS.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="modes-section">
+      <div class="wrap prose">
+        <h2>Three pack modes</h2>
+        <ol>
+          <li><b>Style pack.</b> Style id and optional palette (bytes) plus landmarks each tick. The receiver paints the avatar.</li>
+          <li><b>Stylized base.</b> Camera → style → nu.media half-res base → mixnet or call relays.</li>
+          <li><b>Local style.</b> Unstyled nu.media on the wire; each peer or wearable applies the look.</li>
+        </ol>
+        <p>
+          Detail: <a href={SPEC}>dev.khensu.nu/specs/nu-avatars</a>.
+          Codecs: <a href={PRODUCTS.media}>nu.media</a>. Network: <a href={PRODUCTS.network}>nu.network</a>.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .av-hero h1 em {
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .av-lede {
+    max-width: 40rem;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.78);
+  }
+</style>
