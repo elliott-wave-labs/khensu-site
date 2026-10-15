@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="skills.music.theory"
+  description="Learn music theory the khėnsu way: animated notes, audio, and live code for nu.waves and nu.media."
+>
+  <div class="khensu">
+    <section class="page-head" data-hero>
+      <div class="wrap">
+        <p class="eyebrow">skills.music.theory.khensu.nu</p>
+        <h1>skills.music.theory</h1>
+        <p class="lede">
+          Music theory as live code. Hear the note, see the shape, write the pattern.
+          Built for nu.waves, nu.media, and Ask khėnsu — in shorthand that looks like the music.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap prose">
+        <h2>What you learn</h2>
+        <ul>
+          <li>Notes, intervals, chords and rhythm with motion and sound.</li>
+          <li>How to <strong>code</strong> notes: a live scripting language in the spirit of
+            <a href="https://tidalcycles.org/" rel="noopener noreferrer" target="_blank">Tidal Cycles</a>,
+            with everything nu.media and nu.waves can play.</li>
+          <li>Beat sync across tracks. Pull stems from other tracks and remix.</li>
+        </ul>
+        <h2>Where it runs</h2>
+        <ul>
+          <li><strong>nu.media</strong> — Homebrew Rust package in khensu-core. Actions use <code>~</code> (never <code>/</code>); flags stay <code>-</code>.</li>
+          <li><strong>nu.waves</strong> — web, iOS and Mac. Remix in the browser or the app.</li>
+          <li><strong>ñü.řåł</strong> — talk to the private LLM in musical shorthand.</li>
+        </ul>
+        <p class="note">
+          This page is the public home. The lesson player, squiggle language and stem remix ship next;
+          the Thursday nu.ot checkpoint tracks what lands.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href="https://waves.khensu.nu">Open nu.waves</a>
+          <a class="btn" href="https://khensu.nu/skills-agent-harness">nu.harness</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .prose h2 { margin: 2rem 0 0.6rem; font-size: 1.35rem; }
+  .prose p, .prose li { color: rgba(255,255,255,0.78); line-height: 1.55; }
+  .prose ul { padding-left: 1.2rem; }
+  .prose code { font-family: var(--font-mono); font-size: 0.9em; }
+  .prose a { color: #7ec8ff; }
+  .note { margin-top: 1.5rem; opacity: 0.85; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1.2rem 0; }
+</style>

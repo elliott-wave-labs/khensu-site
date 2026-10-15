@@ -1,0 +1,109 @@
+/* nu.glass — Quantum × Liquid Glass
+   Surfaces are the CLEAR number-light bubble explosion (Burst / creators),
+   not solid sheet frosted glass. That language is part of nu.aura —
+   fashion + design styles (gradient text, First Attempt control, light bubbles). */
+
+:root,
+.nu-glass {
+  /* Aura fashion spectrum (same as scripts/burst.ts) */
+  --aura-glow-g: #22f59a;
+  --aura-glow-b: #1e8fff;
+  --aura-glow-p: #8b5cff;
+  --aura-core-g: #6dffbf;
+  --aura-core-b: #4fb0ff;
+  --aura-core-p: #a98bff;
+
+  /* Clear bubble — barely there film, not a sheet */
+  --nu-glass: rgba(255, 255, 255, 0.04);
+  --nu-glass-strong: rgba(255, 255, 255, 0.07);
+  --nu-glass-edge: rgba(255, 255, 255, 0.28);
+  --nu-glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -12px 28px rgba(79, 176, 255, 0.06);
+  --nu-glass-blur: blur(22px) saturate(200%);
+  --nu-glass-blur-max: blur(36px) saturate(220%);
+  --nu-glass-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.12),
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 0 48px rgba(79, 176, 255, 0.12),
+    0 0 72px rgba(34, 245, 154, 0.06);
+}
+
+/* Clear light-bubble panel (the material) */
+.nu-glass-panel {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid transparent;
+  background:
+    radial-gradient(120% 90% at 18% 8%, rgba(109, 255, 191, 0.16), transparent 55%),
+    radial-gradient(100% 80% at 92% 88%, rgba(169, 139, 255, 0.14), transparent 50%),
+    radial-gradient(80% 70% at 50% 50%, rgba(79, 176, 255, 0.06), transparent 70%),
+    var(--nu-glass);
+  background-origin: border-box;
+  backdrop-filter: var(--nu-glass-blur);
+  -webkit-backdrop-filter: var(--nu-glass-blur);
+  box-shadow: var(--nu-glass-shadow), var(--nu-glass-inset);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Soft aura rim — clear bubble skin */
+.nu-glass-panel::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(109, 255, 191, 0.55),
+    rgba(79, 176, 255, 0.35) 40%,
+    rgba(169, 139, 255, 0.5) 75%,
+    rgba(255, 255, 255, 0.15)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.85;
+  z-index: 0;
+}
+
+.nu-glass-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Flowing aura fill (selected / play / progress) */
+.nu-glass-aura {
+  background: var(--aura);
+  background-size: 300% 100%;
+  animation: aura-flow var(--aura-flow-dur) linear infinite;
+}
+
+.nu-glass-aura-text {
+  background: var(--aura);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: aura-flow var(--aura-flow-dur) linear infinite;
+}
+
+/* Floating clear bubble (mini player shell) */
+.nu-glass-bubble {
+  border-radius: 1.65rem;
+  background:
+    radial-gradient(ellipse 90% 70% at 25% 20%, rgba(255, 255, 255, 0.22), transparent 55%),
+    radial-gradient(ellipse 70% 60% at 80% 85%, rgba(34, 245, 154, 0.1), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 50% 55%, rgba(30, 143, 255, 0.08), transparent 60%),
+    rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: var(--nu-glass-blur-max);
+  -webkit-backdrop-filter: var(--nu-glass-blur-max);
+  box-shadow:
+    var(--nu-glass-inset),
+    0 0 0 0.5px rgba(255, 255, 255, 0.1),
+    0 18px 50px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(79, 176, 255, 0.14),
+    0 0 90px rgba(139, 92, 255, 0.08);
+}

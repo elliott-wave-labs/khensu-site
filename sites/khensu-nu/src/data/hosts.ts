@@ -17,6 +17,17 @@ export const PRODUCTS = {
   // Own-cert hosts (dig A → 34.107.228.246 verified 15 Oct 2026).
   avatars: 'https://avatars.khensu.nu',
   indra: 'https://indra.og.khensu.nu',
+  /** Install hub — nu:get.apps.khensu.nu (never /apps). Apex /app redirects here once host SSL is ACTIVE. */
+  getApps: 'https://get.apps.khensu.nu',
+  /** Kronos — harness + OT one page. Apex until Hover A + own_certificate ACTIVE. */
+  kronos: 'https://khensu.nu/kronos',
+  /** @deprecated use PRODUCTS.kronos — kept as aliases */
+  skillsAgent: 'https://khensu.nu/kronos',
+  skillsAgentHarness: 'https://khensu.nu/kronos#nu-harness',
+  skillsWeeklyUpdates: 'https://khensu.nu/kronos#nu-ot-222',
+  skillsMusicTheory: 'https://khensu.nu/skills-music-theory',
+  /** nu.glass — Quantum × Liquid Glass. Apex until Hover A + own_certificate ACTIVE. */
+  nuGlass: 'https://khensu.nu/design-quantumglass',
 } as const;
 
 /** Old path on khensu.nu → product URL (no trailing slash). */
@@ -37,4 +48,12 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/deadman': PRODUCTS.sla,
   '/avatars': PRODUCTS.avatars,
   '/indra': PRODUCTS.indra,
+  '/app': PRODUCTS.getApps,
+  '/apps': PRODUCTS.getApps,
+  '/kronos': PRODUCTS.kronos,
+  '/skills-agent': PRODUCTS.kronos,
+  '/skills-agent-harness': PRODUCTS.skillsAgentHarness,
+  '/skills-agent-weekly': PRODUCTS.skillsWeeklyUpdates,
+  '/skills-music-theory': PRODUCTS.skillsMusicTheory,
+  '/design-quantumglass': PRODUCTS.nuGlass,
 };

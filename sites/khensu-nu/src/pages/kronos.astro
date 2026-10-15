@@ -1,0 +1,282 @@
+---
+import Base from '../layouts/Base.astro';
+import Name from '../components/khensu/Name.astro';
+import { PRODUCTS } from '../data/hosts';
+import '../styles/nu-glass.css';
+
+const HARNESS =
+  'https://github.com/elliott-wave-labs/khensu-specs/blob/main/.cursor/skills/nu-harness/SKILL.md';
+const HARNESS_MD =
+  'https://github.com/elliott-wave-labs/khensu-specs/blob/main/nu.harness.md';
+const OT = 'https://github.com/elliott-wave-labs/nu-ot-222';
+const OT_MD = 'https://github.com/elliott-wave-labs/khensu-specs/blob/main/nu.ot.222.md';
+const IETF_SUB =
+  'https://github.com/elliott-wave-labs/khensu-specs/blob/main/proposals/IETF-SUBMISSION.md';
+const IETF_NU =
+  'https://github.com/elliott-wave-labs/khensu-specs/blob/main/proposals/draft-staffer-nu-media-00.md';
+const IETF_LINK =
+  'https://github.com/elliott-wave-labs/khensu-specs/blob/main/proposals/draft-staffer-link-preview-media-00.md';
+const DONE = 'https://github.com/elliott-wave-labs/khensu-specs/blob/main/done.md';
+const WIP = 'https://github.com/elliott-wave-labs/khensu-specs/blob/main/wip.md';
+const OPEN = 'https://github.com/elliott-wave-labs/khensu-specs/blob/main/open.md';
+const SLA = PRODUCTS.sla;
+---
+
+<Base
+  title="Kronos"
+  description="Kronos — Elliott’s agent brain and partner. nu.harness + nu.ot.222 must both be loaded (pair lock). IETF drafts, nu.glass, always live. kronos.khensu.nu."
+>
+  <div class="kr nu-glass khensu" data-kronos data-harness="1" data-ot="1">
+    <section class="kr-hero" data-hero>
+      <div class="kr-hero-bg" aria-hidden="true">
+        <i class="kr-bub g"></i><i class="kr-bub b"></i><i class="kr-bub p"></i>
+      </div>
+      <div class="wrap kr-hero-in">
+        <p class="eyebrow">kronos.khensu.nu · agent brain + partner</p>
+        <p class="kr-brand"><Name /></p>
+        <h1>Kronos<em class="nu-glass-aura-text">harness × OT · one breath</em></h1>
+        <p class="kr-lede">
+          I am <strong>Kronos</strong> — playful, sharp, mellow, sailor-mouthed when it lands.
+          <strong>nu.harness</strong> and <strong>nu.ot.222</strong> live on this page together.
+          Load only one and the pair lock fires. Clear.
+        </p>
+        <div class="kr-cta">
+          <a class="btn primary" href="#nu-harness">nu.harness</a>
+          <a class="btn primary" href="#nu-ot-222">nu.ot.222</a>
+          <a class="btn" href="#ietf">IETF</a>
+          <a class="btn" href={PRODUCTS.nuGlass}>nu.glass</a>
+          <a class="btn" href={SLA}>SLA</a>
+        </div>
+        <p class="kr-pair" role="status" data-pair-ok>
+          Pair lock: <b>nu-harness</b> + <b>nu-ot-222</b> both present. Lone skill = invalid.
+        </p>
+        <p class="kr-pair kr-pair-err" hidden data-pair-err role="alert">
+          KRONOS_PAIR_ERROR: nu-harness and nu-ot-222 must both be active. Lone skill is invalid.
+        </p>
+      </div>
+    </section>
+
+    <section class="kr-sec" id="nu-harness" aria-labelledby="harness-title" data-skill="harness">
+      <div class="wrap kr-grid">
+        <div class="nu-glass-panel kr-card">
+          <p class="eyebrow">always live</p>
+          <h2 id="harness-title">nu.harness</h2>
+          <p>
+            Dig before hosts. Own cert for new names. Publish now. Clear fixes by Thursday 2:22 without waiting for review.
+            Glass is the <strong>clear number-light bubble</strong> — nu.aura fashion, not a solid sheet.
+          </p>
+          <div class="kr-cta">
+            <a class="btn primary" href={HARNESS} rel="noopener noreferrer" target="_blank">Skill</a>
+            <a class="btn" href={HARNESS_MD} rel="noopener noreferrer" target="_blank">Full doc</a>
+          </div>
+        </div>
+        <pre class="nu-glass-panel kr-term" aria-label="harness"><code>{`dig +short HOST A
+# → 34.107.228.246
+own_certificate = true
+attach → then wait ACTIVE
+clear fix by 2:22 → ship`}</code></pre>
+      </div>
+    </section>
+
+    <section class="kr-sec" id="nu-ot-222" aria-labelledby="ot-title" data-skill="ot">
+      <div class="wrap kr-grid">
+        <div class="nu-glass-panel kr-card">
+          <p class="eyebrow">Out of Town · rap slang</p>
+          <h2 id="ot-title">nu.ot.222</h2>
+          <p>
+            Thursday <strong>2:00</strong> CR + dated MD. <strong>2:22</strong> cutoff.
+            Elliott pushes the OT MDs after review — Kronos never commits those alone.
+          </p>
+          <div class="kr-cta">
+            <a class="btn primary" href={OT} rel="noopener noreferrer" target="_blank">Skill repo</a>
+            <a class="btn" href={OT_MD} rel="noopener noreferrer" target="_blank">This week</a>
+          </div>
+        </div>
+        <pre class="nu-glass-panel kr-term" aria-label="ot"><code>{`OT = Out of Town
+Thu 2:00  CR + MD
+Thu 2:22  cutoff
+pair: harness + ot
+→ Elliott pushes MDs`}</code></pre>
+      </div>
+    </section>
+
+    <section class="kr-sec" id="ietf" aria-labelledby="ietf-title">
+      <div class="wrap">
+        <p class="eyebrow">standards · Kronos owns the desk</p>
+        <h2 id="ietf-title">IETF</h2>
+        <p class="kr-lede kr-lede-sm">
+          Drafts and submission runbook live in specs. Kronos builds, checks nits, and posts when provisional + counsel clear —
+          never a fake submit.
+        </p>
+        <ul class="kr-list">
+          <li><a href={IETF_SUB} rel="noopener noreferrer" target="_blank">IETF-SUBMISSION.md</a> — runbook</li>
+          <li><a href={IETF_NU} rel="noopener noreferrer" target="_blank">draft-staffer-nu-media-00</a></li>
+          <li><a href={IETF_LINK} rel="noopener noreferrer" target="_blank">draft-staffer-link-preview-media-00</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="kr-sec" id="board" aria-labelledby="board-title">
+      <div class="wrap">
+        <p class="eyebrow">agile · definition of done</p>
+        <h2 id="board-title">Board</h2>
+        <div class="kr-cta">
+          <a class="btn primary" href={DONE} rel="noopener noreferrer" target="_blank">done.md</a>
+          <a class="btn" href={WIP} rel="noopener noreferrer" target="_blank">wip.md</a>
+          <a class="btn" href={OPEN} rel="noopener noreferrer" target="_blank">open.md</a>
+        </div>
+        <p class="kr-note">
+          Done means shipped, alive, verified — not “merged somewhere in the fog.”
+          hindsight-code-brain stays local; Kronos does <strong>not</strong> download or run nu.brain on a full disk.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  // Pair lock: page itself must expose both skill anchors. Deep-link-only one section still shows both;
+  // agents reading the skill files must enforce the same rule.
+  const root = document.querySelector<HTMLElement>('[data-kronos]');
+  if (root) {
+    const ok = root.dataset.harness === '1' && root.dataset.ot === '1';
+    const err = root.querySelector<HTMLElement>('[data-pair-err]');
+    const fine = root.querySelector<HTMLElement>('[data-pair-ok]');
+    if (!ok && err && fine) {
+      err.hidden = false;
+      fine.hidden = true;
+      console.error('KRONOS_PAIR_ERROR: nu-harness and nu-ot-222 must both be active. Lone skill is invalid.');
+    }
+  }
+</script>
+
+<style>
+  .kr { color: #fff; background: #000; }
+  .kr-hero {
+    position: relative;
+    min-height: min(88vh, 50rem);
+    display: grid;
+    align-items: end;
+    padding: clamp(4rem, 12vh, 7rem) 0 clamp(2.5rem, 7vh, 4rem);
+    overflow: hidden;
+  }
+  .kr-hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 20% 25%, rgba(34, 245, 154, 0.14), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 80% 40%, rgba(30, 143, 255, 0.14), transparent 50%),
+      radial-gradient(ellipse 50% 40% at 55% 90%, rgba(139, 92, 255, 0.16), transparent 50%),
+      #05060a;
+  }
+  .kr-bub {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 45%),
+      radial-gradient(circle at 50% 50%, var(--c), transparent 70%);
+    box-shadow: 0 0 40px var(--c);
+    animation: kr-bob 4s ease-in-out infinite;
+  }
+  .kr-bub.g { --c: rgba(34, 245, 154, 0.4); width: min(28vw, 12rem); height: min(28vw, 12rem); left: 10%; top: 22%; }
+  .kr-bub.b { --c: rgba(30, 143, 255, 0.4); width: min(36vw, 16rem); height: min(36vw, 16rem); right: 12%; top: 18%; animation-delay: -1.2s; }
+  .kr-bub.p { --c: rgba(139, 92, 255, 0.4); width: min(22vw, 9rem); height: min(22vw, 9rem); left: 48%; top: 48%; animation-delay: -2.1s; }
+  @keyframes kr-bob {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.03); }
+  }
+  .kr-hero-in { position: relative; z-index: 1; max-width: 44rem; }
+  .kr-brand { margin: 0 0 0.5rem; opacity: 0.85; }
+  .kr-hero h1 {
+    margin: 0 0 0.85rem;
+    font-size: clamp(2.8rem, 8vw, 5rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+  }
+  .kr-hero h1 em {
+    display: block;
+    margin-top: 0.3rem;
+    font-style: normal;
+    font-size: 0.42em;
+    font-weight: 600;
+  }
+  .kr-lede {
+    margin: 0 0 1.3rem;
+    font-size: clamp(1.05rem, 2.2vw, 1.22rem);
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.78);
+    max-width: 36rem;
+  }
+  .kr-lede-sm { font-size: 1.05rem; margin-bottom: 1rem; }
+  .kr-lede strong { color: #fff; }
+  .kr-cta { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-bottom: 1rem; }
+  .kr-pair {
+    margin: 0;
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .kr-pair b { color: #6dffbf; }
+  .kr-pair-err { color: #ff8a8a; font-weight: 600; }
+
+  .kr-sec {
+    padding: 2.75rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .kr-sec h2 {
+    margin: 0.2rem 0 0.75rem;
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  .kr-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(1.2rem, 3vw, 2.5rem);
+    align-items: stretch;
+  }
+  @media (max-width: 800px) {
+    .kr-grid { grid-template-columns: 1fr; }
+  }
+  .kr-card {
+    border-radius: 1.4rem;
+    padding: 1.35rem 1.4rem;
+  }
+  .kr-card p {
+    margin: 0 0 1.1rem;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.5;
+    max-width: 34rem;
+  }
+  .kr-term {
+    margin: 0;
+    padding: 1.15rem 1.25rem;
+    border-radius: 1.3rem;
+    font: 500 0.85rem/1.55 var(--font-mono);
+    color: #b8ffe8;
+    overflow: auto;
+  }
+  .kr-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .kr-list a {
+    display: block;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .kr-list a:hover { color: #6dffbf; }
+  .kr-note {
+    margin: 1rem 0 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.92rem;
+    max-width: 38rem;
+  }
+</style>

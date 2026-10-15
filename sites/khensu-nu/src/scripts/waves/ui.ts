@@ -896,6 +896,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'venue':
         eng.setVenue(el.dataset.venue!);
         this.save();
+        this.root.querySelector<HTMLDetailsElement>('[data-room-menu]')!.open = false;
         break;
       case 'preset':
         eng.usePreset(el.dataset.preset!);
@@ -1400,7 +1401,13 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       }
     }
     now.dataset.mode = t.kind === 'song' ? eng.mode : 'waves';
-    for (const b of now.querySelectorAll<HTMLButtonElement>('[data-venue]')) b.setAttribute('aria-pressed', String(b.dataset.venue === eng.venue.id));
+    for (const b of now.querySelectorAll<HTMLButtonElement>('[data-venue]')) {
+      const on = b.dataset.venue === eng.venue.id;
+      b.setAttribute('aria-checked', String(on));
+      b.setAttribute('aria-pressed', String(on));
+    }
+    const venueLabel = now.querySelector<HTMLElement>('[data-venue-label]');
+    if (venueLabel) venueLabel.textContent = eng.venue.label;
     set('[data-picked]', eng.venue.why, now);
     this.paintFx();
     this.paintTone();

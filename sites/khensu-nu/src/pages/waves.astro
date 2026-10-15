@@ -5,6 +5,7 @@ import Sounds from '../components/creators/Sounds.astro';
 import Story from '../components/waves/Story.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 import { ALBUMS, ARTISTS, CHANNELS, COLLECTIONS, TRACKS, VENUES, artistOf, mmss } from '../data/waves';
+import '../styles/nu-glass.css';
 import '../styles/waves-app.css';
 
 const appHref = APP_STORE_ID
@@ -86,11 +87,24 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
               <span class="wv-dir" data-dir="above">above</span>
               <span class="wv-dir" data-dir="below">below</span>
             </div>
-            <div class="wv-venues" role="group" aria-label="Room">
-              {VENUES.map((v) => (
-                <button type="button" data-act="venue" data-venue={v.id} aria-pressed={String(v.id === 'hall')}>{v.label}</button>
-              ))}
-            </div>
+            <details class="wv-room-menu" data-room-menu>
+              <summary class="wv-room-summary" aria-label="Room">
+                <span class="wv-room-eyebrow">Room</span>
+                <span class="wv-room-value" data-venue-label>Concert hall</span>
+                <svg class="wv-room-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.2 6.2 8 10l3.8-3.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </summary>
+              <div class="wv-room-panel" role="menu" aria-label="Rooms">
+                {VENUES.map((v) => (
+                  <button
+                    type="button"
+                    role="menuitemradio"
+                    data-act="venue"
+                    data-venue={v.id}
+                    aria-checked={String(v.id === 'hall')}
+                  >{v.label}</button>
+                ))}
+              </div>
+            </details>
             <p class="wv-picked" data-picked>Concert hall. Strings, winds and piano, written as a film score.</p>
             <p class="wv-picked" data-obj-count></p>
             <div class="wv-height">
@@ -260,19 +274,21 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
     </p>
     <p class="wv-offline" data-offline hidden role="status">Offline · kept tracks, your files and generated sounds still play</p>
 
-    <!-- Mini bar when scrolled away from the stage -->
-    <div class="wv-bar" data-bar hidden role="region" aria-label="Now playing">
+    <!-- Floating glass card / mini player when scrolled away from the stage -->
+    <div class="wv-bar wv-bar-card" data-bar hidden role="region" aria-label="Now playing">
       <button type="button" class="wv-bar-art" data-act="open-now" data-bar-art aria-label="Show player"></button>
-      <button type="button" class="wv-bar-text" data-act="open-now" aria-label="Show player">
-        <b data-bar-title></b>
-        <small data-bar-by></small>
-      </button>
-      <div class="wv-bar-ctl">
-        <span class="wv-bar-live" data-bar-live hidden>Live</span>
-        <button type="button" data-act="prev" aria-label="Previous"></button>
-        <button type="button" data-act="toggle" aria-label="Play"></button>
-        <button type="button" data-act="next" aria-label="Next"></button>
-        <button type="button" data-act="queue-toggle" aria-pressed="false">Queue</button>
+      <div class="wv-bar-body">
+        <button type="button" class="wv-bar-text" data-act="open-now" aria-label="Show player">
+          <b data-bar-title></b>
+          <small data-bar-by></small>
+        </button>
+        <div class="wv-bar-ctl">
+          <span class="wv-bar-live" data-bar-live hidden>Live</span>
+          <button type="button" data-act="prev" aria-label="Previous"></button>
+          <button type="button" class="wv-bar-play" data-act="toggle" aria-label="Play"></button>
+          <button type="button" data-act="next" aria-label="Next"></button>
+          <button type="button" class="wv-bar-queue" data-act="queue-toggle" aria-pressed="false">Queue</button>
+        </div>
       </div>
       <div class="wv-bar-prog" aria-hidden="true"><i data-bar-prog></i></div>
     </div>
