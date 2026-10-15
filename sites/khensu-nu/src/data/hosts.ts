@@ -13,7 +13,8 @@ export const PRODUCTS = {
   bi: 'https://bi.khensu.nu',
   shield: 'https://shield.khensu.nu',
   network: 'https://network.khensu.nu',
-  sla: 'https://sla.khensu.nu',
+  // Apex until sla.khensu.nu is on the products cert without blocking peers.
+  sla: 'https://khensu.nu/sla',
 } as const;
 
 /** Old path on khensu.nu → product URL (no trailing slash). */
