@@ -1,8 +1,3 @@
----
-title: 'ñü.åůřâ'
-source: 'design/nu-aura.md'
----
-
 # ñü.åůřâ (nu.aura) — fashion house + quiet sensing
 
 **Product name:** ñü.åůřâ (code / host / nav: `nu.aura`, `aura`, `aura.khensu.nu`, page `/aura`).
@@ -18,11 +13,23 @@ Legacy **Aura** (Instagram / Ibiza Swim Week, Venice Beach) is the root. This is
 | Layer | What |
 | --- | --- |
 | Fashion house | Sets, stones, swim and evening — light as wardrobe |
+| House mark | **ñü.isheru** — Triangulum + mirror in stone and platinum; same seal as suñůlink.shield, cut for every fashion set |
 | Design language | Same light family as nu.glass Burst: aura cores, clear bubbles, spectrum chrome |
-| Quiet sensing | Non-invasive EEG / EKG / optical dim as jewelry — rings, sunglasses, necklace, bracelets |
+| Quiet sensing | Non-invasive EEG / EKG / optical dim as jewelry — rings, sunglasses, necklace, bracelets; the ñü.isheru is the stone face |
 | Collab desk | On-device private AI (Kronos lane; Qwen 3.8 MoE when that runtime ships) — intention stays on device |
 
-Nothing looks like medical gear. Dim-shift sunglasses, a ring, a bracelet, a necklace — jewelry first.
+Nothing looks like medical gear. Dim-shift sunglasses, a ring, a bracelet, a necklace — jewelry first. Every set wears the ñü.isheru.
+
+## 1b. ñü.isheru in the collection
+
+| Line | Mark |
+| --- | --- |
+| $444 set | Standard ñü.isheru (bloodstone, lapis, labradorite, onyx, platinum) |
+| $44k gem cut | Emerald (or peer) in the mark’s node points |
+| $4.4m diamond | Clear diamond ñü.isheru |
+| $44m moldavite | Moldavite ñü.isheru — three only |
+
+Shown on [khensu.nu/aura#isheru](https://khensu.nu/aura#isheru). Hardware story: [buy#isheru](https://khensu.nu/buy#isheru).
 
 ## 2. First show — pricing
 

@@ -5,14 +5,65 @@ import Name from '../components/khensu/Name.astro';
 import { PRODUCTS } from '../data/hosts';
 
 const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
+const BUY = 'https://khensu.nu/buy#isheru';
+
+const lines = [
+  {
+    tone: 'set',
+    k: 'Set · ñü.isheru',
+    title: 'Non–gem cut',
+    price: '444',
+    unit: '',
+    body: 'Every non–gem-cut set wears the standard ñü.isheru: bloodstone ring, lapis crescent, labradorite disc, onyx base, platinum line — flush in the metal.',
+    inlay: 'standard',
+  },
+  {
+    tone: 'emerald',
+    k: 'Gem cut · ñü.isheru',
+    title: 'Emerald · or peer',
+    price: '44k',
+    unit: '',
+    body: '$44,000. Gem-cut emerald (or peer stone) takes the node points of the mark — same Triangulum geometry, elevated cut.',
+    inlay: 'standard',
+  },
+  {
+    tone: 'diamond',
+    k: 'Diamond · ñü.isheru',
+    title: 'The clear one',
+    price: '4.4m',
+    unit: '',
+    body: '$4,400,000. One diamond line. The mark in quiet fire — platinum crescent, clear nodes, same mirror hexagon.',
+    inlay: 'standard',
+  },
+  {
+    tone: 'moldavite',
+    k: 'Moldavite · only 3',
+    title: 'Sky glass ñü.isheru',
+    price: '44m',
+    unit: '',
+    body: '$44,000,000. Three moldavite ñü.isheru pieces: Elliott display, museum, public sale. The rarest cut of the house mark.',
+    inlay: 'moldavite',
+  },
+] as const;
+
+const stones = [
+  { name: 'lapis', img: 'lapis', role: 'Crescent' },
+  { name: 'bloodstone', img: 'bloodstone', role: 'Ring' },
+  { name: 'labradorite', img: 'labradorite', role: 'Disc' },
+  { name: 'onyx', img: 'onyx', role: 'Base' },
+  { name: 'kyanite', img: 'kyanite', role: 'Points' },
+  { name: 'tourmaline', img: 'tourmaline', role: 'Markers' },
+  { name: 'pyrite', img: 'pyrite', role: 'Hexagon' },
+  { name: 'moldavite', img: 'moldavite', role: 'Rare tier' },
+] as const;
 ---
 
 <Base
   title="ñü.åůřâ"
-  description="ñü.åůřâ (nu.aura): Elliott’s first fashion show — $444 sets, $44k gem cuts, diamond $4.4m, moldavite $44m (three only). Quiet sensing as jewelry. Venice → the age of N/U."
+  description="ñü.åůřâ (nu.aura): Elliott’s first fashion show — sets dressed in the ñü.isheru. $444, $44k gem cuts, diamond $4.4m, moldavite $44m (three only). Quiet sensing as jewelry."
 >
   <div class="khensu aura-page">
-    <ProductBar name="ñü.åůřâ" action="The collection" href="#collection" explore="#sensing" />
+    <ProductBar name="ñü.åůřâ" action="The collection" href="#collection" explore="#isheru" />
 
     <section class="aura-hero" data-hero>
       <div class="aura-hero-media" aria-hidden="true">
@@ -36,12 +87,13 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
         </h1>
         <p class="lede">
           Legacy Aura was the beach house. This is <strong>nu.aura</strong> — fashion and design styles for the age of N/U.
-          Light dresses the body. Jewelry that doesn’t look like tech. <Name tld={false} /> holds the desk.
+          Every set carries the <strong>ñü.isheru</strong>: the house mark in stone and platinum. Jewelry that doesn’t look like tech.
+          <Name tld={false} /> holds the desk.
         </p>
         <div class="btn-row">
           <a class="btn primary" href="#collection">See the collection</a>
+          <a class="btn" href="#isheru">ñü.isheru</a>
           <a class="btn" href="#sensing">Quiet sensing</a>
-          <a class="btn" href={SPEC}>ñü.åůřâ spec</a>
         </div>
       </div>
     </section>
@@ -51,72 +103,119 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
       <h2>From Aura to nu.aura</h2>
       <p class="body">
         Happy to announce the brand from California — that was the old profile. Ibiza Swim Week energy, Venice Beach pin.
-        The beads on the string were the tell. Now the stones are the product, and the name carries the ñü mark.
+        The beads on the string were the tell. Now the stones are the product: the same ñü.isheru that seals suñůlink.shield
+        dresses every fashion set.
       </p>
     </section>
 
-    <section class="section band" id="collection">
+    <section class="section band aura-isheru" id="isheru">
       <div class="wrap">
-        <p class="aura-k">01 · collection</p>
-        <h2>The first show</h2>
+        <p class="aura-k">01 · house mark</p>
+        <div class="isheru-head">
+          <div class="isheru-copy">
+            <h2>ñü.isheru.<br /><em>The wardrobe seal.</em></h2>
+            <p class="body aura-lede">
+              Triangulum and its complete mirror — where the triangle meets itself, a hexagon. Lapis crescent, bloodstone ring,
+              labradorite disc, onyx base, platinum line. Cut for the shield; set for the collection. One mark across hardware and fashion.
+            </p>
+            <div class="isheru-switch" role="group" aria-label="ñü.isheru tier">
+              <button type="button" class="isheru-chip is-on" data-inlay="standard" aria-pressed="true">Standard</button>
+              <button type="button" class="isheru-chip" data-inlay="moldavite" aria-pressed="false">Moldavite</button>
+            </div>
+            <div class="btn-row">
+              <a class="btn primary" href={BUY}>On the shield</a>
+              <a class="btn" href={PRODUCTS.shield}>suñůlink.shield</a>
+              <a class="btn" href={SPEC}>ñü.åůřâ spec</a>
+            </div>
+          </div>
+          <figure class="isheru-fig">
+            <img
+              class="isheru-inlay"
+              src="/khensu/stones/inlay-standard.png"
+              width="1024"
+              height="1024"
+              alt="ñü.isheru inlay: the khėnsu.ñü mark in stone and platinum, Triangulum mirrored into a hexagon"
+              decoding="async"
+              fetchpriority="high"
+            />
+            <figcaption>ñü.isheru · house mark</figcaption>
+          </figure>
+        </div>
+        <figure class="isheru-macro">
+          <img
+            src="/khensu/renders/macro.webp"
+            width="1600"
+            height="1200"
+            loading="lazy"
+            decoding="async"
+            alt="Macro of the ñü.isheru set flush in brushed brass: labradorite disc, lapis crescent with platinum, bloodstone ring"
+          />
+          <figcaption>Flush to the metal — fashion cuts use the same stone grammar.</figcaption>
+        </figure>
+        <ul class="isheru-stones" role="list">
+          {stones.map((s) => (
+            <li>
+              <img src={`/khensu/stones/${s.img}.jpg`} alt="" width="96" height="96" loading="lazy" decoding="async" />
+              <b>{s.name}</b>
+              <span>{s.role}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="collection">
+      <div class="wrap">
+        <p class="aura-k">02 · collection</p>
+        <h2>The first show — dressed in ñü.isheru</h2>
         <p class="body aura-lede">
-          Four lines. One house. Prices fixed — no scaling up or down for drama.
+          Four lines. One mark. Prices fixed — no scaling up or down for drama. Each set is a fashion cut of the ñü.isheru.
         </p>
         <div class="aura-tiers" role="list">
-          <article class="aura-tier" role="listitem" data-tone="set">
-            <p class="aura-tier-k">Set</p>
-            <h3>Non–gem cut</h3>
-            <p class="aura-price"><span>$</span>444</p>
-            <p>Every non–gem-cut set. Rings, links, glasses frames — the everyday wardrobe.</p>
-          </article>
-          <article class="aura-tier" role="listitem" data-tone="emerald">
-            <p class="aura-tier-k">Gem cut</p>
-            <h3>Emerald · or peer</h3>
-            <p class="aura-price"><span>$</span>44k</p>
-            <p>$44,000 emerald with gem-cut stones — or any other stone at this price point.</p>
-          </article>
-          <article class="aura-tier" role="listitem" data-tone="diamond">
-            <p class="aura-tier-k">Diamond</p>
-            <h3>The clear one</h3>
-            <p class="aura-price"><span>$</span>4.4m</p>
-            <p>$4,400,000. One diamond line. Quiet fire.</p>
-          </article>
-          <article class="aura-tier aura-tier-rare" role="listitem" data-tone="moldavite">
-            <p class="aura-tier-k">Moldavite · only 3</p>
-            <h3>Sky glass</h3>
-            <p class="aura-price"><span>$</span>44m</p>
-            <p>
-              $44,000,000. Three made: one Elliott’s for display, one for a museum, one for public sale.
-            </p>
-          </article>
+          {lines.map((line) => (
+            <article class={`aura-tier${line.tone === 'moldavite' ? ' aura-tier-rare' : ''}`} role="listitem" data-tone={line.tone}>
+              <div class="aura-tier-mark" aria-hidden="true">
+                <img src={`/khensu/stones/inlay-${line.inlay}.png`} alt="" width="160" height="160" loading="lazy" decoding="async" />
+              </div>
+              <p class="aura-tier-k">{line.k}</p>
+              <h3>{line.title}</h3>
+              <p class="aura-price"><span>$</span>{line.price}</p>
+              <p>{line.body}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
 
-    <section class="section" id="sensing">
+    <section class="section band" id="sensing">
       <div class="wrap">
-        <p class="aura-k">02 · quiet sensing</p>
-        <h2>Think it. Wear it. Nothing looks like gear.</h2>
+        <p class="aura-k">03 · quiet sensing</p>
+        <h2>Think it. Wear it. The stone is the face.</h2>
         <p class="body aura-lede">
           Non-invasive EEG, EKG-class pulse, and optical dim — as a ring, sunglasses, necklace, bracelet.
-          Lasers stay skin-surface. Signals stay on your device. Kronos collabs on what you create; humans stay loved, not suppressed.
+          The ñü.isheru sits where the sensing lives: jewelry first, never a chip badge. Lasers stay skin-surface.
+          Signals stay on your device.
         </p>
         <ul class="aura-wear" role="list">
           <li>
+            <img class="wear-seal" src="/khensu/stones/inlay-standard.png" alt="" width="72" height="72" loading="lazy" decoding="async" />
             <b>Ring</b>
-            <span>Dry contacts in the band. Stone on top. Pulse + intention cues on device.</span>
+            <span>ñü.isheru as the stone. Dry contacts in the band. Pulse + intention cues on device.</span>
           </li>
           <li>
+            <img class="wear-seal" src="/khensu/stones/inlay-standard.png" alt="" width="72" height="72" loading="lazy" decoding="async" />
             <b>Sunglasses</b>
-            <span>Dim shift — daylight softens without a gadget face. Optical path, no implant.</span>
+            <span>Dim shift — daylight softens without a gadget face. Temple tips carry a micro seal.</span>
           </li>
           <li>
+            <img class="wear-seal" src="/khensu/stones/inlay-standard.png" alt="" width="72" height="72" loading="lazy" decoding="async" />
             <b>Necklace</b>
-            <span>Links that read heart and throat quietly. Looks like chain.</span>
+            <span>Links that read heart and throat quietly. The pendant is the ñü.isheru, flush set.</span>
           </li>
           <li>
+            <img class="wear-seal" src="/khensu/stones/inlay-moldavite.png" alt="" width="72" height="72" loading="lazy" decoding="async" />
             <b>Bracelet</b>
-            <span>Wrist cuff. Motion + pulse. Same family of stones as the sets.</span>
+            <span>Wrist cuff. Motion + pulse. Same stone family — moldavite only on the three rare sets.</span>
           </li>
         </ul>
         <p class="body">
@@ -125,19 +224,21 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
         </p>
         <div class="btn-row">
           <a class="btn primary" href={PRODUCTS.kronos}>Kronos desk</a>
+          <a class="btn" href={PRODUCTS.eyes}>ñü.êýêš</a>
           <a class="btn" href={PRODUCTS.nuGlass}>nu.glass</a>
           <a class="btn" href={PRODUCTS.waves}>nu.waves</a>
         </div>
       </div>
     </section>
 
-    <section class="section band aura-close" id="age">
+    <section class="section aura-close" id="age">
       <div class="wrap prose">
-        <p class="aura-k">03 · age of N/U</p>
+        <p class="aura-k">04 · age of N/U</p>
         <h2>Love was never the problem.</h2>
         <p>
           People have been suppressed for eons. That time is over. The network is a gift — freedom, privacy, basic income —
-          so everyone can create, build and live. Fashion is how light meets the body. nu.aura is how that light dresses the age.
+          so everyone can create, build and live. Fashion is how light meets the body. The ñü.isheru is how that light
+          signs every piece. nu.aura is how it dresses the age.
         </p>
         <p>
           SLA stays at <a href={PRODUCTS.sla}>100% uptime</a>. The gift that carries it is
@@ -146,6 +247,28 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
       </div>
     </section>
   </div>
+
+  <script>
+    const img = document.querySelector<HTMLImageElement>('.isheru-inlay');
+    const chips = document.querySelectorAll<HTMLButtonElement>('.isheru-chip');
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        const tier = chip.dataset.inlay ?? 'standard';
+        for (const c of chips) {
+          const on = c === chip;
+          c.classList.toggle('is-on', on);
+          c.setAttribute('aria-pressed', String(on));
+        }
+        if (img) {
+          img.src = `/khensu/stones/inlay-${tier}.png`;
+          img.alt =
+            tier === 'moldavite'
+              ? 'ñü.isheru moldavite inlay: the house mark in sky glass and platinum'
+              : 'ñü.isheru inlay: the khėnsu.ñü mark in stone and platinum, Triangulum mirrored into a hexagon';
+        }
+      });
+    }
+  </script>
 </Base>
 
 <style>
@@ -236,6 +359,117 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
     max-width: 36rem;
     margin-bottom: 1.75rem;
   }
+
+  /* ñü.isheru */
+  .aura-isheru h2 em {
+    font-style: normal;
+    color: rgba(34, 245, 154, 0.95);
+  }
+  .isheru-head {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+  @media (min-width: 900px) {
+    .isheru-head {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 3rem;
+    }
+  }
+  .isheru-fig {
+    margin: 0;
+    text-align: center;
+  }
+  .isheru-inlay {
+    width: min(420px, 88vw);
+    height: auto;
+    aspect-ratio: 1;
+    filter: drop-shadow(0 28px 48px rgba(0, 0, 0, 0.55));
+  }
+  .isheru-fig figcaption,
+  .isheru-macro figcaption {
+    margin-top: 0.85rem;
+    font-size: 0.85rem;
+    color: rgba(244, 240, 234, 0.55);
+  }
+  .isheru-switch {
+    display: inline-flex;
+    gap: 0.4rem;
+    margin: 0 0 1.25rem;
+    padding: 0.25rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .isheru-chip {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: rgba(244, 240, 234, 0.7);
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .isheru-chip.is-on {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+  .isheru-macro {
+    margin: 0 0 2rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .isheru-macro img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .isheru-macro figcaption {
+    padding: 0 0.25rem;
+  }
+  .isheru-stones {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  @media (min-width: 720px) {
+    .isheru-stones {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+  }
+  .isheru-stones li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    text-align: center;
+    font-size: 0.72rem;
+  }
+  .isheru-stones img {
+    width: 100%;
+    max-width: 72px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .isheru-stones b {
+    font-weight: 550;
+    text-transform: capitalize;
+  }
+  .isheru-stones span {
+    color: rgba(244, 240, 234, 0.5);
+  }
+
   .aura-tiers {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -253,7 +487,7 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
     background: rgba(255, 255, 255, 0.035);
     border: 1px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
-    min-height: 14rem;
+    min-height: 16rem;
   }
   .aura-tier::before {
     content: '';
@@ -280,6 +514,18 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
   .aura-tier-rare {
     border-color: rgba(107, 255, 74, 0.35);
     box-shadow: 0 0 0 1px rgba(107, 255, 74, 0.12), 0 20px 60px rgba(0, 0, 0, 0.35);
+  }
+  .aura-tier-mark {
+    position: relative;
+    width: 3.4rem;
+    height: 3.4rem;
+    margin: 0 0 0.85rem;
+  }
+  .aura-tier-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
   }
   .aura-tier-k {
     position: relative;
@@ -328,13 +574,23 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
     }
   }
   .aura-wear li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+    display: grid;
+    grid-template-columns: 3.2rem 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 0.85rem;
+    row-gap: 0.25rem;
     padding: 1.1rem 1.15rem;
     border-radius: 1.1rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .wear-seal {
+    grid-row: 1 / span 2;
+    width: 3.2rem;
+    height: 3.2rem;
+    object-fit: contain;
+    align-self: center;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
   }
   .aura-wear b {
     font-size: 1.02rem;
@@ -354,6 +610,9 @@ const SPEC = 'https://dev.khensu.nu/specs/nu-aura/';
     }
     .aura-mark {
       letter-spacing: 0.12em;
+    }
+    .isheru-stones {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
   @media (prefers-reduced-motion: reduce) {
