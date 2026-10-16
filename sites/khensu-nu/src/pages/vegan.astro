@@ -1,0 +1,140 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import { PRODUCTS } from '../data/hosts';
+
+const dishes = [
+  {
+    name: 'Venice bowl',
+    note: 'Brown rice, black beans, avocado, pickled onion, lime, cilantro, chili crisp (vegan).',
+  },
+  {
+    name: 'Roasted cauliflower steak',
+    note: 'Tahini lemon, pomegranate, parsley, toasted sesame.',
+  },
+  {
+    name: 'Mushroom al pastor tacos',
+    note: 'Corn tortillas, pineapple, onion, cilantro, salsa verde.',
+  },
+  {
+    name: 'Midnight noodles',
+    note: 'Rice ramen, ginger, garlic, scallion oil, soft tofu, chili.',
+  },
+  {
+    name: 'Garden flatbread',
+    note: 'Olive oil crust, tomato, basil, cashew ricotta.',
+  },
+  {
+    name: 'Sweet potato curry',
+    note: 'Coconut milk, lemongrass, lime leaf, jasmine rice.',
+  },
+];
+
+const drinks = [
+  { name: 'Cold brew + oat', note: 'House cold brew, oat milk, pinch of salt.' },
+  { name: 'Matcha mist', note: 'Ceremonial matcha, cold water, no sweetener unless you ask.' },
+  { name: 'Turmeric golden', note: 'Fresh turmeric, ginger, black pepper, coconut.' },
+  { name: 'Hibiscus lime', note: 'Dried hibiscus, lime, sparkling water.' },
+  { name: 'Cacao night', note: 'Ceremonial cacao, cinnamon, oat — evening only.' },
+  { name: 'Still water', note: 'Always. Compost the citrus after.' },
+];
+---
+
+<Base
+  title="nu.vegan"
+  description="nu.vegan — Elliott’s vegan dishes and drinks. Plant only. Pair with vegan materials on nu.devices. Don’t forget to compost :-)"
+>
+  <div class="khensu veg-page">
+    <ProductBar name="nu.vegan" action="Dishes" href="#dishes" explore="#drinks" />
+
+    <section class="page-head veg-hero" data-hero>
+      <div class="wrap">
+        <p class="eyebrow">nu.vegan · kitchen</p>
+        <h1>
+          Plant only.<br />
+          <em>Don’t forget to compost :-)</em>
+        </h1>
+        <p class="lede">
+          Elliott’s dishes and drinks. Same ethic as nu.devices materials — no animal, no plastic excuses in the kitchen.
+          Devices recycle; scraps compost. Wear the set after lunch:
+          <a href={PRODUCTS.devices}>nu.devices</a>.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href="#dishes">Dishes</a>
+          <a class="btn" href="#drinks">Drinks</a>
+          <a class="btn" href={PRODUCTS.devices}>nu.devices</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="dishes">
+      <div class="wrap">
+        <h2>Dishes</h2>
+        <div class="veg-grid">
+          {dishes.map((d) => (
+            <article>
+              <h3>{d.name}</h3>
+              <p>{d.note}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section band" id="drinks">
+      <div class="wrap">
+        <h2>Drinks</h2>
+        <div class="veg-grid">
+          {drinks.map((d) => (
+            <article>
+              <h3>{d.name}</h3>
+              <p>{d.note}</p>
+            </article>
+          ))}
+        </div>
+        <p class="veg-foot">
+          Menu is a living board — swap anything. Hardware stays vegan too:
+          <a href={PRODUCTS.devices}>nu.devices</a> · <a href={PRODUCTS.eyes}>ñü.êýêš</a> ·
+          <a href={PRODUCTS.aura}>ñü.åůřâ</a>.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .veg-hero h1 em {
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur, 8s) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .veg-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .veg-grid article {
+    padding: 1.2rem 1.15rem;
+    border-radius: 1.1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .veg-grid h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1.08rem;
+  }
+  .veg-grid p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+  .veg-foot {
+    margin-top: 1.75rem;
+    color: var(--text-dim);
+    max-width: 36rem;
+  }
+</style>

@@ -28,8 +28,14 @@ export const PRODUCTS = {
   skillsMusicTheory: 'https://khensu.nu/skills-music-theory',
   /** nu.glass — Quantum × Liquid Glass. Apex until Hover A + own_certificate ACTIVE. */
   nuGlass: 'https://khensu.nu/design-quantumglass',
-  /** ñü.åůřâ — fashion house. Apex until Hover A for aura.khensu.nu + own_certificate ACTIVE. */
+  /** ñü.åůřâ — fashion house. Apex until own_certificate CN matches aura.khensu.nu. */
   aura: 'https://khensu.nu/aura',
+  /** ñü.êýêš — glasses. Apex until Hover A + own_certificate ACTIVE. */
+  eyes: 'https://khensu.nu/eyes',
+  /** nu.devices — wearable set. Apex until Hover A + own_certificate ACTIVE. */
+  devices: 'https://khensu.nu/devices',
+  /** nu.vegan — kitchen. Apex until Hover A + own_certificate ACTIVE. */
+  vegan: 'https://khensu.nu/vegan',
 } as const;
 
 /** Old path on khensu.nu → product URL (no trailing slash). */
@@ -59,4 +65,7 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/skills-music-theory': PRODUCTS.skillsMusicTheory,
   '/design-quantumglass': PRODUCTS.nuGlass,
   '/aura': PRODUCTS.aura,
+  '/eyes': PRODUCTS.eyes,
+  '/devices': PRODUCTS.devices,
+  '/vegan': PRODUCTS.vegan,
 };

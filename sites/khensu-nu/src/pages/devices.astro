@@ -1,0 +1,168 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import { PRODUCTS } from '../data/hosts';
+---
+
+<Base
+  title="nu.devices"
+  description="nu.devices: wear the set — glasses, ears, ring, brooch, moldavite necklace, bracelet, suñůlink.shield. Same chips. Cost + labour + 10%. Recycle, don’t repair. Compost :-)"
+>
+  <div class="khensu dev-page">
+    <ProductBar name="nu.devices" action="Buy the set" href="#set" explore="#econ" />
+
+    <section class="page-head dev-hero" data-hero>
+      <div class="wrap">
+        <p class="eyebrow">nu.devices · wear it as a set</p>
+        <h1>
+          One body.<br />
+          <em>One chip family.</em>
+        </h1>
+        <p class="lede">
+          Glasses, ears, ring, crystal brooch, moldavite necklace, bracelet, and
+          <a href={PRODUCTS.shield}>suñůlink.shield</a> — same Guard / HaLow / BLE / EdgeLock stack.
+          Phone in the pocket. Talk to your glasses. <a href={PRODUCTS.memory}>ñü.řåł</a> thinks on the phone.
+          Materials touch skin. Vegan. Recycle nu.devices — and don’t forget to compost :-)
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href="#set">The set</a>
+          <a class="btn" href="#econ">10% markup</a>
+          <a class="btn" href={PRODUCTS.eyes}>ñü.êýêš</a>
+          <a class="btn" href={PRODUCTS.vegan}>nu.vegan</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="set">
+      <div class="wrap">
+        <h2>The set</h2>
+        <div class="dev-grid">
+          <article>
+            <p class="k">01 · glasses</p>
+            <h3>ñü.êýêš</h3>
+            <p>
+              Clear / sun-reactive glass. Side button autodim. <strong>4K</strong> cams. Jawbone audio. Dry EEG.
+              Optional no-mic. Same chips as the shield. No LLM in the frame.
+            </p>
+            <a href={PRODUCTS.eyes}>Open ñü.êýêš →</a>
+          </article>
+          <article>
+            <p class="k">02 · ears</p>
+            <h3>nu.ears</h3>
+            <p>Spatial + jawbone. Calls on the mixnet. <strong>No camera</strong> — ever.</p>
+          </article>
+          <article>
+            <p class="k">03 · ring</p>
+            <h3>Sensing or cam</h3>
+            <p>Wedding / fashion. Metal + real stone on skin. Cam-in-stone SKU, or sensing-only (no cam).</p>
+          </article>
+          <article>
+            <p class="k">04 · brooch</p>
+            <h3>Real crystal</h3>
+            <p>Not fake costume crystal. Optional tiny cam. Mechanical set — no glue on the skin path.</p>
+          </article>
+          <article>
+            <p class="k">05 · necklace</p>
+            <h3>Moldavite · silver</h3>
+            <p>Stones and silver touch skin. EKG / Class 1 near-IR monitor lives in the <strong>case</strong>, not glued to you.</p>
+          </article>
+          <article>
+            <p class="k">06 · bracelet</p>
+            <h3>Wrist</h3>
+            <p>Pulse + motion. Bare metal contact. Same radio family.</p>
+          </article>
+          <article>
+            <p class="k">07 · shield</p>
+            <h3>suñůlink.shield</h3>
+            <p>Pocket mesh + battery. Wakes the app. You talk to glasses while the phone stays put.</p>
+            <a href={PRODUCTS.shield}>Open shield →</a>
+          </article>
+          <article>
+            <p class="k">08 · fashion</p>
+            <h3>ñü.åůřâ</h3>
+            <p>House prices for show jewelry: $444 / $44k / $4.4m / $44m×3.</p>
+            <a href={PRODUCTS.aura}>Open ñü.åůřâ →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band" id="econ">
+      <div class="wrap prose">
+        <h2>Economics — not 10×</h2>
+        <ul class="facts">
+          <li><b>Markup.</b> Cost of parts + labour + <strong>10%</strong>. That’s the device rule.</li>
+          <li><b>Repair.</b> Not recommended at this margin — swap and <strong>recycle</strong> instead.</li>
+          <li><b>Recycle nu.devices.</b> Metals and stones come home. Boards get harvested.</li>
+          <li><b>Compost.</b> The organics in your life — kitchen scraps included. See <a href={PRODUCTS.vegan}>nu.vegan</a>.</li>
+          <li><b>Tips.</b> 100% to the person. App purchases stay flat 10%.</li>
+        </ul>
+        <div class="btn-row">
+          <a class="btn primary" href="#set">Wear the set</a>
+          <a class="btn" href={PRODUCTS.network}>nu.network</a>
+          <a class="btn" href={PRODUCTS.sla}>SLA</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .dev-hero h1 em {
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur, 8s) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .dev-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+  .dev-grid article {
+    padding: 1.25rem 1.2rem;
+    border-radius: 1.15rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .dev-grid .k {
+    margin: 0;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .dev-grid h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  .dev-grid p {
+    margin: 0;
+    flex: 1;
+    color: var(--text-dim);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+  .dev-grid a {
+    font-size: 0.9rem;
+  }
+  .facts {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .facts li {
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+</style>

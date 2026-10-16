@@ -1,0 +1,89 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import { PRODUCTS } from '../data/hosts';
+
+const DIOR_REF =
+  'https://alleyesforme.com/en-us/products/dior-club-m1u?variant=54448997433683&country=US&currency=USD';
+---
+
+<Base
+  title="ñü.êýêš"
+  description="ñü.êýêš: clear autodim glasses, 4K cams, jawbone audio, EEG — same chips as suñůlink. Part of nu.devices. Vegan materials, skin-touch metal and stone."
+>
+  <div class="khensu eyes-page">
+    <ProductBar name="ñü.êýêš" action="The set" href={PRODUCTS.devices} explore="#glass" />
+
+    <section class="page-head eyes-hero" data-hero>
+      <div class="wrap">
+        <p class="eyebrow">ñü.êýêš · nu.devices</p>
+        <h1>
+          Clear glass.<br />
+          <em>Button for the sun.</em>
+        </h1>
+        <p class="lede">
+          Transparent by default, sun-reactive, side button autodim. <strong>4K</strong> cameras. Jawbone audio. Dry EEG.
+          Same chips as <a href={PRODUCTS.shield}>suñůlink.shield</a>. LLM stays on
+          <a href={PRODUCTS.memory}>ñü.řåł</a> in your pocket — not in the temples.
+          Wear it as a set on <a href={PRODUCTS.devices}>nu.devices</a>.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href={PRODUCTS.devices}>Buy the set</a>
+          <a class="btn" href="#glass">Glass + cams</a>
+          <a class="btn" href={PRODUCTS.aura}>ñü.åůřâ</a>
+          <a class="btn" href={PRODUCTS.vegan}>nu.vegan</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="glass">
+      <div class="wrap prose">
+        <h2>Glasses</h2>
+        <ul class="facts">
+          <li><b>Lens.</b> Clear / transparent; tracks the sun; side button forces autodim.</li>
+          <li><b>4K cams.</b> World-facing. Encrypted to the phone. Person detect on-device via nu.ral.</li>
+          <li><b>Jawbone.</b> Bone conduction on the temple — private audio.</li>
+          <li><b>EEG.</b> Dry metal contacts on skin. Non-invasive. Forever.</li>
+          <li><b>Mic optional.</b> SKU without mic still has cam + EEG. Ears never get a camera.</li>
+          <li><b>Silhouette.</b> <a href={DIOR_REF} rel="noopener noreferrer" target="_blank">Club M1U</a> language — ÑÜ mark, not Dior.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section band" id="materials">
+      <div class="wrap prose">
+        <h2>Natural · vegan · on skin</h2>
+        <p>
+          Stones and metals touch your skin. No plastic barrier, no glue on the skin path.
+          No leather, bone, or animal glue. Recycled metals when we can. Zero-carbon process is the aim —
+          measured later. Full set economics: <strong>cost + labour + 10%</strong> on
+          <a href={PRODUCTS.devices}>nu.devices</a>. Recycle, don’t repair. Compost :-)
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .eyes-hero h1 em {
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur, 8s) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .facts {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .facts li {
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+</style>
