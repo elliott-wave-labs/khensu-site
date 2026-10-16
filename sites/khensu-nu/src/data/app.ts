@@ -1,10 +1,10 @@
-// Install hub: nu:get.apps.khensu.nu · https://get.apps.khensu.nu
-// (Never /apps — address form is nu: plus the host.)
-export const GET_APPS = 'https://get.apps.khensu.nu';
+// Install hub: address nu:get.apps.khensu.nu. Apex until Hover A + own cert ACTIVE.
+// (Never /apps as the product URL.)
+export const GET_APPS = 'https://khensu.nu/app';
 export const GET_APPS_NU = 'nu:get.apps.khensu.nu';
 
 // The App Store's numeric Apple ID for nu.khensu.ptah, from App Store Connect (App Information > Apple ID).
-// Until it is set, links go to get.apps. Apple's badge only shows once the app is on the App Store.
+// Until it is set, links go to the install hub. Apple's badge only shows once the app is on the App Store.
 export const APP_STORE_ID = '';
 export const APP_STORE_URL = APP_STORE_ID ? `https://apps.apple.com/app/id${APP_STORE_ID}` : GET_APPS;
 
