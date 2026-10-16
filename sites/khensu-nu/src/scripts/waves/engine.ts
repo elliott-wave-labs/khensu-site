@@ -313,6 +313,33 @@ export class Engine {
     el.playbackRate = 1;
     return el;
   }
+
+  /** Waits until the element has buffered enough to play cleanly (or times out). */
+  private ready(el: HTMLAudioElement, ms = 20_000): Promise<void> {
+    if (el.error || el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) return Promise.resolve();
+    return new Promise((resolve) => {
+      let settled = false;
+      const done = () => {
+        if (settled) return;
+        settled = true;
+        el.removeEventListener('canplaythrough', done);
+        el.removeEventListener('canplay', done);
+        el.removeEventListener('loadeddata', done);
+        el.removeEventListener('error', done);
+        window.clearTimeout(tid);
+        resolve();
+      };
+      const tid = window.setTimeout(done, ms);
+      el.addEventListener('canplaythrough', done);
+      el.addEventListener('canplay', done);
+      el.addEventListener('loadeddata', done);
+      el.addEventListener('error', done);
+    });
+  }
+
+  private async readyAll(els: HTMLAudioElement[]) {
+    await Promise.all(els.map((el) => this.ready(el)));
+  }
   private release(el: HTMLAudioElement) {
     el.pause();
     el.onended = null;
@@ -743,10 +770,14 @@ export class Engine {
     if (mode === 'bed' && !d.bed && d.track.bed) {
       const el = this.element();
       el.src = pick(el, d.track.bed.src);
-      el.currentTime = d.master?.currentTime ?? 0;
       this.sourceOf(el).connect(d.bedGain);
       d.bed = el;
-      if (d.playing) el.play().catch(() => {});
+      // Load as soon as the bed source is selected; play only once it is ready.
+      void this.ready(el).then(() => {
+        if (d.disposed || d.bed !== el) return;
+        el.currentTime = d.master?.currentTime ?? 0;
+        if (d.playing) el.play().catch(() => {});
+      });
     }
   }
   setMode(m: Mode) {
@@ -766,8 +797,17 @@ export class Engine {
     clearTimeout(this.channelTimer);
     this.queue = [...tracks];
     this.index = Math.max(0, Math.min(start, this.queue.length - 1));
+    // Selecting a source always loads it; autoplay only decides whether to start after load.
     if (autoplay) void this.playIndex(this.index);
-    else this.emit();
+    else void this.loadIndex(this.index);
+  }
+
+  /** Builds the deck and buffers media for queue index `i` without starting playback. */
+  async loadIndex(i: number) {
+    const track = this.queue[i];
+    if (!track) return;
+    this.index = i;
+    await this.load(track, 0);
   }
   enqueue(tracks: PlayTrack[], next = false) {
     if (next) this.queue.splice(this.index + 1, 0, ...tracks);
@@ -797,13 +837,24 @@ export class Engine {
     await this.start(track, 0, xf);
   }
 
-  /** Swaps the playing deck for `track`, crossfading over `xf` seconds when given. */
-  private async start(track: PlayTrack, at: number, xf?: number) {
+  /** Builds + buffers `track` into the active deck. Does not start playback. */
+  private async load(track: PlayTrack, at: number, xf?: number): Promise<Deck | null> {
     const ctx = this.graph();
     this.unlocked = true;
     await ctx.resume();
     const my = ++this.startSerial;
     const old = this.deck;
+    // Reuse an already-loaded deck for the same track (select → load, then play).
+    if (old && !old.disposed && old.track.id === track.id && old.isSong) {
+      await this.readyAll(old.els());
+      if (my !== this.startSerial) return null;
+      for (const el of old.els()) {
+        el.currentTime = at;
+        el.loop = this.repeat === 'one' && !this.channel && !this.mixed;
+      }
+      this.emit();
+      return old;
+    }
     let loaded = track;
     if (this.loader) {
       try {
@@ -811,20 +862,29 @@ export class Engine {
       } catch {
         loaded = track;
       }
-      if (my !== this.startSerial) return;
+      if (my !== this.startSerial) return null;
     }
     const d = await this.build(loaded);
     if (my !== this.startSerial) {
       this.dispose(d);
-      return;
+      return null;
+    }
+    // Buffer every source as soon as the track is selected — before play.
+    if (d.isSong) await this.readyAll(d.els());
+    if (my !== this.startSerial) {
+      this.dispose(d);
+      return null;
     }
     this.deck = d;
     this.selected = d.objs[0] ?? null;
     this.applyMode(d, true);
+    // Bed may have been created in applyMode; wait for it too.
+    if (d.bed) await this.ready(d.bed);
+    if (my !== this.startSerial) return null;
     const wasPlaying = !!old?.playing;
     const fadeS = xf ?? (wasPlaying ? this.crossfade : 0);
     const outS = Math.max(fadeS, wasPlaying ? 0.25 : 0);
-    if (old) {
+    if (old && old !== d) {
       if (outS > 0) {
         this.rampTo(old.fade, 0, outS);
         this.rampTo(old.spatial, 0, outS);
@@ -844,15 +904,6 @@ export class Engine {
       const v = d.objs.find((o) => o.voice)?.voice;
       v?.retune?.(this.tone.hold, this.tone.fade, fadeS > 0 ? fadeS : 0.04);
     }
-    await this.run(d, at);
-    this.history?.(d.track, this.duration());
-    this.emit();
-  }
-
-  private async run(d: Deck, at: number) {
-    const ctx = this.ctx!;
-    d.playing = true;
-    d.ended = false;
     if (d.isSong) {
       for (const el of d.els()) {
         el.currentTime = at;
@@ -865,6 +916,31 @@ export class Engine {
         window.setTimeout(() => this.onEnded(d), 400);
       };
       this.error = null;
+    }
+    this.emit();
+    return d;
+  }
+
+  /** Swaps the playing deck for `track`, crossfading over `xf` seconds when given. */
+  private async start(track: PlayTrack, at: number, xf?: number) {
+    const d = await this.load(track, at, xf);
+    if (!d || d !== this.deck) return;
+    await this.run(d, at);
+    this.history?.(d.track, this.duration());
+    this.emit();
+  }
+
+  private async run(d: Deck, at: number) {
+    const ctx = this.ctx!;
+    d.playing = true;
+    d.ended = false;
+    if (d.isSong) {
+      // Media is already buffered from load(); just align clocks once and play.
+      for (const el of d.els()) {
+        if (Math.abs(el.currentTime - at) > 0.02) el.currentTime = at;
+        el.loop = this.repeat === 'one' && !this.channel && !this.mixed;
+      }
+      this.lastSync = performance.now();
       await Promise.allSettled(d.els().map((el) => el.play()));
     } else {
       d.genOffset = at;
@@ -895,15 +971,8 @@ export class Engine {
     }
     if (d.playing) return;
     const at = d.ended ? 0 : d.position();
-    if (!d.isSong) {
-      await this.run(d, at);
-    } else {
-      d.playing = true;
-      d.ended = false;
-      for (const el of d.els()) el.currentTime = at;
-      await Promise.allSettled(d.els().map((el) => el.play()));
-    }
-    this.updateSession();
+    if (d.isSong) await this.readyAll(d.els());
+    await this.run(d, at);
     this.emit();
   }
   pause() {
@@ -1043,14 +1112,20 @@ export class Engine {
   frame(now: number) {
     const d = this.deck;
     if (d && this.ctx) {
-      if (d.master && d.playing && now - this.lastSync > 500) {
+      // Stem clock: only wake paused elements, and only hard-seek on catastrophic drift.
+      // Seeking HTMLMediaElement every ~500ms at a 50ms threshold was the choppy drop.
+      if (d.master && d.playing && now - this.lastSync > 2000) {
         this.lastSync = now;
         const t = d.master.currentTime;
         if (!d.master.paused)
           for (const el of d.els()) {
             if (el === d.master) continue;
-            if (Math.abs(el.currentTime - t) > 0.05) el.currentTime = t;
-            if (el.paused) el.play().catch(() => {});
+            if (el.paused) {
+              el.currentTime = t;
+              el.play().catch(() => {});
+            } else if (Math.abs(el.currentTime - t) > 0.45) {
+              el.currentTime = t;
+            }
           }
       }
       // Keep the split as loud as the untouched file, measured live, while both play in step.
