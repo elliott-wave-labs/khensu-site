@@ -2307,6 +2307,7 @@ body.wv-has-bar .wv {
 
 .wv-lyric-word {
   display: inline-block;
+  margin-right: 0.24em;
   transform-origin: center bottom;
   transition: color 0.12s ease, transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), text-shadow 0.14s ease;
 }
@@ -2364,6 +2365,7 @@ body.wv-has-bar .wv {
 }
 .wv-bar-word {
   display: inline-block;
+  margin-right: 0.24em;
   transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.12s ease;
 }
 .wv-bar-word.is-sung {
@@ -2377,6 +2379,26 @@ body.wv-has-bar .wv {
 }
 
 /* 9:16 Instagram Story / Reel Share Studio Modal */
+.wv-dialog {
+  border: 1px solid rgba(125, 211, 252, 0.24);
+  border-radius: 1.25rem;
+  background: rgba(7, 11, 22, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: #f8fafc;
+  padding: 1.15rem 1.25rem;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72), 0 0 40px rgba(56, 189, 248, 0.12);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.wv-dialog:not([open]) {
+  display: none !important;
+}
+.wv-dialog::backdrop {
+  background: rgba(2, 6, 18, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
 .wv-story-dialog {
   max-width: 48rem;
   width: min(94vw, 48rem);
