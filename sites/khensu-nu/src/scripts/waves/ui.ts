@@ -9,7 +9,7 @@ import { HeadTracker, hasCamera, hasDeviceMotion, hasNative, type HeadSource } f
 import * as lib from './library';
 import * as store from './store';
 import { onAir, upcoming } from './channels';
-import { capture as captureScene, encodeShare, decodeShare, type Scene } from './scene';
+import { capture as captureScene, encodeShare, decodeShare, listenUrl, isCatalogueTrack, type Scene } from './scene';
 import { InkPen, inkSvg } from './ink';
 import { tide, resolveTide } from './tide';
 
@@ -45,6 +45,8 @@ const ICON = {
   shuffle: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3.5l9 10H20M20 7h-4.5L13 9.8M3 17h3.5l2.5-2.8M17.5 4.5L20 7l-2.5 2.5M17.5 14.5L20 17l-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   repeat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   live: '<i class="wv-live-dot" aria-hidden="true"></i>',
+  share:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10M12 3l-3.5 3.5M12 3l3.5 3.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 
 declare global {
@@ -117,9 +119,12 @@ export class App {
       void this.refreshWake();
     });
     this.paintNow();
-    addEventListener('hashchange', () => void this.render());
+    addEventListener('hashchange', () => {
+      void this.render().then(() => void this.openShare());
+    });
     await this.render();
-    this.consumeShareHash();
+    const shared = await this.openShare();
+    if (!shared) await this.cueDefault();
     const first = () => {
       e.unlock();
       removeEventListener('pointerdown', first, true);
@@ -245,6 +250,7 @@ export class App {
     let html = '';
     switch (r.name) {
       case 'home':
+      case 't':
         this.view.innerHTML = this.homeHtml;
         await this.enhanceHome();
         break;
@@ -453,14 +459,14 @@ ${this.playlists.length ? this.rail(this.playlists.map((p) => this.playlistCard(
       const all = await store.scenes.all();
       this.scenes = all;
       body = all.length
-        ? `<p class="wv-lib-note">ñü.scene layouts stay on this device. Open a track, then recall a scene mid-listen.</p><ul class="wv-scene-lib">${all
+        ? `<p class="wv-lib-note">ñü.scene layouts stay on this device. Share a listen and the catalogue song opens with these settings.</p><ul class="wv-scene-lib">${all
             .map(
               (s) => `<li>
   <b>${esc(s.name)}</b>
   <small>${esc(s.trackId ? trackOf(s.trackId)?.title || s.trackId : 'any track')} · ${new Date(s.updated).toLocaleDateString()}</small>
   <span class="wv-acts-row">
     <button type="button" class="wv-btn" data-act="scene-apply" data-id="${esc(s.id)}"><span>Recall</span></button>
-    <button type="button" class="wv-btn" data-act="scene-share" data-id="${esc(s.id)}"><span>Copy code</span></button>
+    <button type="button" class="wv-btn" data-act="scene-share" data-id="${esc(s.id)}"><span>Share listen</span></button>
     <button type="button" class="wv-btn" data-act="scene-delete" data-id="${esc(s.id)}"><span>Delete</span></button>
   </span>
 </li>`,
@@ -944,6 +950,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         await this.applySceneId(id || el.dataset.id || '');
         break;
       case 'scene-share':
+      case 'share':
         await this.shareScene(id || el.dataset.id || '');
         break;
       case 'scene-import':
@@ -1011,7 +1018,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     }
   }
 
-  private playIds(ids: string[], start: number) {
+  private playIds(ids: string[], start: number, autoplay = true) {
     const tracks = this.tracksOf(ids);
     if (!tracks.length) return;
     const eng = this.engine;
@@ -1021,12 +1028,17 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       eng.setCrossfade(Math.max(eng.crossfade, eng.tone.cross));
     }
     void this.sealInk();
-    eng.setQueue(tracks, start);
     const t = tracks[Math.max(0, Math.min(start, tracks.length - 1))];
     if (t) {
+      eng.prefetch(t);
       this.ink.begin(t.id, t.title);
       this.inkTrack = t.id;
     }
+    // Load deck + bubble on select; play only when asked (autoplay still loads first).
+    void eng.setQueue(tracks, start, autoplay).then(() => {
+      this.bubble.sync();
+      this.paintNow();
+    });
     this.openNow(true);
   }
 
@@ -1062,38 +1074,89 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const eng = this.engine;
     let s = id ? this.scenes.find((x) => x.id === id) || (await store.scenes.get(id)) : null;
     if (!s && eng.track) s = captureScene(eng.track.id, eng.track.title, eng.venue.id, eng.fx, eng.mode, eng.objs());
-    if (!s) return;
+    if (!s) return this.toast('Play something first.');
     const code = encodeShare(s);
+    const origin = `${location.origin}${location.pathname.endsWith('/') ? location.pathname : `${location.pathname}/`}`;
+    const url = listenUrl(origin, s, code);
+    const song = isCatalogueTrack(s.trackId) ? this.light(s.trackId) : undefined;
+    const title = song ? `${song.title} · nu.waves` : `${s.name} · nu.waves`;
+    const text = song
+      ? `Listen to ${song.title} in this room, with these settings.`
+      : 'A nu.waves scene. Open it and play the same song — the sounds sit where they were.';
     try {
-      await navigator.clipboard.writeText(code);
-      this.toast('Scene code copied. It is only numbers and letters — paste it into nu.waves.');
+      if (navigator.share) {
+        await navigator.share({ title, text, url });
+        this.toast('Shared the listen.');
+        return;
+      }
+    } catch (err) {
+      if ((err as DOMException).name === 'AbortError') return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      this.toast(song ? 'Link copied — the song and these settings.' : 'Link copied. They still need the same file on their device.');
     } catch {
-      prompt('Copy this scene code', code);
+      prompt('Copy this listen', url);
     }
   }
 
   private async importScene() {
-    const code = prompt('Paste a ñü.scene share code');
-    if (!code) return;
-    const s = decodeShare(code.trim());
-    if (!s) return this.toast('That code could not be read.');
+    const pasted = prompt('Paste a nu.waves listen link or a ñü.scene code');
+    if (!pasted) return;
+    const raw = pasted.trim();
+    let fromUrl: string | null = null;
+    try {
+      const u = raw.includes('://') || raw.startsWith('#') ? new URL(raw, 'https://waves.khensu.nu/') : null;
+      const h = u?.hash ?? '';
+      fromUrl = h.includes('?') ? new URLSearchParams(h.slice(h.indexOf('?') + 1)).get('scene') : null;
+    } catch {
+      fromUrl = null;
+    }
+    const s = decodeShare(fromUrl || raw);
+    if (!s) return this.toast('That listen could not be read.');
     await store.scenes.put(s);
-    this.scenes.unshift(s);
+    this.scenes = [s, ...this.scenes.filter((x) => x.id !== s.id)];
+    if (s.trackId && this.light(s.trackId) && this.engine.track?.id !== s.trackId) {
+      await this.engine.setQueue(this.tracksOf([s.trackId]), 0, false);
+    }
     this.engine.applyScene(s);
-    this.toast(`Imported “${s.name}”.`);
+    this.toast(`“${s.name}” is on ${this.engine.track?.title ?? 'the stage'}. Press play.`);
     this.paintScenes();
+    this.openNow(true);
   }
 
-  private consumeShareHash() {
-    const q = new URLSearchParams(location.hash.split('?')[1] ?? '');
+  /** Opens a shared listen (`#/t/{id}?scene=`) or returns false when the hash is not one. */
+  private async openShare(): Promise<boolean> {
+    const r = parseRoute();
+    const q = new URLSearchParams(location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '');
     const code = q.get('scene');
-    if (!code) return;
-    const s = decodeShare(code);
-    if (!s) return;
-    void store.scenes.put(s).then(() => {
-      this.scenes.unshift(s);
-      this.toast(`Scene “${s.name}” ready. Play the track, then recall it.`);
-    });
+    const scene = code ? decodeShare(code) : null;
+    const trackId = (r.name === 't' && r.id) || q.get('t') || scene?.trackId || '';
+    if (!trackId && !scene) return false;
+    if (trackId && this.light(trackId)) {
+      if (this.engine.track?.id !== trackId) await this.engine.setQueue(this.tracksOf([trackId]), 0, false);
+    } else if (trackId && !this.light(trackId)) {
+      this.toast('That song is not in the catalogue. Files stay on the device they were added on.');
+    }
+    if (scene) {
+      await store.scenes.put(scene);
+      this.scenes = [scene, ...this.scenes.filter((x) => x.id !== scene.id)];
+      this.engine.applyScene(scene);
+      this.toast(`“${scene.name}” is on ${this.engine.track?.title ?? 'the stage'}. Press play.`);
+    }
+    this.openNow(true);
+    return true;
+  }
+
+  /** Builds the deck + spacetime bubble and buffers every stem as soon as the page opens, without autoplay. */
+  private async cueDefault() {
+    if (this.engine.deck) return;
+    const tracks = this.tracksOf(['first-attempt']);
+    if (!tracks.length) return;
+    this.engine.prefetch(tracks[0]);
+    await this.engine.setQueue(tracks, 0, false);
+    this.bubble.sync();
+    this.paintNow();
   }
 
   private async sealInk(force = false) {
@@ -1346,11 +1409,13 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         ? 'Next up'
         : eng.live
           ? `Live · ${eng.channel!.name}`
-          : t.albumTitle
-            ? `Playing from ${t.albumTitle}`
-            : t.local
-              ? 'Playing from your files'
-              : 'Playing',
+          : !eng.playing
+            ? 'Ready'
+            : t.albumTitle
+              ? `Playing from ${t.albumTitle}`
+              : t.local
+                ? 'Playing from your files'
+                : 'Playing',
       now,
     );
     const nowArt = now.querySelector<HTMLElement>('[data-now-art]')!;
@@ -1381,6 +1446,8 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       likeBtn.innerHTML = ICON.heart;
       likeBtn.setAttribute('aria-pressed', String(this.liked.has(t.id)));
     }
+    const shareBtn = now.querySelector<HTMLElement>('[data-act="share"]');
+    if (shareBtn) shareBtn.innerHTML = ICON.share;
     const keepBtn = now.querySelector<HTMLButtonElement>('[data-act="keep-current"]');
     if (keepBtn) {
       const can = t.kind === 'song' && !t.local;

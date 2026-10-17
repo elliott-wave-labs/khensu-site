@@ -798,8 +798,7 @@ export class Engine {
     this.queue = [...tracks];
     this.index = Math.max(0, Math.min(start, this.queue.length - 1));
     // Selecting a source always loads it; autoplay only decides whether to start after load.
-    if (autoplay) void this.playIndex(this.index);
-    else void this.loadIndex(this.index);
+    return autoplay ? this.playIndex(this.index) : this.loadIndex(this.index);
   }
 
   /** Builds the deck and buffers media for queue index `i` without starting playback. */
@@ -837,11 +836,26 @@ export class Engine {
     await this.start(track, 0, xf);
   }
 
-  /** Builds + buffers `track` into the active deck. Does not start playback. */
+  /** Warm the HTTP cache for a track’s media so select/play hits warm bytes. */
+  prefetch(track: PlayTrack) {
+    const urls: string[] = [];
+    if (track.kind === 'song') {
+      for (const s of track.src ?? []) if (s.url) urls.push(s.url);
+      for (const s of track.original ?? []) if (s.url) urls.push(s.url);
+      for (const s of track.stems ?? []) if (s.url) urls.push(s.url);
+      for (const s of track.bed?.src ?? []) if (s.url) urls.push(s.url);
+    } else if (track.gen?.type === 'clip' && track.gen.url) urls.push(track.gen.url);
+    for (const url of urls) {
+      if (!url || url.startsWith('data:')) continue;
+      void fetch(url, { mode: 'cors', credentials: 'omit', cache: 'force-cache' }).catch(() => {});
+    }
+  }
+
+  /** Builds + buffers `track` into the active deck. Does not start playback.
+   *  Never awaits AudioContext.resume — that only resolves after a user gesture and would
+   *  block the spacetime bubble and stem buffers until play. */
   private async load(track: PlayTrack, at: number, xf?: number): Promise<Deck | null> {
-    const ctx = this.graph();
-    this.unlocked = true;
-    await ctx.resume();
+    this.graph(); // may stay suspended until play
     const my = ++this.startSerial;
     const old = this.deck;
     // Reuse an already-loaded deck for the same track (select → load, then play).
@@ -855,6 +869,7 @@ export class Engine {
       this.emit();
       return old;
     }
+    this.prefetch(track);
     let loaded = track;
     if (this.loader) {
       try {
@@ -869,18 +884,10 @@ export class Engine {
       this.dispose(d);
       return null;
     }
-    // Buffer every source as soon as the track is selected — before play.
-    if (d.isSong) await this.readyAll(d.els());
-    if (my !== this.startSerial) {
-      this.dispose(d);
-      return null;
-    }
+    // Put the deck on stage immediately so the bubble shows every stem while media buffers.
     this.deck = d;
     this.selected = d.objs[0] ?? null;
     this.applyMode(d, true);
-    // Bed may have been created in applyMode; wait for it too.
-    if (d.bed) await this.ready(d.bed);
-    if (my !== this.startSerial) return null;
     const wasPlaying = !!old?.playing;
     const fadeS = xf ?? (wasPlaying ? this.crossfade : 0);
     const outS = Math.max(fadeS, wasPlaying ? 0.25 : 0);
@@ -918,11 +925,19 @@ export class Engine {
       this.error = null;
     }
     this.emit();
+    // Buffer every source as soon as the track is selected — before play.
+    if (d.isSong) await this.readyAll(d.els());
+    if (d.bed) await this.ready(d.bed);
+    if (my !== this.startSerial) return null;
+    this.emit();
     return d;
   }
 
   /** Swaps the playing deck for `track`, crossfading over `xf` seconds when given. */
   private async start(track: PlayTrack, at: number, xf?: number) {
+    const ctx = this.graph();
+    this.unlocked = true;
+    await ctx.resume();
     const d = await this.load(track, at, xf);
     if (!d || d !== this.deck) return;
     await this.run(d, at);
