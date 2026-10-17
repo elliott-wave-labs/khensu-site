@@ -302,10 +302,25 @@ export class App {
     let html = '';
     switch (r.name) {
       case 'home':
-      case 't':
         this.view.innerHTML = this.homeHtml;
         await this.enhanceHome();
         break;
+      case 't': {
+        this.view.innerHTML = this.homeHtml;
+        await this.enhanceHome();
+        if (r.id && this.engine.track?.id !== r.id) {
+          const t = this.light(r.id);
+          if (t) {
+            const albumIds = albumOf(t.albumId)?.tracks ?? TRACKS.map((x) => x.id);
+            const rest = albumIds.filter((id) => id !== t.id);
+            const queue = [t, ...this.tracksOf(rest)];
+            await this.engine.setQueue(queue, 0, false);
+            this.bubble.sync();
+          }
+        }
+        this.openNow();
+        break;
+      }
       case 'healing':
         await this.cueCollection(['all-healing-tones', ...HEALING_ALL_IDS]);
         html = this.healingView();
@@ -341,7 +356,7 @@ export class App {
         html = `<p class="wv-empty">Nothing here. <a href="#/">Home</a></p>`;
     }
     if (html) this.view.innerHTML = html;
-    if (r.name !== 'home' && r.name !== 'search') this.view.scrollIntoView({ block: 'start', behavior: 'instant' as ScrollBehavior });
+    if (r.name !== 'home' && r.name !== 't' && r.name !== 'search') this.view.scrollIntoView({ block: 'start', behavior: 'instant' as ScrollBehavior });
     if (r.name === 'search') {
       const input = this.view.querySelector<HTMLInputElement>('[data-search]');
       input?.focus({ preventScroll: true });
@@ -1274,11 +1289,26 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const url = songUrl(this.shareOrigin(), song.id);
     const title = `${song.title}${song.artistName ? ` · ${song.artistName}` : ''} — ñü.ŵævẽš`;
     const text = `Listen to ${song.title}${song.artistName ? ` by ${song.artistName}` : ''} on ñü.ŵævẽš`;
+    let copied = false;
     try {
       await navigator.clipboard?.writeText(url);
+      copied = true;
     } catch {
-      /* clipboard optional before native share */
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        copied = document.execCommand('copy');
+        ta.remove();
+      } catch {
+        /* fallback below */
+      }
     }
+    this.toast(`Song link copied: ${song.title}`);
     try {
       if (navigator.share) {
         await navigator.share({ title, text, url });
@@ -1288,11 +1318,12 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     } catch (err) {
       if ((err as DOMException).name === 'AbortError') return;
     }
-    try {
-      await navigator.clipboard.writeText(url);
-      this.toast(`Song link copied: ${song.title}`);
-    } catch {
-      prompt(`Share link for ${song.title}`, url);
+    if (!copied) {
+      try {
+        prompt(`Share link for ${song.title}`, url);
+      } catch {
+        /* ignore in headless */
+      }
     }
   }
 
