@@ -88,6 +88,7 @@ export class App {
   private seeking = false;
   private menuFor: string | null = null;
   private toastTimer = 0;
+  private floatTimers = new WeakMap<HTMLElement, number>();
   private scenes: Scene[] = [];
   private ink = new InkPen();
   private inkTrack = '';
@@ -203,13 +204,40 @@ export class App {
     void s.set('tone', e.tone);
   }
 
+  private setFloat(el: HTMLElement | null | undefined, open: boolean) {
+    if (!el) return;
+    const prevTimer = this.floatTimers.get(el);
+    if (open) {
+      if (prevTimer) {
+        clearTimeout(prevTimer);
+        this.floatTimers.delete(el);
+      }
+      if (!el.hidden && el.dataset.open === '1') return;
+      el.hidden = false;
+      el.dataset.open = '0';
+      void el.offsetWidth;
+      requestAnimationFrame(() => {
+        el.dataset.open = '1';
+      });
+    } else {
+      if (el.hidden) return;
+      if (el.dataset.open === '0' && prevTimer) return;
+      el.dataset.open = '0';
+      const timer = window.setTimeout(() => {
+        if (el.dataset.open === '0') el.hidden = true;
+        this.floatTimers.delete(el);
+      }, 300);
+      this.floatTimers.set(el, timer);
+    }
+  }
+
   private toast(msg: string) {
-    let el = this.root.querySelector<HTMLElement>('[data-toast]');
+    const el = this.root.querySelector<HTMLElement>('[data-toast]');
     if (!el) return;
     el.textContent = msg;
-    el.hidden = false;
+    this.setFloat(el, true);
     clearTimeout(this.toastTimer);
-    this.toastTimer = window.setTimeout(() => (el!.hidden = true), 3200);
+    this.toastTimer = window.setTimeout(() => this.setFloat(el, false), 3200);
   }
 
   // MARK: Catalogue lookups
@@ -1224,7 +1252,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     if (!el) return;
     const dismissed = await store.settings.get('installDismissed', 0);
     const hide = forceHide || !this.installEvt || (dismissed && Date.now() - dismissed < 14 * 864e5);
-    el.hidden = !!hide;
+    this.setFloat(el, !hide);
   }
 
   private paintOffline() {
@@ -1397,7 +1425,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     if (!t) return;
     const bar = this.bar;
     document.body.classList.toggle('wv-has-bar', !!live);
-    bar.hidden = !live;
+    this.setFloat(bar, !!live);
     this.now.hidden = false;
     if (live && t.id !== this.inkTrack) {
       void this.sealInk();

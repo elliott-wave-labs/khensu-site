@@ -24,6 +24,14 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
   description="Music and healing sounds you can move. Live channels, your files on this device, spacetime bubble mid-listen, and head tracking — on waves.khensu.nu."
   manifest="/waves.webmanifest"
 >
+  <Fragment slot="head">
+    {(featured.original ?? []).map((s) => (
+      <link rel="preload" as="audio" href={s.url} type={s.type} />
+    ))}
+    {(featured.stems ?? []).map((s) => (
+      <link rel="preload" as="audio" href={s.url} type="audio/mp4" />
+    ))}
+  </Fragment>
   <div class="wv khensu" data-waves>
     <section class="wv-stage" aria-labelledby="wv-now-title">
       <div class="wrap wv-stage-head">
@@ -54,6 +62,7 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
               <button type="button" data-act="next" aria-label="Next"></button>
               <button type="button" data-act="repeat" aria-pressed="false" data-state="off" aria-label="Repeat off"></button>
               <button type="button" data-act="like" aria-pressed="false" aria-label="Like"></button>
+              <button type="button" data-act="share" aria-label="Share listen"></button>
               <button type="button" data-act="keep-current" aria-pressed="false"><span>Keep</span></button>
             </div>
             <div class="wv-time">
@@ -136,11 +145,11 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
               </fieldset>
               <fieldset class="wv-scene" data-scene-box>
                 <legend>ñü.scene</legend>
-                <p class="wv-lib-note">Save where every sound sits, the room and ñü.ÊQ. Recall mid-listen. Share a code; nothing is uploaded.</p>
+                <p class="wv-lib-note">Save where every sound sits, the room and ñü.ÊQ. Share the song and these settings as a link — nothing is uploaded.</p>
                 <div class="wv-acts-row">
                   <button type="button" class="wv-btn wv-btn-primary" data-act="scene-save"><span>Save scene</span></button>
-                  <button type="button" class="wv-btn" data-act="scene-share"><span>Copy share code</span></button>
-                  <button type="button" class="wv-btn" data-act="scene-import"><span>Paste scene</span></button>
+                  <button type="button" class="wv-btn" data-act="scene-share"><span>Share listen</span></button>
+                  <button type="button" class="wv-btn" data-act="scene-import"><span>Paste listen</span></button>
                 </div>
                 <div class="wv-scene-list" data-scene-list></div>
               </fieldset>
@@ -268,32 +277,36 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
       <div data-home-mine></div>
     </div>
 
-    <p class="wv-install" data-install hidden>
-      <button type="button" data-act="install"><span>Install nu.waves on this device</span></button>
-      <button type="button" data-act="install-dismiss" aria-label="Dismiss">×</button>
-    </p>
     <p class="wv-offline" data-offline hidden role="status">Offline · kept tracks, your files and generated sounds still play</p>
 
-    <!-- Floating glass card / mini player when scrolled away from the stage -->
-    <div class="wv-bar wv-bar-card" data-bar hidden role="region" aria-label="Now playing">
-      <button type="button" class="wv-bar-art" data-act="open-now" data-bar-art aria-label="Show player"></button>
-      <div class="wv-bar-body">
-        <button type="button" class="wv-bar-text" data-act="open-now" aria-label="Show player">
-          <b data-bar-title></b>
-          <small data-bar-by></small>
-        </button>
-        <div class="wv-bar-ctl">
-          <span class="wv-bar-live" data-bar-live hidden>Live</span>
-          <button type="button" data-act="prev" aria-label="Previous"></button>
-          <button type="button" class="wv-bar-play" data-act="toggle" aria-label="Play"></button>
-          <button type="button" data-act="next" aria-label="Next"></button>
-          <button type="button" class="wv-bar-queue" data-act="queue-toggle" aria-pressed="false">Queue</button>
-        </div>
-      </div>
-      <div class="wv-bar-prog" aria-hidden="true"><i data-bar-prog></i></div>
-    </div>
+    <!-- Bottom floating stack: toast on top, floating mini player above install overlay, animated with pop/scale/fade -->
+    <div class="wv-float-stack" data-float-stack>
+      <p class="wv-toast" data-toast hidden role="status"></p>
 
-    <p class="wv-toast" data-toast hidden role="status"></p>
+      <!-- Floating glass card / mini player when scrolled away from the stage -->
+      <div class="wv-bar wv-bar-card" data-bar hidden role="region" aria-label="Now playing">
+        <button type="button" class="wv-bar-art" data-act="open-now" data-bar-art aria-label="Show player"></button>
+        <div class="wv-bar-body">
+          <button type="button" class="wv-bar-text" data-act="open-now" aria-label="Show player">
+            <b data-bar-title></b>
+            <small data-bar-by></small>
+          </button>
+          <div class="wv-bar-ctl">
+            <span class="wv-bar-live" data-bar-live hidden>Live</span>
+            <button type="button" data-act="prev" aria-label="Previous"></button>
+            <button type="button" class="wv-bar-play" data-act="toggle" aria-label="Play"></button>
+            <button type="button" data-act="next" aria-label="Next"></button>
+            <button type="button" data-act="queue-toggle" class="wv-bar-queue" aria-pressed="false">Queue</button>
+          </div>
+        </div>
+        <div class="wv-bar-prog" aria-hidden="true"><i data-bar-prog></i></div>
+      </div>
+
+      <p class="wv-install" data-install hidden>
+        <button type="button" data-act="install"><span>Install nu.waves on this device</span></button>
+        <button type="button" data-act="install-dismiss" aria-label="Dismiss">×</button>
+      </p>
+    </div>
 
     <dialog class="wv-dialog" data-menu>
       <div class="wv-dialog-inner">

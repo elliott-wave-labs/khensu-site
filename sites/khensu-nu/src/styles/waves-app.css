@@ -502,15 +502,56 @@ body.wv-has-bar .wv {
   font-size: 0.78rem;
 }
 
-/* Floating clear aura bubble / mini player (nu.glass — not a solid sheet) */
-.wv-bar {
+/* Bottom floating stack: toast on top, floating mini player above install overlay, pop/scale/fade in & out */
+.wv-float-stack {
   position: fixed;
   left: max(0.85rem, env(safe-area-inset-left, 0px));
-  right: auto;
-  transform: none;
-  bottom: calc(var(--wv-tabs) + 0.55rem + env(safe-area-inset-bottom, 0px));
-  z-index: 40;
-  width: min(17.25rem, calc(100% - 1.7rem));
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  pointer-events: none;
+}
+.wv-float-stack > * {
+  pointer-events: auto;
+  transform-origin: center bottom;
+  transition:
+    opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.wv-float-stack > *[data-open='1'] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+.wv-float-stack > *[data-open='0'],
+.wv-float-stack > *[hidden] {
+  opacity: 0;
+  transform: translateY(0.55rem) scale(0.9);
+  filter: blur(4px);
+  pointer-events: none;
+}
+.wv-float-stack > *[hidden] {
+  display: none !important;
+}
+@starting-style {
+  .wv-float-stack > *:not([hidden]) {
+    opacity: 0;
+    transform: translateY(0.55rem) scale(0.9);
+    filter: blur(4px);
+  }
+}
+
+/* Floating clear aura bubble / mini player (nu.glass — not a solid sheet) */
+.wv-bar {
+  position: relative;
+  z-index: 2;
+  width: min(18.5rem, 100%);
   display: grid;
   grid-template-columns: 3.4rem minmax(0, 1fr);
   align-items: center;
@@ -648,13 +689,6 @@ body.wv-has-bar .wv {
   text-transform: uppercase;
   color: #ff6b6b;
   margin-right: 0.1rem;
-}
-@media (min-width: 720px) {
-  .wv-bar {
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(18.5rem, calc(100% - 2rem));
-  }
 }
 
 /* Player stage: art + controls beside the spacetime bubble */
@@ -1311,21 +1345,21 @@ body.wv-has-bar .wv {
   margin: 0.6rem 0 0;
 }
 .wv-toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  z-index: 60;
-  max-width: min(28rem, calc(100% - 2rem));
-  padding: 0.65rem 1rem;
+  position: relative;
+  z-index: 3;
+  margin: 0;
+  max-width: min(26rem, 100%);
+  padding: 0.6rem 1rem;
   border-radius: 999px;
-  background: rgba(20, 22, 28, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(16, 18, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: var(--wv-glass-blur);
+  -webkit-backdrop-filter: var(--wv-glass-blur);
   color: #fff;
-  font-size: 0.85rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  font-size: 0.84rem;
+  box-shadow: var(--wv-glass-inset), 0 12px 34px rgba(0, 0, 0, 0.45);
 }
-.wv-toast[hidden] { display: none; }
+.wv-toast[hidden] { display: none !important; }
 
 .wv-dialog {
   border: 1px solid rgba(255, 255, 255, 0.28);
@@ -1402,20 +1436,23 @@ body.wv-has-bar .wv {
 }
 
 .wv-install {
-  position: sticky;
-  bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
-  z-index: 30;
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0 auto 0.5rem;
-  padding: 0.55rem 0.75rem;
-  max-width: 28rem;
+  margin: 0;
+  padding: 0.5rem 0.8rem;
+  width: min(22rem, 100%);
   border-radius: 999px;
-  background: color-mix(in srgb, #0a0a0c 82%, transparent);
-  border: 1px solid color-mix(in srgb, #fff 14%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background:
+    radial-gradient(ellipse 80% 70% at 25% 20%, rgba(255, 255, 255, 0.16), transparent 55%),
+    rgba(12, 14, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: var(--wv-glass-blur);
+  -webkit-backdrop-filter: var(--wv-glass-blur);
+  box-shadow: var(--wv-glass-inset), 0 12px 32px rgba(0, 0, 0, 0.4);
+  font-size: 0.82rem;
 }
 .wv-install[hidden] {
   display: none !important;
