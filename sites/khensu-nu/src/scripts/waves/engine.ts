@@ -9,6 +9,16 @@ import { listenerVectors, type Pose } from './head';
 import { onAir } from './channels';
 import type { Scene } from './scene';
 
+/** Every iPhone and iPad browser is WebKit, which freezes an AudioContext's own output mid-buffer when the app goes
+ *  to the background (a buzz) but treats an <audio> element as music it may keep playing. There the mix goes
+ *  through a stream into one element. `?out=element` or `?out=device` forces either path for testing. */
+const OUT_VIA_ELEMENT = (() => {
+  if (typeof navigator === 'undefined') return false;
+  const forced = new URLSearchParams(location.search).get('out');
+  if (forced) return forced === 'element';
+  return /iP(hone|ad|od)/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+})();
+
 export type Mode = 'orig' | 'bed' | 'waves';
 export type Repeat = 'off' | 'all' | 'one';
 export type Fx = { gain: number; wet: number; rt: number; pre: number; bounces: number };
@@ -312,10 +322,85 @@ export class Engine {
     // The untouched original and fixed beds skip the room; binaural beats skip the panners too.
     this.flat.connect(this.user);
     this.direct.connect(this.user);
-    this.user.connect(lim).connect(ctx.destination);
+    this.user.connect(lim);
+    try {
+      // Safari 16.4+: music, not a game sound, so it ignores the silent switch and may go on in the background.
+      (navigator as Navigator & { audioSession?: { type: string } }).audioSession!.type = 'playback';
+    } catch {
+      /* no Audio Session API */
+    }
+    this.connectOut();
+    ctx.onstatechange = () => {
+      // iOS interrupts the context (backgrounded, a call, Siri): show it as paused so play resumes cleanly.
+      if (ctx.state !== 'running' && ctx.state !== 'closed' && this.playing && (document.hidden || (ctx.state as string) === 'interrupted')) this.pause();
+    };
     this.room();
     this.applyPose();
     return ctx;
+  }
+
+  // MARK: Output
+
+  /** On iPhone and iPad the mix plays through one <audio> element fed by a stream (`OUT_VIA_ELEMENT`). */
+  private out: HTMLAudioElement | null = null;
+  private outStream: MediaStreamAudioDestinationNode | null = null;
+  private pausingOut = false;
+
+  private connectOut() {
+    const ctx = this.ctx!;
+    if (!OUT_VIA_ELEMENT) {
+      this.limiter.connect(ctx.destination);
+      return;
+    }
+    const dest = (this.outStream = ctx.createMediaStreamDestination());
+    this.limiter.connect(dest);
+    const el = (this.out = document.createElement('audio'));
+    el.setAttribute('playsinline', '');
+    el.srcObject = dest.stream;
+    // The system paused it (backgrounded, locked, another app's audio): pause the player too.
+    el.addEventListener('pause', () => {
+      if (this.out === el && !this.pausingOut && this.playing) this.pause();
+    });
+  }
+
+  /** Starts the output element; call inside a tap or a Media Session action. Falls back to the context's own
+   *  output if the element can't play or its clock doesn't move. */
+  private startOut() {
+    const el = this.out;
+    if (!el || !el.paused) return;
+    el.play().then(
+      () => {
+        const t0 = el.currentTime;
+        window.setTimeout(() => {
+          if (this.out === el && !el.paused && el.currentTime === t0) this.outToDevice();
+        }, 1500);
+      },
+      (err: DOMException) => {
+        // Blocked until a tap: the next gesture starts it. Anything else: play through the context.
+        if (this.out === el && err?.name !== 'AbortError' && err?.name !== 'NotAllowedError') this.outToDevice();
+      },
+    );
+  }
+
+  private pauseOut() {
+    const el = this.out;
+    if (!el || el.paused) return;
+    this.pausingOut = true;
+    el.pause();
+    this.pausingOut = false;
+  }
+
+  private outToDevice() {
+    if (!this.ctx || !this.out) return;
+    try {
+      if (this.outStream) this.limiter.disconnect(this.outStream);
+    } catch {
+      /* ignore */
+    }
+    this.out.srcObject = null;
+    this.out = null;
+    this.outStream = null;
+    this.limiter.connect(this.ctx.destination);
   }
 
   /** Creates a live MediaStream tap of the master spatial output for recording 9:16 Instagram Story / Reel clips. */
@@ -345,6 +430,7 @@ export class Engine {
     if (ctx.state !== 'running') {
       void ctx.resume().catch(() => {});
     }
+    if (fromGesture) this.startOut();
     if (fromGesture || ctx.state === 'running') {
       const wasUnlocked = this.unlocked;
       this.unlocked = true;
@@ -1353,6 +1439,7 @@ export class Engine {
       for (const o of d.objs) o.voice?.stop();
     }
     d.playing = false;
+    this.pauseOut();
     this.updateSession();
     this.emit();
   }

@@ -874,7 +874,13 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       if (dx < 0) void this.engine.next();
       else void this.engine.prev();
     });
-    document.addEventListener('visibilitychange', () => void this.refreshWake());
+    // Animation frames stop in a background tab; the engine still has hand-offs, slots and the sleep timer to run.
+    let hiddenTimer = 0;
+    document.addEventListener('visibilitychange', () => {
+      void this.refreshWake();
+      clearInterval(hiddenTimer);
+      if (document.hidden) hiddenTimer = window.setInterval(() => this.engine.frame(performance.now()), 250);
+    });
   }
   private searchTimer = 0;
 
