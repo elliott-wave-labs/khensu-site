@@ -57,6 +57,8 @@ export type Track = {
   /** A fixed-speaker comparison mix. */
   bed?: { label: string; src: Source[]; spec: string };
   gen?: Generator;
+  /** Multiple generated sounds placed in the spacetime bubble at once (e.g. all 7 chakras or all healing tones). */
+  gens?: { id: string; label: string; gen: Generator; pos: Pos }[];
   /** Where a single sound sits by default (generators and mono tracks). */
   pos?: Pos;
   spec?: string;
@@ -321,6 +323,54 @@ export const TRACKS: Track[] = [
   chopinTrack('chopin-waltz-op69-no1', 'Waltz Op. 69 No. 1 “L’Adieu”', 'waltz-op69-no1', 248.42, 5_426_176, ['piano', 'waltz', 'classical']),
   chopinTrack('chopin-prelude-op28-no1', 'Prelude Op. 28 No. 1 in C major', 'prelude-op28-no1', 39.86, 800_976, ['piano', 'prelude', 'classical']),
   ...CHAKRAS.map(chakraTrack),
+  {
+    id: 'all-chakras-3d',
+    title: 'All 7 chakra tones (3D)',
+    artistId: 'waves',
+    albumId: 'healing-chakras',
+    dur: 60,
+    kind: 'generator',
+    spatial: 'stems',
+    gen: { type: 'tone', hz: 136.1, hold: 10, fade: 4, mark: '#3ccf7a' },
+    gens: CHAKRAS.map((c) => ({
+      id: c.id,
+      label: `${c.en} · ${Math.round(c.hz)} Hz`,
+      gen: { type: 'tone', hz: c.hz, hold: 10, fade: 4, mark: c.hex },
+      pos: c.pos,
+    })),
+    spec: '7 chakra tones in 3D · root to crown · generated on your device',
+    licence: 'khėnsu.ñü · generated',
+    loop: true,
+    tags: ['healing', 'chakra', 'meditation', '3d'],
+  },
+  {
+    id: 'all-healing-tones',
+    title: 'All healing tones (3D)',
+    artistId: 'waves',
+    albumId: 'healing-chakras',
+    dur: 90,
+    kind: 'generator',
+    spatial: 'stems',
+    gen: { type: 'bowl', hz: 528, mark: '#18e0c8' },
+    gens: [
+      { id: 'bowl-528', label: '528 Hz Bowl', gen: { type: 'bowl', hz: 528, mark: '#18e0c8' }, pos: { x: 0.9, y: 1.5, z: 0.35 } },
+      { id: 'bowl-432', label: '432 Hz Bowl', gen: { type: 'bowl', hz: 432, mark: '#c9a96e' }, pos: { x: -0.9, y: 1.5, z: 0.35 } },
+      { id: 'bowl-396', label: '396 Hz Bowl', gen: { type: 'bowl', hz: 396, mark: '#ff8a3c' }, pos: { x: 0, y: 1.9, z: -0.2 } },
+      ...CHAKRAS.map((c, idx) => {
+        const ang = ((idx - 3) / 3.5) * 1.35;
+        return {
+          id: c.id,
+          label: `${c.en} (${Math.round(c.hz)} Hz)`,
+          gen: { type: 'tone' as const, hz: c.hz, hold: 10, fade: 4, mark: c.hex },
+          pos: { x: Math.sin(ang) * 1.4, y: Math.cos(ang) * 1.4, z: c.pos.z },
+        };
+      }),
+    ],
+    spec: '10 healing tones & singing bowls in 3D · generated on your device',
+    licence: 'khėnsu.ñü · generated',
+    loop: true,
+    tags: ['healing', 'chakra', 'solfeggio', 'meditation', '3d'],
+  },
   healing('creek', 'Stair Creek', { type: 'creek', mark: '#3d8f8a' }, 48, 'One sound beside you · generated · loops', { x: -1.5, y: -1.6, z: -0.6 }, ['healing', 'nature', 'water', 'sleep']),
   healing('rain', 'Rain on glass', { type: 'rain', mark: '#7fb3d5' }, 60, 'Rain on a window · generated · loops', { x: 0.6, y: 1.4, z: 1.2 }, ['healing', 'nature', 'rain', 'sleep']),
   healing('ocean', 'Ocean at night', { type: 'ocean', mark: '#3a7bd5' }, 60, 'Waves on a beach · generated · loops', { x: 0, y: 2.6, z: -0.3 }, ['healing', 'nature', 'ocean', 'sleep']),
@@ -348,6 +398,12 @@ export const TRACKS: Track[] = [
     tags: ['effect', 'film'],
   },
 ];
+
+export const HEALING_BOWL_IDS = ['solfeggio-528', 'solfeggio-432', 'bowl-396'];
+export const HEALING_BINAURAL_IDS = ['theta-6', 'alpha-10', 'delta-2'];
+export const HEALING_NATURE_IDS = ['creek', 'rain', 'ocean', 'forest', 'brown-noise', 'pink-noise'];
+export const HEALING_TONE_IDS = [...CHAKRA_IDS, ...HEALING_BOWL_IDS, ...HEALING_BINAURAL_IDS];
+export const HEALING_ALL_IDS = [...CHAKRA_IDS, ...HEALING_BOWL_IDS, ...HEALING_BINAURAL_IDS, ...HEALING_NATURE_IDS];
 
 export const ALBUMS: Album[] = [
   {
@@ -380,9 +436,9 @@ export const ALBUMS: Album[] = [
     year: 2026,
     art: '',
     artClass: 'h5',
-    tracks: CHAKRA_IDS,
+    tracks: ['all-chakras-3d', ...CHAKRA_IDS],
     licence: 'Generated on your device',
-    note: 'Seven planetary tones from the root, below you, to the crown. Each holds, fades, then hands to the next.',
+    note: 'Seven planetary tones from the root, below you, to the crown. Play all 7 together in 3D or walk them one by one.',
   },
   {
     id: 'healing-nature',
@@ -392,13 +448,22 @@ export const ALBUMS: Album[] = [
     year: 2026,
     art: '',
     artClass: 'h3',
-    tracks: TRACKS.filter((t) => t.albumId === 'healing-nature').map((t) => t.id),
+    tracks: ['all-healing-tones', ...HEALING_BOWL_IDS, ...HEALING_BINAURAL_IDS, ...HEALING_NATURE_IDS],
     licence: 'Generated on your device',
-    note: 'Rain, ocean, forest, noise, binaural beats and singing bowls, generated live so they never repeat and never end.',
+    note: 'Solfeggio bowls, binaural beats, rain, ocean, forest and noise, generated live so they never repeat and never end.',
   },
 ];
 
 export const COLLECTIONS: Collection[] = [
+  {
+    id: 'healing-all',
+    title: 'All healing tones',
+    desc: 'All 7 chakra tones, 528 · 432 · 396 Hz singing bowls, binaural beats and nature sounds.',
+    art: '',
+    artClass: 'h1',
+    tracks: ['all-healing-tones', ...HEALING_ALL_IDS],
+    journey: true,
+  },
   {
     id: 'chakra-journey',
     title: 'Chakra journey',

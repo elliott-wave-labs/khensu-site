@@ -4,7 +4,7 @@ import ProductBar from '../components/khensu/ProductBar.astro';
 import Sounds from '../components/creators/Sounds.astro';
 import Story from '../components/waves/Story.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
-import { ALBUMS, ARTISTS, CHANNELS, COLLECTIONS, TRACKS, VENUES, artistOf, mmss } from '../data/waves';
+import { ALBUMS, ARTISTS, CHANNELS, COLLECTIONS, HEALING_ALL_IDS, HEALING_BINAURAL_IDS, HEALING_BOWL_IDS, CHAKRA_IDS, TRACKS, VENUES, artistOf, mmss } from '../data/waves';
 import '../styles/nu-glass.css';
 import '../styles/waves-app.css';
 
@@ -17,6 +17,7 @@ const featuredArtist = artistOf(featured.artistId)!;
 const live = CHANNELS.filter((c) => c.kind === 'live');
 const healingAlbums = ALBUMS.filter((a) => a.artistId === 'waves');
 const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
+const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id)!).filter(Boolean);
 ---
 
 <Base
@@ -218,17 +219,129 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
 
     <nav class="wv-tabs" aria-label="nu.waves">
       <a href="#/" data-tab="home">Home</a>
-      <a href="#/search" data-tab="search">Search</a>
-      <a href="#/library/files" data-tab="library">Library</a>
+      <a href="#/healing" data-tab="healing">Healing</a>
+      <a href="#/library/all" data-tab="library">Library</a>
       <a href="#/channels" data-tab="channels">Channels</a>
+      <a href="#/search" data-tab="search">Search</a>
     </nav>
 
     <div class="wrap wv-view" data-view>
+      <!-- Spotify-style quick-access shortcuts at the top of Home -->
+      <section class="wv-sec wv-sec-quick" aria-label="Quick play">
+        <div class="wv-quick-grid">
+          <button type="button" class="wv-qcard" data-act="play-healing-all">
+            <span class="wv-art wv-art-css h1" aria-hidden="true"></span>
+            <span class="wv-qcard-txt">
+              <b>Play all healing tones</b>
+              <small>Chakras, 528 Hz bowls, binaural & nature</small>
+            </span>
+            <span class="wv-qcard-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+          </button>
+
+          <button type="button" class="wv-qcard" data-act="play-one" data-id="all-healing-tones">
+            <span class="wv-art wv-art-css h5" aria-hidden="true"></span>
+            <span class="wv-qcard-txt">
+              <b>All healing tones in 3D</b>
+              <small>10 bowls & chakras in the bubble at once</small>
+            </span>
+            <span class="wv-qcard-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+          </button>
+
+          <button type="button" class="wv-qcard" data-act="play-one" data-id="all-chakras-3d">
+            <span class="wv-art wv-art-css h2" aria-hidden="true"></span>
+            <span class="wv-qcard-txt">
+              <b>All 7 chakra tones in 3D</b>
+              <small>Root to crown · 194 Hz to 172 Hz</small>
+            </span>
+            <span class="wv-qcard-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+          </button>
+
+          <button type="button" class="wv-qcard" data-act="play-one" data-id={featured.id}>
+            <img class="wv-art" src={featuredArtist.art} alt="" width="120" height="120" loading="lazy" />
+            <span class="wv-qcard-txt">
+              <b>{featured.title}</b>
+              <small>{featuredArtist.name} · 5 instruments in 3D</small>
+            </span>
+            <span class="wv-qcard-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+          </button>
+
+          <a class="wv-qcard" href="#/album/chopin-nocturnes">
+            <img class="wv-art" src="/khensu/waves/chopin/cover.webp" alt="" width="120" height="120" loading="lazy" />
+            <span class="wv-qcard-txt">
+              <b>Nocturnes, Waltzes & Preludes</b>
+              <small>Frédéric Chopin · 11 works</small>
+            </span>
+            <span class="wv-qcard-play" data-act="play-all" data-ids={JSON.stringify(ALBUMS.find((a) => a.id === 'chopin-nocturnes')!.tracks)} role="button" tabindex="0" aria-label="Play Chopin"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+          </a>
+
+          <button type="button" class="wv-qcard" data-act="tune" data-id="khensu-radio">
+            <img class="wv-art" src={featuredArtist.art} alt="" width="120" height="120" loading="lazy" />
+            <span class="wv-qcard-txt">
+              <b><i class="wv-live-dot" aria-hidden="true" />khėnsu.ñü radio</b>
+              <small data-onair="khensu-radio">Live channel · on air</small>
+            </span>
+            <span class="wv-qcard-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Healing tones & frequencies: one-tap play all + 3D bubble + direct tone pills -->
+      <section class="wv-sec wv-healing-banner" aria-labelledby="wv-healing-head">
+        <div class="wv-healing-top">
+          <div>
+            <h2 class="wv-h" id="wv-healing-head">healing tones & frequencies</h2>
+            <p class="wv-lib-note">Generated live on this device — play all tones in sequence, put all 10 in the 3D spacetime bubble at once, or layer any tone into what you’re listening to.</p>
+          </div>
+          <div class="wv-acts-row wv-healing-acts">
+            <button type="button" class="wv-btn wv-btn-primary" data-act="play-healing-all">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+              <span>Play all healing tones</span>
+            </button>
+            <button type="button" class="wv-btn" data-act="play-one" data-id="all-healing-tones">
+              <span>All 10 tones in 3D bubble</span>
+            </button>
+            <button type="button" class="wv-btn" data-act="play-one" data-id="all-chakras-3d">
+              <span>All 7 chakras in 3D</span>
+            </button>
+            <button type="button" class="wv-btn" data-act="play-all" data-ids={JSON.stringify(CHAKRA_IDS)}>
+              <span>Chakra journey (1→7)</span>
+            </button>
+            <button type="button" class="wv-btn" data-act="play-all" data-ids={JSON.stringify(HEALING_BOWL_IDS)}>
+              <span>Solfeggio bowls (528 · 432 · 396 Hz)</span>
+            </button>
+            <button type="button" class="wv-btn" data-act="play-all" data-ids={JSON.stringify(HEALING_BINAURAL_IDS)}>
+              <span>Binaural beats</span>
+            </button>
+            <a class="wv-btn" href="#/healing"><span>Open full healing studio →</span></a>
+          </div>
+        </div>
+        <div class="wv-tone-grid" data-list={JSON.stringify(HEALING_ALL_IDS)}>
+          {healingTracks.map((t, i) => (
+            <div class="wv-tone-pill" data-id={t.id}>
+              <button type="button" class="wv-tone-main" data-act="play-track" data-id={t.id} data-i={i}>
+                <span class="wv-tone-dot" style={`background:${t.gen?.mark || '#22f59a'}`} aria-hidden="true"></span>
+                <span class="wv-tone-txt">
+                  <b>{t.title}</b>
+                  <small>{t.spec?.replace(/ · generated.*$/, '')}</small>
+                </span>
+              </button>
+              <button type="button" class="wv-tone-layer" data-act="add-to-bubble" data-id={t.id} title="Add this tone into the spacetime bubble">+ 3D</button>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section class="wv-sec" aria-labelledby="wv-featured">
-        <h2 class="wv-h" id="wv-featured">Listen</h2>
+        <div class="wv-h">
+          <span id="wv-featured">music, albums & collections</span>
+          <a class="wv-h-link" href="#/library/all">Open library →</a>
+        </div>
         <div class="wv-rail">
           <button type="button" class="wv-card" data-act="play-one" data-id={featured.id}>
-            <img class="wv-art" src={featuredArtist.art} alt="" width="273" height="466" />
+            <span class="wv-card-media">
+              <img class="wv-art" src={featuredArtist.art} alt="" width="240" height="240" loading="lazy" />
+              <span class="wv-card-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+            </span>
             <b>{featured.title}</b>
             <small>{featuredArtist.name} · {mmss(featured.dur)}</small>
           </button>
@@ -236,36 +349,60 @@ const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
             const by = artistOf(a.artistId);
             return (
               <a class="wv-card" href={`#/album/${a.id}`}>
-                {a.art ? <img class="wv-art" src={a.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />}
+                <span class="wv-card-media">
+                  {a.art ? <img class="wv-art" src={a.art} alt="" width="240" height="240" loading="lazy" /> : <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />}
+                  <span class="wv-card-play" data-act="play-all" data-ids={JSON.stringify(a.tracks)} role="button" tabindex="0" aria-label={`Play ${a.title}`}><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+                </span>
                 <b>{a.title}</b>
                 <small>{by?.name} · {a.year}</small>
               </a>
             );
           })}
-          {live.map((c) => (
-            <a class="wv-card wv-card-ch" href={`#/channel/${c.id}`}>
-              {c.art ? <img class="wv-art" src={c.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${c.artClass || 'h1'}`} aria-hidden="true" />}
-              <b><i class="wv-live-dot" aria-hidden="true" />{c.name}</b>
-              <small data-onair={c.id}>on air</small>
-            </a>
-          ))}
           {COLLECTIONS.map((c) => (
             <a class="wv-card" href={`#/collection/${c.id}`}>
-              {c.art ? <img class="wv-art" src={c.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${c.artClass || 'h1'}`} aria-hidden="true" />}
+              <span class="wv-card-media">
+                {c.art ? <img class="wv-art" src={c.art} alt="" width="240" height="240" loading="lazy" /> : <span class={`wv-art wv-art-css ${c.artClass || 'h1'}`} aria-hidden="true" />}
+                <span class="wv-card-play" data-act="play-all" data-ids={JSON.stringify(c.tracks)} role="button" tabindex="0" aria-label={`Play ${c.title}`}><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+              </span>
               <b>{c.title}</b>
               <small>{c.desc}</small>
             </a>
           ))}
           {healingAlbums.map((a) => (
             <a class="wv-card" href={`#/album/${a.id}`}>
-              <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />
+              <span class="wv-card-media">
+                <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />
+                <span class="wv-card-play" data-act="play-all" data-ids={JSON.stringify(a.tracks)} role="button" tabindex="0" aria-label={`Play ${a.title}`}><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+              </span>
               <b>{a.title}</b>
               <small>{a.note || 'Generated on your device'}</small>
             </a>
           ))}
+        </div>
+      </section>
+
+      <section class="wv-sec" aria-labelledby="wv-live-artists">
+        <div class="wv-h">
+          <span id="wv-live-artists">live channels & artists</span>
+          <a class="wv-h-link" href="#/channels">All channels →</a>
+        </div>
+        <div class="wv-rail">
+          {live.map((c) => (
+            <a class="wv-card wv-card-ch" href={`#/channel/${c.id}`}>
+              <span class="wv-card-media">
+                {c.art ? <img class="wv-art" src={c.art} alt="" width="240" height="240" loading="lazy" /> : <span class={`wv-art wv-art-css ${c.artClass || 'h1'}`} aria-hidden="true" />}
+                <span class="wv-card-play" data-act="tune" data-id={c.id} role="button" tabindex="0" aria-label={`Tune in to ${c.name}`}><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+              </span>
+              <b><i class="wv-live-dot" aria-hidden="true" />{c.name}</b>
+              <small data-onair={c.id}>on air</small>
+            </a>
+          ))}
           {ARTISTS.map((a) => (
             <a class="wv-card wv-card-round" href={`#/artist/${a.id}`}>
-              {a.art ? <img class="wv-art" src={a.art} alt="" width="320" height="320" loading="lazy" /> : <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />}
+              <span class="wv-card-media">
+                {a.art ? <img class="wv-art" src={a.art} alt="" width="240" height="240" loading="lazy" /> : <span class={`wv-art wv-art-css ${a.artClass || 'h1'}`} aria-hidden="true" />}
+                <span class="wv-card-play" data-act="play-all" data-ids={JSON.stringify(TRACKS.filter((t) => t.artistId === a.id).map((t) => t.id))} role="button" tabindex="0" aria-label={`Play ${a.name}`}><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+              </span>
               <b>{a.name}</b>
               <small>{a.kind}</small>
             </a>

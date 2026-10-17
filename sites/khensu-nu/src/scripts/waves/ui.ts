@@ -2,7 +2,28 @@
 // view with the spacetime bubble, venues, ñü.ÊQ and head tracking. The Home is rendered on the server and kept; every
 // other view is drawn here from the same catalogue module. Everything you keep stays in this browser.
 
-import { ALBUMS, ARTISTS, CHANNELS, COLLECTIONS, TRACKS, albumOf, artistOf, trackOf, mmss, mb, type Album, type Artist, type Channel, type Collection, type Track } from '../../data/waves';
+import {
+  ALBUMS,
+  ARTISTS,
+  CHAKRA_IDS,
+  CHANNELS,
+  COLLECTIONS,
+  HEALING_ALL_IDS,
+  HEALING_BINAURAL_IDS,
+  HEALING_BOWL_IDS,
+  HEALING_NATURE_IDS,
+  TRACKS,
+  albumOf,
+  artistOf,
+  trackOf,
+  mmss,
+  mb,
+  type Album,
+  type Artist,
+  type Channel,
+  type Collection,
+  type Track,
+} from '../../data/waves';
 import { Engine, type Mode, type PlayTrack, type Repeat } from './engine';
 import { Bubble } from './bubble';
 import { HeadTracker, hasCamera, hasDeviceMotion, hasNative, type HeadSource } from './head';
@@ -63,7 +84,7 @@ const parseRoute = (): Route => {
   const seg = path.split('/').filter(Boolean).map(decodeURIComponent);
   const q = new URLSearchParams(qs ?? '').get('q') ?? undefined;
   if (!seg.length) return { name: 'home' };
-  if (seg[0] === 'library') return { name: 'library', sub: seg[1] ?? 'files' };
+  if (seg[0] === 'library') return { name: 'library', sub: seg[1] ?? 'all' };
   return { name: seg[0], id: seg[1], q };
 };
 
@@ -282,11 +303,15 @@ export class App {
         this.view.innerHTML = this.homeHtml;
         await this.enhanceHome();
         break;
+      case 'healing':
+        await this.cueCollection(['all-healing-tones', ...HEALING_ALL_IDS]);
+        html = this.healingView();
+        break;
       case 'search':
         html = this.searchView(r.q ?? '');
         break;
       case 'library':
-        html = await this.libraryView(r.sub ?? 'files');
+        html = await this.libraryView(r.sub ?? 'all');
         break;
       case 'channels':
         html = this.channelsView();
@@ -362,23 +387,34 @@ export class App {
   private rail(cards: string[]) {
     return `<div class="wv-rail">${cards.join('')}</div>`;
   }
+  private subnav(crumb: string) {
+    return `<nav class="wv-subnav" aria-label="Breadcrumb">
+  <a class="wv-subnav-back" href="#/">← Home</a>
+  <a class="wv-subnav-pill" href="#/library/all">Your Library</a>
+  <a class="wv-subnav-pill" href="#/healing">Healing tones</a>
+  <a class="wv-subnav-pill" href="#/channels">Channels</a>
+  <span class="wv-subnav-cur">${esc(lower(crumb))}</span>
+</nav>`;
+  }
   private albumCard(a: Album) {
     const by = artistOf(a.artistId)?.name ?? '';
-    return `<a class="wv-card" href="#/album/${esc(a.id)}">${art(a.art, a.artClass, '')}<b>${esc(a.title)}</b><small>${esc(by)} · ${a.year}</small></a>`;
+    return `<a class="wv-card" href="#/album/${esc(a.id)}"><span class="wv-card-media">${art(a.art, a.artClass, '', 240)}<span class="wv-card-play" data-act="play-all" data-ids="${esc(JSON.stringify(a.tracks))}" role="button" tabindex="0" aria-label="Play ${esc(a.title)}">${ICON.play}</span></span><b>${esc(a.title)}</b><small>${esc(by)} · ${a.year}</small></a>`;
   }
   private collectionCard(c: Collection) {
-    return `<a class="wv-card" href="#/collection/${esc(c.id)}">${art(c.art, c.artClass)}<b>${esc(c.title)}</b><small>${esc(c.desc)}</small></a>`;
+    return `<a class="wv-card" href="#/collection/${esc(c.id)}"><span class="wv-card-media">${art(c.art, c.artClass, '', 240)}<span class="wv-card-play" data-act="play-all" data-ids="${esc(JSON.stringify(c.tracks))}" role="button" tabindex="0" aria-label="Play ${esc(c.title)}">${ICON.play}</span></span><b>${esc(c.title)}</b><small>${esc(c.desc)}</small></a>`;
   }
   private artistCard(a: Artist) {
-    return `<a class="wv-card wv-card-round" href="#/artist/${esc(a.id)}">${art(a.art, a.artClass, '')}<b>${esc(a.name)}</b><small>${esc(a.kind)}</small></a>`;
+    const artistTracks = TRACKS.filter((t) => t.artistId === a.id).map((t) => t.id);
+    return `<a class="wv-card wv-card-round" href="#/artist/${esc(a.id)}"><span class="wv-card-media">${art(a.art, a.artClass, '', 240)}<span class="wv-card-play" data-act="play-all" data-ids="${esc(JSON.stringify(artistTracks))}" role="button" tabindex="0" aria-label="Play ${esc(a.name)}">${ICON.play}</span></span><b>${esc(a.name)}</b><small>${esc(a.kind)}</small></a>`;
   }
   private channelCard(c: Channel) {
     const air = c.kind === 'live' ? onAir(c) : null;
     const t = air && trackOf(air.item.trackId);
-    return `<a class="wv-card wv-card-ch" href="#/channel/${esc(c.id)}">${art(c.art, c.artClass)}<b>${c.live ? ICON.live : ''}${esc(c.name)}</b><small>${t ? `${esc(t.title)}` : esc(c.by)}</small></a>`;
+    const playAct = c.kind === 'live' ? `data-act="tune" data-id="${esc(c.id)}"` : '';
+    return `<a class="wv-card wv-card-ch" href="#/channel/${esc(c.id)}"><span class="wv-card-media">${art(c.art, c.artClass, '', 240)}${playAct ? `<span class="wv-card-play" ${playAct} role="button" tabindex="0" aria-label="Tune in to ${esc(c.name)}">${ICON.play}</span>` : ''}</span><b>${c.live ? ICON.live : ''}${esc(c.name)}</b><small>${t ? `${esc(t.title)}` : esc(c.by)}</small></a>`;
   }
   private trackCard(t: PlayTrack) {
-    return `<button type="button" class="wv-card" data-act="play-one" data-id="${esc(t.id)}">${art(t.artUrl, this.cssArt(t), '')}<b>${esc(t.title)}</b><small>${esc(t.artistName ?? '')}</small></button>`;
+    return `<button type="button" class="wv-card" data-act="play-one" data-id="${esc(t.id)}"><span class="wv-card-media">${art(t.artUrl, this.cssArt(t), '', 240)}<span class="wv-card-play" aria-hidden="true">${ICON.play}</span></span><b>${esc(t.title)}</b><small>${esc(t.artistName ?? '')}</small></button>`;
   }
   private cssArt(t: PlayTrack) {
     if (t.local) return 'f1';
@@ -393,10 +429,12 @@ export class App {
     const cur = this.engine.track?.id;
     return `<ol class="wv-list" data-list="${esc(JSON.stringify(ids))}">${tracks
       .map((t, i) => {
-        const sub = [t.artistName, opts.showAlbum ? t.albumTitle : '', t.kind === 'generator' ? 'generated' : '', this.kept.has(t.id) ? 'kept' : ''].filter(Boolean).join(' · ');
+        const sub = [t.artistName, opts.showAlbum ? t.albumTitle : '', t.spec ? t.spec.replace(/ · generated.*$/, '') : '', this.kept.has(t.id) ? 'kept' : ''].filter(Boolean).join(' · ');
+        const canLayer = t.kind === 'generator' && !t.gens?.length;
         return `<li class="wv-row${t.id === cur ? ' is-current' : ''}" data-id="${esc(t.id)}">
   <button type="button" class="wv-row-play" data-act="play-track" data-id="${esc(t.id)}" data-i="${i}" aria-label="Play ${esc(t.title)}">${opts.art ? art(t.artUrl, this.cssArt(t), '', 96) : `<span class="wv-row-n">${i + 1}</span>`}<span class="wv-row-ic">${ICON.play}</span></button>
   <button type="button" class="wv-row-text" data-act="select-track" data-id="${esc(t.id)}" data-i="${i}"><b>${esc(t.title)}</b><small>${esc(sub)}</small></button>
+  ${canLayer ? `<button type="button" class="wv-row-layer" data-act="add-to-bubble" data-id="${esc(t.id)}" title="Add ${esc(t.title)} into the spacetime bubble">+ 3D</button>` : ''}
   <span class="wv-row-dur">${t.loop ? '∞' : t.dur ? mmss(t.dur) : ''}</span>
   <button type="button" class="wv-row-more" data-act="menu" data-id="${esc(t.id)}" ${opts.playlist ? `data-playlist="${esc(opts.playlist)}"` : ''} aria-label="More for ${esc(t.title)}">${ICON.more}</button>
 </li>`;
@@ -444,20 +482,145 @@ export class App {
 </form>${results}`;
   }
 
+  private healingView() {
+    const ensembles = this.tracksOf(['all-healing-tones', 'all-chakras-3d']);
+    const chakras = this.tracksOf(CHAKRA_IDS);
+    const bowls = this.tracksOf(HEALING_BOWL_IDS);
+    const binaural = this.tracksOf(HEALING_BINAURAL_IDS);
+    const nature = this.tracksOf(HEALING_NATURE_IDS);
+    return `${this.subnav('healing tones')}
+<header class="wv-page-head">
+  ${art(undefined, 'h1', '', 240)}
+  <div>
+    <p class="eyebrow">ñü.ŵævẽš · generated on your device</p>
+    <h1 class="wv-h1">healing tones & frequencies</h1>
+    <p class="wv-page-sub">Seven planetary chakra tones, Solfeggio singing bowls (528 · 432 · 396 Hz), binaural beats and nature sounds. Play them all in sequence, place all 10 in the 3D spacetime bubble at once, or tap <b>+ 3D</b> on any sound to layer it into what you’re hearing.</p>
+  </div>
+</header>
+<div class="wv-acts-row">
+  <button type="button" class="wv-btn wv-btn-primary" data-act="play-healing-all">${ICON.play}<span>Play all healing tones</span></button>
+  <button type="button" class="wv-btn" data-act="play-one" data-id="all-healing-tones"><span>All 10 tones in 3D bubble</span></button>
+  <button type="button" class="wv-btn" data-act="play-one" data-id="all-chakras-3d"><span>All 7 chakras in 3D</span></button>
+  <button type="button" class="wv-btn" data-act="shuffle-all" data-ids="${esc(JSON.stringify(HEALING_ALL_IDS))}">${ICON.shuffle}<span>Shuffle all</span></button>
+  <button type="button" class="wv-btn" data-act="tune" data-id="healing-live">${ICON.live}<span>Healing live channel</span></button>
+</div>
+<section class="wv-sec">
+  ${h2('3D ensembles (all in the bubble at once)')}
+  ${this.list(ensembles, { art: true })}
+</section>
+<section class="wv-sec">
+  ${h2('7 planetary chakra tones (root → crown)', `<button type="button" class="wv-h-link" data-act="play-all" data-ids="${esc(JSON.stringify(CHAKRA_IDS))}">Play all 7 →</button>`)}
+  ${this.list(chakras, { num: true })}
+</section>
+<section class="wv-sec">
+  ${h2('Solfeggio singing bowls (528 · 432 · 396 Hz)', `<button type="button" class="wv-h-link" data-act="play-all" data-ids="${esc(JSON.stringify(HEALING_BOWL_IDS))}">Play bowls →</button>`)}
+  ${this.list(bowls, { art: true })}
+</section>
+<section class="wv-sec">
+  ${h2('Binaural beats (theta · alpha · delta)', `<button type="button" class="wv-h-link" data-act="play-all" data-ids="${esc(JSON.stringify(HEALING_BINAURAL_IDS))}">Play binaural →</button>`)}
+  ${this.list(binaural, { art: true })}
+</section>
+<section class="wv-sec">
+  ${h2('Nature & sleep sounds', `<button type="button" class="wv-h-link" data-act="play-all" data-ids="${esc(JSON.stringify(HEALING_NATURE_IDS))}">Play nature →</button>`)}
+  ${this.list(nature, { art: true })}
+</section>`;
+  }
+
   private async libraryView(sub: string) {
     const tabs = [
-      ['files', 'Your files'],
-      ['kept', 'Kept offline'],
-      ['liked', 'Liked'],
+      ['all', 'All'],
+      ['healing', 'Healing tones'],
+      ['albums', 'Albums'],
       ['playlists', 'Playlists'],
+      ['liked', 'Liked'],
+      ['kept', 'Kept offline'],
+      ['files', 'Your files'],
       ['scenes', 'Scenes'],
       ['ink', 'Ink'],
       ['history', 'History'],
       ['following', 'Following'],
     ];
+    const headBar = `<div class="wv-lib-topbar">
+  <div>
+    <h1 class="wv-h1 wv-lib-title">your library</h1>
+    <p class="wv-lib-sub">Everything stays sealed on this device — music, healing tones, playlists, scenes and your own files.</p>
+  </div>
+  <div class="wv-acts-row">
+    <button type="button" class="wv-btn wv-btn-primary" data-act="play-healing-all">${ICON.play}<span>Play all healing tones</span></button>
+    <button type="button" class="wv-btn" data-act="new-playlist"><span>+ New playlist</span></button>
+    <button type="button" class="wv-btn" data-act="add-files">${ICON.down}<span>+ Add files</span></button>
+    <input type="file" accept="audio/*,.mp3,.m4a,.aac,.mp4,.wav,.flac,.ogg,.opus,.aif,.aiff,.caf" multiple hidden data-file-input />
+  </div>
+</div>`;
     const nav = `<div class="wv-segs" role="tablist" aria-label="Library">${tabs.map(([id, label]) => `<a role="tab" href="#/library/${id}" aria-selected="${id === sub}">${esc(label)}</a>`).join('')}</div>`;
     let body = '';
-    if (sub === 'files') {
+    if (sub === 'all') {
+      const mine = this.fileTracks();
+      const likedTracks = this.tracksOf([...this.liked]);
+      const keptTracks = this.tracksOf([...this.kept]);
+      const songs = TRACKS.filter((t) => t.kind === 'song').map(lib.decorate);
+      const healingTracks = this.tracksOf(['all-healing-tones', 'all-chakras-3d', ...HEALING_ALL_IDS]);
+      body = `<section class="wv-sec wv-sec-quick">
+  <div class="wv-quick-grid">
+    <button type="button" class="wv-qcard" data-act="play-healing-all">
+      <span class="wv-art wv-art-css h1" aria-hidden="true"></span>
+      <span class="wv-qcard-txt"><b>All healing tones</b><small>19 frequencies, bowls, binaural & nature</small></span>
+      <span class="wv-qcard-play" aria-hidden="true">${ICON.play}</span>
+    </button>
+    <button type="button" class="wv-qcard" data-act="play-one" data-id="all-healing-tones">
+      <span class="wv-art wv-art-css h5" aria-hidden="true"></span>
+      <span class="wv-qcard-txt"><b>All 10 healing tones in 3D</b><small>Simultaneous 3D spacetime bubble</small></span>
+      <span class="wv-qcard-play" aria-hidden="true">${ICON.play}</span>
+    </button>
+    <button type="button" class="wv-qcard" data-act="play-one" data-id="all-chakras-3d">
+      <span class="wv-art wv-art-css h2" aria-hidden="true"></span>
+      <span class="wv-qcard-txt"><b>All 7 chakras in 3D</b><small>Root to crown · 194 Hz to 172 Hz</small></span>
+      <span class="wv-qcard-play" aria-hidden="true">${ICON.play}</span>
+    </button>
+    <a class="wv-qcard" href="#/library/liked">
+      <span class="wv-art wv-art-css a1" aria-hidden="true"></span>
+      <span class="wv-qcard-txt"><b>Liked songs</b><small>${plural(likedTracks.length, 'track')} on this device</small></span>
+      ${likedTracks.length ? `<span class="wv-qcard-play" data-act="play-all" data-ids="${esc(JSON.stringify(likedTracks.map((t) => t.id)))}" role="button" tabindex="0">${ICON.play}</span>` : ''}
+    </a>
+    <a class="wv-qcard" href="#/library/kept">
+      <span class="wv-art wv-art-css a3" aria-hidden="true"></span>
+      <span class="wv-qcard-txt"><b>Kept offline</b><small>${plural(keptTracks.length, 'song')} + all 20 generators</small></span>
+      ${keptTracks.length ? `<span class="wv-qcard-play" data-act="play-all" data-ids="${esc(JSON.stringify(keptTracks.map((t) => t.id)))}" role="button" tabindex="0">${ICON.play}</span>` : ''}
+    </a>
+    <a class="wv-qcard" href="#/library/files">
+      <span class="wv-art wv-art-css f1" aria-hidden="true"></span>
+      <span class="wv-qcard-txt"><b>Your files</b><small>${mine.length ? plural(mine.length, 'local file') : 'Import MP3, FLAC, WAV, M4A'}</small></span>
+      ${mine.length ? `<span class="wv-qcard-play" data-act="play-all" data-ids="${esc(JSON.stringify(mine.map((t) => t.id)))}" role="button" tabindex="0">${ICON.play}</span>` : ''}
+    </a>
+  </div>
+</section>
+${this.playlists.length ? `<section class="wv-sec">${h2('Your playlists', `<button type="button" class="wv-h-link" data-act="new-playlist">+ New playlist</button>`)}${this.rail(this.playlists.map((p) => this.playlistCard(p)))}</section>` : ''}
+<section class="wv-sec">
+  ${h2('Albums & collections')}
+  ${this.rail([...ALBUMS.map((a) => this.albumCard(a)), ...COLLECTIONS.map((c) => this.collectionCard(c))])}
+</section>
+<section class="wv-sec">
+  ${h2('Healing tones & frequencies', `<button type="button" class="wv-h-link" data-act="play-healing-all">Play all healing tones →</button>`)}
+  ${this.list(healingTracks, { art: true, showAlbum: true })}
+</section>
+<section class="wv-sec">
+  ${h2('Songs', `<button type="button" class="wv-h-link" data-act="play-all" data-ids="${esc(JSON.stringify(songs.map((t) => t.id)))}">Play all songs →</button>`)}
+  ${this.list([...mine, ...songs], { art: true, showAlbum: true })}
+</section>`;
+    } else if (sub === 'healing') {
+      const healingTracks = this.tracksOf(['all-healing-tones', 'all-chakras-3d', ...HEALING_ALL_IDS]);
+      body = `<div class="wv-acts-row">
+  <button type="button" class="wv-btn wv-btn-primary" data-act="play-healing-all">${ICON.play}<span>Play all healing tones</span></button>
+  <button type="button" class="wv-btn" data-act="play-one" data-id="all-healing-tones"><span>All 10 tones in 3D</span></button>
+  <button type="button" class="wv-btn" data-act="play-one" data-id="all-chakras-3d"><span>All 7 chakras in 3D</span></button>
+  <button type="button" class="wv-btn" data-act="play-all" data-ids="${esc(JSON.stringify(CHAKRA_IDS))}"><span>Chakra journey (1→7)</span></button>
+  <button type="button" class="wv-btn" data-act="play-all" data-ids="${esc(JSON.stringify(HEALING_BOWL_IDS))}"><span>Solfeggio bowls</span></button>
+</div>
+${this.list(healingTracks, { art: true, showAlbum: true })}`;
+    } else if (sub === 'albums') {
+      body = `<section class="wv-sec">${h2('Albums')}${this.rail(ALBUMS.map((a) => this.albumCard(a)))}</section>
+<section class="wv-sec">${h2('Collections & journeys')}${this.rail(COLLECTIONS.map((c) => this.collectionCard(c)))}</section>`;
+    } else if (sub === 'files') {
       const use = await store.usage();
       const mine = this.fileTracks();
       const nativeN = lib.nativeItems().length;
@@ -467,7 +630,6 @@ export class App {
     <button type="button" class="wv-btn wv-btn-primary" data-act="add-files">${ICON.down}<span>Add files</span></button>
     ${lib.canPickFolder() ? `<button type="button" class="wv-btn" data-act="add-folder"><span>Add a folder</span></button>` : ''}
     ${hasNative() ? `<button type="button" class="wv-btn" data-act="native-refresh"><span>Music on this phone${nativeN ? ` · ${nativeN}` : ''}</span></button>` : ''}
-    <input type="file" accept="audio/*,.mp3,.m4a,.aac,.mp4,.wav,.flac,.ogg,.opus,.aif,.aiff,.caf" multiple hidden data-file-input />
   </div>
   <p class="wv-lib-storage" data-storage>${use.bytes ? `${mb(use.bytes)} on this device${use.quota ? ` · ${mb(use.quota)} available` : ''}` : ''}</p>
   <p class="wv-progress" data-add-progress hidden></p>
@@ -478,7 +640,7 @@ ${this.list(mine, { art: true, showAlbum: true })}`;
       const ids = [...this.kept];
       const tracks = this.tracksOf(ids);
       const bytes = (await store.downloads.all()).reduce((a, d) => a + d.bytes, 0);
-      body = `<p class="wv-lib-note">Kept tracks play with no connection, sealed on this device. ${bytes ? `${mb(bytes)} kept.` : 'Keep an album from its page, or a track from its menu.'} Generated sounds need no download: they are already here.</p>
+      body = `<p class="wv-lib-note">Kept tracks play with no connection, sealed on this device. ${bytes ? `${mb(bytes)} kept.` : 'Keep an album from its page, or a track from its menu.'} All 20 generated healing sounds need no download: they are already here.</p>
 ${tracks.length ? this.headActions(ids) : ''}${this.list(tracks, { art: true, showAlbum: true })}`;
     } else if (sub === 'liked') {
       const tracks = this.tracksOf([...this.liked]);
@@ -520,11 +682,11 @@ ${this.playlists.length ? this.rail(this.playlists.map((p) => this.playlistCard(
       const chs = CHANNELS.filter((c) => this.follows.has(c.id));
       body = arts.length || chs.length ? `${arts.length ? `<section class="wv-sec">${h2('Artists')}${this.rail(arts.map((a) => this.artistCard(a)))}</section>` : ''}${chs.length ? `<section class="wv-sec">${h2('Channels')}${this.rail(chs.map((c) => this.channelCard(c)))}</section>` : ''}` : `<p class="wv-empty">Follow an artist or a channel and it shows here. Follows stay on this device.</p>`;
     }
-    return `${nav}<div class="wv-lib">${body}</div>`;
+    return `${headBar}${nav}<div class="wv-lib">${body}</div>`;
   }
 
   private playlistCard(p: store.Playlist) {
-    return `<a class="wv-card" href="#/playlist/${esc(p.id)}">${art(undefined, 'p1')}<b>${esc(p.name)}</b><small>${plural(p.tracks.length, 'track')}</small></a>`;
+    return `<a class="wv-card" href="#/playlist/${esc(p.id)}"><span class="wv-card-media">${art(undefined, 'p1', '', 240)}${p.tracks.length ? `<span class="wv-card-play" data-act="play-all" data-ids="${esc(JSON.stringify(p.tracks))}" role="button" tabindex="0" aria-label="Play ${esc(p.name)}">${ICON.play}</span>` : ''}</span><b>${esc(p.name)}</b><small>${plural(p.tracks.length, 'track')}</small></a>`;
   }
 
   private channelsView() {
@@ -556,7 +718,7 @@ ${this.playlists.length ? this.rail(this.playlists.map((p) => this.playlistCard(
 <p class="wv-lib-note">${c.live ? 'Live now.' : 'Not live right now.'} ${esc(c.desc)}</p>
 <section class="wv-sec">${h2('Releases')}${this.rail(rel.map((a) => this.albumCard(a)))}</section>`;
     }
-    return `<header class="wv-page-head">${art(c.art, c.artClass, '', 480)}<div><p class="eyebrow">${c.kind === 'live' ? 'live channel' : 'creator channel'}</p><h1 class="wv-h1">${esc(lower(c.name))}</h1><p class="wv-page-sub">${esc(c.desc)}</p><p class="wv-page-meta">by ${esc(c.by)}</p></div></header>${body}`;
+    return `${this.subnav(c.name)}<header class="wv-page-head">${art(c.art, c.artClass, '', 480)}<div><p class="eyebrow">${c.kind === 'live' ? 'live channel' : 'creator channel'}</p><h1 class="wv-h1">${esc(lower(c.name))}</h1><p class="wv-page-sub">${esc(c.desc)}</p><p class="wv-page-meta">by ${esc(c.by)}</p></div></header>${body}`;
   }
 
   private artistView(id: string) {
@@ -566,7 +728,7 @@ ${this.playlists.length ? this.rail(this.playlists.map((p) => this.playlistCard(
     const tracks = TRACKS.filter((t) => t.artistId === a.id).map(lib.decorate);
     const chans = CHANNELS.filter((c) => c.artistId === a.id);
     const following = this.follows.has(a.id);
-    return `<header class="wv-page-head">${art(a.art, a.artClass, '', 480)}<div><p class="eyebrow">${esc(a.kind)}${a.handle ? ` · <span class="wv-handle">${esc(a.handle)}</span>` : ''}</p><h1 class="wv-h1">${esc(lower(a.name))}</h1><p class="wv-page-sub">${esc(a.bio)}</p>${(a.links ?? []).map((l) => `<a class="wv-page-link" href="${esc(l.href)}" rel="noopener">${esc(l.label)}</a>`).join(' ')}</div></header>
+    return `${this.subnav(a.name)}<header class="wv-page-head">${art(a.art, a.artClass, '', 480)}<div><p class="eyebrow">${esc(a.kind)}${a.handle ? ` · <span class="wv-handle">${esc(a.handle)}</span>` : ''}</p><h1 class="wv-h1">${esc(lower(a.name))}</h1><p class="wv-page-sub">${esc(a.bio)}</p>${(a.links ?? []).map((l) => `<a class="wv-page-link" href="${esc(l.href)}" rel="noopener">${esc(l.label)}</a>`).join(' ')}</div></header>
 ${this.headActions(
   tracks.map((t) => t.id),
   `<button type="button" class="wv-btn" data-act="follow" data-id="${esc(a.id)}" data-kind="artist" aria-pressed="${following}"><span>${following ? 'Following' : 'Follow'}</span></button>`,
@@ -581,7 +743,7 @@ ${chans.length ? `<section class="wv-sec">${h2('Channels')}${this.rail(chans.map
     if (!a) return `<p class="wv-empty">No such album.</p>`;
     const tracks = this.tracksOf(a.tracks);
     const by = artistOf(a.artistId);
-    return `<header class="wv-page-head">${art(a.art, a.artClass, '', 480)}<div><p class="eyebrow">${esc(a.kind)} · ${a.year}</p><h1 class="wv-h1">${esc(lower(a.title))}</h1><p class="wv-page-sub"><a href="#/artist/${esc(a.artistId)}">${esc(by?.name ?? '')}</a> · ${plural(tracks.length, 'track')} · ${totalDur(tracks)}</p>${a.note ? `<p class="wv-page-meta">${esc(a.note)}</p>` : ''}<p class="wv-page-licence">${esc(a.licence)}</p></div></header>
+    return `${this.subnav(a.title)}<header class="wv-page-head">${art(a.art, a.artClass, '', 480)}<div><p class="eyebrow">${esc(a.kind)} · ${a.year}</p><h1 class="wv-h1">${esc(lower(a.title))}</h1><p class="wv-page-sub"><a href="#/artist/${esc(a.artistId)}">${esc(by?.name ?? '')}</a> · ${plural(tracks.length, 'track')} · ${totalDur(tracks)}</p>${a.note ? `<p class="wv-page-meta">${esc(a.note)}</p>` : ''}<p class="wv-page-licence">${esc(a.licence)}</p></div></header>
 ${this.headActions(a.tracks)}
 ${this.list(tracks, { num: true })}`;
   }
@@ -590,7 +752,7 @@ ${this.list(tracks, { num: true })}`;
     const c = COLLECTIONS.find((x) => x.id === id);
     if (!c) return `<p class="wv-empty">No such collection.</p>`;
     const tracks = this.tracksOf(c.tracks);
-    return `<header class="wv-page-head">${art(c.art, c.artClass, '', 480)}<div><p class="eyebrow">${c.journey ? 'journey' : 'collection'}</p><h1 class="wv-h1">${esc(lower(c.title))}</h1><p class="wv-page-sub">${esc(c.desc)}</p><p class="wv-page-meta">${plural(tracks.length, 'track')}${c.journey ? ' · plays as one, crossfading, on a loop' : ''}</p></div></header>
+    return `${this.subnav(c.title)}<header class="wv-page-head">${art(c.art, c.artClass, '', 480)}<div><p class="eyebrow">${c.journey ? 'journey' : 'collection'}</p><h1 class="wv-h1">${esc(lower(c.title))}</h1><p class="wv-page-sub">${esc(c.desc)}</p><p class="wv-page-meta">${plural(tracks.length, 'track')}${c.journey ? ' · plays as one, crossfading, on a loop' : ''}</p></div></header>
 ${this.headActions(c.tracks)}
 ${this.list(tracks, { art: true, showAlbum: true })}`;
   }
@@ -599,7 +761,7 @@ ${this.list(tracks, { art: true, showAlbum: true })}`;
     const p = this.playlists.find((x) => x.id === id);
     if (!p) return `<p class="wv-empty">No such playlist.</p>`;
     const tracks = this.tracksOf(p.tracks);
-    return `<header class="wv-page-head">${art(undefined, 'p1', '', 480)}<div><p class="eyebrow">playlist</p><h1 class="wv-h1">${esc(lower(p.name))}</h1><p class="wv-page-sub">${plural(tracks.length, 'track')} · ${totalDur(tracks)}</p></div></header>
+    return `${this.subnav(p.name)}<header class="wv-page-head">${art(undefined, 'p1', '', 480)}<div><p class="eyebrow">playlist</p><h1 class="wv-h1">${esc(lower(p.name))}</h1><p class="wv-page-sub">${plural(tracks.length, 'track')} · ${totalDur(tracks)}</p></div></header>
 ${this.headActions(
   p.tracks,
   `<button type="button" class="wv-btn" data-act="rename-playlist" data-id="${esc(p.id)}"><span>Rename</span></button><button type="button" class="wv-btn" data-act="delete-playlist" data-id="${esc(p.id)}"><span>Delete</span></button>`,
@@ -703,6 +865,10 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
   private async onClick(e: MouseEvent) {
     const el = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
     if (!el) return;
+    if (el.closest('a[href]')) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     const act = el.dataset.act!;
     const id = el.dataset.id ?? '';
     const eng = this.engine;
@@ -712,6 +878,21 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       return ol ? (JSON.parse(ol.dataset.list!) as string[]) : [id];
     };
     switch (act) {
+      case 'play-healing-all':
+        eng.setRepeat('all');
+        this.playIds(['all-healing-tones', ...HEALING_ALL_IDS], 0, true);
+        this.toast('Playing all healing tones.');
+        break;
+      case 'add-to-bubble': {
+        const tr = this.light(id);
+        if (tr) {
+          await eng.addGenToBubble(tr);
+          this.bubble.sync();
+          this.paintNow();
+          this.toast(`${tr.title} added to the spacetime bubble.`);
+        }
+        break;
+      }
       case 'select-track': {
         const all = listIds();
         const i = Math.max(0, all.indexOf(id));

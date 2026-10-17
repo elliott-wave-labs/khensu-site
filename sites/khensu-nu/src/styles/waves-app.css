@@ -101,23 +101,25 @@ body.wv-has-bar .wv {
 }
 .wv-page-head {
   display: grid;
-  grid-template-columns: minmax(8rem, 14rem) minmax(0, 1fr);
-  gap: clamp(1rem, 3vw, 2rem);
+  grid-template-columns: minmax(6.5rem, 10rem) minmax(0, 1fr);
+  gap: clamp(0.85rem, 2.5vw, 1.5rem);
   align-items: end;
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.1rem;
 }
 .wv-page-head .wv-art {
   width: 100%;
-  aspect-ratio: 1;
-  border-radius: 1rem;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 0.85rem;
   background:
     radial-gradient(ellipse 65% 50% at 50% 58%, rgba(255, 255, 255, 0.1), transparent 72%),
     linear-gradient(165deg, rgba(255, 255, 255, 0.05), transparent 55%);
 }
 .wv-page-sub {
   color: rgba(255, 255, 255, 0.72);
-  line-height: 1.5;
-  margin: 0 0 0.4rem;
+  line-height: 1.45;
+  margin: 0 0 0.35rem;
 }
 .wv-page-sub a {
   color: #fff;
@@ -125,13 +127,13 @@ body.wv-has-bar .wv {
 .wv-page-meta,
 .wv-page-licence {
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.88rem;
-  line-height: 1.45;
-  margin: 0.25rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  margin: 0.2rem 0 0;
 }
 .wv-page-link {
   color: #7ec8ff;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   margin-right: 0.8rem;
 }
 .wv-handle {
@@ -139,31 +141,267 @@ body.wv-has-bar .wv {
   font-size: 0.85em;
 }
 
-.wv-rail {
+/* Subpage breadcrumb / Spotify-style quick back bar */
+.wv-subnav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.55rem 0.65rem;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+.wv-subnav-back,
+.wv-subnav-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+  font: 600 0.78rem/1.2 var(--font-sans);
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.wv-subnav-back:hover,
+.wv-subnav-pill:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.wv-subnav-cur {
+  color: rgba(255, 255, 255, 0.45);
+  font: 500 0.78rem/1.2 var(--font-sans);
+  margin-left: 0.25rem;
+}
+
+/* Spotify-style top quick-play horizontal shortcut grid */
+.wv-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  gap: 0.5rem;
+}
+.wv-qcard {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.3rem 0.55rem 0.3rem 0.3rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(109, 255, 191, 0.1), transparent 55%),
+    rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+}
+.wv-qcard:hover,
+.wv-qcard:focus-visible {
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(109, 255, 191, 0.18), transparent 55%),
+    rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+.wv-qcard .wv-art {
+  width: 3.25rem;
+  height: 3.25rem;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.5rem;
+  object-fit: cover;
+}
+.wv-qcard-txt {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.wv-qcard-txt b {
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.wv-qcard-txt small {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.56);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wv-qcard-play {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #22f59a;
+  color: #050807;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.wv-qcard-play svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: currentColor;
+}
+.wv-qcard:hover .wv-qcard-play {
+  transform: scale(1.06);
+}
+
+/* Healing tones banner & direct tone pills */
+.wv-healing-banner {
+  padding: 0.95rem 1.05rem;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(109, 255, 191, 0.22);
+  background:
+    radial-gradient(90% 80% at 15% 10%, rgba(34, 245, 154, 0.12), transparent 60%),
+    radial-gradient(80% 80% at 85% 90%, rgba(139, 92, 255, 0.12), transparent 60%),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: var(--wv-glass-inset);
+}
+.wv-healing-banner .wv-h {
+  margin-bottom: 0.25rem;
+}
+.wv-healing-banner .wv-lib-note {
+  margin-bottom: 0.55rem;
+  font-size: 0.82rem;
+}
+.wv-healing-acts {
+  margin: 0.35rem 0 0.75rem;
+}
+.wv-tone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  gap: 0.4rem;
+}
+.wv-tone-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.35rem 0.25rem 0.5rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.wv-tone-pill:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+.wv-tone-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wv-tone-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+.wv-tone-txt {
+  display: grid;
+  min-width: 0;
+}
+.wv-tone-txt b {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wv-tone-txt small {
+  font-size: 0.66rem;
+  color: rgba(255, 255, 255, 0.52);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wv-tone-layer,
+.wv-row-layer {
+  flex-shrink: 0;
+  padding: 0.22rem 0.48rem;
+  border-radius: 999px;
+  border: 1px solid rgba(109, 255, 191, 0.32);
+  background: rgba(34, 245, 154, 0.1);
+  color: #6dffbf;
+  font: 600 0.66rem/1 var(--font-mono);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.wv-tone-layer:hover,
+.wv-row-layer:hover {
+  background: rgba(34, 245, 154, 0.24);
+  transform: scale(1.04);
+}
+
+/* Library topbar */
+.wv-lib-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.wv-lib-title {
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  margin: 0 0 0.15rem;
+}
+.wv-lib-sub {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.wv-rail {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.6rem, 1fr));
+  gap: 0.55rem;
+  align-items: start;
   padding-bottom: 0.15rem;
 }
 .wv-card {
-  flex: 1 1 7.25rem;
-  max-width: 8.75rem;
-  min-width: 6.5rem;
+  width: 100%;
+  max-width: 10.5rem;
+  min-width: 0;
   display: grid;
-  grid-template-rows: auto auto 1fr;
-  gap: 0.3rem;
+  grid-template-rows: auto auto auto;
+  gap: 0.25rem;
   align-content: start;
+  align-self: start;
   text-align: left;
-  padding: 0.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 1.05rem;
+  padding: 0.42rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.85rem;
   background:
-    radial-gradient(120% 90% at 20% 0%, rgba(109, 255, 191, 0.12), transparent 55%),
-    radial-gradient(90% 70% at 90% 100%, rgba(169, 139, 255, 0.1), transparent 50%),
+    radial-gradient(120% 90% at 20% 0%, rgba(109, 255, 191, 0.1), transparent 55%),
+    radial-gradient(90% 70% at 90% 100%, rgba(169, 139, 255, 0.08), transparent 50%),
     rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(18px) saturate(190%);
   -webkit-backdrop-filter: blur(18px) saturate(190%);
-  box-shadow: var(--wv-glass-inset), 0 0 28px rgba(79, 176, 255, 0.06);
+  box-shadow: var(--wv-glass-inset), 0 0 22px rgba(79, 176, 255, 0.05);
   color: inherit;
   font: inherit;
   cursor: pointer;
@@ -173,39 +411,78 @@ body.wv-has-bar .wv {
 .wv-card:hover,
 .wv-card:focus-visible {
   background:
-    radial-gradient(120% 90% at 20% 0%, rgba(109, 255, 191, 0.2), transparent 55%),
+    radial-gradient(120% 90% at 20% 0%, rgba(109, 255, 191, 0.18), transparent 55%),
     rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: var(--wv-glass-inset), 0 0 36px rgba(79, 176, 255, 0.14);
-  transform: translateY(-1px);
+  box-shadow: var(--wv-glass-inset), 0 0 32px rgba(79, 176, 255, 0.14);
+  transform: translateY(-2px);
+}
+.wv-card-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.55rem;
+  overflow: hidden;
 }
 .wv-card .wv-art {
   width: 100%;
-  aspect-ratio: 1;
-  border-radius: 0.65rem;
-  object-fit: contain;
-  /* Punched covers sit on clear glass so the subject pops */
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.55rem;
+  object-fit: cover;
   background:
     radial-gradient(ellipse 70% 55% at 50% 62%, rgba(255, 255, 255, 0.07), transparent 70%),
     linear-gradient(165deg, rgba(255, 255, 255, 0.04), transparent 55%);
 }
 .wv-card-round .wv-art {
   border-radius: 50%;
-  object-fit: contain;
-  padding: 6%;
-  box-sizing: border-box;
+  object-fit: cover;
+}
+.wv-card-play {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.35rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #22f59a;
+  color: #050807;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: translateY(4px) scale(0.92);
+  transition: opacity 0.16s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.wv-card-play svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: currentColor;
+}
+.wv-card:hover .wv-card-play,
+.wv-card:focus-visible .wv-card-play,
+.wv-card-play:focus-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 .wv-card b {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
+  line-height: 1.22;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .wv-card small {
-  font-size: 0.72rem;
-  line-height: 1.3;
+  font-size: 0.68rem;
+  line-height: 1.28;
   color: rgba(255, 255, 255, 0.55);
-  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .wv-card-ch b {
   display: flex;
@@ -215,7 +492,8 @@ body.wv-has-bar .wv {
 
 .wv-art {
   display: block;
-  object-fit: contain;
+  height: auto;
+  object-fit: cover;
   background:
     radial-gradient(ellipse 70% 55% at 50% 62%, rgba(255, 255, 255, 0.07), transparent 70%),
     linear-gradient(165deg, rgba(255, 255, 255, 0.04), transparent 55%);
@@ -249,12 +527,16 @@ body.wv-has-bar .wv {
   display: grid;
 }
 .wv-row {
-  display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr) auto auto;
+  display: flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.45rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.38rem 0.35rem;
+  border-radius: 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.14s ease;
+}
+.wv-row:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 .wv-row.is-current b {
   background: var(--aura);
@@ -307,6 +589,7 @@ body.wv-has-bar .wv {
   fill: #fff;
 }
 .wv-row-text {
+  flex: 1;
   display: grid;
   min-width: 0;
   border: 0;
@@ -1690,6 +1973,7 @@ body.wv-has-bar .wv {
     font-size: 1.05rem;
   }
   .wv-rail {
+    display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -1705,17 +1989,28 @@ body.wv-has-bar .wv {
     display: none;
   }
   .wv-card {
-    flex: 0 0 6.4rem;
-    max-width: 6.4rem;
-    min-width: 6.4rem;
+    flex: 0 0 6.8rem;
+    width: 6.8rem;
+    max-width: 6.8rem;
+    min-width: 6.8rem;
     scroll-snap-align: start;
-    padding: 0.25rem;
+    padding: 0.3rem;
     gap: 0.2rem;
   }
   .wv-card .wv-art {
-    aspect-ratio: 1;
-    border-radius: 0.55rem;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 0.5rem;
+    object-fit: cover;
+  }
+  .wv-quick-grid {
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    gap: 0.4rem;
+  }
+  .wv-tone-grid {
+    grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+    gap: 0.35rem;
   }
   .wv-card b {
     font-size: 0.72rem;

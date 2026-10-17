@@ -618,6 +618,50 @@ export class Engine {
     this.emit();
   }
 
+  /** Layers a generated healing tone or nature sound into the active spacetime bubble alongside whatever is playing. */
+  async addGenToBubble(track: PlayTrack) {
+    const g = track.gen;
+    if (!g) return;
+    const ctx = this.graph();
+    await ctx.resume();
+    if (!this.deck) {
+      await this.setQueue([track], 0, true);
+      return;
+    }
+    const d = this.deck;
+    if (d.objs.length >= 16) return;
+    const clip = g.type === 'clip' ? await clipBuffer(ctx, g.url) : undefined;
+    const voice = createVoice(ctx, g, { loop: true, attack: 0.15, clip });
+    voice.out.gain.value = 0.65;
+    const basePos = track.pos ?? { x: (Math.random() - 0.5) * 2.2, y: 1.4, z: (Math.random() - 0.5) * 1.2 };
+    const jitter = d.objs.some((x) => Math.hypot(x.pos.x - basePos.x, x.pos.y - basePos.y, x.pos.z - basePos.z) < 0.25)
+      ? clampPos({ x: basePos.x + 0.45, y: basePos.y - 0.3, z: basePos.z + 0.2 })
+      : clampPos({ ...basePos });
+    const o: Obj = {
+      key: `gen-${track.id}-${++d.serial}`,
+      kind: track.spatial === 'direct' ? 'direct' : 'mono',
+      label: track.title,
+      pos: jitter,
+      mark: g.mark,
+      clone: true,
+      level: 0,
+      voice,
+    };
+    this.wire(d, o);
+    d.objs.push(o);
+    if (!d.playing) {
+      await this.play();
+    } else {
+      if (o.fade) {
+        o.fade.gain.value = 0;
+        this.rampTo(o.fade, 1, 0.6);
+      }
+      o.voice?.start();
+    }
+    this.selected = o;
+    this.emit();
+  }
+
   private wire(d: Deck, o: Obj) {
     const ctx = this.graph();
     o.meter = ctx.createAnalyser();
@@ -724,6 +768,24 @@ export class Engine {
           d.objs.push({ key: 'right', kind: 'right', label: 'Right', pos: { ...this.venue.stereo.r }, mark: '#c8a2ff', clone: false, level: 0, el });
         }
       }
+    } else if (track.gens?.length) {
+      d.spatial.connect(this.bus);
+      const gainScale = 1 / Math.sqrt(track.gens.length);
+      for (const item of track.gens) {
+        const clip = item.gen.type === 'clip' ? await clipBuffer(ctx, item.gen.url) : undefined;
+        const voice = createVoice(ctx, item.gen, { loop: !!track.loop, attack: 0.35, clip });
+        voice.out.gain.value = gainScale;
+        d.objs.push({
+          key: item.id,
+          kind: 'mono',
+          label: item.label,
+          pos: { ...item.pos },
+          mark: item.gen.mark,
+          clone: false,
+          level: 0,
+          voice,
+        });
+      }
     } else if (track.gen) {
       const direct = track.spatial === 'direct';
       d.spatial.connect(direct ? this.direct : this.bus);
@@ -732,7 +794,7 @@ export class Engine {
       d.objs.push({ key: 'voice', kind: direct ? 'direct' : 'mono', label: track.title, pos: { ...(track.pos ?? this.venue.mono) }, mark: track.gen.mark, clone: false, level: 0, voice });
     }
     for (const o of d.objs) this.wire(d, o);
-    for (const o of d.objs) if (o.kind !== 'mono' || !track.pos) this.placeDefault(o);
+    for (const o of d.objs) if (o.kind !== 'mono' || (!track.pos && !track.gens?.length)) this.placeDefault(o);
     return d;
   }
 
