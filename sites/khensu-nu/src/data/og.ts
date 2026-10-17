@@ -93,6 +93,27 @@ export const CARDS: Record<string, Card> = {
     alt: 'nu.vegan kitchen on khėnsu.ñü',
   },
   sla: { title: 'SLA', em: '100% uptime.', line: 'Dead-man\'s switch on. Activated 14 October 2026, 2:22 pm, Venice CA. We did it.', bg: EARTH, alt: 'khėnsu.ñü SLA: 100% uptime and dead-man\'s switch' },
+  kronos: {
+    title: 'Kronos',
+    em: 'harness × OT · one breath.',
+    line: 'Agent brain + partner. Pair-locked nu.harness × nu.ot.222. Always-live HTTPS, publish now, dead-man’s switch.',
+    bg: EARTH,
+    alt: 'Kronos — agent brain and pair-locked nu.harness × nu.ot.222 on khėnsu.ñü',
+  },
+  'design-quantumglass': {
+    title: 'nu.glass',
+    em: 'Quantum × Liquid Glass.',
+    line: 'See-through specular film, rim refraction and clear number-light bubble explosion.',
+    bg: EARTH,
+    alt: 'nu.glass — Quantum × Liquid Glass design system on khėnsu.ñü',
+  },
+  'skills-music-theory': {
+    title: 'skills.music.theory',
+    em: 'Hear the note, write the pattern.',
+    line: 'Music theory as live code for nu.waves, nu.media and ñü.řåł — animated notes, intervals, chords and 3D stems.',
+    bg: EARTH,
+    alt: 'skills.music.theory — live-coded music theory on khėnsu.ñü',
+  },
   'dev-index': { title: 'Developers', em: 'Build on webË.', line: 'Specs, repositories and the post-quantum stack behind khėnsu.ñü.', bg: EARTH, alt: 'khėnsu.ñü developers' },
   'dev-architecture': { title: 'Architecture', em: 'How khėnsu.ñü works.', line: 'MLS with ML-KEM-1024, a mixnet, and a network run by people.', bg: EARTH, alt: 'khėnsu.ñü architecture' },
   'dev-webe': { title: 'webË', em: 'The specification.', line: 'Names, sites, feeds, contracts and network work, version 1.0.', bg: EARTH, alt: 'The webË specification' },
@@ -163,11 +184,151 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     duration: 4,
     wideBytes: 572447,
     wideHash: "sha-256=420d4b9c7191e943cfd667b42610480903294ea2ac0cfdd19a4268ed7321c724"
-  }
+  },
+  aura: {
+    bytes: 474805,
+    hash: 'sha-256=b14d9d6df51d61d95e206cd490e798a0fbe9704196d9840e705b2ebb03c6b43d',
+    duration: 3,
+    wideBytes: 332666,
+    wideHash: 'sha-256=479d09dedad7707bba8adad1bd8d4bef1fee9b9800a6795ac289ef7c792ec4a9',
+  },
+  avatars: {
+    bytes: 386449,
+    hash: 'sha-256=5352149acb4813d0a816b4231cae04723afc68aafa0ba250b11e4ae5474382d8',
+    duration: 3,
+    wideBytes: 274273,
+    wideHash: 'sha-256=c9e2e7346f2e6011bfe3b490499f7451547696226bde433d5d5495e977d31d53',
+  },
+  bi: {
+    bytes: 388831,
+    hash: 'sha-256=50107ce14d951430a4364912a5f94a15a299234286b365c7fc1c5ef2ade37cc7',
+    duration: 3,
+    wideBytes: 281943,
+    wideHash: 'sha-256=77bf830769ea7ecc1db37a5ec2c1c54d108360e3d20507901b6a33947db18055',
+  },
+  devices: {
+    bytes: 428045,
+    hash: 'sha-256=bc4cbdb2720483c50d2fe5e47830ba47fec3382754cffdd709e5a9c4c3237fda',
+    duration: 3,
+    wideBytes: 310865,
+    wideHash: 'sha-256=abe84da5c58d0ef5667bc2688b181a2dc32f362fecc6d2a6cf150151eb3fcb17',
+  },
+  eyes: {
+    bytes: 423075,
+    hash: 'sha-256=1625a5d304b898db7b102955718fd4335b6f9fa59f3356d47b900ebd56f9e783',
+    duration: 3,
+    wideBytes: 311094,
+    wideHash: 'sha-256=f20b5cb9cd14a4d1f5465a2adf742afb40938fd602a79bc8b897129ed0f592d5',
+  },
+  nufi: {
+    bytes: 432765,
+    hash: 'sha-256=400bb4716e4580d75d74ca1501abb3067411d2c30bea4b6dd954b4efdbd01694',
+    duration: 3,
+    wideBytes: 309768,
+    wideHash: 'sha-256=547125ccc3eff12ce36bf299058abcaf56bf18d3c51d7a6dd7d01288876818a8',
+  },
+  app: {
+    bytes: 395400,
+    hash: 'sha-256=d8790b39cc248ad2c678c971960c7110701cf119d2b174f999d2a534b1a3cd0d',
+    duration: 3,
+    wideBytes: 286080,
+    wideHash: 'sha-256=0fe0897dda8dd602d9c771bda5e3373a2e739603d658da15a61b08b48dceb412',
+  },
+  'design-quantumglass': {
+    bytes: 435974,
+    hash: 'sha-256=4623e4a11a9f17b192da0b44db7321c60021222430d33328f61d22496a045777',
+    duration: 3,
+    wideBytes: 301865,
+    wideHash: 'sha-256=c25e2e34f1626b076c048aba68c7b236787d56b2c25b245728755dd1111c7b12',
+  },
+  kronos: {
+    bytes: 420170,
+    hash: 'sha-256=e6e91b3ff3904b626009cd43f7c59cfebda49d51cbd5d3e1513a15f2114890e0',
+    duration: 3,
+    wideBytes: 297126,
+    wideHash: 'sha-256=76ea646e80732fcaa90ec6f77c455a019248940312db24b12fed77b8380dca5d',
+  },
+  media: {
+    bytes: 403700,
+    hash: 'sha-256=d85e0b958cf575e849a4f1ee2dc4a42bd001e1645ab50d05e42c51931b9dc6bc',
+    duration: 3,
+    wideBytes: 302308,
+    wideHash: 'sha-256=bb97a04e8e41a7dca57ba534731e884e43cbae923bf2c232337664fca5d5404d',
+  },
+  memory: {
+    bytes: 415668,
+    hash: 'sha-256=b51c50035fe96fd0d803d1458d3f8e17cee6d89461e1114bd2ef7f65ed8aa978',
+    duration: 3,
+    wideBytes: 293055,
+    wideHash: 'sha-256=ca042c73dda05f98657fda91f18063343091b6c4d30ca9c66a16321b30b4d530',
+  },
+  moments: {
+    bytes: 377629,
+    hash: 'sha-256=67a0a027131dbfe490b5030db4213a809db823785c617d3136c7abec798a0727',
+    duration: 3,
+    wideBytes: 281669,
+    wideHash: 'sha-256=3d68e45fa3f19a85fc2b556e3dce969eb9b124d93d452fa40c0db24e6a9f1229',
+  },
+  network: {
+    bytes: 392898,
+    hash: 'sha-256=bdb17e2b647d71fc8a35270000f4240d1ec06c7384a4e979249ab1f67e718610',
+    duration: 3,
+    wideBytes: 284449,
+    wideHash: 'sha-256=fcdc4c54214a1be31d4acbc2c549c9313793bf46aad63445dc2928cfab2b54ff',
+  },
+  'skills-music-theory': {
+    bytes: 409387,
+    hash: 'sha-256=ad8aefe325e0c7b414249dca0e678a28a695b502b77c52ee03a19a6216cbaaa4',
+    duration: 3,
+    wideBytes: 290010,
+    wideHash: 'sha-256=9b92b83faf28a208a411246ba6cc6276f0f03829e01d29285d1e969cf2cbb059',
+  },
+  sla: {
+    bytes: 435218,
+    hash: 'sha-256=69802bf81066e47ebd14c8176188d9ecc5acc144b78f2e10392393572090277b',
+    duration: 3,
+    wideBytes: 310991,
+    wideHash: 'sha-256=414275704e83d963a63b2d4a0811d3137e35eac007c03c53bbba95317b435799',
+  },
+  vegan: {
+    bytes: 429626,
+    hash: 'sha-256=b307e15636f41d9c63a16d0c98f340a0cf8f02f7856e5cf1bb148be062310611',
+    duration: 3,
+    wideBytes: 303555,
+    wideHash: 'sha-256=55e80aceec5fea2da917e68d7168a4af491f0c1b735610d13f72806c74688dff',
+  },
+  void: {
+    bytes: 419155,
+    hash: 'sha-256=e51af0bbe2aab3407772fdd2f1446491f4f8474906475765e4cf77cedcfe56bb',
+    duration: 3,
+    wideBytes: 293715,
+    wideHash: 'sha-256=8a6b8281d3ebd0e82ed321e3d4d89b63bdef5aef42abf8c9729aaf173f14bfec',
+  },
+  webe: {
+    bytes: 393308,
+    hash: 'sha-256=f2a21b7e7c1100966bd0c88de9f0f7ab24d28ca8498fe11ac21c5e1282ffb137',
+    duration: 3,
+    wideBytes: 284307,
+    wideHash: 'sha-256=22e27dbe255d77cc24da58908660fcc7254a60c435e82ae8f9875ecf9075bb21',
+  },
+  compliance: {
+    bytes: 438834,
+    hash: 'sha-256=3f8507bd9260098447ca837683cda289fc828ec008f38091ee173a6100b33cfd',
+    duration: 3,
+    wideBytes: 308863,
+    wideHash: 'sha-256=a996035b54c900585ccbba3113d8e9da227863ec524dc9401e9a3c6914635f22',
+  },
+  security: {
+    bytes: 398240,
+    hash: 'sha-256=534310f18a3650719bea7f68258931038c6605bfeae3e2d91d7f6ed466be4004',
+    duration: 3,
+    wideBytes: 287891,
+    wideHash: 'sha-256=381f2756254c4c517e7e68662f207e5ddae6977e8e5d3ccfd9b3187e66aa3066',
+  },
 };
-// The shield pages share the buy card's animation.
+// The shield pages share the buy card's animation; every nav page has its own custom preview.
 export const previewFor = (card: string) =>
-  card === 'shield' || card === 'dev-shell' ? 'buy' : card === 'avatars' ? 'home' : card in PREVIEWS ? card : undefined;
+  card === 'shield' || card === 'dev-shell' ? 'buy' : card in PREVIEWS ? card : undefined;
 
 export const cardFor = (path: string, prefix = '') => {
   const parts = path.replace(/^\/|\/$/g, '').split('/');

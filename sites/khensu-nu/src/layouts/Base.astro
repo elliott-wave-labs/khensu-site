@@ -37,14 +37,14 @@ const canonical = canonicalUrl
     ? new URL(PATH_TO_PRODUCT[pathForCanon])
     : new URL(Astro.url.pathname, Astro.site);
 const card = ogCard && CARDS[ogCard] ? ogCard : cardFor(Astro.url.pathname);
-const ogCacheBust = card === 'waves' || card === 'all-healing-tones' || card === 'all-chakras-3d' || card === 'indra' ? '?v=bubble3' : '';
+const ogCacheBust = '?v=indra4';
 const ogImage = new URL(`/og/${card}.jpg${ogCacheBust}`, Astro.site);
 const preview = previewFor(card);
 const previewMeta = preview ? PREVIEWS[preview] : undefined;
 // Landscape H.264 for og:video (Apple Messages + Android); square HEVC for nu:preview (indra.md).
-const previewSquareUrl = preview ? `https://khensu.nu/og/${preview}-square.mp4` : undefined;
+const previewSquareUrl = preview ? `https://khensu.nu/og/${preview}-square.mp4${ogCacheBust}` : undefined;
 const previewWideUrl =
-  preview && previewMeta?.wideBytes ? `https://khensu.nu/og/${preview}.mp4` : previewSquareUrl;
+  preview && previewMeta?.wideBytes ? `https://khensu.nu/og/${preview}.mp4${ogCacheBust}` : previewSquareUrl;
 const ogVideoW = previewMeta?.wideBytes ? '1200' : '1080';
 const ogVideoH = previewMeta?.wideBytes ? '630' : '1080';
 const ogAlt = CARDS[card].alt;
@@ -137,7 +137,10 @@ const navCurrent = (href: string) => {
           content={String(previewMeta.wideBytes ?? previewMeta.bytes)}
         />
         {previewMeta.wideHash && <meta property="preview:hash" content={previewMeta.wideHash} />}
-        <meta property="preview:policy" content="mute loop autoplay" />
+        <meta property="preview:policy" content="mute loop autoplay inline no-fullscreen no-download pointer-events-none tap-opens-link" />
+        <meta property="preview:interactive" content="false" />
+        <meta property="preview:hit-test" content="false" />
+        <meta property="preview:action" content={String(canonical)} />
         {/* webË / Apple-quality square (WEBE.md 7.1); synonym of preview:* when clients prefer it. */}
         <meta property="nu:preview" content={previewSquareUrl} />
         <meta property="nu:preview:type" content="video/mp4; codecs=hvc1" />
@@ -146,6 +149,10 @@ const navCurrent = (href: string) => {
         <meta property="nu:preview:bytes" content={String(previewMeta.bytes)} />
         <meta property="nu:preview:hash" content={previewMeta.hash} />
         <meta property="nu:preview:effect" content="ripple" />
+        <meta property="nu:preview:policy" content="mute loop autoplay inline no-fullscreen no-download pointer-events-none tap-opens-link" />
+        <meta property="nu:preview:interactive" content="false" />
+        <meta property="nu:preview:hit-test" content="false" />
+        <meta property="nu:preview:href" content={String(canonical)} />
       </>
     )}
 
@@ -253,6 +260,37 @@ const navCurrent = (href: string) => {
     <script>
       import '../scripts/section-links.ts';
       import '../../../_shared/aura-buttons.ts';
+    </script>
+    <script is:inline>
+      (() => {
+        // Lock all preview / ambient videos so they play strictly inline at preview size:
+        // hit-test false (pointer-events: none), no fullscreen expansion, no PiP, no context-menu video download.
+        const lockVideos = () => {
+          for (const v of document.querySelectorAll('video')) {
+            v.muted = true;
+            v.playsInline = true;
+            v.disablePictureInPicture = true;
+            v.disableRemotePlayback = true;
+            v.removeAttribute('controls');
+            v.setAttribute('playsinline', '');
+            v.setAttribute('webkit-playsinline', '');
+            v.setAttribute('disablepictureinpicture', '');
+            v.setAttribute('disableremoteplayback', '');
+            v.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback');
+            v.style.pointerEvents = 'none';
+            v.style.userSelect = 'none';
+            v.style.webkitUserSelect = 'none';
+            v.style.webkitTouchCallout = 'none';
+            v.addEventListener('contextmenu', (e) => e.preventDefault());
+            v.addEventListener('webkitbeginfullscreen', (e) => {
+              e.preventDefault?.();
+              try { v.webkitExitFullscreen?.(); } catch {}
+            });
+          }
+        };
+        lockVideos();
+        document.addEventListener('DOMContentLoaded', lockVideos);
+      })();
     </script>
   </body>
 </html>

@@ -36,7 +36,14 @@ const PATHS = [
   </div>
 
   <div class="ic-stage-wrap">
-    <canvas class="ic-canvas" data-ic-canvas data-fmt="indra" width="1200" height="630"></canvas>
+    <a
+      class="ic-stage-link"
+      href="https://waves.khensu.nu/#/t/first-attempt?shareplay=live"
+      aria-label="Open First Attempt in 3D on waves.khensu.nu"
+      oncontextmenu="return false"
+    >
+      <canvas class="ic-canvas" data-ic-canvas data-fmt="indra" width="1200" height="630"></canvas>
+    </a>
     <!-- Hidden SVG used to measure & morph chakra yantra strokes cleanly -->
     <svg class="ic-svg-hidden" viewBox="0 0 100 100" aria-hidden="true">
       <path class="ic-path" fill="none" stroke-linecap="round" stroke-linejoin="round" />
@@ -724,6 +731,17 @@ const PATHS = [
     align-items: center;
     overflow: visible;
   }
+  .ic-stage-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
   .ic-canvas {
     width: 100%;
     height: auto;
@@ -734,6 +752,10 @@ const PATHS = [
     border: 1px solid rgba(255, 255, 255, 0.16);
     box-shadow: 0 16px 44px rgba(0, 0, 0, 0.55);
     background: #040812;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
   .ic-canvas[data-fmt='story'] {
     max-width: 16.5rem;

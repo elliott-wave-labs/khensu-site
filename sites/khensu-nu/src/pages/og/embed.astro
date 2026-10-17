@@ -1,13 +1,16 @@
 ---
-// Mute-loop player for Slack-class video blocks / custom unfurls.
-// Same-origin /og/*.mp4 only. Note: the sites LB currently sends
-// X-Frame-Options: DENY / frame-ancestors 'none', so Slack iframes need a
-// path exception before this embeds; until then paste the MP4 URL in Slack.
-const ALLOWED = new Set(['home', 'buy', 'creators', 'waves', 'thumb']);
+import { PREVIEWS } from '../../data/og';
+import { PATH_TO_PRODUCT } from '../../data/hosts';
+
+// Mute-loop non-interactive preview player for unfurls / embeds:
+// - Video has pointer-events: none (hit-test false), no controls, no fullscreen, no PiP, no download.
+// - Tapping anywhere on the preview opens the target link immediately.
 const raw = Astro.url.searchParams.get('src') || 'waves';
-const slug = ALLOWED.has(raw) ? raw : 'waves';
+const slug = raw in PREVIEWS ? raw : 'waves';
 const src = `/og/${slug}.mp4`;
 const poster = `/og/${slug}.jpg`;
+const pathKey = slug === 'home' ? '/' : slug === 'nufi' ? '/nufi' : `/${slug}`;
+const targetHref = Astro.url.searchParams.get('href') || PATH_TO_PRODUCT[pathKey] || `https://khensu.nu${pathKey === '/' ? '/' : pathKey}`;
 ---
 
 <!doctype html>
@@ -24,6 +27,17 @@ const poster = `/og/${slug}.jpg`;
         height: 100%;
         background: #0a0b0d;
         overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+      }
+      .preview-hit {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        text-decoration: none;
       }
       video {
         width: 100%;
@@ -31,10 +45,27 @@ const poster = `/og/${slug}.jpg`;
         object-fit: cover;
         display: block;
         background: #0a0b0d;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
       }
     </style>
   </head>
-  <body>
-    <video src={src} poster={poster} muted autoplay loop playsinline></video>
+  <body oncontextmenu="return false">
+    <a class="preview-hit" href={targetHref} target="_top" rel="noopener" aria-label="Open link">
+      <video
+        src={src}
+        poster={poster}
+        muted
+        autoplay
+        loop
+        playsinline
+        webkit-playsinline
+        disablepictureinpicture
+        disableremoteplayback
+        controlslist="nodownload nofullscreen noremoteplayback"
+      ></video>
+    </a>
   </body>
 </html>
