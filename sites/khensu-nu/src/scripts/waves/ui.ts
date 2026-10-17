@@ -1412,8 +1412,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
 
   private shareOrigin(): string {
     if (location.hostname === 'waves.khensu.nu') return `${location.origin}/`;
-    const p = location.pathname.replace(/\/index\.html$/, '').replace(/\/+$/, '');
-    return `${location.origin}${p || ''}/`;
+    return `${location.origin}/waves/`;
   }
 
   private async shareSong(id: string) {
@@ -1522,16 +1521,32 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     this.openNow(true);
   }
 
-  /** Opens a shared song (`#/t/{id}`) or shared scene (`#/t/{id}?scene=`) or Instagram Story link (`#/t/{id}?story=1`) and autoplays. */
+  /** Opens a shared song (`/{id}` or `#/t/{id}`), shared scene (`?scene=`), or Instagram Story link (`?story=1`) and autoplays. */
   private async openShare(): Promise<boolean> {
     const r = parseRoute();
-    const q = new URLSearchParams(location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '');
+    const hashQs = location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '';
+    const searchQs = location.search.replace(/^\?/, '');
+    const q = new URLSearchParams([searchQs, hashQs].filter(Boolean).join('&'));
     const code = q.get('scene');
     const scene = code ? decodeShare(code) : null;
     const isStory = q.get('story') === '1';
     const isSharePlay = Boolean(q.get('shareplay'));
     const startSec = Number(q.get('t') || 0);
-    const trackId = (r.name === 't' && r.id) || (q.get('t') && !Number.isFinite(Number(q.get('t'))) ? q.get('t')! : '') || scene?.trackId || '';
+
+    // Detect clean path track IDs (`/all-healing-tones`, `/t/all-healing-tones`, `/waves/all-healing-tones`, `/healing`)
+    const pathParts = location.pathname.replace(/\/index\.html$/, '').replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+    const lastSeg = pathParts[pathParts.length - 1] || '';
+    const mappedSeg = lastSeg === 'healing' ? 'all-healing-tones' : lastSeg;
+    const pathTrackId = mappedSeg && mappedSeg !== 'waves' && trackOf(mappedSeg) ? mappedSeg : '';
+    const attrTrackId = this.root.dataset.initialTrack && trackOf(this.root.dataset.initialTrack) ? this.root.dataset.initialTrack : '';
+
+    const trackId =
+      (r.name === 't' && r.id) ||
+      pathTrackId ||
+      attrTrackId ||
+      (q.get('t') && !Number.isFinite(Number(q.get('t'))) ? q.get('t')! : '') ||
+      scene?.trackId ||
+      '';
     if (isSharePlay) this.shareplay.joinSessionFromUrl();
     if (!trackId && !scene && !isStory && !isSharePlay) return false;
     const targetTrackId = trackId || 'first-attempt';

@@ -12,8 +12,19 @@ const appHref = APP_STORE_ID
   ? APP_STORE_URL
   : 'https://github.com/elliott-wave-labs/khensu-apple/blob/main/docs/INSTALL.md';
 const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Install from GitHub';
-const featured = TRACKS.find((t) => t.id === 'first-attempt')!;
+
+interface Props {
+  trackId?: string;
+}
+const { trackId } = Astro.props;
+const featured = (trackId ? TRACKS.find((t) => t.id === trackId) : undefined) ?? TRACKS.find((t) => t.id === 'first-attempt')!;
 const featuredArtist = artistOf(featured.artistId)!;
+const pageTitle = trackId ? `${featured.title} · ñü.ŵævẽš` : 'ñü.ŵævẽš';
+const pageDesc = trackId
+  ? `${featured.spec}. Move every sound together in the 3D spacetime bubble™ with Apple SharePlay — on waves.khensu.nu.`
+  : 'Music and healing sounds you can move. Live channels, your files on this device, spacetime bubble mid-listen, and head tracking — on waves.khensu.nu.';
+const pageCanonical = trackId ? `https://waves.khensu.nu/${featured.id}` : 'https://waves.khensu.nu/';
+const pageOgCard = trackId === 'all-healing-tones' ? 'all-healing-tones' : trackId === 'all-chakras-3d' ? 'all-chakras-3d' : 'waves';
 const live = CHANNELS.filter((c) => c.kind === 'live');
 const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
 const songTracks = TRACKS.filter((t) => t.kind === 'song');
@@ -21,9 +32,11 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
 ---
 
 <Base
-  title="ñü.ŵævẽš"
-  description="Music and healing sounds you can move. Live channels, your files on this device, spacetime bubble mid-listen, and head tracking — on waves.khensu.nu."
+  title={pageTitle}
+  description={pageDesc}
   manifest="/waves.webmanifest"
+  canonicalUrl={pageCanonical}
+  ogCard={pageOgCard}
 >
   <Fragment slot="head">
     {(featured.original ?? []).map((s) => (
@@ -33,7 +46,7 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
       <link rel="preload" as="audio" href={s.url} type="audio/mp4" />
     ))}
   </Fragment>
-  <div class="wv khensu" data-waves>
+  <div class="wv khensu" data-waves data-initial-track={trackId || undefined}>
     <section class="wv-stage" aria-labelledby="wv-now-title">
       <div class="wrap wv-stage-head">
         <p class="eyebrow">ñü.ŵævẽš</p>

@@ -1,0 +1,20 @@
+---
+import WavesPage from './waves.astro';
+import { TRACKS } from '../data/waves';
+
+export function getStaticPaths() {
+  const paths = TRACKS.map((t) => ({
+    params: { track: t.id },
+    props: { trackId: t.id },
+  }));
+  paths.push({
+    params: { track: 'healing' },
+    props: { trackId: 'all-healing-tones' },
+  });
+  return paths;
+}
+
+const { trackId } = Astro.props;
+---
+
+<WavesPage trackId={trackId} />

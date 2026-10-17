@@ -18,20 +18,27 @@ interface Props {
   noindex?: boolean;
   /** A product's own web manifest (nu.waves installs as its own app). */
   manifest?: string;
+  /** Optional explicit canonical URL (e.g. https://waves.khensu.nu/all-healing-tones). */
+  canonicalUrl?: string;
+  /** Optional explicit OG card slug override (e.g. 'all-healing-tones' or 'waves'). */
+  ogCard?: string;
 }
 
 const SITE_NAME = 'khėnsu.ñü';
 const DEFAULT_DESC =
   'khėnsu.ñü is a post-quantum private messenger on a network run by people: messages, calls, feeds, forums, sites and private payments, with private AI that runs only on your device.';
 
-const { title, description = DEFAULT_DESC, noindex = false, manifest = '/site.webmanifest' } = Astro.props;
+const { title, description = DEFAULT_DESC, noindex = false, manifest = '/site.webmanifest', canonicalUrl, ogCard } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — webË, private by design. Post-quantum. Run profitably by the people.`;
 const pathForCanon = Astro.url.pathname.replace(/\/$/, '') || '/';
-const canonical = PATH_TO_PRODUCT[pathForCanon]
-  ? new URL(PATH_TO_PRODUCT[pathForCanon])
-  : new URL(Astro.url.pathname, Astro.site);
-const card = cardFor(Astro.url.pathname);
-const ogImage = new URL(`/og/${card}.jpg`, Astro.site);
+const canonical = canonicalUrl
+  ? new URL(canonicalUrl)
+  : PATH_TO_PRODUCT[pathForCanon]
+    ? new URL(PATH_TO_PRODUCT[pathForCanon])
+    : new URL(Astro.url.pathname, Astro.site);
+const card = ogCard && CARDS[ogCard] ? ogCard : cardFor(Astro.url.pathname);
+const ogCacheBust = card === 'waves' || card === 'all-healing-tones' || card === 'all-chakras-3d' || card === 'indra' ? '?v=bubble3' : '';
+const ogImage = new URL(`/og/${card}.jpg${ogCacheBust}`, Astro.site);
 const preview = previewFor(card);
 const previewMeta = preview ? PREVIEWS[preview] : undefined;
 // Landscape H.264 for og:video (Apple Messages + Android); square HEVC for nu:preview (indra.md).

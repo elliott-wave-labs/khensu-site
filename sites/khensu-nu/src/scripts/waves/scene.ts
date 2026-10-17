@@ -92,22 +92,22 @@ export function decodeShare(code: string): Scene | null {
   }
 }
 
-/** A clean per-song link that opens and cues this song on the player (`#/t/<id>`). */
+/** A clean per-song link that opens and cues this song on the player (`/<id>`). */
 export function songUrl(origin: string, trackId: string): string {
   const base = origin.endsWith('/') ? origin : `${origin}/`;
-  return trackId ? `${base}#/t/${encodeURIComponent(trackId)}` : `${base}#/`;
+  return trackId ? `${base}${encodeURIComponent(trackId)}` : base;
 }
 
-/** An Instagram Story / Reel link (`#/t/<id>?story=1`) that opens waves.khensu.nu and autoplays with animated lyrics + mini-player + spacetime bubble. */
+/** An Instagram Story / Reel link (`/<id>?story=1`) that opens waves.khensu.nu and autoplays with animated lyrics + mini-player + spacetime bubble. */
 export function storyUrl(origin: string, trackId: string, atSec = 0): string {
   const base = origin.endsWith('/') ? origin : `${origin}/`;
   const tParam = atSec > 1 ? `&t=${Math.floor(atSec)}` : '';
-  return trackId ? `${base}#/t/${encodeURIComponent(trackId)}?story=1${tParam}` : `${base}#/?story=1`;
+  return trackId ? `${base}${encodeURIComponent(trackId)}?story=1${tParam}` : `${base}?story=1`;
 }
 
 /** A link that opens this listen: the catalogue song (when there is one) plus the scene. */
 export function listenUrl(origin: string, s: Scene, code = encodeShare(s)): string {
   const base = origin.endsWith('/') ? origin : `${origin}/`;
-  const hash = isCatalogueTrack(s.trackId) ? `#/t/${encodeURIComponent(s.trackId)}` : '#/';
-  return `${base}${hash}?scene=${code}`;
+  const path = isCatalogueTrack(s.trackId) ? encodeURIComponent(s.trackId) : '';
+  return `${base}${path}?scene=${code}`;
 }

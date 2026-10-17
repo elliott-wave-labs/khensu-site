@@ -79,7 +79,7 @@ export class SharePlayCoordinator {
     const snap = captureScene(trackId, 'SharePlay 3D', this.engine.venue.id, this.engine.fx, this.engine.mode, this.engine.objs());
     const code = encodeShare(snap);
     const base = this.getOrigin().replace(/\/$/, '');
-    return `${base}/#/t/${encodeURIComponent(trackId)}?shareplay=${encodeURIComponent(sid)}&t=${pos}&scene=${encodeURIComponent(code)}`;
+    return `${base}/${encodeURIComponent(trackId)}?shareplay=${encodeURIComponent(sid)}&t=${pos}&scene=${encodeURIComponent(code)}`;
   }
 
   async startOrToggle() {
@@ -174,7 +174,9 @@ export class SharePlayCoordinator {
   }
 
   joinSessionFromUrl() {
-    const q = new URLSearchParams(location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '');
+    const hashQs = location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '';
+    const searchQs = location.search.replace(/^\?/, '');
+    const q = new URLSearchParams([searchQs, hashQs].filter(Boolean).join('&'));
     const sid = q.get('shareplay');
     if (!sid) return;
     const cleanSid = sid === '1' ? 'live' : sid;

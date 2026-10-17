@@ -36,6 +36,20 @@ export const CARDS: Record<string, Card> = {
   memory: { title: 'ñü.řåł', em: 'Your private AI.', line: 'It learns what you’re looking forward to, on your device. No tracking, ever.', bg: EARTH, product: '/khensu/memory/phone_burgundy.webp', alt: 'iPhone showing khėnsu.ñü ñü.řåł planning a sailing trip in Greece' },
   creators: { title: 'ñü.ċřêæțẽ', em: 'You own everything.', line: 'Your rights, your fans, and $10 per 1,000 plays with no cut.', bg: EARTH, product: '/khensu/renders/phone-front.webp', alt: 'ñü.ċřêæțẽ on khėnsu.ñü over Earth and Indra\'s Net' },
   waves: { title: 'ñü.ŵævẽš', em: 'Every instrument, where it belongs.', line: 'Stereo becomes objects you can drag around you. Switch to the original or Opus 5.1 any time.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: 'ñü.ŵævẽš spatial audio on khėnsu.ñü, instruments placed around you over Earth' },
+  'all-healing-tones': {
+    title: 'All healing tones (3D)',
+    em: '10 sounds in the 3D spacetime bubble™.',
+    line: '528 · 432 · 396 Hz Solfeggio singing bowls and all 7 Root → Crown planetary chakra tones, generated live on your device.',
+    bg: EARTH,
+    alt: 'All 10 healing tones and Solfeggio singing bowls orbiting inside the 3D spacetime bubble on waves.khensu.nu',
+  },
+  'all-chakras-3d': {
+    title: 'All 7 chakra tones (3D)',
+    em: 'Root → Crown in the 3D spacetime bubble™.',
+    line: 'Seven planetary chakra tones from Root (194.18 Hz) below you to Crown (172.06 Hz) above, generated on your device.',
+    bg: EARTH,
+    alt: 'All 7 planetary chakra tones orbiting inside the 3D spacetime bubble on waves.khensu.nu',
+  },
   nufi: { title: 'ñũ.Fî', em: 'A basic income first.', line: 'Creators paid for every view, nodes for every job. Private, with no cut.', bg: EARTH, alt: 'ñũ.Fî private payments on khėnsu.ñü' },
   bi: { title: 'ñũ.Bî', em: 'A basic income, paid by the network.', line: 'Node operators paid for real work at one worldwide rate, and an equal share for every person next.', bg: EARTH, alt: 'ñũ.Bî, the ñü basic income, over Earth wrapped in the khėnsu.ñü network' },
   network: { title: 'The network', em: 'A gift to everyone.', line: 'Freedom, privacy and a basic income. Contracts for any work and nodes paid for real jobs.', bg: EARTH, alt: 'The khėnsu.ñü network wrapped around Earth at night' },
@@ -129,6 +143,20 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     wideBytes: 572979,
     wideHash: "sha-256=6e365667def7e5d01caaa383d56b7e3355698e565cfcc38c8d265bffcf95d124"
   },
+  "all-healing-tones": {
+    bytes: 912180,
+    hash: "sha-256=afea7b8af063f9ca1504380e6cfd282bb0ba5afa7adcf2b468c273cdd4e83b8d",
+    duration: 4,
+    wideBytes: 808617,
+    wideHash: "sha-256=2387bdb8b91c744a7acfaad3a023e6a1be5346ba93c92b4371987199bdcfd902"
+  },
+  "all-chakras-3d": {
+    bytes: 879237,
+    hash: "sha-256=063df50dc790f7ec3f96da2e339c0eea366cb08e6ae555cc8c82d0c686fa7b23",
+    duration: 4,
+    wideBytes: 762468,
+    wideHash: "sha-256=0241a27d7dbc0334be200f848559f4f45970ca738dc96e6a71f536fe05995eaa"
+  },
   indra: {
     bytes: 765777,
     hash: "sha-256=8f4eebe3bb347511cc725ba3d9b29e3f399b1ac875ea614530e50b5a500404fc",
@@ -143,6 +171,12 @@ export const previewFor = (card: string) =>
 
 export const cardFor = (path: string, prefix = '') => {
   const parts = path.replace(/^\/|\/$/g, '').split('/');
+  const last = parts[parts.length - 1] || '';
+  if (last === 'all-healing-tones' || last === 'healing') return 'all-healing-tones';
+  if (last === 'all-chakras-3d') return 'all-chakras-3d';
+  if (parts[0] === 't' || (parts[0] === 'waves' && parts.length > 1)) {
+    return CARDS[last] ? last : 'waves';
+  }
   const slug = prefix + (parts[0] || 'index');
   // /sounds redirects to nu.waves; share its card and Indra preview.
   const key = slug === 'index' ? 'home' : slug === 'sounds' ? 'waves' : slug;
