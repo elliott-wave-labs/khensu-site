@@ -9,6 +9,11 @@ if (root) {
   void app.boot();
   (window as unknown as { nuWaves?: App }).nuWaves = app;
   if ('serviceWorker' in navigator && location.hostname === 'waves.khensu.nu') {
-    addEventListener('load', () => void navigator.serviceWorker.register('/waves-sw.js', { scope: '/' }).catch(() => {}));
+    addEventListener('load', () =>
+      void navigator.serviceWorker
+        .register('/waves-sw.js', { scope: '/', updateViaCache: 'none' })
+        .then((reg) => reg.update())
+        .catch(() => {}),
+    );
   }
 }

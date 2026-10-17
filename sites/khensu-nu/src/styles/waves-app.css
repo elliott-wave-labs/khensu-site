@@ -309,6 +309,13 @@ body.wv-has-bar .wv {
 .wv-row-text {
   display: grid;
   min-width: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 .wv-row-text b {
   font-size: 0.95rem;
@@ -754,6 +761,7 @@ body.wv-has-bar .wv {
 }
 .wv-now-ctl {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem;
   margin-top: 0.8rem;
@@ -793,6 +801,7 @@ body.wv-has-bar .wv {
   height: 1.15rem;
   fill: currentColor;
 }
+.wv-now-ctl button[data-act='share'] svg,
 .wv-now-ctl button[data-act='shuffle'] svg,
 .wv-now-ctl button[data-act='repeat'] svg {
   fill: none;

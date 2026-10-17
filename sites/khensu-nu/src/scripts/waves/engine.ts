@@ -860,13 +860,14 @@ export class Engine {
     const old = this.deck;
     // Reuse an already-loaded deck for the same track (select → load, then play).
     if (old && !old.disposed && old.track.id === track.id && old.isSong) {
-      await this.readyAll(old.els());
-      if (my !== this.startSerial) return null;
       for (const el of old.els()) {
         el.currentTime = at;
         el.loop = this.repeat === 'one' && !this.channel && !this.mixed;
       }
       this.emit();
+      void this.readyAll(old.els()).then(() => {
+        if (my === this.startSerial) this.emit();
+      });
       return old;
     }
     this.prefetch(track);
@@ -925,11 +926,17 @@ export class Engine {
       this.error = null;
     }
     this.emit();
-    // Buffer every source as soon as the track is selected — before play.
-    if (d.isSong) await this.readyAll(d.els());
-    if (d.bed) await this.ready(d.bed);
-    if (my !== this.startSerial) return null;
-    this.emit();
+    // Buffer every source in the background as soon as the track is selected — before play — without blocking UI.
+    if (d.isSong) {
+      void this.readyAll(d.els()).then(() => {
+        if (my === this.startSerial) this.emit();
+      });
+    }
+    if (d.bed) {
+      void this.ready(d.bed).then(() => {
+        if (my === this.startSerial) this.emit();
+      });
+    }
     return d;
   }
 
@@ -940,6 +947,9 @@ export class Engine {
     await ctx.resume();
     const d = await this.load(track, at, xf);
     if (!d || d !== this.deck) return;
+    if (d.isSong) await this.readyAll(d.els());
+    if (d.bed) await this.ready(d.bed);
+    if (d !== this.deck || d.disposed) return;
     await this.run(d, at);
     this.history?.(d.track, this.duration());
     this.emit();
@@ -1028,7 +1038,8 @@ export class Engine {
   async prev() {
     if (this.channel) return;
     if (this.position() > 3 || this.index <= 0) return this.seek(0);
-    await this.playIndex(this.index - 1);
+    if (this.playing) await this.playIndex(this.index - 1);
+    else await this.loadIndex(this.index - 1);
   }
   private async advance(auto: boolean, xf?: number) {
     if (this.advancing) return;
@@ -1052,7 +1063,8 @@ export class Engine {
           return;
         }
       }
-      await this.playIndex(i, xf);
+      if (auto || this.playing) await this.playIndex(i, xf);
+      else await this.loadIndex(i);
     } finally {
       this.advancing = false;
     }

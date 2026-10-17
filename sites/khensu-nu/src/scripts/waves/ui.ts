@@ -267,15 +267,18 @@ export class App {
         html = this.artistView(r.id ?? '');
         break;
       case 'album':
+        await this.cueCollection(albumOf(r.id ?? '')?.tracks);
         html = this.albumView(r.id ?? '');
         break;
       case 'collection':
+        await this.cueCollection(COLLECTIONS.find((x) => x.id === (r.id ?? ''))?.tracks);
         html = this.collectionView(r.id ?? '');
         break;
       case 'channel':
         html = this.channelView(r.id ?? '');
         break;
       case 'playlist':
+        await this.cueCollection(this.playlists.find((x) => x.id === (r.id ?? ''))?.tracks);
         html = this.playlistView(r.id ?? '');
         break;
       default:
@@ -355,7 +358,7 @@ export class App {
     return 'h1';
   }
 
-  /** A track list. `ids` of the whole list ride on the <ol>, so a tap plays from that point. */
+  /** A track list. `ids` of the whole list ride on the <ol>, so a tap on the row selects/loads and the play button starts. */
   private list(tracks: PlayTrack[], opts: { num?: boolean; art?: boolean; playlist?: string; showAlbum?: boolean } = {}) {
     if (!tracks.length) return `<p class="wv-empty">Nothing yet.</p>`;
     const ids = tracks.map((t) => t.id);
@@ -365,7 +368,7 @@ export class App {
         const sub = [t.artistName, opts.showAlbum ? t.albumTitle : '', t.kind === 'generator' ? 'generated' : '', this.kept.has(t.id) ? 'kept' : ''].filter(Boolean).join(' · ');
         return `<li class="wv-row${t.id === cur ? ' is-current' : ''}" data-id="${esc(t.id)}">
   <button type="button" class="wv-row-play" data-act="play-track" data-id="${esc(t.id)}" data-i="${i}" aria-label="Play ${esc(t.title)}">${opts.art ? art(t.artUrl, this.cssArt(t), '', 96) : `<span class="wv-row-n">${i + 1}</span>`}<span class="wv-row-ic">${ICON.play}</span></button>
-  <span class="wv-row-text"><b>${esc(t.title)}</b><small>${esc(sub)}</small></span>
+  <button type="button" class="wv-row-text" data-act="select-track" data-id="${esc(t.id)}" data-i="${i}"><b>${esc(t.title)}</b><small>${esc(sub)}</small></button>
   <span class="wv-row-dur">${t.loop ? '∞' : t.dur ? mmss(t.dur) : ''}</span>
   <button type="button" class="wv-row-more" data-act="menu" data-id="${esc(t.id)}" ${opts.playlist ? `data-playlist="${esc(opts.playlist)}"` : ''} aria-label="More for ${esc(t.title)}">${ICON.more}</button>
 </li>`;
@@ -681,11 +684,21 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       return ol ? (JSON.parse(ol.dataset.list!) as string[]) : [id];
     };
     switch (act) {
+      case 'select-track': {
+        const all = listIds();
+        const i = Math.max(0, all.indexOf(id));
+        if (eng.track?.id === id && eng.deck && !eng.live) {
+          this.openNow(true);
+          break;
+        }
+        this.playIds(all, i, eng.playing);
+        break;
+      }
       case 'play-track': {
         const all = listIds();
         const i = Math.max(0, all.indexOf(id));
         if (eng.track?.id === id && eng.deck && !eng.live) return void eng.toggle();
-        this.playIds(all, i);
+        this.playIds(all, i, true);
         break;
       }
       case 'play-one':
@@ -738,7 +751,10 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         break;
       }
       case 'queue-jump':
-        await eng.playIndex(Number(el.dataset.i));
+        if (eng.playing) await eng.playIndex(Number(el.dataset.i));
+        else await eng.loadIndex(Number(el.dataset.i));
+        this.bubble.sync();
+        this.paintNow();
         break;
       case 'queue-remove':
         eng.removeAt(Number(el.dataset.i));
@@ -1151,7 +1167,18 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
   /** Builds the deck + spacetime bubble and buffers every stem as soon as the page opens, without autoplay. */
   private async cueDefault() {
     if (this.engine.deck) return;
-    const tracks = this.tracksOf(['first-attempt']);
+    const tracks = this.tracksOf(TRACKS.map((t) => t.id));
+    if (!tracks.length) return;
+    this.engine.prefetch(tracks[0]);
+    await this.engine.setQueue(tracks, 0, false);
+    this.bubble.sync();
+    this.paintNow();
+  }
+
+  /** Cues the first track of an opened album, collection or playlist onto the stage when nothing is actively playing. */
+  private async cueCollection(ids?: string[]) {
+    if (!ids?.length || this.engine.playing || this.engine.live) return;
+    const tracks = this.tracksOf(ids);
     if (!tracks.length) return;
     this.engine.prefetch(tracks[0]);
     await this.engine.setQueue(tracks, 0, false);
