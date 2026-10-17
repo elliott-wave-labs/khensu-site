@@ -131,6 +131,10 @@ export class App {
   async boot() {
     const e = this.engine;
     e.loader = (t) => lib.resolve(t.id);
+    e.syncLoader = (t) => {
+      if (t.local || t.id.startsWith('file:') || t.id.startsWith('native:') || this.kept.has(t.id)) return undefined;
+      return this.light(t.id);
+    };
     e.onPlayed((t, dur) => {
       void store.history.add(t.id, dur);
       void this.sealInk();
@@ -150,13 +154,12 @@ export class App {
     await this.render();
     const shared = await this.openShare();
     if (!shared) await this.cueDefault();
-    const first = () => {
+    const wakeGesture = () => {
       e.unlock();
-      removeEventListener('pointerdown', first, true);
-      removeEventListener('keydown', first, true);
     };
-    addEventListener('pointerdown', first, true);
-    addEventListener('keydown', first, true);
+    addEventListener('pointerdown', wakeGesture, { capture: true, passive: true });
+    addEventListener('touchend', wakeGesture, { capture: true, passive: true });
+    addEventListener('keydown', wakeGesture, true);
     const loop = (now: number) => {
       e.frame(now);
       this.head.frame();
@@ -871,11 +874,13 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'select-track': {
         const all = listIds();
         const i = Math.max(0, all.indexOf(id));
+        const isTouch = typeof matchMedia === 'function' && matchMedia('(hover: none), (pointer: coarse)').matches;
         if (eng.track?.id === id && eng.deck && !eng.live) {
+          if (isTouch) await eng.toggle();
           this.openNow(true);
           break;
         }
-        this.playIds(all, i, eng.playing);
+        this.playIds(all, i, isTouch || eng.playing);
         break;
       }
       case 'play-track': {

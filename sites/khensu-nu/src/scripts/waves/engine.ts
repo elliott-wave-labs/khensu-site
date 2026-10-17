@@ -60,6 +60,12 @@ const SLOT_S = 180;
 const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
 const meterBuf = new Float32Array(2048);
 
+const isMobileAudio = () =>
+  typeof navigator !== 'undefined' &&
+  (/iPhone|iPad|iPod|Android|Mobi/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+    (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches));
+
 const clampPos = (p: Pos) => {
   const d = Math.hypot(p.x, p.y, p.z);
   if (d > MAX_R) {
@@ -90,33 +96,42 @@ class Deck {
   objs: Obj[] = [];
   master?: HTMLAudioElement; // the clock for songs: the original, or the one stereo file
   bed?: HTMLAudioElement;
-  origGain!: GainNode;
-  bedGain!: GainNode;
-  spatial!: GainNode;
-  fade!: GainNode;
+  origGain?: GainNode;
+  bedGain?: GainNode;
+  spatial?: GainNode;
+  fade?: GainNode;
   origMeter?: AnalyserNode;
   startedAt = 0; // ctx time when a generator started
   genOffset = 0; // seconds into a generator at startedAt
   playing = false;
   ended = false;
   disposed = false;
+  wired = false;
   serial = 0;
   splits = new Map<HTMLAudioElement, ChannelSplitterNode>();
+  ctx: AudioContext | null = null;
   constructor(
     public track: PlayTrack,
-    private ctx: AudioContext,
-  ) {}
+    ctx: AudioContext | null = null,
+  ) {
+    this.ctx = ctx;
+  }
 
   get isSong() {
     return this.track.kind === 'song';
   }
   position(): number {
-    if (this.master) return this.master.currentTime || 0;
-    if (!this.playing) return this.genOffset;
+    if (this.master) {
+      if (!this.master.paused && this.master.currentTime > 0) return this.master.currentTime;
+      for (const o of this.objs) if (o.el && !o.gone && !o.el.paused && o.el.currentTime > 0) return o.el.currentTime;
+      return this.master.currentTime || 0;
+    }
+    if (!this.playing || !this.ctx) return this.genOffset;
     return this.genOffset + (this.ctx.currentTime - this.startedAt);
   }
   duration(): number {
     if (this.master && Number.isFinite(this.master.duration) && this.master.duration > 0) return this.master.duration;
+    for (const o of this.objs) if (o.el && Number.isFinite(o.el.duration) && o.el.duration > 0) return o.el.duration;
     const v = this.objs.find((o) => o.voice)?.voice;
     if (v?.length && !this.track.loop) return v.length;
     return this.track.dur;
@@ -126,6 +141,15 @@ class Deck {
     if (this.master) set.add(this.master);
     if (this.bed) set.add(this.bed);
     for (const o of this.objs) if (o.el && !o.gone) set.add(o.el);
+    return [...set];
+  }
+  /** Active elements that should be started when play() is pressed (skips the 10 MB untouched original on mobile when in nu.waves stem mode). */
+  playEls(mode: Mode): HTMLAudioElement[] {
+    const set = new Set<HTMLAudioElement>();
+    const stemsMode = this.track.spatial === 'stems' && this.objs.some((o) => o.kind === 'stem' && o.el);
+    if (this.master && (!stemsMode || mode === 'orig' || !isMobileAudio())) set.add(this.master);
+    if (this.bed && mode === 'bed') set.add(this.bed);
+    for (const o of this.objs) if (o.el && !o.gone && (mode === 'waves' || !stemsMode)) set.add(o.el);
     return [...set];
   }
 }
@@ -179,6 +203,8 @@ export class Engine {
   private history: ((t: PlayTrack, dur: number) => void) | null = null;
   /** Opens a queued track's files right before it plays (sealed copies, your files, the phone's library). */
   loader: ((t: PlayTrack) => Promise<PlayTrack | undefined>) | null = null;
+  /** Synchronous fast-path for catalogue tracks & generators so mobile play() runs inside the user tap gesture. */
+  syncLoader: ((t: PlayTrack) => PlayTrack | undefined) | null = null;
   private advancing = false;
   private startSerial = 0;
   // Media elements and their source nodes live for the whole session: a source node binds to an element for good,
@@ -240,7 +266,8 @@ export class Engine {
 
   private graph(): AudioContext {
     if (this.ctx) return this.ctx;
-    const ctx = (this.ctx = new AudioContext({ latencyHint: 'playback' }));
+    const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ctx = (this.ctx = new Ctor({ latencyHint: 'playback' }));
     this.bus = ctx.createGain();
     this.bus.gain.value = 0.55;
     this.flat = ctx.createGain();
@@ -286,20 +313,29 @@ export class Engine {
     return ctx;
   }
 
-  /** Call from the first tap or key press: starts the context and readies a few media elements. */
-  unlock() {
-    if (this.unlocked) return;
-    this.unlocked = true;
-    const ctx = this.graph();
-    void ctx.resume();
-    for (let i = 0; i < 6; i++) {
-      const el = this.element();
-      el.src = SILENT_WAV;
-      el.play()
-        .then(() => el.pause())
-        .catch(() => {})
-        .finally(() => this.release(el));
+  /** Wakes the AudioContext synchronously inside a user tap/click/key gesture (including iOS Safari's "interrupted" state). */
+  private wakeContext(ctx: AudioContext) {
+    if (ctx.state !== 'running') {
+      void ctx.resume().catch(() => {});
     }
+    if (!this.unlocked || ctx.state !== 'running') {
+      this.unlocked = true;
+      try {
+        const buf = ctx.createBuffer(1, 1, 22050);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start(0);
+      } catch {
+        /* fine */
+      }
+    }
+  }
+
+  /** Call from the first tap or key press: wakes the AudioContext synchronously. */
+  unlock() {
+    const ctx = this.graph();
+    this.wakeContext(ctx);
   }
 
   private element(): HTMLAudioElement {
@@ -308,6 +344,9 @@ export class Engine {
       el = new Audio();
       el.crossOrigin = 'anonymous';
       el.preload = 'auto';
+      (el as HTMLAudioElement & { playsInline?: boolean }).playsInline = true;
+      el.setAttribute('playsinline', '');
+      el.setAttribute('webkit-playsinline', '');
     }
     el.loop = false;
     el.playbackRate = 1;
@@ -668,7 +707,7 @@ export class Engine {
     o.meter.fftSize = 1024;
     o.fade = ctx.createGain();
     if (o.kind === 'direct') {
-      o.voice!.out.connect(o.fade).connect(d.spatial);
+      o.voice!.out.connect(o.fade).connect(d.spatial!);
       o.fade.connect(o.meter);
       return;
     }
@@ -683,7 +722,7 @@ export class Engine {
           src.connect(split);
           d.splits.set(o.el, split);
           // A stereo file's untouched original is the same element, flat and unsplit.
-          if (!o.clone) src.connect(d.origGain);
+          if (!o.clone && d.origGain) src.connect(d.origGain);
         }
         const tap = ctx.createGain();
         split.connect(tap, o.kind === 'left' ? 0 : 1);
@@ -691,7 +730,7 @@ export class Engine {
         o.tap = tap;
       } else if (o.kind === 'mono') {
         into = src;
-        if (!o.clone) src.connect(d.origGain);
+        if (!o.clone && d.origGain) src.connect(d.origGain);
       } else {
         into = src;
         if (o.stem === 'piano') {
@@ -712,7 +751,7 @@ export class Engine {
     } else {
       into = o.voice!.out;
     }
-    into.connect(o.fade).connect(o.panner).connect(d.spatial);
+    into.connect(o.fade).connect(o.panner).connect(d.spatial!);
     o.fade.connect(o.meter);
     this.place(o);
   }
@@ -727,9 +766,13 @@ export class Engine {
 
   // MARK: Decks
 
-  private async build(track: PlayTrack): Promise<Deck> {
+  /** Connects a deck's media elements or generators into the Web Audio graph.
+   *  May be deferred until the first tap gesture so mobile Safari never creates a background-suspended AudioContext. */
+  private wireDeck(d: Deck) {
+    if (d.wired || d.disposed) return;
     const ctx = this.graph();
-    const d = new Deck(track, ctx);
+    d.ctx = ctx;
+    d.wired = true;
     d.origGain = ctx.createGain();
     d.bedGain = ctx.createGain();
     d.spatial = ctx.createGain();
@@ -739,28 +782,65 @@ export class Engine {
     d.origGain.connect(d.fade);
     d.bedGain.connect(d.fade);
     d.fade.connect(this.flat);
+    const track = d.track;
     if (track.kind === 'song') {
-      const mk = (srcs: { url: string; type: string }[] = []) => {
+      if (track.spatial === 'stems' && track.stems) {
+        if (d.master) {
+          const o = this.sourceOf(d.master);
+          o.connect(d.origGain);
+          d.origMeter = ctx.createAnalyser();
+          d.origMeter.fftSize = 2048;
+          o.connect(d.origMeter);
+        }
+        d.spatial.connect(this.bus);
+      } else {
+        d.spatial.connect(this.bus);
+      }
+    } else if (track.gens?.length) {
+      d.spatial.connect(this.bus);
+      const gainScale = 1 / Math.sqrt(track.gens.length);
+      for (let i = 0; i < track.gens.length; i++) {
+        const item = track.gens[i];
+        const o = d.objs[i];
+        if (o && !o.voice && item.gen.type !== 'clip') {
+          o.voice = createVoice(ctx, item.gen, { loop: !!track.loop, attack: 0.35 });
+          o.voice.out.gain.value = gainScale;
+        }
+      }
+    } else if (track.gen) {
+      const direct = track.spatial === 'direct';
+      d.spatial.connect(direct ? this.direct : this.bus);
+      const o = d.objs[0];
+      if (o && !o.voice && track.gen.type !== 'clip') {
+        o.voice = createVoice(ctx, track.gen, { loop: !!track.loop, attack: 0.04 });
+      }
+    }
+    for (const o of d.objs) if (o.el || o.voice) this.wire(d, o);
+    for (const o of d.objs) if (o.kind !== 'mono' || (!track.pos && !track.gens?.length)) this.placeDefault(o);
+    this.applyMode(d, true);
+  }
+
+  /** Synchronously creates the Deck and its HTMLAudioElements + bubble objects without awaiting network or IDB.
+   *  When `deferAudioContext` is true (cued on page open before any user gesture), no AudioContext is created yet. */
+  private buildSync(track: PlayTrack, deferAudioContext = false): Deck {
+    const d = new Deck(track, deferAudioContext ? null : this.graph());
+    if (track.kind === 'song') {
+      const mk = (srcs: { url: string; type: string }[] = [], eager = true) => {
         const el = this.element();
+        el.preload = eager ? 'auto' : isMobileAudio() ? 'metadata' : 'auto';
         el.src = pick(el, srcs);
         return el;
       };
       if (track.spatial === 'stems' && track.stems) {
-        d.master = mk(track.original ?? track.src);
-        const o = this.sourceOf(d.master);
-        o.connect(d.origGain);
-        d.origMeter = ctx.createAnalyser();
-        d.origMeter.fftSize = 2048;
-        o.connect(d.origMeter);
-        d.spatial.connect(this.bus);
+        // On mobile, don't force a simultaneous 10 MB original download while 5 stems are buffering in nu.waves mode.
+        d.master = mk(track.original ?? track.src, !isMobileAudio() || this.mode === 'orig');
         for (const s of track.stems) {
-          const el = mk([{ url: s.url, type: '' }]);
+          const el = mk([{ url: s.url, type: '' }], true);
           d.objs.push({ key: s.id, kind: 'stem', stem: s.id, label: s.label, pos: { x: 0, y: 1, z: 0 }, mark: s.mark, clone: false, level: 0, el });
         }
       } else {
-        const el = mk(track.src);
+        const el = mk(track.src, true);
         d.master = el;
-        d.spatial.connect(this.bus);
         if (track.spatial === 'mono') {
           d.objs.push({ key: 'mono', kind: 'mono', label: track.title, pos: { ...(track.pos ?? this.venue.mono) }, mark: '#7ee0ff', clone: false, level: 0, el });
         } else {
@@ -769,12 +849,7 @@ export class Engine {
         }
       }
     } else if (track.gens?.length) {
-      d.spatial.connect(this.bus);
-      const gainScale = 1 / Math.sqrt(track.gens.length);
       for (const item of track.gens) {
-        const clip = item.gen.type === 'clip' ? await clipBuffer(ctx, item.gen.url) : undefined;
-        const voice = createVoice(ctx, item.gen, { loop: !!track.loop, attack: 0.35, clip });
-        voice.out.gain.value = gainScale;
         d.objs.push({
           key: item.id,
           kind: 'mono',
@@ -783,18 +858,38 @@ export class Engine {
           mark: item.gen.mark,
           clone: false,
           level: 0,
-          voice,
         });
       }
     } else if (track.gen) {
       const direct = track.spatial === 'direct';
-      d.spatial.connect(direct ? this.direct : this.bus);
-      const clip = track.gen.type === 'clip' ? await clipBuffer(ctx, track.gen.url) : undefined;
-      const voice = createVoice(ctx, track.gen, { loop: !!track.loop, attack: 0.04, clip });
-      d.objs.push({ key: 'voice', kind: direct ? 'direct' : 'mono', label: track.title, pos: { ...(track.pos ?? this.venue.mono) }, mark: track.gen.mark, clone: false, level: 0, voice });
+      d.objs.push({ key: 'voice', kind: direct ? 'direct' : 'mono', label: track.title, pos: { ...(track.pos ?? this.venue.mono) }, mark: track.gen.mark, clone: false, level: 0 });
     }
-    for (const o of d.objs) this.wire(d, o);
     for (const o of d.objs) if (o.kind !== 'mono' || (!track.pos && !track.gens?.length)) this.placeDefault(o);
+    if (!deferAudioContext) this.wireDeck(d);
+    return d;
+  }
+
+  private async build(track: PlayTrack, deferAudioContext = false): Promise<Deck> {
+    const d = this.buildSync(track, deferAudioContext);
+    if (!deferAudioContext && track.kind === 'generator') {
+      const ctx = this.graph();
+      if (track.gens?.length) {
+        const gainScale = 1 / Math.sqrt(track.gens.length);
+        for (let i = 0; i < track.gens.length; i++) {
+          const item = track.gens[i];
+          if (item.gen.type === 'clip' && d.objs[i] && !d.objs[i].voice) {
+            const clip = await clipBuffer(ctx, item.gen.url);
+            d.objs[i].voice = createVoice(ctx, item.gen, { loop: !!track.loop, attack: 0.35, clip });
+            d.objs[i].voice!.out.gain.value = gainScale;
+            this.wire(d, d.objs[i]);
+          }
+        }
+      } else if (track.gen?.type === 'clip' && d.objs[0] && !d.objs[0].voice) {
+        const clip = await clipBuffer(ctx, track.gen.url);
+        d.objs[0].voice = createVoice(ctx, track.gen, { loop: !!track.loop, attack: 0.04, clip });
+        this.wire(d, d.objs[0]);
+      }
+    }
     return d;
   }
 
@@ -804,10 +899,10 @@ export class Engine {
     for (const o of d.objs) this.unwire(d, o);
     for (const el of d.els()) this.release(el);
     if (d.bed) this.release(d.bed);
-    d.origGain.disconnect();
-    d.bedGain.disconnect();
-    d.spatial.disconnect();
-    d.fade.disconnect();
+    d.origGain?.disconnect();
+    d.bedGain?.disconnect();
+    d.spatial?.disconnect();
+    d.fade?.disconnect();
     d.origMeter?.disconnect();
     for (const s of d.splits.values()) s.disconnect();
     for (const u of d.track.revoke ?? []) URL.revokeObjectURL(u);
@@ -819,7 +914,7 @@ export class Engine {
   }
 
   private applyMode(d: Deck, now = false) {
-    if (!this.ctx) return;
+    if (!this.ctx || !d.wired || !d.origGain || !d.bedGain || !d.spatial) return;
     const t = this.ctx.currentTime;
     const k = now ? 0.001 : 0.12;
     const stems = d.track.spatial === 'stems';
@@ -829,6 +924,10 @@ export class Engine {
     d.origGain.gain.setTargetAtTime(mode === 'orig' ? 1 : 0, t, k);
     d.bedGain.gain.setTargetAtTime(mode === 'bed' ? 1 : 0, t, k);
     d.spatial.gain.setTargetAtTime(mode === 'waves' ? this.spatialGain(d) : 0, t, k);
+    if (mode === 'orig' && d.master && d.playing && d.master.paused) {
+      d.master.currentTime = d.position();
+      d.master.play().catch(() => {});
+    }
     if (mode === 'bed' && !d.bed && d.track.bed) {
       const el = this.element();
       el.src = pick(el, d.track.bed.src);
@@ -913,55 +1012,22 @@ export class Engine {
     }
   }
 
-  /** Builds + buffers `track` into the active deck. Does not start playback.
-   *  Never awaits AudioContext.resume — that only resolves after a user gesture and would
-   *  block the spacetime bubble and stem buffers until play. */
-  private async load(track: PlayTrack, at: number, xf?: number): Promise<Deck | null> {
-    this.graph(); // may stay suspended until play
-    const my = ++this.startSerial;
-    const old = this.deck;
-    // Reuse an already-loaded deck for the same track (select → load, then play).
-    if (old && !old.disposed && old.track.id === track.id && old.isSong) {
-      for (const el of old.els()) {
-        el.currentTime = at;
-        el.loop = this.repeat === 'one' && !this.channel && !this.mixed;
-      }
-      this.emit();
-      void this.readyAll(old.els()).then(() => {
-        if (my === this.startSerial) this.emit();
-      });
-      return old;
-    }
-    this.prefetch(track);
-    let loaded = track;
-    if (this.loader) {
-      try {
-        loaded = (await this.loader(track)) ?? track;
-      } catch {
-        loaded = track;
-      }
-      if (my !== this.startSerial) return null;
-    }
-    const d = await this.build(loaded);
-    if (my !== this.startSerial) {
-      this.dispose(d);
-      return null;
-    }
-    // Put the deck on stage immediately so the bubble shows every stem while media buffers.
+  /** Installs `d` as the active deck, handles crossfades from `old`, and configures element listeners. */
+  private installDeck(d: Deck, old: Deck | null, at: number, xf?: number, my = this.startSerial) {
     this.deck = d;
     this.selected = d.objs[0] ?? null;
-    this.applyMode(d, true);
+    if (d.wired) this.applyMode(d, true);
     const wasPlaying = !!old?.playing;
     const fadeS = xf ?? (wasPlaying ? this.crossfade : 0);
     const outS = Math.max(fadeS, wasPlaying ? 0.25 : 0);
     if (old && old !== d) {
-      if (outS > 0) {
+      if (outS > 0 && old.wired) {
         this.rampTo(old.fade, 0, outS);
         this.rampTo(old.spatial, 0, outS);
         window.setTimeout(() => this.dispose(old), outS * 1000 + 80);
       } else this.dispose(old);
     }
-    if (fadeS > 0 && d.isSong) {
+    if (fadeS > 0 && d.isSong && d.wired && d.fade) {
       d.fade.gain.value = 0;
       this.rampTo(d.fade, 1, fadeS);
       for (const o of d.objs)
@@ -970,25 +1036,36 @@ export class Engine {
           this.rampTo(o.fade, 1, fadeS);
         }
     }
-    if (!d.isSong) {
+    if (!d.isSong && d.wired) {
       const v = d.objs.find((o) => o.voice)?.voice;
       v?.retune?.(this.tone.hold, this.tone.fade, fadeS > 0 ? fadeS : 0.04);
     }
     if (d.isSong) {
       for (const el of d.els()) {
-        el.currentTime = at;
+        if (at > 0) {
+          try {
+            el.currentTime = at;
+          } catch {
+            /* seek applied on loadedmetadata */
+          }
+        }
         el.loop = this.repeat === 'one' && !this.channel && !this.mixed;
       }
-      d.master!.onended = () => this.onEnded(d);
-      d.master!.onerror = () => {
-        if (d !== this.deck || d.disposed) return;
-        this.error = `${d.track.title} could not be played.`;
-        window.setTimeout(() => this.onEnded(d), 400);
-      };
+      const endCarrier = d.master ?? d.objs.find((o) => o.el)?.el;
+      if (endCarrier) {
+        endCarrier.onended = () => this.onEnded(d);
+        endCarrier.onerror = () => {
+          if (d !== this.deck || d.disposed) return;
+          this.error = `${d.track.title} could not be played.`;
+          window.setTimeout(() => this.onEnded(d), 400);
+        };
+      }
+      if (d.objs[0]?.el && d.objs[0].el !== endCarrier) {
+        d.objs[0].el.onended = () => this.onEnded(d);
+      }
       this.error = null;
     }
     this.emit();
-    // Buffer every source in the background as soon as the track is selected — before play — without blocking UI.
     if (d.isSong) {
       void this.readyAll(d.els()).then(() => {
         if (my === this.startSerial) this.emit();
@@ -999,37 +1076,169 @@ export class Engine {
         if (my === this.startSerial) this.emit();
       });
     }
+  }
+
+  /** Builds + buffers `track` into the active deck. Does not start playback.
+   *  Never creates or resumes AudioContext when unlocked is false — on iOS Safari an AudioContext created
+   *  outside a user gesture can permanently silence MediaElementAudioSourceNode until the tab reloads. */
+  private async load(track: PlayTrack, at: number, xf?: number): Promise<Deck | null> {
+    const deferCtx = !this.unlocked;
+    if (!deferCtx) this.graph();
+    const my = ++this.startSerial;
+    const old = this.deck;
+    // Reuse an already-loaded deck for the same track (select → load, then play).
+    if (old && !old.disposed && old.track.id === track.id && old.isSong) {
+      for (const el of old.els()) {
+        if (at > 0 || el.currentTime > 0.05) {
+          try {
+            el.currentTime = at;
+          } catch {
+            /* ignore before metadata */
+          }
+        }
+        el.loop = this.repeat === 'one' && !this.channel && !this.mixed;
+      }
+      this.emit();
+      void this.readyAll(old.els()).then(() => {
+        if (my === this.startSerial) this.emit();
+      });
+      return old;
+    }
+    this.prefetch(track);
+    const syncTrack = this.syncLoader?.(track);
+    if (syncTrack) {
+      const d = await this.build(syncTrack, deferCtx);
+      if (my !== this.startSerial) {
+        this.dispose(d);
+        return null;
+      }
+      this.installDeck(d, old, at, xf, my);
+      return d;
+    }
+    let loaded = track;
+    if (this.loader) {
+      try {
+        loaded = (await this.loader(track)) ?? track;
+      } catch {
+        loaded = track;
+      }
+      if (my !== this.startSerial) return null;
+    }
+    const d = await this.build(loaded, deferCtx);
+    if (my !== this.startSerial) {
+      this.dispose(d);
+      return null;
+    }
+    this.installDeck(d, old, at, xf, my);
     return d;
   }
 
-  /** Swaps the playing deck for `track`, crossfading over `xf` seconds when given. */
+  /** Swaps the playing deck for `track`, crossfading over `xf` seconds when given.
+   *  For catalogue tracks and generators, builds the deck and invokes `el.play()` synchronously
+   *  before the first `await` so mobile browsers (iOS Safari / Android Chrome) never reject playback. */
   private async start(track: PlayTrack, at: number, xf?: number) {
     const ctx = this.graph();
-    this.unlocked = true;
-    await ctx.resume();
+    this.wakeContext(ctx);
+    const old = this.deck;
+    if (old && !old.disposed && old.track.id === track.id && old.isSong) {
+      if (!old.wired) this.wireDeck(old);
+      await this.run(old, at);
+      this.history?.(old.track, this.duration());
+      this.emit();
+      return;
+    }
+    const syncTrack = this.syncLoader?.(track);
+    if (syncTrack && !(syncTrack.kind === 'generator' && (syncTrack.gen?.type === 'clip' || syncTrack.gens?.some((g) => g.gen.type === 'clip')))) {
+      const my = ++this.startSerial;
+      this.prefetch(syncTrack);
+      const d = this.buildSync(syncTrack, false);
+      this.installDeck(d, old, at, xf, my);
+      await this.run(d, at);
+      this.history?.(d.track, this.duration());
+      this.emit();
+      return;
+    }
     const d = await this.load(track, at, xf);
-    if (!d || d !== this.deck) return;
-    if (d.isSong) await this.readyAll(d.els());
-    if (d.bed) await this.ready(d.bed);
-    if (d !== this.deck || d.disposed) return;
+    if (!d || d !== this.deck || d.disposed) return;
+    if (!d.wired) this.wireDeck(d);
     await this.run(d, at);
     this.history?.(d.track, this.duration());
     this.emit();
   }
 
   private async run(d: Deck, at: number) {
-    const ctx = this.ctx!;
+    const ctx = this.graph();
+    this.wakeContext(ctx);
+    if (!d.wired) this.wireDeck(d);
     d.playing = true;
     d.ended = false;
+    this.error = null;
+    this.emit();
     if (d.isSong) {
-      // Media is already buffered from load(); just align clocks once and play.
-      for (const el of d.els()) {
-        if (Math.abs(el.currentTime - at) > 0.02) el.currentTime = at;
+      const allEls = d.els();
+      const activeEls = d.playEls(this.mode);
+      for (const el of allEls) {
         el.loop = this.repeat === 'one' && !this.channel && !this.mixed;
+        if (at > 0 || el.currentTime > 0.05) {
+          try {
+            if (Math.abs(el.currentTime - at) > 0.05) el.currentTime = at;
+          } catch {
+            const seekOnce = () => {
+              el.removeEventListener('loadedmetadata', seekOnce);
+              try {
+                el.currentTime = at;
+              } catch {
+                /* ignore */
+              }
+            };
+            el.addEventListener('loadedmetadata', seekOnce);
+          }
+        }
       }
       this.lastSync = performance.now();
-      await Promise.allSettled(d.els().map((el) => el.play()));
+      // Call play() on every active element synchronously inside the user gesture before awaiting anything!
+      const playPromises = activeEls.map((el) => {
+        try {
+          return el.play();
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      });
+      const results = await Promise.allSettled(playPromises);
+      if (d !== this.deck || d.disposed) return;
+      // Retry any stem that rejected transiently once it finishes buffering.
+      for (let i = 0; i < activeEls.length; i++) {
+        if (results[i].status === 'rejected' && d.playing) {
+          const el = activeEls[i];
+          void this.ready(el, 6000).then(() => {
+            if (d === this.deck && d.playing && !d.disposed && el.paused) {
+              const refT = d.position();
+              if (refT > 0.05) {
+                try {
+                  el.currentTime = refT;
+                } catch {
+                  /* ignore */
+                }
+              }
+              el.play().catch(() => {});
+            }
+          });
+        }
+      }
+      const anyPlaying = activeEls.some((el) => !el.paused);
+      if (!anyPlaying && results.length && results.every((r) => r.status === 'rejected')) {
+        d.playing = false;
+        this.emit();
+        return;
+      }
     } else {
+      if (ctx.state !== 'running') {
+        try {
+          await ctx.resume();
+        } catch {
+          /* ignore */
+        }
+      }
       d.genOffset = at;
       d.startedAt = ctx.currentTime;
       for (const o of d.objs) o.voice?.start();
@@ -1049,7 +1258,7 @@ export class Engine {
 
   async play() {
     const ctx = this.graph();
-    await ctx.resume();
+    this.wakeContext(ctx);
     const d = this.deck;
     if (!d) {
       if (this.channel) return;
@@ -1058,7 +1267,6 @@ export class Engine {
     }
     if (d.playing) return;
     const at = d.ended ? 0 : d.position();
-    if (d.isSong) await this.readyAll(d.els());
     await this.run(d, at);
     this.emit();
   }
@@ -1203,19 +1411,30 @@ export class Engine {
     if (d && this.ctx) {
       // Stem clock: only wake paused elements, and only hard-seek on catastrophic drift.
       // Seeking HTMLMediaElement every ~500ms at a 50ms threshold was the choppy drop.
-      if (d.master && d.playing && now - this.lastSync > 2000) {
+      if (d.playing && d.isSong && now - this.lastSync > 2000) {
         this.lastSync = now;
-        const t = d.master.currentTime;
-        if (!d.master.paused)
-          for (const el of d.els()) {
-            if (el === d.master) continue;
+        const activeEls = d.playEls(this.mode);
+        const clockEl = (d.master && !d.master.paused ? d.master : activeEls.find((e) => !e.paused)) ?? null;
+        if (clockEl) {
+          const t = clockEl.currentTime;
+          for (const el of activeEls) {
+            if (el === clockEl) continue;
             if (el.paused) {
-              el.currentTime = t;
+              try {
+                el.currentTime = t;
+              } catch {
+                /* ignore */
+              }
               el.play().catch(() => {});
             } else if (Math.abs(el.currentTime - t) > 0.45) {
-              el.currentTime = t;
+              try {
+                el.currentTime = t;
+              } catch {
+                /* ignore */
+              }
             }
           }
+        }
       }
       // Keep the split as loud as the untouched file, measured live, while both play in step.
       if (d.origMeter && d.master && !d.master.paused && this.mode === 'waves') {

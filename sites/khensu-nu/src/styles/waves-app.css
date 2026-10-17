@@ -2066,6 +2066,17 @@ body.wv-has-bar .wv {
     border-radius: 0.5rem;
     object-fit: cover;
   }
+  .wv-card-play {
+    opacity: 0.94;
+    transform: translateY(0) scale(1);
+    width: 1.75rem;
+    height: 1.75rem;
+    right: 0.28rem;
+    bottom: 0.28rem;
+  }
+  .wv-row-ic {
+    opacity: 0.85;
+  }
   .wv-quick-grid {
     grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
     gap: 0.4rem;
