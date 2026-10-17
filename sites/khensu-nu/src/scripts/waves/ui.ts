@@ -30,7 +30,7 @@ import { HeadTracker, hasCamera, hasDeviceMotion, hasNative, type HeadSource } f
 import * as lib from './library';
 import * as store from './store';
 import { onAir, upcoming } from './channels';
-import { capture as captureScene, encodeShare, decodeShare, listenUrl, isCatalogueTrack, type Scene } from './scene';
+import { capture as captureScene, encodeShare, decodeShare, listenUrl, songUrl, isCatalogueTrack, type Scene } from './scene';
 import { InkPen, inkSvg } from './ink';
 import { tide, resolveTide } from './tide';
 
@@ -84,7 +84,10 @@ const parseRoute = (): Route => {
   const seg = path.split('/').filter(Boolean).map(decodeURIComponent);
   const q = new URLSearchParams(qs ?? '').get('q') ?? undefined;
   if (!seg.length) return { name: 'home' };
-  if (seg[0] === 'library') return { name: 'library', sub: seg[1] ?? 'all' };
+  if (seg[0] === 'library') {
+    const sub = seg[1] && seg[1] !== 'all' ? seg[1] : 'songs';
+    return { name: 'library', sub };
+  }
   return { name: seg[0], id: seg[1], q };
 };
 
@@ -311,7 +314,7 @@ export class App {
         html = this.searchView(r.q ?? '');
         break;
       case 'library':
-        html = await this.libraryView(r.sub ?? 'all');
+        html = await this.libraryView(r.sub ?? 'songs');
         break;
       case 'channels':
         html = this.channelsView();
@@ -353,34 +356,21 @@ export class App {
       const t = air && trackOf(air.item.trackId);
       el.textContent = t ? `${t.title} · ${artistOf(t.artistId)?.name ?? ''}` : 'off air';
     }
-    const tideEl = this.view.querySelector<HTMLElement>('[data-home-tide]');
-    if (tideEl) {
-      const t = tide();
-      const r = resolveTide(t);
-      const cards = [
-        ...r.collections.map((c) => this.collectionCard(c)),
-        ...r.albums.map((a) => this.albumCard(a)),
-        ...r.channels.map((c) => this.channelCard(c)),
-        ...r.tracks.map((tr) => this.trackCard(lib.decorate(tr))),
-      ].slice(0, 8);
-      tideEl.innerHTML = `<section class="wv-sec wv-tide" data-tide="${esc(t.band)}">${h2(t.label)}<p class="wv-lib-note">${esc(t.lede)}</p>${this.rail(cards)}</section>`;
+    const plRail = this.view.querySelector<HTMLElement>('[data-home-playlists-rail]');
+    if (plRail && this.playlists.length) {
+      for (const p of this.playlists) {
+        if (!plRail.querySelector(`[href="#/playlist/${CSS.escape(p.id)}"]`)) {
+          plRail.insertAdjacentHTML('afterbegin', this.playlistCard(p));
+        }
+      }
     }
     const mine = this.view.querySelector<HTMLElement>('[data-home-mine]');
     if (!mine) return;
-    const recent = await store.history.recent(12).catch(() => []);
-    const seen = new Set<string>();
-    const recentTracks = recent.filter((h) => (seen.has(h.key) ? false : seen.add(h.key))).map((h) => this.light(h.key)).filter((t): t is PlayTrack => !!t).slice(0, 8);
     let html = '';
-    if (recentTracks.length) html += `<section class="wv-sec">${h2('Recently played')}${this.rail(recentTracks.map((t) => this.trackCard(t)))}</section>`;
-    const mixIds = [...this.liked, ...recent.map((h) => h.key)].filter((id, i, a) => a.indexOf(id) === i).slice(0, 24);
-    const mix = this.tracksOf(mixIds).slice(0, 12);
-    if (mix.length >= 3) {
-      html += `<section class="wv-sec">${h2('Made for you', `<button type="button" class="wv-h-link" data-act="play-all" data-ids="${esc(JSON.stringify(mix.map((t) => t.id)))}">Play</button>`)}<p class="wv-lib-note">From likes and what you played, shuffled on this device. Nothing leaves it.</p>${this.rail(mix.map((t) => this.trackCard(t)))}</section>`;
-    }
-    const followed = ARTISTS.filter((a) => this.follows.has(a.id));
-    if (followed.length) html += `<section class="wv-sec">${h2('Following')}${this.rail(followed.map((a) => this.artistCard(a)))}</section>`;
     const mineTracks = this.fileTracks();
-    if (mineTracks.length) html += `<section class="wv-sec">${h2('Your files', `<a class="wv-h-link" href="#/library/files">${plural(mineTracks.length, 'file')}</a>`)}${this.list(mineTracks.slice(0, 5), { art: true })}</section>`;
+    if (mineTracks.length) {
+      html += `<section class="wv-sec">${h2('Your files', `<a class="wv-h-link" href="#/library/files">${plural(mineTracks.length, 'file')}</a>`)}${this.list(mineTracks.slice(0, 5), { art: true })}</section>`;
+    }
     mine.innerHTML = html;
   }
 
@@ -390,7 +380,9 @@ export class App {
   private subnav(crumb: string) {
     return `<nav class="wv-subnav" aria-label="Breadcrumb">
   <a class="wv-subnav-back" href="#/">← Home</a>
-  <a class="wv-subnav-pill" href="#/library/all">Your Library</a>
+  <a class="wv-subnav-pill" href="#/library/songs">Songs</a>
+  <a class="wv-subnav-pill" href="#/library/albums">Albums</a>
+  <a class="wv-subnav-pill" href="#/library/playlists">Playlists</a>
   <a class="wv-subnav-pill" href="#/healing">Healing tones</a>
   <a class="wv-subnav-pill" href="#/channels">Channels</a>
   <span class="wv-subnav-cur">${esc(lower(crumb))}</span>
@@ -424,10 +416,12 @@ export class App {
 
   /** A track list. `ids` of the whole list ride on the <ol>, so a tap on the row selects/loads and the play button starts. */
   private list(tracks: PlayTrack[], opts: { num?: boolean; art?: boolean; playlist?: string; showAlbum?: boolean } = {}) {
-    if (!tracks.length) return `<p class="wv-empty">Nothing yet.</p>`;
-    const ids = tracks.map((t) => t.id);
+    const seen = new Set<string>();
+    const unique = tracks.filter((t) => (seen.has(t.id) ? false : (seen.add(t.id), true)));
+    if (!unique.length) return `<p class="wv-empty">Nothing yet.</p>`;
+    const ids = unique.map((t) => t.id);
     const cur = this.engine.track?.id;
-    return `<ol class="wv-list" data-list="${esc(JSON.stringify(ids))}">${tracks
+    return `<ol class="wv-list" data-list="${esc(JSON.stringify(ids))}">${unique
       .map((t, i) => {
         const sub = [t.artistName, opts.showAlbum ? t.albumTitle : '', t.spec ? t.spec.replace(/ · generated.*$/, '') : '', this.kept.has(t.id) ? 'kept' : ''].filter(Boolean).join(' · ');
         const canLayer = t.kind === 'generator' && !t.gens?.length;
@@ -435,6 +429,7 @@ export class App {
   <button type="button" class="wv-row-play" data-act="play-track" data-id="${esc(t.id)}" data-i="${i}" aria-label="Play ${esc(t.title)}">${opts.art ? art(t.artUrl, this.cssArt(t), '', 96) : `<span class="wv-row-n">${i + 1}</span>`}<span class="wv-row-ic">${ICON.play}</span></button>
   <button type="button" class="wv-row-text" data-act="select-track" data-id="${esc(t.id)}" data-i="${i}"><b>${esc(t.title)}</b><small>${esc(sub)}</small></button>
   ${canLayer ? `<button type="button" class="wv-row-layer" data-act="add-to-bubble" data-id="${esc(t.id)}" title="Add ${esc(t.title)} into the spacetime bubble">+ 3D</button>` : ''}
+  <button type="button" class="wv-row-share" data-act="share" data-id="${esc(t.id)}" title="Share ${esc(t.title)}" aria-label="Share ${esc(t.title)}">${ICON.share}</button>
   <span class="wv-row-dur">${t.loop ? '∞' : t.dur ? mmss(t.dur) : ''}</span>
   <button type="button" class="wv-row-more" data-act="menu" data-id="${esc(t.id)}" ${opts.playlist ? `data-playlist="${esc(opts.playlist)}"` : ''} aria-label="More for ${esc(t.title)}">${ICON.more}</button>
 </li>`;
@@ -527,11 +522,12 @@ export class App {
   }
 
   private async libraryView(sub: string) {
+    const activeSub = sub === 'all' ? 'songs' : sub;
     const tabs = [
-      ['all', 'All'],
-      ['healing', 'Healing tones'],
+      ['songs', 'Songs'],
       ['albums', 'Albums'],
       ['playlists', 'Playlists'],
+      ['healing', 'Healing tones'],
       ['liked', 'Liked'],
       ['kept', 'Kept offline'],
       ['files', 'Your files'],
@@ -543,7 +539,7 @@ export class App {
     const headBar = `<div class="wv-lib-topbar">
   <div>
     <h1 class="wv-h1 wv-lib-title">your library</h1>
-    <p class="wv-lib-sub">Everything stays sealed on this device — music, healing tones, playlists, scenes and your own files.</p>
+    <p class="wv-lib-sub">Songs, albums, playlists and healing tones — separate, organized and sealed on this device.</p>
   </div>
   <div class="wv-acts-row">
     <button type="button" class="wv-btn wv-btn-primary" data-act="play-healing-all">${ICON.play}<span>Play all healing tones</span></button>
@@ -552,75 +548,42 @@ export class App {
     <input type="file" accept="audio/*,.mp3,.m4a,.aac,.mp4,.wav,.flac,.ogg,.opus,.aif,.aiff,.caf" multiple hidden data-file-input />
   </div>
 </div>`;
-    const nav = `<div class="wv-segs" role="tablist" aria-label="Library">${tabs.map(([id, label]) => `<a role="tab" href="#/library/${id}" aria-selected="${id === sub}">${esc(label)}</a>`).join('')}</div>`;
+    const nav = `<div class="wv-segs" role="tablist" aria-label="Library">${tabs.map(([id, label]) => `<a role="tab" href="#/library/${id}" aria-selected="${id === activeSub}">${esc(label)}</a>`).join('')}</div>`;
     let body = '';
-    if (sub === 'all') {
+    if (activeSub === 'songs') {
       const mine = this.fileTracks();
-      const likedTracks = this.tracksOf([...this.liked]);
-      const keptTracks = this.tracksOf([...this.kept]);
-      const songs = TRACKS.filter((t) => t.kind === 'song').map(lib.decorate);
-      const healingTracks = this.tracksOf(['all-healing-tones', 'all-chakras-3d', ...HEALING_ALL_IDS]);
-      body = `<section class="wv-sec wv-sec-quick">
-  <div class="wv-quick-grid">
-    <button type="button" class="wv-qcard" data-act="play-healing-all">
-      <span class="wv-art wv-art-css h1" aria-hidden="true"></span>
-      <span class="wv-qcard-txt"><b>All healing tones</b><small>19 frequencies, bowls, binaural & nature</small></span>
-      <span class="wv-qcard-play" aria-hidden="true">${ICON.play}</span>
-    </button>
-    <button type="button" class="wv-qcard" data-act="play-one" data-id="all-healing-tones">
-      <span class="wv-art wv-art-css h5" aria-hidden="true"></span>
-      <span class="wv-qcard-txt"><b>All 10 healing tones in 3D</b><small>Simultaneous 3D spacetime bubble</small></span>
-      <span class="wv-qcard-play" aria-hidden="true">${ICON.play}</span>
-    </button>
-    <button type="button" class="wv-qcard" data-act="play-one" data-id="all-chakras-3d">
-      <span class="wv-art wv-art-css h2" aria-hidden="true"></span>
-      <span class="wv-qcard-txt"><b>All 7 chakras in 3D</b><small>Root to crown · 194 Hz to 172 Hz</small></span>
-      <span class="wv-qcard-play" aria-hidden="true">${ICON.play}</span>
-    </button>
-    <a class="wv-qcard" href="#/library/liked">
-      <span class="wv-art wv-art-css a1" aria-hidden="true"></span>
-      <span class="wv-qcard-txt"><b>Liked songs</b><small>${plural(likedTracks.length, 'track')} on this device</small></span>
-      ${likedTracks.length ? `<span class="wv-qcard-play" data-act="play-all" data-ids="${esc(JSON.stringify(likedTracks.map((t) => t.id)))}" role="button" tabindex="0">${ICON.play}</span>` : ''}
-    </a>
-    <a class="wv-qcard" href="#/library/kept">
-      <span class="wv-art wv-art-css a3" aria-hidden="true"></span>
-      <span class="wv-qcard-txt"><b>Kept offline</b><small>${plural(keptTracks.length, 'song')} + all 20 generators</small></span>
-      ${keptTracks.length ? `<span class="wv-qcard-play" data-act="play-all" data-ids="${esc(JSON.stringify(keptTracks.map((t) => t.id)))}" role="button" tabindex="0">${ICON.play}</span>` : ''}
-    </a>
-    <a class="wv-qcard" href="#/library/files">
-      <span class="wv-art wv-art-css f1" aria-hidden="true"></span>
-      <span class="wv-qcard-txt"><b>Your files</b><small>${mine.length ? plural(mine.length, 'local file') : 'Import MP3, FLAC, WAV, M4A'}</small></span>
-      ${mine.length ? `<span class="wv-qcard-play" data-act="play-all" data-ids="${esc(JSON.stringify(mine.map((t) => t.id)))}" role="button" tabindex="0">${ICON.play}</span>` : ''}
-    </a>
-  </div>
-</section>
-${this.playlists.length ? `<section class="wv-sec">${h2('Your playlists', `<button type="button" class="wv-h-link" data-act="new-playlist">+ New playlist</button>`)}${this.rail(this.playlists.map((p) => this.playlistCard(p)))}</section>` : ''}
-<section class="wv-sec">
-  ${h2('Albums & collections')}
-  ${this.rail([...ALBUMS.map((a) => this.albumCard(a)), ...COLLECTIONS.map((c) => this.collectionCard(c))])}
-</section>
-<section class="wv-sec">
-  ${h2('Healing tones & frequencies', `<button type="button" class="wv-h-link" data-act="play-healing-all">Play all healing tones →</button>`)}
-  ${this.list(healingTracks, { art: true, showAlbum: true })}
-</section>
-<section class="wv-sec">
-  ${h2('Songs', `<button type="button" class="wv-h-link" data-act="play-all" data-ids="${esc(JSON.stringify(songs.map((t) => t.id)))}">Play all songs →</button>`)}
-  ${this.list([...mine, ...songs], { art: true, showAlbum: true })}
+      const catSongs = TRACKS.filter((t) => t.kind === 'song').map(lib.decorate);
+      const songs = [...mine, ...catSongs];
+      body = `<section class="wv-sec">
+  ${h2('Songs', `<span class="wv-h-sub">${plural(songs.length, 'song')}</span>`)}
+  ${this.headActions(songs.map((t) => t.id))}
+  ${this.list(songs, { art: true, showAlbum: true })}
 </section>`;
-    } else if (sub === 'healing') {
+    } else if (activeSub === 'albums') {
+      const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
+      body = `<section class="wv-sec">
+  ${h2('Albums', `<span class="wv-h-sub">${plural(musicAlbums.length, 'album')}</span>`)}
+  ${this.rail(musicAlbums.map((a) => this.albumCard(a)))}
+</section>`;
+    } else if (activeSub === 'playlists') {
+      const cards = [
+        ...this.playlists.map((p) => this.playlistCard(p)),
+        ...COLLECTIONS.map((c) => this.collectionCard(c)),
+      ];
+      body = `<section class="wv-sec">
+  ${h2('Playlists', `<button type="button" class="wv-h-link" data-act="new-playlist">+ New playlist</button>`)}
+  ${cards.length ? this.rail(cards) : `<p class="wv-empty">No playlists yet.</p>`}
+</section>`;
+    } else if (activeSub === 'healing') {
       const healingTracks = this.tracksOf(['all-healing-tones', 'all-chakras-3d', ...HEALING_ALL_IDS]);
       body = `<div class="wv-acts-row">
   <button type="button" class="wv-btn wv-btn-primary" data-act="play-healing-all">${ICON.play}<span>Play all healing tones</span></button>
   <button type="button" class="wv-btn" data-act="play-one" data-id="all-healing-tones"><span>All 10 tones in 3D</span></button>
   <button type="button" class="wv-btn" data-act="play-one" data-id="all-chakras-3d"><span>All 7 chakras in 3D</span></button>
-  <button type="button" class="wv-btn" data-act="play-all" data-ids="${esc(JSON.stringify(CHAKRA_IDS))}"><span>Chakra journey (1→7)</span></button>
   <button type="button" class="wv-btn" data-act="play-all" data-ids="${esc(JSON.stringify(HEALING_BOWL_IDS))}"><span>Solfeggio bowls</span></button>
 </div>
-${this.list(healingTracks, { art: true, showAlbum: true })}`;
-    } else if (sub === 'albums') {
-      body = `<section class="wv-sec">${h2('Albums')}${this.rail(ALBUMS.map((a) => this.albumCard(a)))}</section>
-<section class="wv-sec">${h2('Collections & journeys')}${this.rail(COLLECTIONS.map((c) => this.collectionCard(c)))}</section>`;
-    } else if (sub === 'files') {
+${this.list(healingTracks, { art: true, showAlbum: false })}`;
+    } else if (activeSub === 'files') {
       const use = await store.usage();
       const mine = this.fileTracks();
       const nativeN = lib.nativeItems().length;
@@ -636,19 +599,16 @@ ${this.list(healingTracks, { art: true, showAlbum: true })}`;
 </div>
 ${mine.length ? this.headActions(mine.map((t) => t.id)) : ''}
 ${this.list(mine, { art: true, showAlbum: true })}`;
-    } else if (sub === 'kept') {
+    } else if (activeSub === 'kept') {
       const ids = [...this.kept];
       const tracks = this.tracksOf(ids);
       const bytes = (await store.downloads.all()).reduce((a, d) => a + d.bytes, 0);
-      body = `<p class="wv-lib-note">Kept tracks play with no connection, sealed on this device. ${bytes ? `${mb(bytes)} kept.` : 'Keep an album from its page, or a track from its menu.'} All 20 generated healing sounds need no download: they are already here.</p>
+      body = `<p class="wv-lib-note">Kept tracks play with no connection, sealed on this device. ${bytes ? `${mb(bytes)} kept.` : 'Keep an album from its page, or a track from its menu.'} All generated healing sounds need no download: they are already here.</p>
 ${tracks.length ? this.headActions(ids) : ''}${this.list(tracks, { art: true, showAlbum: true })}`;
-    } else if (sub === 'liked') {
+    } else if (activeSub === 'liked') {
       const tracks = this.tracksOf([...this.liked]);
       body = `${tracks.length ? this.headActions(tracks.map((t) => t.id)) : ''}${this.list(tracks, { art: true, showAlbum: true })}`;
-    } else if (sub === 'playlists') {
-      body = `<div class="wv-acts-row"><button type="button" class="wv-btn wv-btn-primary" data-act="new-playlist"><span>New playlist</span></button></div>
-${this.playlists.length ? this.rail(this.playlists.map((p) => this.playlistCard(p))) : `<p class="wv-empty">No playlists yet.</p>`}`;
-    } else if (sub === 'scenes') {
+    } else if (activeSub === 'scenes') {
       const all = await store.scenes.all();
       this.scenes = all;
       body = all.length
@@ -659,25 +619,25 @@ ${this.playlists.length ? this.rail(this.playlists.map((p) => this.playlistCard(
   <small>${esc(s.trackId ? trackOf(s.trackId)?.title || s.trackId : 'any track')} · ${new Date(s.updated).toLocaleDateString()}</small>
   <span class="wv-acts-row">
     <button type="button" class="wv-btn" data-act="scene-apply" data-id="${esc(s.id)}"><span>Recall</span></button>
-    <button type="button" class="wv-btn" data-act="scene-share" data-id="${esc(s.id)}"><span>Share listen</span></button>
+    <button type="button" class="wv-btn" data-act="scene-share" data-id="${esc(s.id)}"><span>Share scene</span></button>
     <button type="button" class="wv-btn" data-act="scene-delete" data-id="${esc(s.id)}"><span>Delete</span></button>
   </span>
 </li>`,
             )
             .join('')}</ul>`
         : `<p class="wv-empty">No scenes yet. Play something, arrange the spacetime bubble, then save a ñü.scene.</p>`;
-    } else if (sub === 'ink') {
+    } else if (activeSub === 'ink') {
       const rows = await store.inks.recent(60);
       body = rows.length
         ? `<p class="wv-lib-note">ñü.ink glyphs of how you listened. Private to this device.</p><div class="wv-ink-grid">${rows
             .map((ink) => `<figure class="wv-ink-card" title="${esc(ink.title)}">${inkSvg(ink.d, 120)}<figcaption><b>${esc(ink.title)}</b><small>${new Date(ink.at).toLocaleString()}</small></figcaption><button type="button" class="wv-btn" data-act="ink-delete" data-id="${esc(ink.id)}"><span>Delete</span></button></figure>`)
             .join('')}</div><div class="wv-acts-row"><button type="button" class="wv-btn" data-act="ink-clear"><span>Clear all ink</span></button></div>`
         : `<p class="wv-empty">No ink yet. Drag sounds or turn your head while something plays, then keep the glyph.</p>`;
-    } else if (sub === 'history') {
+    } else if (activeSub === 'history') {
       const rows = await store.history.recent(100);
       const tracks = rows.map((r) => this.light(r.key)).filter((t): t is PlayTrack => !!t);
       body = `${tracks.length ? `<div class="wv-acts-row"><button type="button" class="wv-btn" data-act="clear-history"><span>Clear history</span></button></div>` : ''}${this.list(tracks, { art: true, showAlbum: true })}`;
-    } else if (sub === 'following') {
+    } else if (activeSub === 'following') {
       const arts = ARTISTS.filter((a) => this.follows.has(a.id));
       const chs = CHANNELS.filter((c) => this.follows.has(c.id));
       body = arts.length || chs.length ? `${arts.length ? `<section class="wv-sec">${h2('Artists')}${this.rail(arts.map((a) => this.artistCard(a)))}</section>` : ''}${chs.length ? `<section class="wv-sec">${h2('Channels')}${this.rail(chs.map((c) => this.channelCard(c)))}</section>` : ''}` : `<p class="wv-empty">Follow an artist or a channel and it shows here. Follows stay on this device.</p>`;
@@ -1175,8 +1135,10 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         await this.applySceneId(id || el.dataset.id || '');
         break;
       case 'scene-share':
-      case 'share':
         await this.shareScene(id || el.dataset.id || '');
+        break;
+      case 'share':
+        await this.shareSong(id || el.dataset.id || '');
         break;
       case 'scene-import':
         await this.importScene();
@@ -1295,13 +1257,52 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     this.openNow(true);
   }
 
+  private shareOrigin(): string {
+    if (location.hostname === 'waves.khensu.nu') return `${location.origin}/`;
+    const p = location.pathname.replace(/\/index\.html$/, '').replace(/\/+$/, '');
+    return `${location.origin}${p || ''}/`;
+  }
+
+  private async shareSong(id: string) {
+    const tid = id || this.engine.track?.id || 'first-attempt';
+    const song = this.light(tid);
+    this.closeMenu();
+    if (!song) return this.toast('Play a song first.');
+    if (song.local || !isCatalogueTrack(song.id)) {
+      return this.toast('Local files stay on this device and are never uploaded.');
+    }
+    const url = songUrl(this.shareOrigin(), song.id);
+    const title = `${song.title}${song.artistName ? ` · ${song.artistName}` : ''} — ñü.ŵævẽš`;
+    const text = `Listen to ${song.title}${song.artistName ? ` by ${song.artistName}` : ''} on ñü.ŵævẽš`;
+    try {
+      await navigator.clipboard?.writeText(url);
+    } catch {
+      /* clipboard optional before native share */
+    }
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url });
+        this.toast(`Shared “${song.title}”.`);
+        return;
+      }
+    } catch (err) {
+      if ((err as DOMException).name === 'AbortError') return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      this.toast(`Song link copied: ${song.title}`);
+    } catch {
+      prompt(`Share link for ${song.title}`, url);
+    }
+  }
+
   private async shareScene(id: string) {
     const eng = this.engine;
     let s = id ? this.scenes.find((x) => x.id === id) || (await store.scenes.get(id)) : null;
     if (!s && eng.track) s = captureScene(eng.track.id, eng.track.title, eng.venue.id, eng.fx, eng.mode, eng.objs());
     if (!s) return this.toast('Play something first.');
     const code = encodeShare(s);
-    const origin = `${location.origin}${location.pathname.endsWith('/') ? location.pathname : `${location.pathname}/`}`;
+    const origin = this.shareOrigin();
     const url = listenUrl(origin, s, code);
     const song = isCatalogueTrack(s.trackId) ? this.light(s.trackId) : undefined;
     const title = song ? `${song.title} · nu.waves` : `${s.name} · nu.waves`;
@@ -1350,7 +1351,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     this.openNow(true);
   }
 
-  /** Opens a shared listen (`#/t/{id}?scene=`) or returns false when the hash is not one. */
+  /** Opens a shared song (`#/t/{id}`) or shared scene (`#/t/{id}?scene=`) or returns false when the hash is not one. */
   private async openShare(): Promise<boolean> {
     const r = parseRoute();
     const q = new URLSearchParams(location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '');
@@ -1359,7 +1360,15 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const trackId = (r.name === 't' && r.id) || q.get('t') || scene?.trackId || '';
     if (!trackId && !scene) return false;
     if (trackId && this.light(trackId)) {
-      if (this.engine.track?.id !== trackId) await this.engine.setQueue(this.tracksOf([trackId]), 0, false);
+      if (this.engine.track?.id !== trackId) {
+        const cat = trackOf(trackId);
+        const alb = cat?.albumId ? albumOf(cat.albumId) : undefined;
+        const pool = alb?.tracks?.length ? alb.tracks : TRACKS.map((x) => x.id);
+        const ordered = [trackId, ...pool.filter((x) => x !== trackId)];
+        await this.engine.setQueue(this.tracksOf(ordered), 0, false);
+        this.bubble.sync();
+        this.paintNow();
+      }
     } else if (trackId && !this.light(trackId)) {
       this.toast('That song is not in the catalogue. Files stay on the device they were added on.');
     }
@@ -1561,6 +1570,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const items: string[] = [];
     items.push(`<button type="button" data-act="queue-next" data-id="${esc(id)}">Play next</button>`);
     items.push(`<button type="button" data-act="queue-last" data-id="${esc(id)}">Add to queue</button>`);
+    if (cat) items.push(`<button type="button" data-act="share" data-id="${esc(id)}">Share song link</button>`);
     items.push(`<button type="button" data-act="like" data-id="${esc(id)}">${this.liked.has(id) ? 'Unlike' : 'Like'}</button>`);
     items.push(`<button type="button" data-act="add-to-playlist" data-id="${esc(id)}">Add to playlist</button>`);
     if (playlist) items.push(`<button type="button" data-act="remove-from-playlist" data-id="${esc(id)}" data-playlist="${esc(playlist)}">Remove from this playlist</button>`);
@@ -1629,6 +1639,17 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       for (const b of bar.querySelectorAll<HTMLElement>('[data-act="prev"]')) b.innerHTML = ICON.prev;
       for (const b of bar.querySelectorAll<HTMLElement>('[data-act="next"]')) b.innerHTML = ICON.next;
       bar.querySelector<HTMLElement>('[data-bar-live]')!.hidden = !eng.live;
+    }
+    const perSongUrl = isCatalogueTrack(t.id) ? songUrl(this.shareOrigin(), t.id) : '';
+    for (const b of this.root.querySelectorAll<HTMLElement>('[data-now] [data-act="share"], [data-bar] [data-act="share"]')) {
+      b.dataset.id = t.id;
+      if (perSongUrl) b.dataset.url = perSongUrl;
+      b.setAttribute('aria-label', `Share ${t.title}`);
+      b.setAttribute('title', perSongUrl ? `Share ${t.title} (${perSongUrl})` : `Share ${t.title}`);
+      if (!b.hasAttribute('data-now-share')) b.innerHTML = ICON.share;
+    }
+    for (const row of this.root.querySelectorAll<HTMLElement>('.wv-row[data-id]')) {
+      row.classList.toggle('is-current', row.dataset.id === t.id);
     }
     for (const b of this.root.querySelectorAll<HTMLElement>('[data-act="toggle"]')) {
       b.innerHTML = eng.playing ? ICON.pause : ICON.play;

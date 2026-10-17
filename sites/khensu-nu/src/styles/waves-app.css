@@ -90,8 +90,25 @@ body.wv-has-bar .wv {
 .wv-h-link {
   font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.62);
   text-decoration: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+.wv-h-link:hover {
+  color: #fff;
+}
+.wv-h-links {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.9rem;
+}
+.wv-h-sub {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
 }
 .wv-h1 {
   font-size: clamp(1.8rem, 4vw, 2.8rem);
@@ -618,14 +635,30 @@ body.wv-has-bar .wv {
   font: 500 0.75rem var(--font-mono);
   color: rgba(255, 255, 255, 0.45);
 }
+.wv-row-share,
 .wv-row-more {
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  flex-shrink: 0;
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
+  display: grid;
+  place-items: center;
   cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.wv-row-share:hover,
+.wv-row-more:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.wv-row-share svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
 }
 .wv-row-more svg {
   width: 1.1rem;
@@ -944,6 +977,10 @@ body.wv-has-bar .wv {
   height: 0.95rem;
   fill: currentColor;
 }
+.wv-bar-ctl .wv-bar-share svg {
+  fill: none;
+  stroke: currentColor;
+}
 .wv-bar-ctl .wv-bar-play svg {
   width: 1rem;
   height: 1rem;
@@ -1026,6 +1063,7 @@ body.wv-has-bar .wv {
 .wv-now-ctl,
 .wv-time,
 .wv-modes,
+.wv-now-actions,
 .wv-queue-btn,
 .wv-now-error,
 .wv-now-meta [data-leave] {
@@ -1038,16 +1076,37 @@ body.wv-has-bar .wv {
   margin: 0;
   overflow-wrap: anywhere;
 }
-.wv-queue-btn {
-  justify-self: start;
+.wv-now-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: 0.65rem;
-  border: 0;
+}
+.wv-share-btn,
+.wv-queue-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   border-radius: 999px;
-  padding: 0.45rem 0.85rem;
+  padding: 0.45rem 0.9rem;
   font: 600 0.82rem var(--font-sans);
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.wv-share-btn:hover,
+.wv-queue-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.wv-share-btn svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: none;
+  stroke: currentColor;
 }
 .wv-more {
   margin-top: 0.85rem;
@@ -1924,10 +1983,13 @@ body.wv-has-bar .wv {
   .wv-modes {
     margin-top: 0.35rem;
   }
+  .wv-now-actions {
+    margin-top: 0.45rem;
+    gap: 0.4rem;
+  }
+  .wv-share-btn,
   .wv-queue-btn {
-    justify-self: start;
-    margin-top: 0.4rem;
-    padding: 0.35rem 0.75rem;
+    padding: 0.38rem 0.78rem;
     font-size: 0.78rem;
   }
   .wv-room {

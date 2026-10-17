@@ -477,7 +477,8 @@ export const COLLECTIONS: Collection[] = [
     id: 'night',
     title: 'Night',
     desc: 'Nocturnes and rain for the end of the day.',
-    art: `${W}/chopin/cover.webp`,
+    art: '',
+    artClass: 'h6',
     tracks: ['chopin-nocturne-op9-no2', 'rain', 'chopin-nocturne-op27-no2', 'chopin-prelude-op28-no15', 'chopin-nocturne-op48-no1', 'ocean'],
   },
   {

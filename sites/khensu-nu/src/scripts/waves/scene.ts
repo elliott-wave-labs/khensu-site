@@ -1,9 +1,9 @@
 // nu.scene: a mid-listen layout of every sound, the room and ñü.ÊQ, saved on this device and recalled
 // without touching the audio samples. Moving a sound is a few numbers; a scene is those numbers named.
 // An artist can ship a default scene later; today you save your own. Nothing leaves the device unless
-// you copy a compact share code yourself.
+// you share a listen link (catalogue song + these numbers) yourself.
 
-import type { Pos } from '../../data/waves';
+import { trackOf, type Pos } from '../../data/waves';
 import type { Fx, Mode, Obj } from './engine';
 
 export type SceneOrbit = { rate: number; radius: number; phase: number };
@@ -47,6 +47,9 @@ export const capture = (
   updated: Date.now(),
 });
 
+/** True when the track lives in the public catalogue (so a link can play it). */
+export const isCatalogueTrack = (id: string) => !!id && !!trackOf(id);
+
 /** Compact share payload (no id): about 200–800 bytes of JSON, then base64url. */
 export function encodeShare(s: Scene): string {
   const bare = { n: s.name, t: s.trackId, v: s.venue, f: s.fx, m: s.mode, o: s.objs.map((x) => [x.key, +x.pos.x.toFixed(3), +x.pos.y.toFixed(3), +x.pos.z.toFixed(3), x.gone ? 1 : 0, x.orbit ? [+x.orbit.rate.toFixed(3), +x.orbit.radius.toFixed(3), +x.orbit.phase.toFixed(3)] : 0]) };
@@ -87,4 +90,17 @@ export function decodeShare(code: string): Scene | null {
   } catch {
     return null;
   }
+}
+
+/** A clean per-song link that opens and cues this song on the player (`#/t/<id>`). */
+export function songUrl(origin: string, trackId: string): string {
+  const base = origin.endsWith('/') ? origin : `${origin}/`;
+  return trackId ? `${base}#/t/${encodeURIComponent(trackId)}` : `${base}#/`;
+}
+
+/** A link that opens this listen: the catalogue song (when there is one) plus the scene. */
+export function listenUrl(origin: string, s: Scene, code = encodeShare(s)): string {
+  const base = origin.endsWith('/') ? origin : `${origin}/`;
+  const hash = isCatalogueTrack(s.trackId) ? `#/t/${encodeURIComponent(s.trackId)}` : '#/';
+  return `${base}${hash}?scene=${code}`;
 }
