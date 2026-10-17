@@ -136,7 +136,7 @@ export function createOrb(canvas: HTMLCanvasElement, radius: number) {
 
   let yaw = 0.0;
   let pitch = 0.42;
-  const dist = radius * 3.3;
+  const dist = radius * 3.95;
   let W = 1;
   let H = 1;
 
@@ -164,7 +164,15 @@ export function createOrb(canvas: HTMLCanvasElement, radius: number) {
     project(p: Pos) {
       tmp.copy(toWorld(p)).project(camera);
       const d = camera.position.distanceTo(toWorld(p));
-      return { x: ((tmp.x + 1) / 2) * W, y: ((1 - tmp.y) / 2) * H, near: Math.max(0, Math.min(1, (dist + radius - d) / (2 * radius))) };
+      const rawX = ((tmp.x + 1) / 2) * W;
+      const rawY = ((1 - tmp.y) / 2) * H;
+      const padX = Math.min(28, W * 0.08);
+      const padY = Math.min(22, H * 0.07);
+      return {
+        x: Math.max(padX, Math.min(W - padX, rawX)),
+        y: Math.max(padY, Math.min(H - padY, rawY)),
+        near: Math.max(0, Math.min(1, (dist + radius - d) / (2 * radius))),
+      };
     },
     /** Moves a point along the plane facing the camera, under the pointer. */
     drag(clientX: number, clientY: number, from: Pos): Pos {

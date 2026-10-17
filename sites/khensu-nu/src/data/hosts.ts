@@ -4,7 +4,7 @@ export const PRODUCTS = {
   webe: 'https://webe.khensu.nu',
   void: 'https://void.khensu.nu',
   media: 'https://media.khensu.nu',
-  // Apex until Hover has moments.khensu.nu A → sites LB and product_hosts is re-enabled.
+  // Apex until Hover A for moments.khensu.nu → LB + own_certificate ACTIVE (currently NXDOMAIN).
   moments: 'https://khensu.nu/moments',
   memory: 'https://memory.khensu.nu',
   create: 'https://create.khensu.nu',

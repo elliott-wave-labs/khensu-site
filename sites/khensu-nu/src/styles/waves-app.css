@@ -1064,6 +1064,7 @@ body.wv-has-bar .wv {
 .wv-time,
 .wv-modes,
 .wv-now-actions,
+.wv-lyrics,
 .wv-queue-btn,
 .wv-now-error,
 .wv-now-meta [data-leave] {
@@ -1242,18 +1243,21 @@ body.wv-has-bar .wv {
 
 .wv-room {
   text-align: center;
+  overflow: visible;
+  padding: 0.35rem 0.5rem 0.6rem;
 }
 .wv-orb-brand {
-  margin: 0;
+  margin: 0 0 0.25rem;
   font-weight: 650;
   font-size: 0.95rem;
   letter-spacing: -0.03em;
 }
 .wv-ring {
   position: relative;
-  width: min(100%, 22rem);
+  width: min(100%, 22.5rem);
   aspect-ratio: 1;
-  margin: 0.35rem auto 0;
+  margin: 0.45rem auto 0.55rem;
+  overflow: visible;
   touch-action: none;
 }
 .wv-ring canvas {
@@ -2400,23 +2404,44 @@ body.wv-has-bar .wv {
   -webkit-backdrop-filter: blur(8px);
 }
 .wv-story-dialog {
-  max-width: 48rem;
-  width: min(94vw, 48rem);
+  max-width: 52rem;
+  width: min(95vw, 52rem);
 }
 .wv-story-sheet {
   max-width: 100%;
 }
+.wv-story-top,
 .wv-story-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
 }
+.wv-story-top h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.wv-story-top p {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(226, 232, 240, 0.7);
+}
+.wv-story-fmts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.65rem 0 0.4rem;
+}
+.wv-story-fmts .wv-chip[aria-pressed='true'] {
+  background: linear-gradient(135deg, rgba(34, 245, 154, 0.28), rgba(56, 189, 248, 0.28));
+  border-color: rgba(34, 245, 154, 0.65);
+  color: #fff;
+}
 .wv-story-grid {
   display: grid;
-  grid-template-columns: minmax(12.5rem, 15.5rem) minmax(0, 1fr);
+  grid-template-columns: minmax(13rem, auto) minmax(0, 1fr);
   gap: 1.15rem;
-  align-items: start;
+  align-items: center;
   margin-top: 0.5rem;
 }
 .wv-story-preview,
@@ -2424,19 +2449,108 @@ body.wv-has-bar .wv {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.45rem;
 }
 .wv-story-preview canvas,
 .wv-story-canvas,
 canvas[data-story-canvas] {
-  width: 100%;
-  max-width: 14.5rem;
-  aspect-ratio: 9 / 16;
-  height: auto;
+  width: auto !important;
+  height: auto !important;
+  max-width: min(100%, 22rem) !important;
+  max-height: min(56vh, 23.5rem) !important;
+  object-fit: contain;
   border-radius: 1.1rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), 0 0 28px rgba(56, 189, 248, 0.16);
   background: #050811;
+}
+canvas[data-story-canvas][data-fmt='indra'] {
+  max-width: min(100%, 25rem) !important;
+  max-height: min(46vh, 14.5rem) !important;
+}
+canvas[data-story-canvas][data-fmt='square'] {
+  max-width: min(100%, 19rem) !important;
+  max-height: min(50vh, 19rem) !important;
+}
+.wv-shareplay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.88rem;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.42);
+  background: linear-gradient(135deg, rgba(34, 245, 154, 0.16), rgba(56, 189, 248, 0.22));
+  color: #e0f2fe;
+  font: 600 0.82rem var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.wv-shareplay-btn:hover,
+.wv-shareplay-btn.is-active,
+.wv-shareplay-btn[aria-pressed='true'] {
+  border-color: #22f59a;
+  box-shadow: 0 0 18px rgba(34, 245, 154, 0.35);
+  color: #fff;
+}
+.wv-shareplay-btn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+.wv-bar-shareplay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.36);
+  background: rgba(56, 189, 248, 0.14);
+  color: #bae6fd;
+  cursor: pointer;
+}
+.wv-bar-shareplay:hover,
+.wv-bar-shareplay.is-active {
+  border-color: #22f59a;
+  background: rgba(34, 245, 154, 0.24);
+  color: #fff;
+}
+.wv-bar-shareplay svg {
+  width: 1rem;
+  height: 1rem;
+}
+.wv-shareplay-dialog {
+  max-width: 34rem;
+  width: min(94vw, 34rem);
+}
+.wv-shareplay-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.78rem;
+  margin-top: 0.75rem;
+}
+.wv-shareplay-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  align-self: flex-start;
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  font: 700 0.72rem var(--font-mono);
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  color: #bae6fd;
+}
+.wv-shareplay-badge.is-live {
+  background: rgba(34, 245, 154, 0.2);
+  border-color: #22f59a;
+  color: #86efac;
+}
+.wv-shareplay-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 .wv-dialog-close {
   width: 2rem;

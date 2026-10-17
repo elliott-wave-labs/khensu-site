@@ -33,7 +33,8 @@ import { onAir, upcoming } from './channels';
 import { capture as captureScene, encodeShare, decodeShare, listenUrl, songUrl, storyUrl, isCatalogueTrack, type Scene } from './scene';
 import { InkPen, inkSvg } from './ink';
 import { tide, resolveTide } from './tide';
-import { StoryShareStudio, renderLyricsPanel, updateLyricsLive, parseCustomLyrics, saveCustomLyrics } from './story-share';
+import { StoryShareStudio, renderLyricsPanel, updateLyricsLive, parseCustomLyrics, saveCustomLyrics, type PreviewFormat } from './story-share';
+import { SharePlayCoordinator } from './shareplay';
 
 // MARK: Helpers
 
@@ -99,6 +100,7 @@ export class App {
   head = new HeadTracker();
   bubble!: Bubble;
   story!: StoryShareStudio;
+  shareplay!: SharePlayCoordinator;
   private root: HTMLElement;
   private view: HTMLElement;
   private homeHtml: string;
@@ -144,10 +146,19 @@ export class App {
     this.bubble = new Bubble(this.now.querySelector('[data-ring]')!, e, this.now.querySelector<HTMLInputElement>('[data-height]') ?? undefined, this.now.querySelector('[data-height-out]') ?? undefined);
     this.bubble.onSelect = () => this.paintShape();
     this.story = new StoryShareStudio(this.root, e, () => this.shareOrigin(), (m) => this.toast(m));
+    this.shareplay = new SharePlayCoordinator(
+      e,
+      () => this.shareOrigin(),
+      (m) => this.toast(m),
+      (trackId, startSec, scene) => void this.onRemoteSharePlayTrack(trackId, startSec, scene),
+    );
+    this.bubble.onMoveObj = (idx, pos) => this.shareplay.broadcastMoveObj(idx, pos);
+    this.shareplay.onChange = () => this.paintSharePlay();
     await this.loadState();
     this.bind();
     e.on(() => {
       this.paintNow();
+      this.shareplay.updateMediaSession();
       void this.refreshWake();
     });
     this.paintNow();
@@ -171,6 +182,8 @@ export class App {
       'prev',
       'lyric-seek',
       'story-share',
+      'shareplay',
+      'shareplay-start',
     ]);
     const wakeGesture = (ev: Event) => {
       const target = ev.target as HTMLElement | null;
@@ -936,12 +949,15 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'toggle':
         if (!eng.track) this.playIds(['first-attempt'], 0);
         else await eng.toggle();
+        this.shareplay.broadcast(eng.playing ? 'play' : 'pause');
         break;
       case 'next':
         await eng.next();
+        this.shareplay.broadcast('track');
         break;
       case 'prev':
         await eng.prev();
+        this.shareplay.broadcast('track');
         break;
       case 'shuffle':
         eng.setShuffle(!eng.shuffle);
@@ -1127,11 +1143,13 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'mode':
         eng.setMode(el.dataset.mode as Mode);
         this.save();
+        this.shareplay.broadcast('venue');
         break;
       case 'venue':
         eng.setVenue(el.dataset.venue!);
         this.save();
         this.root.querySelector<HTMLDetailsElement>('[data-room-menu]')!.open = false;
+        this.shareplay.broadcast('venue');
         break;
       case 'preset':
         eng.usePreset(el.dataset.preset!);
@@ -1190,7 +1208,13 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         if (targetId && eng.track?.id !== targetId && this.light(targetId)) {
           this.playIds([targetId], 0, true);
         }
-        this.story.open(this.light(targetId) ?? eng.track);
+        const fmt = (el.dataset.fmt as PreviewFormat | undefined) ?? undefined;
+        this.story.open(this.light(targetId) ?? eng.track, fmt);
+        break;
+      }
+      case 'story-fmt': {
+        const fmt = (el.dataset.fmt as PreviewFormat) || 'story';
+        this.story.setFormat(fmt);
         break;
       }
       case 'story-close':
@@ -1205,10 +1229,35 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'story-copy-link':
         await this.story.copyStoryLink();
         break;
+      case 'shareplay': {
+        this.closeMenu();
+        this.openSharePlayDialog();
+        break;
+      }
+      case 'shareplay-start': {
+        await this.shareplay.startOrToggle();
+        this.paintSharePlay();
+        break;
+      }
+      case 'shareplay-copy': {
+        await this.shareplay.copySessionLink();
+        this.paintSharePlay();
+        break;
+      }
+      case 'shareplay-leave': {
+        this.shareplay.leave();
+        this.paintSharePlay();
+        break;
+      }
+      case 'shareplay-close': {
+        this.root.querySelector<HTMLDialogElement>('[data-shareplay-dialog]')?.close();
+        break;
+      }
       case 'lyric-seek': {
         const sec = Number(el.dataset.t || 0);
         if (Number.isFinite(sec)) eng.seek(sec);
         if (!eng.playing) await eng.play();
+        this.shareplay.broadcast('seek');
         this.paintTime();
         break;
       }
@@ -1474,9 +1523,11 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const code = q.get('scene');
     const scene = code ? decodeShare(code) : null;
     const isStory = q.get('story') === '1';
+    const isSharePlay = Boolean(q.get('shareplay'));
     const startSec = Number(q.get('t') || 0);
     const trackId = (r.name === 't' && r.id) || (q.get('t') && !Number.isFinite(Number(q.get('t'))) ? q.get('t')! : '') || scene?.trackId || '';
-    if (!trackId && !scene && !isStory) return false;
+    if (isSharePlay) this.shareplay.joinSessionFromUrl();
+    if (!trackId && !scene && !isStory && !isSharePlay) return false;
     const targetTrackId = trackId || 'first-attempt';
     if (targetTrackId && this.light(targetTrackId)) {
       if (this.engine.track?.id !== targetTrackId || !this.engine.playing) {
@@ -1878,6 +1929,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     this.paintQueue();
     this.paintHead();
     this.paintScenes();
+    this.paintSharePlay();
     const err = now.querySelector<HTMLElement>('[data-now-error]')!;
     err.hidden = !eng.error;
     err.textContent = eng.error ?? '';
@@ -1914,6 +1966,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       shown,
       dur,
     );
+    this.shareplay.updatePositionState();
     if (!this.now.hidden) {
       const q = this.now.querySelector<HTMLElement>('[data-queue-list]');
       if (q && q.dataset.index !== String(eng.index)) this.paintQueue();
@@ -1973,6 +2026,53 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const status = box.querySelector<HTMLElement>('[data-head-status]')!;
     status.textContent = src === 'off' ? (hasNative() ? 'Off. Your AirPods, the camera or the phone can steer the sound.' : hasDeviceMotion() ? 'Off. Turn it on and the phone steers the sound as you turn.' : hasCamera() ? 'Off. The camera can follow your face, on this device only.' : 'Off. In the nu.waves app, AirPods steer the sound.') : this.head.status;
     box.querySelector<HTMLButtonElement>('[data-act="recentre"]')!.hidden = src === 'off';
+  }
+
+  private openSharePlayDialog() {
+    const dlg = this.root.querySelector<HTMLDialogElement>('[data-shareplay-dialog]');
+    if (!dlg) {
+      void this.shareplay.startOrToggle();
+      return;
+    }
+    this.paintSharePlay();
+    if (!dlg.open) dlg.showModal();
+  }
+
+  private paintSharePlay() {
+    const active = this.shareplay?.active ?? false;
+    const sid = this.shareplay?.sessionId ?? '';
+    for (const b of this.root.querySelectorAll<HTMLElement>('[data-act="shareplay"]')) {
+      b.setAttribute('aria-pressed', String(active));
+      b.classList.toggle('is-active', active);
+    }
+    const dlg = this.root.querySelector<HTMLDialogElement>('[data-shareplay-dialog]');
+    if (!dlg) return;
+    const badge = dlg.querySelector<HTMLElement>('[data-shareplay-status]');
+    if (badge) {
+      badge.textContent = active ? `Live SharePlay Session · ${sid}` : 'Ready for FaceTime, iMessage & Web SharePlay';
+      badge.classList.toggle('is-live', active);
+    }
+    const urlOut = dlg.querySelector<HTMLElement>('[data-shareplay-url]');
+    if (urlOut) {
+      urlOut.textContent = this.shareplay.buildSharePlayUrl(sid || 'live');
+    }
+    const leaveBtn = dlg.querySelector<HTMLElement>('[data-act="shareplay-leave"]');
+    if (leaveBtn) leaveBtn.hidden = !active;
+  }
+
+  private async onRemoteSharePlayTrack(trackId: string, startSec: number, sceneCode?: string) {
+    if (trackId && this.light(trackId) && this.engine.track?.id !== trackId) {
+      await this.engine.setQueue(this.tracksOf([trackId]), 0, true);
+    }
+    if (sceneCode) {
+      const sc = decodeShare(sceneCode);
+      if (sc) this.engine.applyScene(sc);
+    }
+    if (Number.isFinite(startSec) && startSec >= 0) {
+      this.engine.seek(startSec);
+    }
+    this.bubble.sync();
+    this.paintNow();
   }
 
   private paintQueue() {

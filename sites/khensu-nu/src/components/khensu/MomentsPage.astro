@@ -1,27 +1,39 @@
 ---
 import RevealText from './RevealText.astro';
-import { APP_STORE_URL } from '../../data/app';
+import { APP_STORE_URL, GET_APPS } from '../../data/app';
+
+const appHref = APP_STORE_URL || GET_APPS;
 
 const features = [
   {
-    id: 'video',
-    title: 'Video editor',
-    body: 'Cut, grade and finish on your iPhone, iPad or Mac. Everyday clips become a story you would post, with the original kept so every edit can be undone.',
+    id: 'beat',
+    title: 'Beat sync studio',
+    body: 'Drop in clips and a track you have the rights to. Shot cuts and beats land on your Neural Engine. No timeline required for the simple path — and no upload.',
   },
   {
-    id: 'beat',
-    title: 'Beat sync',
-    body: 'Drop in clips and a track you have the rights to. nu.moments finds the beats and the shots on your device, and lays them out without a timeline.',
+    id: 'templates',
+    title: 'Designer templates',
+    body: 'Layouts for the way people post today. Every pack adapts to your shots on the device. Signed over webË, so relays never learn which template you opened.',
+  },
+  {
+    id: 'video',
+    title: 'Video editor',
+    body: 'Cut, grade, captions and finish on iPhone, iPad or Mac. Proxies for the timeline; export renders from the originals at native resolution.',
   },
   {
     id: 'matte',
     title: 'Remove background',
-    body: 'Lift a subject with a soft edge for stickers, collages and template slots. The matte travels with the file; the original stays untouched.',
+    body: 'Subject lift with a soft edge for stickers, collages and template slots. The matte travels with the file; the original stays untouched.',
   },
   {
-    id: 'overlays',
-    title: 'Overlays and stickers',
-    body: 'Packs from creators on webË: overlays, stickers and looks as a signed effect graph. No remote code, and nobody learns which pack you opened.',
+    id: 'carousels',
+    title: 'Carousels',
+    body: 'Swipeable scrapbook stories for trip dumps, tutorials and portfolios. Multi-slide templates you rearrange on the phone, then post to the Feed or export out.',
+  },
+  {
+    id: 'captions',
+    title: 'Captions',
+    body: 'Scroll-stopping type styles you can tune. Speech-to-text and timing stay on this device. Nothing is sent to a caption server.',
   },
   {
     id: 'photo',
@@ -29,19 +41,9 @@ const features = [
     body: 'Filters, soft retouch and curated presets. Every change is a recipe over the original, so you can re-render later with a better model.',
   },
   {
-    id: 'templates',
-    title: 'Designer templates',
-    body: 'Layouts for the way people post today: minimal, bold, editorial. Drop your clips in; the template adapts to your shots, not the other way round.',
-  },
-  {
-    id: 'carousels',
-    title: 'Carousels',
-    body: 'Swipeable scrapbook stories for trip dumps, tutorials and portfolios. Built as multi-slide templates you can rearrange on the phone.',
-  },
-  {
-    id: 'captions',
-    title: 'Captions',
-    body: 'Scroll-stopping type styles you can tune. Caption text and timing stay on your device; nothing is sent to a caption server.',
+    id: 'feed',
+    title: 'Share to the feed',
+    body: 'Post into nu.network without a second app. Outside export is HEVC, ProRes, H.264 or HEIC through the system share sheet.',
   },
 ];
 
@@ -53,6 +55,19 @@ const carouselUses = [
   'Tutorials',
   'Portfolio highlights',
   'Storytelling slides',
+];
+
+const vsRows = [
+  { what: 'Clips leave your device for AI or scoring', us: false, them: true },
+  { what: 'Tracks you across apps and sites for ads', us: false, them: true },
+  { what: 'Beat sync runs entirely on device', us: true, them: false },
+  { what: 'Original kept under a non-destructive recipe', us: true, them: false },
+  { what: 'Template fetch that never reveals which pack you chose', us: true, them: false },
+  { what: 'Honest try-before-you-buy; no surprise paywall after setup', us: true, them: false },
+  { what: 'Tips go 100% to the person; app commerce a flat 10%', us: true, them: false },
+  { what: 'Share into a private network feed, not only public social', us: true, them: false },
+  { what: 'Generated detail is a choice, never forced into what you send', us: true, them: false },
+  { what: 'Desktop and phone share one project model', us: true, them: true },
 ];
 ---
 
@@ -93,16 +108,44 @@ const carouselUses = [
           ]}
         />
         <div class="btn-row">
-          <a class="btn primary" href={APP_STORE_URL}>Get the app</a>
+          <a class="btn primary" href={appHref}>Get the app</a>
           <a class="btn" href="#features-section">Explore</a>
         </div>
+        <p class="mo-proof">
+          No upload to score a clip. No tracking for ads. Tips 100% to the person.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section mo-highlights" id="highlights-section" aria-labelledby="mo-hl-title">
+    <div class="wrap">
+      <p class="eyebrow">get the highlights</p>
+      <h2 id="mo-hl-title">Made for creators who refuse the cloud.</h2>
+      <div class="mo-hl-rail" role="list">
+        <article class="mo-hl" role="listitem">
+          <b>Beat sync in one tap</b>
+          <span>Clips meet the song on the Neural Engine. Pro timing without a timeline.</span>
+        </article>
+        <article class="mo-hl" role="listitem">
+          <b>Templates that adapt</b>
+          <span>Your shots, faces and motion pick the layout. The same pack never looks twice.</span>
+        </article>
+        <article class="mo-hl" role="listitem">
+          <b>Private by construction</b>
+          <span>No Private Cloud Compute. No caption server. No “improve with AI” upload.</span>
+        </article>
+        <article class="mo-hl" role="listitem">
+          <b>Post to the feed</b>
+          <span>Share into nu.network, or export HEVC and walk away. Your choice.</span>
+        </article>
       </div>
     </div>
   </section>
 
   <section class="section" id="features-section" data-scene="reveal">
     <div class="wrap">
-      <p class="eyebrow">Features</p>
+      <p class="eyebrow">features</p>
       <h2>From idea to post.<br /><span class="dim">Minutes, not hours.</span></h2>
       <p class="lede">
         nu.moments is a creator-first editor: templates, beat sync, captions, effects and a full video and photo
@@ -121,7 +164,7 @@ const carouselUses = [
 
   <section class="section mo-effects" id="effects-section" data-scene="reveal">
     <div class="wrap">
-      <p class="eyebrow">Effects shop</p>
+      <p class="eyebrow">effects shop</p>
       <h2>Looks that stop the scroll.<br /><span class="dim">Signed packs, private fetch.</span></h2>
       <p class="lede">
         Curated presets from film to print to haze. Creators publish packs on webË; you fetch them over the
@@ -137,7 +180,7 @@ const carouselUses = [
 
   <section class="section" id="carousels-section" data-scene="reveal">
     <div class="wrap">
-      <p class="eyebrow">The art of carousels</p>
+      <p class="eyebrow">the art of carousels</p>
       <h2>Carousels that feel like you.<br /><span class="dim">Scrapbooks, not slides.</span></h2>
       <p class="lede">
         Swipeable, story-driven templates inspired by junk journals, photo dumps and visual diaries. Drop your
@@ -159,9 +202,49 @@ const carouselUses = [
     </div>
   </section>
 
+  <section class="section" id="vs-section" data-scene="reveal" aria-labelledby="mo-vs-title">
+    <div class="wrap">
+      <p class="eyebrow">worth the switch</p>
+      <h2 id="mo-vs-title">Built to beat the template apps<br /><span class="dim">you already tried.</span></h2>
+      <p class="lede">
+        Typical reel makers score your clips in the cloud, track you for ads, and hide the subscription until after
+        setup. nu.moments keeps every frame on the device you hold — and says so up front.
+      </p>
+      <div class="mo-vs" role="region" aria-label="How nu.moments compares" tabindex="0">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">What happens</th>
+              <th scope="col" class="us">ñü.mømëntš</th>
+              <th scope="col">Typical template apps</th>
+            </tr>
+          </thead>
+          <tbody>
+            {vsRows.map((r) => (
+              <tr>
+                <th scope="row">{r.what}</th>
+                <td class="us">
+                  {r.us ? <span class="yes" aria-label="Yes">●</span> : <span class="no" aria-label="No">–</span>}
+                </td>
+                <td>
+                  {r.them ? <span class="yes muted" aria-label="Yes">●</span> : <span class="no" aria-label="No">–</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        “Typical template apps” reflects common App Store privacy labels and cloud AI flows (contact info, device
+        identifiers and usage data used for tracking and advertising). nu.moments never collects those for ads and
+        never uploads your library to score a template.
+      </p>
+    </div>
+  </section>
+
   <section class="section" id="templates-section" data-scene="reveal">
     <div class="wrap">
-      <p class="eyebrow">Templates</p>
+      <p class="eyebrow">templates</p>
       <h2>Built for your clips.<br /><span class="dim">Not one size fits all.</span></h2>
       <RevealText
         parts={[
@@ -179,9 +262,26 @@ const carouselUses = [
     </div>
   </section>
 
+  <section class="section" id="pricing-section">
+    <div class="wrap">
+      <p class="eyebrow">pricing</p>
+      <h2>Try everything.<br /><span class="dim">Pay when you buy.</span></h2>
+      <p class="lede">
+        Editing, beat sync, captions and templates on this device ship without a surprise monthly wall after
+        onboarding. When you buy a pack or tip a creator, app commerce is a flat 10% — the lowest in the industry —
+        and tips go 100% to the person.
+      </p>
+      <ul class="cards" role="list">
+        <li><b>On-device editor</b><span>Included. Your clips never leave to unlock a feature.</span></li>
+        <li><b>Creator packs</b><span>Buy once from the person who made them. No tracking inside a pack.</span></li>
+        <li><b>Tips</b><span>100% to the creator. khėnsu.ñü takes no cut on tips.</span></li>
+      </ul>
+    </div>
+  </section>
+
   <section class="section" id="privacy-section">
     <div class="wrap">
-      <p class="eyebrow">Privacy</p>
+      <p class="eyebrow">privacy</p>
       <h2>Your moments stay yours.</h2>
       <p class="lede">
         No Siri, no Private Cloud Compute, no Writing Tools in the composer, no iCloud for this path. Edits,
@@ -189,13 +289,13 @@ const carouselUses = [
         default when you send with nu.media.
       </p>
       <div class="btn-row">
-        <a class="btn primary" href={APP_STORE_URL}>Get the app</a>
+        <a class="btn primary" href={appHref}>Get the app</a>
         <a class="btn" href="https://media.khensu.nu">See nu.media</a>
         <a class="btn" href="https://create.khensu.nu">For creators</a>
       </div>
       <p class="footnote">
         nu.moments is the product name for the on-device editor described in
-        <a href="https://dev.khensu.nu/specs/">khensu-specs</a> (<span class="mono">design/nu-moments.md</span>,
+        <a href="https://dev.khensu.nu/specs/nu-moments/">khensu-specs</a> (<span class="mono">design/nu-moments.md</span>,
         <span class="mono">design/editor.md</span>). Address: <span class="mono">nu:moments.khensu.nu</span>.
       </p>
     </div>
@@ -235,6 +335,12 @@ const carouselUses = [
     margin: 0 0 1.25rem;
   }
   .mo-copy :global(.reveal-text) { text-align: left; margin: 0 0 1.75rem; max-width: 36rem; }
+  .mo-proof {
+    margin: 1.25rem 0 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    max-width: 34rem;
+  }
   .btn-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }
   .dim { color: var(--text-dim); font-weight: 300; }
 
@@ -333,6 +439,39 @@ const carouselUses = [
     background: rgba(10, 12, 16, 0.45);
     backdrop-filter: blur(12px);
   }
+
+  .mo-hl-rail {
+    margin-top: 2rem;
+    display: grid;
+    gap: 1rem;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 1fr);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
+  }
+  .mo-hl {
+    scroll-snap-align: center;
+    min-height: min(52vh, 360px);
+    border-radius: 28px;
+    padding: 1.75rem 1.5rem;
+    display: grid;
+    align-content: end;
+    gap: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background:
+      radial-gradient(120% 90% at 15% 0%, rgba(240, 168, 200, 0.4), transparent 55%),
+      radial-gradient(100% 80% at 90% 80%, rgba(126, 224, 200, 0.28), transparent 50%),
+      #12141a;
+  }
+  .mo-hl:nth-child(2n) {
+    background:
+      radial-gradient(120% 90% at 85% 0%, rgba(126, 224, 200, 0.38), transparent 55%),
+      radial-gradient(100% 80% at 10% 90%, rgba(240, 168, 200, 0.25), transparent 50%),
+      #12141a;
+  }
+  .mo-hl b { font-size: 1.35rem; font-weight: 600; letter-spacing: -0.03em; }
+  .mo-hl span { color: rgba(255, 255, 255, 0.62); font-size: 1.05rem; line-height: 1.45; }
 
   .feat {
     list-style: none;
@@ -433,6 +572,39 @@ const carouselUses = [
   .s1 { left: 4%; top: 18%; rotate: -8deg; background: linear-gradient(160deg, #3a2a32, #14161c); }
   .s2 { left: 28%; top: 6%; rotate: 2deg; z-index: 2; background: linear-gradient(160deg, #2a3a36, #14161c); }
   .s3 { left: 52%; top: 22%; rotate: 9deg; background: linear-gradient(160deg, #2a3040, #14161c); }
+
+  .mo-vs {
+    margin-top: 2rem;
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+  .mo-vs table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  .mo-vs th, .mo-vs td {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+  .mo-vs thead th {
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
+  }
+  .mo-vs tbody th {
+    font-weight: 500;
+    max-width: 28rem;
+  }
+  .mo-vs .us { color: var(--mo-deep); }
+  .mo-vs .yes { color: var(--mo-deep); }
+  .mo-vs .yes.muted { color: var(--text-faint); }
+  .mo-vs .no { color: var(--text-faint); }
 
   .cards {
     list-style: none;

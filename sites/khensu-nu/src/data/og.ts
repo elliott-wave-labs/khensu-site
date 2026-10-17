@@ -123,16 +123,23 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     wideHash: "sha-256=366f6cd54d07107ba6fd7ccdb44879a0a7b06fc6e66325c340b7a6bcc25aedd2"
   },
   waves: {
-    bytes: 2915854,
-    hash: "sha-256=24c1856ca29dfdc16f090c92157747f4d7227cac0219c85440ab5e4619ae26d4",
+    bytes: 764849,
+    hash: "sha-256=0742872f77903d105d843d5572d2d93251da4ab142de40d23f342859e035fa3d",
     duration: 4,
-    wideBytes: 3677893,
-    wideHash: "sha-256=3a646c502387a4d0c1fd2494dff15eb701231286ee3c56644d5d42ed5c2f0e76"
+    wideBytes: 572979,
+    wideHash: "sha-256=6e365667def7e5d01caaa383d56b7e3355698e565cfcc38c8d265bffcf95d124"
+  },
+  indra: {
+    bytes: 765777,
+    hash: "sha-256=8f4eebe3bb347511cc725ba3d9b29e3f399b1ac875ea614530e50b5a500404fc",
+    duration: 4,
+    wideBytes: 572447,
+    wideHash: "sha-256=420d4b9c7191e943cfd667b42610480903294ea2ac0cfdd19a4268ed7321c724"
   }
 };
 // The shield pages share the buy card's animation.
 export const previewFor = (card: string) =>
-  card === 'shield' || card === 'dev-shell' ? 'buy' : card === 'indra' || card === 'avatars' ? 'home' : card in PREVIEWS ? card : undefined;
+  card === 'shield' || card === 'dev-shell' ? 'buy' : card === 'avatars' ? 'home' : card in PREVIEWS ? card : undefined;
 
 export const cardFor = (path: string, prefix = '') => {
   const parts = path.replace(/^\/|\/$/g, '').split('/');

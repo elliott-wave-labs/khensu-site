@@ -81,9 +81,13 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10M12 3l-3.5 3.5M12 3l3.5 3.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span data-now-share-label>Share song</span>
               </button>
-              <button type="button" class="wv-story-btn" data-act="story-share" data-now-story data-id={featured.id} aria-label="Share to Instagram Story or Reel">
+              <button type="button" class="wv-story-btn" data-act="story-share" data-now-story data-id={featured.id} aria-label="Share to Instagram Story, Reel or îňðřæ.ōġ">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg>
-                <span>Insta Story / Reel</span>
+                <span>Story / îňðřæ.ōġ</span>
+              </button>
+              <button type="button" class="wv-shareplay-btn" data-act="shareplay" aria-pressed="false" aria-label="Listen together with Apple SharePlay">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="15.5" cy="10.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.2 18.2c.6-2.6 2.5-4.2 4.8-4.2s4.2 1.6 4.8 4.2M13.5 18.2c.5-2 1.9-3.3 3.8-3.3 1.6 0 2.9 1 3.5 2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.2 5.4a8.5 8.5 0 0 1 11.6 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <span>SharePlay</span>
               </button>
               <button type="button" class="wv-queue-btn" data-act="queue-toggle" aria-pressed="false">Queue</button>
             </div>
@@ -96,7 +100,8 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
                 </span>
                 <div class="wv-lyrics-acts">
                   <button type="button" class="wv-chip" data-act="lyrics-edit" title="Paste Apple Speech JSON or LRC timecodes">Timecode</button>
-                  <button type="button" class="wv-chip wv-chip-accent" data-act="story-share">Story / Reel</button>
+                  <button type="button" class="wv-chip" data-act="shareplay" title="Listen together on Apple SharePlay">SharePlay</button>
+                  <button type="button" class="wv-chip wv-chip-accent" data-act="story-share">Story / îňðřæ.ōġ</button>
                 </div>
               </div>
               <div class="wv-lyrics-list" data-lyrics-list>
@@ -453,7 +458,10 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
             <button type="button" data-act="prev" aria-label="Previous"></button>
             <button type="button" class="wv-bar-play" data-act="toggle" aria-label="Play"></button>
             <button type="button" data-act="next" aria-label="Next"></button>
-            <button type="button" class="wv-bar-story" data-act="story-share" data-bar-story data-id={featured.id} title="Share to Instagram Story / Reel" aria-label="Share to Instagram Story or Reel">
+            <button type="button" class="wv-bar-shareplay" data-act="shareplay" title="Apple SharePlay · Listen together" aria-label="Apple SharePlay">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="15.5" cy="10.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.2 18.2c.6-2.6 2.5-4.2 4.8-4.2s4.2 1.6 4.8 4.2M13.5 18.2c.5-2 1.9-3.3 3.8-3.3 1.6 0 2.9 1 3.5 2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.2 5.4a8.5 8.5 0 0 1 11.6 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </button>
+            <button type="button" class="wv-bar-story" data-act="story-share" data-bar-story data-id={featured.id} title="Share to Instagram Story / Reel / îňðřæ.ōġ" aria-label="Share to Instagram Story or Reel">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg>
             </button>
             <button type="button" class="wv-bar-share" data-act="share" data-bar-share data-id={featured.id} aria-label={`Share ${featured.title}`}></button>
@@ -485,18 +493,23 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
         <button type="button" class="wv-dialog-close" onclick="this.closest('dialog').close()">Close</button>
       </div>
     </dialog>
-    <dialog class="wv-dialog wv-story-dialog" data-story-dialog aria-label="Instagram Story and Reel Share Studio">
+    <dialog class="wv-dialog wv-story-dialog" data-story-dialog aria-label="Instagram Story, Reel and îňðřæ.ōġ Share Studio">
       <div class="wv-dialog-inner wv-story-inner">
         <div class="wv-story-top">
           <div>
-            <h3>Insta Story / Reel · 3D share</h3>
-            <p>Live 9:16 vertical preview with spacetime bubble™, Apple Speech word-pop lyrics, mini-player and link sticker.</p>
+            <h3>Story / Reel &amp; îňðřæ.ōġ · 3D share studio</h3>
+            <p>Live uncut 3D spacetime bubble™, Apple Speech word-pop lyrics, floating mini-player and link sticker.</p>
           </div>
           <button type="button" class="wv-dialog-close" data-act="story-close" aria-label="Close">×</button>
         </div>
+        <div class="wv-story-fmts" role="group" aria-label="Preview format">
+          <button type="button" class="wv-chip" data-act="story-fmt" data-fmt="story" aria-pressed="true">9:16 Insta Story / Reel</button>
+          <button type="button" class="wv-chip" data-act="story-fmt" data-fmt="indra" aria-pressed="false">16:9 îňðřæ.ōġ Messages</button>
+          <button type="button" class="wv-chip" data-act="story-fmt" data-fmt="square" aria-pressed="false">1:1 webË Square</button>
+        </div>
         <div class="wv-story-grid">
           <div class="wv-story-preview">
-            <canvas data-story-canvas width="1080" height="1920"></canvas>
+            <canvas data-story-canvas data-fmt="story" width="1080" height="1920"></canvas>
           </div>
           <div class="wv-story-controls">
             <div class="wv-story-link-box">
@@ -505,14 +518,17 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
             </div>
             <button type="button" class="wv-btn wv-btn-primary wv-story-action" data-act="story-record">
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="currentColor"/></svg>
-              <span>Record 8s Story / Reel video (with 3D audio + pop lyrics)</span>
+              <span>Record 8s 3D video (with audio + pop lyrics)</span>
             </button>
             <button type="button" class="wv-btn wv-story-action" data-act="story-card">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg>
-              <span>Share 9:16 Story card + copy link</span>
+              <span>Share card + copy link</span>
+            </button>
+            <button type="button" class="wv-btn wv-story-action" data-act="shareplay">
+              <span>Start Apple SharePlay session…</span>
             </button>
             <button type="button" class="wv-btn wv-story-action" data-act="story-copy-link">
-              <span>Copy Story link for Instagram Link Sticker</span>
+              <span>Copy link for Instagram Link Sticker</span>
             </button>
             <button type="button" class="wv-btn wv-story-action" data-act="lyrics-edit">
               <span>Paste Apple Speech / LRC word timecodes…</span>
@@ -521,6 +537,40 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
               On-device word timecodes with <code>[lead]</code>, <code>[chorus]</code> and <code>[backing]</code> labels come from Apple’s <code>SFSpeechRecognizer</code> (<code>tools/waves-lyrics-speech.swift</code>) with <code>requiresOnDeviceRecognition = true</code>.
             </p>
           </div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="wv-dialog wv-shareplay-dialog" data-shareplay-dialog aria-label="Apple SharePlay · Listen together in 3D">
+      <div class="wv-dialog-inner wv-shareplay-inner">
+        <div class="wv-story-top">
+          <div>
+            <h3>Apple SharePlay · Listen &amp; move in 3D together</h3>
+            <p>Synchronize playback, word-by-word lyrics, room acoustics, and every 3D sound drag inside the spacetime bubble™ over FaceTime, iMessage, or web.</p>
+          </div>
+          <button type="button" class="wv-dialog-close" data-act="shareplay-close" aria-label="Close">×</button>
+        </div>
+        <div class="wv-shareplay-body">
+          <div class="wv-shareplay-badge" data-shareplay-status>Ready for FaceTime, iMessage &amp; Web SharePlay</div>
+          <div class="wv-story-link-box">
+            <span class="wv-story-link-label">SharePlay Session URL (syncs play, pause, seek, lyrics &amp; 3D bubble drags)</span>
+            <code data-shareplay-url>https://waves.khensu.nu/#/t/first-attempt?shareplay=live</code>
+          </div>
+          <div class="wv-shareplay-actions">
+            <button type="button" class="wv-btn wv-btn-primary wv-story-action" data-act="shareplay-start">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="15.5" cy="10.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.2 18.2c.6-2.6 2.5-4.2 4.8-4.2s4.2 1.6 4.8 4.2M13.5 18.2c.5-2 1.9-3.3 3.8-3.3 1.6 0 2.9 1 3.5 2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.2 5.4a8.5 8.5 0 0 1 11.6 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span>Start SharePlay on FaceTime / Messages</span>
+            </button>
+            <button type="button" class="wv-btn wv-story-action" data-act="shareplay-copy">
+              <span>Copy SharePlay session link</span>
+            </button>
+            <button type="button" class="wv-btn wv-story-action" data-act="shareplay-leave" hidden>
+              <span>End SharePlay session</span>
+            </button>
+          </div>
+          <p class="wv-lib-note">
+            In the native iOS, iPadOS and macOS <code>nu.waves</code> app, SharePlay uses Apple’s <code>GroupActivities</code> framework (<code>GroupSessionMessenger</code>) over FaceTime and iMessage. On the web, participants in the same session link stay locked in sync and see every 3D sound move inside the spacetime bubble™ in real time.
+          </p>
         </div>
       </div>
     </dialog>

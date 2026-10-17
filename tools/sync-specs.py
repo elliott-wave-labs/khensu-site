@@ -23,6 +23,7 @@ DOCS = {
     "design/indra.md": ("indra", "îňðřæ.ōġ"),
     "design/nu-avatars.md": ("nu-avatars", "ñü.ævätåřş"),
     "design/nu-aura.md": ("nu-aura", "ñü.åůřâ"),
+    "design/nu-eyes.md": ("nu-eyes", "ñü.êýêš"),
     "design/nu-glass.md": ("nu-glass", "nu.glass"),
     "FOUNDER-HANDOVER.md": ("founder-handover", "Founder handover"),
     "OPEN-SOURCE.md": ("open-source", "Open source"),

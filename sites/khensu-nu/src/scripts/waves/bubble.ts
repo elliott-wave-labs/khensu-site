@@ -28,6 +28,7 @@ export class Bubble {
   private idleTimer = 0;
   showFacing = false;
   onSelect: ((o: Obj | null) => void) | null = null;
+  onMoveObj: ((idx: number, pos: Pos) => void) | null = null;
 
   constructor(
     private ring: HTMLElement,
@@ -48,7 +49,10 @@ export class Bubble {
     });
     addEventListener('pointermove', (e) => {
       if (this.held && this.orb) {
-        engine.moveObj(this.held, this.orb.drag(e.clientX, e.clientY, this.held.pos));
+        const nextPos = this.orb.drag(e.clientX, e.clientY, this.held.pos);
+        engine.moveObj(this.held, nextPos);
+        const idx = engine.objs().indexOf(this.held);
+        if (idx >= 0) this.onMoveObj?.(idx, this.held.pos);
         this.select(this.held, false);
       } else if (this.orbiting && this.orb) {
         this.orb.orbit(e.clientX - this.orbiting.x, e.clientY - this.orbiting.y);
@@ -75,6 +79,8 @@ export class Bubble {
       const o = engine.selected;
       if (!o || o.kind === 'direct') return;
       engine.moveObj(o, { ...o.pos, z: Number(height.value) });
+      const idx = engine.objs().indexOf(o);
+      if (idx >= 0) this.onMoveObj?.(idx, o.pos);
       this.select(o, false);
     });
     engine.on(() => this.sync());
@@ -139,6 +145,8 @@ export class Bubble {
         k[e.key]();
         if (this.engine.objs().includes(o)) {
           this.engine.moveObj(o, p);
+          const idx = this.engine.objs().indexOf(o);
+          if (idx >= 0) this.onMoveObj?.(idx, o.pos);
           this.select(o, false);
         }
       });
