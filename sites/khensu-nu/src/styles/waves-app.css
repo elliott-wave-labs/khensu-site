@@ -2135,3 +2135,348 @@ body.wv-has-bar .wv {
     opacity: 1 !important;
   }
 }
+
+/* --- Instagram Story / Reel Share & Apple Speech Word-Pop Lyrics --- */
+.wv-story-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  border-color: rgba(232, 121, 249, 0.42) !important;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.16), rgba(244, 63, 94, 0.14), rgba(251, 146, 60, 0.14)) !important;
+  color: #fdf4ff !important;
+  font-weight: 600;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.wv-story-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  border-color: rgba(244, 114, 182, 0.72) !important;
+  box-shadow: 0 6px 20px rgba(217, 70, 239, 0.22);
+}
+.wv-bar-story {
+  color: #f0abfc !important;
+}
+.wv-bar-story:hover {
+  color: #fdf4ff !important;
+  background: rgba(217, 70, 239, 0.18) !important;
+}
+
+.wv-lyrics {
+  margin-top: 0.75rem;
+  padding: 0.7rem 0.78rem;
+  border-radius: 0.85rem;
+  background: linear-gradient(165deg, rgba(15, 21, 36, 0.76), rgba(9, 13, 24, 0.88));
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.wv-lyrics-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+.wv-lyrics-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+.wv-lyrics-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+.wv-lyrics-sub {
+  font-size: 0.66rem;
+  color: rgba(226, 232, 240, 0.56);
+}
+.wv-lyrics-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.wv-chip-sm {
+  font-size: 0.68rem !important;
+  padding: 0.24rem 0.52rem !important;
+  min-height: 1.55rem !important;
+}
+.wv-lyrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+  max-height: 10.5rem;
+  overflow-y: auto;
+  padding: 0.2rem 0.15rem;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+.wv-lyric-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.26rem 0.32rem;
+  text-align: left;
+  width: 100%;
+  padding: 0.36rem 0.52rem;
+  border-radius: 0.58rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(226, 232, 240, 0.42);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.45;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease;
+}
+.wv-lyric-line:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(248, 250, 252, 0.78);
+}
+.wv-lyric-line.is-past {
+  color: rgba(148, 163, 184, 0.52);
+}
+.wv-lyric-line.is-active {
+  background: rgba(56, 189, 248, 0.09);
+  border-color: rgba(125, 211, 252, 0.24);
+  color: rgba(248, 250, 252, 0.96);
+  transform: scale(1.01);
+}
+.wv-lyric-line.is-role-chorus.is-active {
+  background: rgba(251, 191, 36, 0.11);
+  border-color: rgba(251, 191, 36, 0.32);
+}
+.wv-lyric-line.is-role-backing {
+  font-style: italic;
+  font-size: 0.81rem;
+}
+.wv-lyric-line.is-role-backing.is-active {
+  background: rgba(192, 132, 252, 0.12);
+  border-color: rgba(192, 132, 252, 0.3);
+}
+.wv-lyric-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.08rem 0.38rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-style: normal;
+  margin-right: 0.18rem;
+  flex-shrink: 0;
+}
+.wv-lyric-badge-lead {
+  background: rgba(56, 189, 248, 0.16);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.34);
+}
+.wv-lyric-badge-chorus {
+  background: rgba(251, 191, 36, 0.18);
+  color: #fde68a;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+.wv-lyric-badge-backing {
+  background: rgba(192, 132, 252, 0.18);
+  color: #e9d5ff;
+  border: 1px solid rgba(192, 132, 252, 0.38);
+}
+.wv-lyric-badge-spoken {
+  background: rgba(94, 234, 212, 0.16);
+  color: #99f6e4;
+  border: 1px solid rgba(94, 234, 212, 0.34);
+}
+
+@keyframes wv-word-pop {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  38% {
+    transform: translateY(-3px) scale(1.22);
+  }
+  72% {
+    transform: translateY(-1px) scale(1.09);
+  }
+  100% {
+    transform: translateY(-1.5px) scale(1.12);
+  }
+}
+
+.wv-lyric-word {
+  display: inline-block;
+  transform-origin: center bottom;
+  transition: color 0.12s ease, transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), text-shadow 0.14s ease;
+}
+.wv-lyric-word.is-sung {
+  color: rgba(248, 250, 252, 0.88);
+}
+.wv-lyric-word.is-pop {
+  color: #ffffff;
+  font-weight: 800;
+  animation: wv-word-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  text-shadow: 0 0 14px rgba(56, 189, 248, 0.82), 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+.wv-lyric-line.is-role-chorus .wv-lyric-word.is-pop {
+  color: #fef08a;
+  text-shadow: 0 0 16px rgba(251, 191, 36, 0.88), 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+.wv-lyric-line.is-role-backing .wv-lyric-word.is-pop {
+  color: #f3e8ff;
+  text-shadow: 0 0 15px rgba(192, 132, 252, 0.85), 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+/* Mini-player live animated lyric line */
+.wv-bar-lyric {
+  display: flex;
+  align-items: center;
+  gap: 0.22rem;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: rgba(226, 232, 240, 0.78);
+  margin-top: 0.08rem;
+}
+.wv-bar-role {
+  display: inline-flex;
+  padding: 0.04rem 0.32rem;
+  border-radius: 999px;
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(56, 189, 248, 0.18);
+  color: #7dd3fc;
+  flex-shrink: 0;
+}
+.wv-bar-lyric[data-role='chorus'] .wv-bar-role {
+  background: rgba(251, 191, 36, 0.22);
+  color: #fde68a;
+}
+.wv-bar-lyric[data-role='backing'] .wv-bar-role {
+  background: rgba(192, 132, 252, 0.22);
+  color: #e9d5ff;
+}
+.wv-bar-word {
+  display: inline-block;
+  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.12s ease;
+}
+.wv-bar-word.is-sung {
+  color: rgba(248, 250, 252, 0.92);
+}
+.wv-bar-word.is-pop {
+  color: #7dd3fc;
+  font-weight: 800;
+  transform: translateY(-1px) scale(1.14);
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.75);
+}
+
+/* 9:16 Instagram Story / Reel Share Studio Modal */
+.wv-story-dialog {
+  max-width: 48rem;
+  width: min(94vw, 48rem);
+}
+.wv-story-sheet {
+  max-width: 100%;
+}
+.wv-story-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.wv-story-grid {
+  display: grid;
+  grid-template-columns: minmax(12.5rem, 15.5rem) minmax(0, 1fr);
+  gap: 1.15rem;
+  align-items: start;
+  margin-top: 0.5rem;
+}
+.wv-story-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+.wv-story-canvas {
+  width: 100%;
+  max-width: 15.2rem;
+  aspect-ratio: 9 / 16;
+  height: auto;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), 0 0 28px rgba(56, 189, 248, 0.14);
+  background: #050811;
+}
+.wv-story-caption {
+  font-size: 0.68rem;
+  color: rgba(226, 232, 240, 0.6);
+  text-align: center;
+  margin: 0;
+}
+.wv-story-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.wv-story-step {
+  padding: 0.68rem 0.78rem;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+.wv-story-step b {
+  display: block;
+  font-size: 0.82rem;
+  color: #f8fafc;
+  margin-bottom: 0.22rem;
+}
+.wv-story-step p {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: rgba(226, 232, 240, 0.74);
+  margin: 0 0 0.5rem;
+}
+.wv-story-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.wv-story-link-row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+.wv-story-link-row .wv-input {
+  flex: 1;
+  font-size: 0.72rem;
+  font-family: var(--font-mono, monospace);
+}
+.wv-story-speech-note p {
+  margin-bottom: 0.35rem;
+}
+.wv-story-speech-note code {
+  display: block;
+  padding: 0.38rem 0.5rem;
+  border-radius: 0.45rem;
+  background: rgba(2, 6, 23, 0.75);
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  font-size: 0.66rem;
+  color: #bae6fd;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+@media (max-width: 680px) {
+  .wv-story-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wv-story-canvas {
+    max-width: 12.5rem;
+  }
+}
+

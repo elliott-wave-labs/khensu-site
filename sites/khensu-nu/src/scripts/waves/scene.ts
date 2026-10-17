@@ -98,6 +98,13 @@ export function songUrl(origin: string, trackId: string): string {
   return trackId ? `${base}#/t/${encodeURIComponent(trackId)}` : `${base}#/`;
 }
 
+/** An Instagram Story / Reel link (`#/t/<id>?story=1`) that opens waves.khensu.nu and autoplays with animated lyrics + mini-player + spacetime bubble. */
+export function storyUrl(origin: string, trackId: string, atSec = 0): string {
+  const base = origin.endsWith('/') ? origin : `${origin}/`;
+  const tParam = atSec > 1 ? `&t=${Math.floor(atSec)}` : '';
+  return trackId ? `${base}#/t/${encodeURIComponent(trackId)}?story=1${tParam}` : `${base}#/?story=1`;
+}
+
 /** A link that opens this listen: the catalogue song (when there is one) plus the scene. */
 export function listenUrl(origin: string, s: Scene, code = encodeShare(s)): string {
   const base = origin.endsWith('/') ? origin : `${origin}/`;

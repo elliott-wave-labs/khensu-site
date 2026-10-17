@@ -143,11 +143,11 @@ class Deck {
     for (const o of this.objs) if (o.el && !o.gone) set.add(o.el);
     return [...set];
   }
-  /** Active elements that should be started when play() is pressed (skips the 10 MB untouched original on mobile when in nu.waves stem mode). */
+  /** Active elements that should be started when play() is pressed (skips the 10 MB untouched original when in nu.waves stem mode). */
   playEls(mode: Mode): HTMLAudioElement[] {
     const set = new Set<HTMLAudioElement>();
     const stemsMode = this.track.spatial === 'stems' && this.objs.some((o) => o.kind === 'stem' && o.el);
-    if (this.master && (!stemsMode || mode === 'orig' || !isMobileAudio())) set.add(this.master);
+    if (this.master && (!stemsMode || mode === 'orig')) set.add(this.master);
     if (this.bed && mode === 'bed') set.add(this.bed);
     for (const o of this.objs) if (o.el && !o.gone && (mode === 'waves' || !stemsMode)) set.add(o.el);
     return [...set];
@@ -192,6 +192,7 @@ export class Engine {
   private sum!: GainNode;
   private makeup!: GainNode;
   private user!: GainNode;
+  private limiter!: DynamicsCompressorNode;
   private sumMeter!: AnalyserNode;
   private origPow = 0;
   private wavePow = 0;
@@ -212,6 +213,10 @@ export class Engine {
   private sources = new Map<HTMLAudioElement, MediaElementAudioSourceNode>();
   private free: HTMLAudioElement[] = [];
   private unlocked = false;
+  /** True when page-load autoplay was deferred by browser autoplay policy and should start on the first gesture. */
+  pendingAutoplay = false;
+  /** Timestamp when pendingAutoplay was fulfilled by a gesture so a same-tap toggle doesn't immediately pause. */
+  autoStartedAt = 0;
 
   on(l: Listener) {
     this.listeners.add(l);
@@ -284,7 +289,7 @@ export class Engine {
     this.user.gain.value = this.volume;
     this.sumMeter = ctx.createAnalyser();
     this.sumMeter.fftSize = 2048;
-    const lim = ctx.createDynamicsCompressor();
+    const lim = (this.limiter = ctx.createDynamicsCompressor());
     lim.threshold.value = -3;
     lim.knee.value = 6;
     lim.ratio.value = 12;
@@ -313,29 +318,65 @@ export class Engine {
     return ctx;
   }
 
+  /** Creates a live MediaStream tap of the master spatial output for recording 9:16 Instagram Story / Reel clips. */
+  createAudioStream(): { stream: MediaStream; disconnect: () => void } | null {
+    try {
+      const ctx = this.graph();
+      this.wakeContext(ctx, true);
+      const dest = ctx.createMediaStreamDestination();
+      this.limiter.connect(dest);
+      return {
+        stream: dest.stream,
+        disconnect: () => {
+          try {
+            this.limiter.disconnect(dest);
+          } catch {
+            /* ignore */
+          }
+        },
+      };
+    } catch {
+      return null;
+    }
+  }
+
   /** Wakes the AudioContext synchronously inside a user tap/click/key gesture (including iOS Safari's "interrupted" state). */
-  private wakeContext(ctx: AudioContext) {
+  private wakeContext(ctx: AudioContext, fromGesture = false) {
     if (ctx.state !== 'running') {
       void ctx.resume().catch(() => {});
     }
-    if (!this.unlocked || ctx.state !== 'running') {
+    if (fromGesture || ctx.state === 'running') {
+      const wasUnlocked = this.unlocked;
       this.unlocked = true;
-      try {
-        const buf = ctx.createBuffer(1, 1, 22050);
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-        src.connect(ctx.destination);
-        src.start(0);
-      } catch {
-        /* fine */
+      if (fromGesture && (!wasUnlocked || ctx.state !== 'running')) {
+        try {
+          const buf = ctx.createBuffer(1, 1, 22050);
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          src.connect(ctx.destination);
+          src.start(0);
+        } catch {
+          /* fine */
+        }
       }
     }
   }
 
-  /** Call from the first tap or key press: wakes the AudioContext synchronously. */
+  /** Call from a user tap or key press: wakes the AudioContext synchronously. */
   unlock() {
     const ctx = this.graph();
-    this.wakeContext(ctx);
+    this.wakeContext(ctx, true);
+  }
+
+  /** If page-load autoplay was blocked by the browser until first interaction, starts playback inside the user gesture. */
+  resumePendingAutoplay() {
+    this.unlock();
+    if (!this.pendingAutoplay) return;
+    this.pendingAutoplay = false;
+    if (!this.playing && (this.deck || this.queue.length)) {
+      this.autoStartedAt = performance.now();
+      void this.play();
+    }
   }
 
   private element(): HTMLAudioElement {
@@ -1137,11 +1178,14 @@ export class Engine {
    *  For catalogue tracks and generators, builds the deck and invokes `el.play()` synchronously
    *  before the first `await` so mobile browsers (iOS Safari / Android Chrome) never reject playback. */
   private async start(track: PlayTrack, at: number, xf?: number) {
-    const ctx = this.graph();
-    this.wakeContext(ctx);
+    const deferUntilPlay = !this.unlocked && track.kind === 'song';
+    if (!deferUntilPlay) {
+      const ctx = this.graph();
+      this.wakeContext(ctx);
+    }
     const old = this.deck;
     if (old && !old.disposed && old.track.id === track.id && old.isSong) {
-      if (!old.wired) this.wireDeck(old);
+      if (!deferUntilPlay && !old.wired) this.wireDeck(old);
       await this.run(old, at);
       this.history?.(old.track, this.duration());
       this.emit();
@@ -1151,7 +1195,7 @@ export class Engine {
     if (syncTrack && !(syncTrack.kind === 'generator' && (syncTrack.gen?.type === 'clip' || syncTrack.gens?.some((g) => g.gen.type === 'clip')))) {
       const my = ++this.startSerial;
       this.prefetch(syncTrack);
-      const d = this.buildSync(syncTrack, false);
+      const d = this.buildSync(syncTrack, deferUntilPlay);
       this.installDeck(d, old, at, xf, my);
       await this.run(d, at);
       this.history?.(d.track, this.duration());
@@ -1160,16 +1204,18 @@ export class Engine {
     }
     const d = await this.load(track, at, xf);
     if (!d || d !== this.deck || d.disposed) return;
-    if (!d.wired) this.wireDeck(d);
+    if (!deferUntilPlay && !d.wired) this.wireDeck(d);
     await this.run(d, at);
     this.history?.(d.track, this.duration());
     this.emit();
   }
 
   private async run(d: Deck, at: number) {
-    const ctx = this.graph();
-    this.wakeContext(ctx);
-    if (!d.wired) this.wireDeck(d);
+    if (this.unlocked || !d.isSong) {
+      const ctx = this.graph();
+      this.wakeContext(ctx);
+      if (!d.wired) this.wireDeck(d);
+    }
     d.playing = true;
     d.ended = false;
     this.error = null;
@@ -1206,32 +1252,48 @@ export class Engine {
       });
       const results = await Promise.allSettled(playPromises);
       if (d !== this.deck || d.disposed) return;
-      // Retry any stem that rejected transiently once it finishes buffering.
-      for (let i = 0; i < activeEls.length; i++) {
-        if (results[i].status === 'rejected' && d.playing) {
-          const el = activeEls[i];
-          void this.ready(el, 6000).then(() => {
-            if (d === this.deck && d.playing && !d.disposed && el.paused) {
-              const refT = d.position();
-              if (refT > 0.05) {
-                try {
-                  el.currentTime = refT;
-                } catch {
-                  /* ignore */
+      const anyBlocked = results.some(
+        (r) => r.status === 'rejected' && ((r.reason as DOMException)?.name === 'NotAllowedError' || String(r.reason).includes('NotAllowedError')),
+      );
+      // Retry any stem that rejected transiently (not due to autoplay policy) once it finishes buffering.
+      if (!anyBlocked) {
+        for (let i = 0; i < activeEls.length; i++) {
+          if (results[i].status === 'rejected' && d.playing) {
+            const el = activeEls[i];
+            void this.ready(el, 6000).then(() => {
+              if (d === this.deck && d.playing && !d.disposed && el.paused) {
+                const refT = d.position();
+                if (refT > 0.05) {
+                  try {
+                    el.currentTime = refT;
+                  } catch {
+                    /* ignore */
+                  }
                 }
+                el.play().catch(() => {});
               }
-              el.play().catch(() => {});
-            }
-          });
+            });
+          }
         }
       }
       const anyPlaying = activeEls.some((el) => !el.paused);
       if (!anyPlaying && results.length && results.every((r) => r.status === 'rejected')) {
         d.playing = false;
+        if (anyBlocked || !this.unlocked) this.pendingAutoplay = true;
         this.emit();
         return;
       }
+      this.pendingAutoplay = false;
+      if (!d.wired) {
+        const ctx = this.graph();
+        this.wakeContext(ctx, true);
+        this.wireDeck(d);
+      } else if (this.ctx && this.ctx.state !== 'running') {
+        void this.ctx.resume().catch(() => {});
+        if (this.ctx.state !== 'running') this.pendingAutoplay = true;
+      }
     } else {
+      const ctx = this.graph();
       if (ctx.state !== 'running') {
         try {
           await ctx.resume();
@@ -1239,6 +1301,13 @@ export class Engine {
           /* ignore */
         }
       }
+      if (ctx.state !== 'running') {
+        d.playing = false;
+        this.pendingAutoplay = true;
+        this.emit();
+        return;
+      }
+      this.pendingAutoplay = false;
       d.genOffset = at;
       d.startedAt = ctx.currentTime;
       for (const o of d.objs) o.voice?.start();
@@ -1258,19 +1327,24 @@ export class Engine {
 
   async play() {
     const ctx = this.graph();
-    this.wakeContext(ctx);
+    this.wakeContext(ctx, true);
+    this.pendingAutoplay = false;
     const d = this.deck;
     if (!d) {
       if (this.channel) return;
       if (this.queue[this.index]) await this.playIndex(this.index);
       return;
     }
-    if (d.playing) return;
+    if (d.playing) {
+      if (!d.wired) this.wireDeck(d);
+      return;
+    }
     const at = d.ended ? 0 : d.position();
     await this.run(d, at);
     this.emit();
   }
   pause() {
+    this.pendingAutoplay = false;
     const d = this.deck;
     if (!d || !d.playing) return;
     if (d.isSong) for (const el of d.els()) el.pause();
@@ -1283,6 +1357,7 @@ export class Engine {
     this.emit();
   }
   toggle() {
+    if (this.playing && performance.now() - this.autoStartedAt < 450) return Promise.resolve();
     return this.playing ? this.pause() : this.play();
   }
   seek(t: number) {
@@ -1307,9 +1382,12 @@ export class Engine {
   }
   async prev() {
     if (this.channel) return;
-    if (this.position() > 3 || this.index <= 0) return this.seek(0);
-    if (this.playing) await this.playIndex(this.index - 1);
-    else await this.loadIndex(this.index - 1);
+    if (this.position() > 3 || this.index <= 0) {
+      this.seek(0);
+      if (!this.playing) await this.play();
+      return;
+    }
+    await this.playIndex(this.index - 1);
   }
   private async advance(auto: boolean, xf?: number) {
     if (this.advancing) return;
@@ -1333,8 +1411,7 @@ export class Engine {
           return;
         }
       }
-      if (auto || this.playing) await this.playIndex(i, xf);
-      else await this.loadIndex(i);
+      await this.playIndex(i, xf);
     } finally {
       this.advancing = false;
     }

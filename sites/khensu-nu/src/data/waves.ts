@@ -36,6 +36,54 @@ export type Generator =
 
 export type Spatial = 'stems' | 'stereo' | 'mono' | 'direct';
 
+export type LyricRole = 'lead' | 'chorus' | 'backing' | 'spoken';
+
+export type LyricWord = {
+  /** Word text */
+  w: string;
+  /** Exact word start timecode in seconds (Apple Speech framework / score alignment) */
+  t: number;
+  /** Word duration in seconds */
+  d: number;
+  /** Optional per-word role override (e.g. backing harmony echo inside a lead line) */
+  role?: LyricRole;
+};
+
+export type LyricLine = {
+  /** Line start time in seconds */
+  t: number;
+  /** Line end time in seconds */
+  end: number;
+  /** Vocal / audio layer role: lead, chorus, backing/background, or spoken */
+  role: LyricRole;
+  /** Optional label shown beside the line (e.g. "chorus", "backing", "winds & strings") */
+  tag?: string;
+  /** Exact word-by-word timecodes for Spotify + IG Story pop animation */
+  words: LyricWord[];
+};
+
+/** Builds a word-timed LyricLine from a start/end window and phrase (with optional inline `(backing: ...)` words). */
+export const lyricLine = (t: number, end: number, phrase: string, role: LyricRole = 'lead', tag?: string): LyricLine => {
+  const tokens = phrase.trim().split(/\s+/).filter(Boolean);
+  const span = Math.max(0.4, end - t);
+  const step = span / Math.max(1, tokens.length);
+  let inBacking = false;
+  const words: LyricWord[] = tokens.map((raw, i) => {
+    let w = raw;
+    let wRole: LyricRole | undefined;
+    if (w.startsWith('(')) inBacking = true;
+    if (inBacking) wRole = 'backing';
+    if (w.endsWith(')')) inBacking = false;
+    return {
+      w,
+      t: +(t + i * step).toFixed(2),
+      d: +Math.max(0.16, step * 0.92).toFixed(2),
+      ...(wRole && wRole !== role ? { role: wRole } : {}),
+    };
+  });
+  return { t, end, role, ...(tag ? { tag } : {}), words };
+};
+
 export type Track = {
   id: string;
   title: string;
@@ -59,6 +107,8 @@ export type Track = {
   gen?: Generator;
   /** Multiple generated sounds placed in the spacetime bubble at once (e.g. all 7 chakras or all healing tones). */
   gens?: { id: string; label: string; gen: Generator; pos: Pos }[];
+  /** Word-by-word synchronized lyrics / score cues with lead, chorus, backing and spoken labels. */
+  lyrics?: LyricLine[];
   /** Where a single sound sits by default (generators and mono tracks). */
   pos?: Pos;
   spec?: string;
@@ -310,8 +360,38 @@ export const TRACKS: Track[] = [
     spec: '5 instruments in 3D · 48 kHz · 9.1 MB · 6:40',
     licence: '© 2008 khėnsu.ñü. All rights reserved; streamed here with the artist’s permission.',
     tags: ['film score', 'orchestral', 'piano', 'strings', 'demo'],
+    lyrics: [
+      lyricLine(0, 6.2, 'First Attempt · Venice film score in 3D space', 'spoken', 'intro'),
+      lyricLine(6.2, 13.8, 'Piano opens on the left · strings breathe ahead', 'lead', 'piano & strings'),
+      lyricLine(13.8, 22.0, '(winds rising above the room · gentle pulse)', 'backing', 'backing winds'),
+      lyricLine(22.0, 31.5, 'Step inside the spacetime bubble · move every sound', 'chorus', 'chorus theme'),
+      lyricLine(31.5, 41.0, 'Drums lock the horizon (strings answer from behind)', 'lead', 'lead motif'),
+      lyricLine(41.0, 52.0, 'Every instrument lives in its own coordinate in the hall', 'chorus', 'chorus swell'),
+      lyricLine(52.0, 64.0, '(low bass resonance · warm woodwinds echoing)', 'backing', 'backing harmony'),
+      lyricLine(64.0, 78.0, 'Turn your head and the concert hall turns with you', 'lead', 'spatial bridge'),
+      lyricLine(78.0, 94.0, 'Five stems in open space · nothing folded flat', 'chorus', 'chorus theme'),
+      lyricLine(94.0, 112.0, '(piano arpeggio drifting across the dome)', 'backing', 'backing piano'),
+      lyricLine(112.0, 132.0, 'Written in 2008 · reborn in post-quantum 3D audio', 'lead', 'movement II'),
+      lyricLine(132.0, 154.0, 'Strings and winds climb together into the canopy', 'chorus', 'full chorus'),
+      lyricLine(154.0, 180.0, '(counter-melody in the violas · soft reverb tail)', 'backing', 'backing strings'),
+      lyricLine(180.0, 210.0, 'Drag any sound closer · let the room breathe around you', 'lead', 'movement III'),
+      lyricLine(210.0, 245.0, 'Full orchestral swell · khėnsu.ñü in the concert hall', 'chorus', 'chorus climax'),
+      lyricLine(245.0, 290.0, '(high strings shimmering · bass holding the floor)', 'backing', 'backing ensemble'),
+      lyricLine(290.0, 345.0, 'Returning to the piano theme · quiet light on water', 'lead', 'coda'),
+      lyricLine(345.0, 400.0, '(final chord fading into the hall · ñü.ŵævẽš)', 'backing', 'outro'),
+    ],
   },
-  chopinTrack('chopin-nocturne-op9-no2', 'Nocturne Op. 9 No. 2 in E flat major', 'nocturne-op9-no2', 276.65, 5_354_496, ['piano', 'nocturne', 'night', 'classical']),
+  {
+    ...chopinTrack('chopin-nocturne-op9-no2', 'Nocturne Op. 9 No. 2 in E flat major', 'nocturne-op9-no2', 276.65, 5_354_496, ['piano', 'nocturne', 'night', 'classical']),
+    lyrics: [
+      lyricLine(0, 10.5, 'Andante · E-flat major cantabile opening phrase', 'lead', 'lead melody'),
+      lyricLine(10.5, 22.0, '(left-hand waltz bass · gentle rubato accompaniment)', 'backing', 'backing left hand'),
+      lyricLine(22.0, 36.0, 'Ornamented turn · the singing line rises and sighs', 'chorus', 'main theme'),
+      lyricLine(36.0, 54.0, 'Second statement with delicate filigree grace notes', 'lead', 'variation'),
+      lyricLine(54.0, 76.0, '(harmonic shift into the nocturnal middle section)', 'backing', 'backing harmony'),
+      lyricLine(76.0, 105.0, 'Soaring octave melody · rubato across the stereo stage', 'chorus', 'chorus theme'),
+    ],
+  },
   chopinTrack('chopin-waltz-op64-no2', 'Waltz Op. 64 No. 2 in C sharp minor', 'waltz-op64-no2', 230.09, 5_126_656, ['piano', 'waltz', 'classical']),
   chopinTrack('chopin-prelude-op28-no15', 'Prelude Op. 28 No. 15 “Raindrop”', 'prelude-op28-no15', 295.27, 5_668_200, ['piano', 'prelude', 'rain', 'classical']),
   chopinTrack('chopin-fantaisie-impromptu', 'Fantaisie-Impromptu Op. 66', 'fantaisie-impromptu-op66', 326.93, 6_707_200, ['piano', 'classical']),
@@ -342,6 +422,14 @@ export const TRACKS: Track[] = [
     licence: 'khėnsu.ñü · generated',
     loop: true,
     tags: ['healing', 'chakra', 'meditation', '3d'],
+    lyrics: [
+      lyricLine(0, 8.5, 'Muladhara · 194.18 Hz root grounding below you', 'lead', 'root chakra'),
+      lyricLine(8.5, 17.0, 'Svadhisthana · 210.42 Hz sacral warmth rising (126.22 Hz solar)', 'backing', 'sacral & solar'),
+      lyricLine(17.0, 26.0, 'Anahata · 136.10 Hz heart centre opening in 3D space', 'chorus', 'heart chorus'),
+      lyricLine(26.0, 36.0, 'Vishuddha · 141.27 Hz throat resonance · clear breath', 'lead', 'throat chakra'),
+      lyricLine(36.0, 48.0, 'Ajna · 221.23 Hz third eye (Sahasrara 172.06 Hz crown above)', 'chorus', 'crown harmonic'),
+      lyricLine(48.0, 60.0, '(all seven planetary frequencies aligned in the bubble)', 'backing', 'full 3D field'),
+    ],
   },
   {
     id: 'all-healing-tones',
@@ -370,6 +458,13 @@ export const TRACKS: Track[] = [
     licence: 'khėnsu.ñü · generated',
     loop: true,
     tags: ['healing', 'chakra', 'solfeggio', 'meditation', '3d'],
+    lyrics: [
+      lyricLine(0, 12.0, '528 Hz & 432 Hz Solfeggio singing bowls strike ahead', 'chorus', 'solfeggio bowls'),
+      lyricLine(12.0, 26.0, '(396 Hz bowl & root-to-crown chakra ring humming)', 'backing', 'backing harmonics'),
+      lyricLine(26.0, 44.0, 'Breathe in · ten pure frequencies orbiting the bubble', 'lead', 'guided breath'),
+      lyricLine(44.0, 66.0, 'Heart 136.1 Hz & 528 Hz shimmer in harmonic lock', 'chorus', 'chorus resonance'),
+      lyricLine(66.0, 90.0, '(seamless on-device synthesis · zero bytes streamed)', 'backing', 'sustained field'),
+    ],
   },
   healing('creek', 'Stair Creek', { type: 'creek', mark: '#3d8f8a' }, 48, 'One sound beside you · generated · loops', { x: -1.5, y: -1.6, z: -0.6 }, ['healing', 'nature', 'water', 'sleep']),
   healing('rain', 'Rain on glass', { type: 'rain', mark: '#7fb3d5' }, 60, 'Rain on a window · generated · loops', { x: 0.6, y: 1.4, z: 1.2 }, ['healing', 'nature', 'rain', 'sleep']),

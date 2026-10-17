@@ -81,7 +81,39 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10M12 3l-3.5 3.5M12 3l3.5 3.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span data-now-share-label>Share song</span>
               </button>
+              <button type="button" class="wv-story-btn" data-act="story-share" data-now-story data-id={featured.id} aria-label="Share to Instagram Story or Reel">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg>
+                <span>Insta Story / Reel</span>
+              </button>
               <button type="button" class="wv-queue-btn" data-act="queue-toggle" aria-pressed="false">Queue</button>
+            </div>
+            <div class="wv-lyrics" data-lyrics data-track-id={featured.id} role="region" aria-label="Synchronized lyrics and score cues">
+              <div class="wv-lyrics-head">
+                <span class="wv-lyrics-title">
+                  <i></i>
+                  <b>lyrics &amp; timecode</b>
+                  <small>Apple Speech word-pop · lead · chorus · backing</small>
+                </span>
+                <div class="wv-lyrics-acts">
+                  <button type="button" class="wv-chip" data-act="lyrics-edit" title="Paste Apple Speech JSON or LRC timecodes">Timecode</button>
+                  <button type="button" class="wv-chip wv-chip-accent" data-act="story-share">Story / Reel</button>
+                </div>
+              </div>
+              <div class="wv-lyrics-list" data-lyrics-list>
+                {(featured.lyrics ?? []).map((line, li) => {
+                  const badge = line.tag || (line.role !== 'lead' ? line.role : '');
+                  return (
+                    <button type="button" class={`wv-lyric-line is-role-${line.role}${li === 0 ? ' is-active' : ''}`} data-act="lyric-seek" data-t={line.t} data-line={li}>
+                      {badge && <span class={`wv-lyric-badge is-${line.role}`}>{badge}</span>}
+                      <span class="wv-lyric-words">
+                        {line.words.map((w, wi) => (
+                          <span class={`wv-lyric-word${w.role ? ` is-role-${w.role}` : ''}${li === 0 && wi === 0 ? ' is-pop' : ''}`} data-l={li} data-w={wi} data-t={w.t}>{w.w} </span>
+                        ))}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <p class="wv-now-error" data-now-error hidden></p>
             <div data-leave hidden>
@@ -414,12 +446,16 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
           <button type="button" class="wv-bar-text" data-act="open-now" aria-label="Show player">
             <b data-bar-title></b>
             <small data-bar-by></small>
+            <span class="wv-bar-lyric" data-bar-lyric hidden></span>
           </button>
           <div class="wv-bar-ctl">
             <span class="wv-bar-live" data-bar-live hidden>Live</span>
             <button type="button" data-act="prev" aria-label="Previous"></button>
             <button type="button" class="wv-bar-play" data-act="toggle" aria-label="Play"></button>
             <button type="button" data-act="next" aria-label="Next"></button>
+            <button type="button" class="wv-bar-story" data-act="story-share" data-bar-story data-id={featured.id} title="Share to Instagram Story / Reel" aria-label="Share to Instagram Story or Reel">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg>
+            </button>
             <button type="button" class="wv-bar-share" data-act="share" data-bar-share data-id={featured.id} aria-label={`Share ${featured.title}`}></button>
             <button type="button" data-act="queue-toggle" class="wv-bar-queue" aria-pressed="false">Queue</button>
           </div>
@@ -447,6 +483,45 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
         <p>Playlists stay on this device.</p>
         <div data-pick-items></div>
         <button type="button" class="wv-dialog-close" onclick="this.closest('dialog').close()">Close</button>
+      </div>
+    </dialog>
+    <dialog class="wv-dialog wv-story-dialog" data-story-dialog aria-label="Instagram Story and Reel Share Studio">
+      <div class="wv-dialog-inner wv-story-inner">
+        <div class="wv-story-top">
+          <div>
+            <h3>Insta Story / Reel · 3D share</h3>
+            <p>Live 9:16 vertical preview with spacetime bubble™, Apple Speech word-pop lyrics, mini-player and link sticker.</p>
+          </div>
+          <button type="button" class="wv-dialog-close" data-act="story-close" aria-label="Close">×</button>
+        </div>
+        <div class="wv-story-grid">
+          <div class="wv-story-preview">
+            <canvas data-story-canvas width="1080" height="1920"></canvas>
+          </div>
+          <div class="wv-story-controls">
+            <div class="wv-story-link-box">
+              <span class="wv-story-link-label">Story Link Sticker URL (opens mini-player + lyrics + 3D bubble)</span>
+              <code data-story-url>https://waves.khensu.nu/#/t/first-attempt?story=1</code>
+            </div>
+            <button type="button" class="wv-btn wv-btn-primary wv-story-action" data-act="story-record">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="currentColor"/></svg>
+              <span>Record 8s Story / Reel video (with 3D audio + pop lyrics)</span>
+            </button>
+            <button type="button" class="wv-btn wv-story-action" data-act="story-card">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg>
+              <span>Share 9:16 Story card + copy link</span>
+            </button>
+            <button type="button" class="wv-btn wv-story-action" data-act="story-copy-link">
+              <span>Copy Story link for Instagram Link Sticker</span>
+            </button>
+            <button type="button" class="wv-btn wv-story-action" data-act="lyrics-edit">
+              <span>Paste Apple Speech / LRC word timecodes…</span>
+            </button>
+            <p class="wv-lib-note">
+              On-device word timecodes with <code>[lead]</code>, <code>[chorus]</code> and <code>[backing]</code> labels come from Apple’s <code>SFSpeechRecognizer</code> (<code>tools/waves-lyrics-speech.swift</code>) with <code>requiresOnDeviceRecognition = true</code>.
+            </p>
+          </div>
+        </div>
       </div>
     </dialog>
 

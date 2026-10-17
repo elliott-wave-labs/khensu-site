@@ -30,9 +30,10 @@ import { HeadTracker, hasCamera, hasDeviceMotion, hasNative, type HeadSource } f
 import * as lib from './library';
 import * as store from './store';
 import { onAir, upcoming } from './channels';
-import { capture as captureScene, encodeShare, decodeShare, listenUrl, songUrl, isCatalogueTrack, type Scene } from './scene';
+import { capture as captureScene, encodeShare, decodeShare, listenUrl, songUrl, storyUrl, isCatalogueTrack, type Scene } from './scene';
 import { InkPen, inkSvg } from './ink';
 import { tide, resolveTide } from './tide';
+import { StoryShareStudio, renderLyricsPanel, updateLyricsLive, parseCustomLyrics, saveCustomLyrics } from './story-share';
 
 // MARK: Helpers
 
@@ -97,6 +98,7 @@ export class App {
   engine = new Engine();
   head = new HeadTracker();
   bubble!: Bubble;
+  story!: StoryShareStudio;
   private root: HTMLElement;
   private view: HTMLElement;
   private homeHtml: string;
@@ -141,6 +143,7 @@ export class App {
     });
     this.bubble = new Bubble(this.now.querySelector('[data-ring]')!, e, this.now.querySelector<HTMLInputElement>('[data-height]') ?? undefined, this.now.querySelector('[data-height-out]') ?? undefined);
     this.bubble.onSelect = () => this.paintShape();
+    this.story = new StoryShareStudio(this.root, e, () => this.shareOrigin(), (m) => this.toast(m));
     await this.loadState();
     this.bind();
     e.on(() => {
@@ -154,11 +157,33 @@ export class App {
     await this.render();
     const shared = await this.openShare();
     if (!shared) await this.cueDefault();
-    const wakeGesture = () => {
-      e.unlock();
+    const PLAY_ACTS = new Set([
+      'toggle',
+      'play-track',
+      'select-track',
+      'play-one',
+      'play-all',
+      'shuffle-all',
+      'play-healing-all',
+      'tune',
+      'queue-jump',
+      'next',
+      'prev',
+      'lyric-seek',
+      'story-share',
+    ]);
+    const wakeGesture = (ev: Event) => {
+      const target = ev.target as HTMLElement | null;
+      const actEl = target?.closest?.('[data-act]') as HTMLElement | null;
+      if (actEl && PLAY_ACTS.has(actEl.dataset.act ?? '')) {
+        e.unlock();
+        return;
+      }
+      e.resumePendingAutoplay();
     };
     addEventListener('pointerdown', wakeGesture, { capture: true, passive: true });
     addEventListener('touchend', wakeGesture, { capture: true, passive: true });
+    addEventListener('click', wakeGesture, { capture: true, passive: true });
     addEventListener('keydown', wakeGesture, true);
     const loop = (now: number) => {
       e.frame(now);
@@ -170,7 +195,7 @@ export class App {
       const sel = e.selected;
       if (sel && !sel.gone) this.ink.mark(sel.pos.x / 4, sel.pos.y / 4, 'drag');
       this.bubble.frame(now);
-      if (now - this.lastPaint > 240) {
+      if (now - this.lastPaint > 85) {
         this.lastPaint = now;
         this.paintTime();
         this.paintInkLive();
@@ -317,11 +342,11 @@ export class App {
             const albumIds = albumOf(t.albumId)?.tracks ?? TRACKS.map((x) => x.id);
             const rest = albumIds.filter((id) => id !== t.id);
             const queue = [t, ...this.tracksOf(rest)];
-            await this.engine.setQueue(queue, 0, false);
+            await this.engine.setQueue(queue, 0, true);
             this.bubble.sync();
           }
         }
-        this.openNow();
+        this.openNow(true);
         break;
       }
       case 'healing':
@@ -874,13 +899,13 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'select-track': {
         const all = listIds();
         const i = Math.max(0, all.indexOf(id));
-        const isTouch = typeof matchMedia === 'function' && matchMedia('(hover: none), (pointer: coarse)').matches;
         if (eng.track?.id === id && eng.deck && !eng.live) {
-          if (isTouch) await eng.toggle();
+          if (!eng.playing) await eng.play();
+          else await eng.toggle();
           this.openNow(true);
           break;
         }
-        this.playIds(all, i, isTouch || eng.playing);
+        this.playIds(all, i, true);
         break;
       }
       case 'play-track': {
@@ -940,8 +965,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         break;
       }
       case 'queue-jump':
-        if (eng.playing) await eng.playIndex(Number(el.dataset.i));
-        else await eng.loadIndex(Number(el.dataset.i));
+        await eng.playIndex(Number(el.dataset.i));
         this.bubble.sync();
         this.paintNow();
         break;
@@ -1160,6 +1184,60 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'share':
         await this.shareSong(id || el.dataset.id || '');
         break;
+      case 'story-share': {
+        this.closeMenu();
+        const targetId = id || el.dataset.id || eng.track?.id || 'first-attempt';
+        if (targetId && eng.track?.id !== targetId && this.light(targetId)) {
+          this.playIds([targetId], 0, true);
+        }
+        this.story.open(this.light(targetId) ?? eng.track);
+        break;
+      }
+      case 'story-close':
+        this.story.close();
+        break;
+      case 'story-card':
+        await this.story.shareStoryCard();
+        break;
+      case 'story-record':
+        await this.story.recordAndShareReel(8, el);
+        break;
+      case 'story-copy-link':
+        await this.story.copyStoryLink();
+        break;
+      case 'lyric-seek': {
+        const sec = Number(el.dataset.t || 0);
+        if (Number.isFinite(sec)) eng.seek(sec);
+        if (!eng.playing) await eng.play();
+        this.paintTime();
+        break;
+      }
+      case 'lyrics-edit': {
+        const curTrack = eng.track ?? this.light('first-attempt');
+        if (!curTrack) break;
+        const raw = prompt(
+          `Paste Apple Speech timecode JSON (from tools/waves-lyrics-speech.swift) or LRC lines with [chorus] / [backing] / [spoken] tags for “${curTrack.title}” (leave empty to reset to default):`,
+          '',
+        );
+        if (raw === null) break;
+        if (!raw.trim()) {
+          saveCustomLyrics(curTrack.id, null);
+          this.toast('Reset to default timecode lyrics.');
+        } else {
+          const parsed = parseCustomLyrics(raw, curTrack.dur || 180);
+          if (parsed.length) {
+            saveCustomLyrics(curTrack.id, parsed);
+            this.toast(`Loaded ${parsed.length} synchronized lines with word-pop timecodes.`);
+          }
+        }
+        const lyrBox = this.now.querySelector<HTMLElement>('[data-lyrics]');
+        if (lyrBox) {
+          lyrBox.dataset.trackId = '';
+          renderLyricsPanel(lyrBox, curTrack);
+        }
+        this.paintTime();
+        break;
+      }
       case 'scene-import':
         await this.importScene();
         break;
@@ -1379,29 +1457,35 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     await store.scenes.put(s);
     this.scenes = [s, ...this.scenes.filter((x) => x.id !== s.id)];
     if (s.trackId && this.light(s.trackId) && this.engine.track?.id !== s.trackId) {
-      await this.engine.setQueue(this.tracksOf([s.trackId]), 0, false);
+      await this.engine.setQueue(this.tracksOf([s.trackId]), 0, true);
+    } else if (!this.engine.playing) {
+      await this.engine.play();
     }
     this.engine.applyScene(s);
-    this.toast(`“${s.name}” is on ${this.engine.track?.title ?? 'the stage'}. Press play.`);
+    this.toast(`“${s.name}” playing on ${this.engine.track?.title ?? 'the stage'}.`);
     this.paintScenes();
     this.openNow(true);
   }
 
-  /** Opens a shared song (`#/t/{id}`) or shared scene (`#/t/{id}?scene=`) or returns false when the hash is not one. */
+  /** Opens a shared song (`#/t/{id}`) or shared scene (`#/t/{id}?scene=`) or Instagram Story link (`#/t/{id}?story=1`) and autoplays. */
   private async openShare(): Promise<boolean> {
     const r = parseRoute();
     const q = new URLSearchParams(location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '');
     const code = q.get('scene');
     const scene = code ? decodeShare(code) : null;
-    const trackId = (r.name === 't' && r.id) || q.get('t') || scene?.trackId || '';
-    if (!trackId && !scene) return false;
-    if (trackId && this.light(trackId)) {
-      if (this.engine.track?.id !== trackId) {
-        const cat = trackOf(trackId);
+    const isStory = q.get('story') === '1';
+    const startSec = Number(q.get('t') || 0);
+    const trackId = (r.name === 't' && r.id) || (q.get('t') && !Number.isFinite(Number(q.get('t'))) ? q.get('t')! : '') || scene?.trackId || '';
+    if (!trackId && !scene && !isStory) return false;
+    const targetTrackId = trackId || 'first-attempt';
+    if (targetTrackId && this.light(targetTrackId)) {
+      if (this.engine.track?.id !== targetTrackId || !this.engine.playing) {
+        const cat = trackOf(targetTrackId);
         const alb = cat?.albumId ? albumOf(cat.albumId) : undefined;
         const pool = alb?.tracks?.length ? alb.tracks : TRACKS.map((x) => x.id);
-        const ordered = [trackId, ...pool.filter((x) => x !== trackId)];
-        await this.engine.setQueue(this.tracksOf(ordered), 0, false);
+        const ordered = [targetTrackId, ...pool.filter((x) => x !== targetTrackId)];
+        await this.engine.setQueue(this.tracksOf(ordered), 0, true);
+        if (Number.isFinite(startSec) && startSec > 0) this.engine.seek(startSec);
         this.bubble.sync();
         this.paintNow();
       }
@@ -1412,30 +1496,30 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       await store.scenes.put(scene);
       this.scenes = [scene, ...this.scenes.filter((x) => x.id !== scene.id)];
       this.engine.applyScene(scene);
-      this.toast(`“${scene.name}” is on ${this.engine.track?.title ?? 'the stage'}. Press play.`);
+      this.toast(`“${scene.name}” playing on ${this.engine.track?.title ?? 'the stage'}.`);
     }
     this.openNow(true);
     return true;
   }
 
-  /** Builds the deck + spacetime bubble and buffers every stem as soon as the page opens, without autoplay. */
+  /** Builds the deck + spacetime bubble, buffers stems, and autoplays when the page loads. */
   private async cueDefault() {
     if (this.engine.deck) return;
     const tracks = this.tracksOf(TRACKS.map((t) => t.id));
     if (!tracks.length) return;
     this.engine.prefetch(tracks[0]);
-    await this.engine.setQueue(tracks, 0, false);
+    await this.engine.setQueue(tracks, 0, true);
     this.bubble.sync();
     this.paintNow();
   }
 
-  /** Cues the first track of an opened album, collection or playlist onto the stage when nothing is actively playing. */
+  /** Autoplays the first track of an opened album, collection or playlist when nothing is actively playing. */
   private async cueCollection(ids?: string[]) {
     if (!ids?.length || this.engine.playing || this.engine.live) return;
     const tracks = this.tracksOf(ids);
     if (!tracks.length) return;
     this.engine.prefetch(tracks[0]);
-    await this.engine.setQueue(tracks, 0, false);
+    await this.engine.setQueue(tracks, 0, true);
     this.bubble.sync();
     this.paintNow();
   }
@@ -1606,7 +1690,10 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const items: string[] = [];
     items.push(`<button type="button" data-act="queue-next" data-id="${esc(id)}">Play next</button>`);
     items.push(`<button type="button" data-act="queue-last" data-id="${esc(id)}">Add to queue</button>`);
-    if (cat) items.push(`<button type="button" data-act="share" data-id="${esc(id)}">Share song link</button>`);
+    if (cat) {
+      items.push(`<button type="button" data-act="story-share" data-id="${esc(id)}">Share to Instagram Story / Reel</button>`);
+      items.push(`<button type="button" data-act="share" data-id="${esc(id)}">Share song link</button>`);
+    }
     items.push(`<button type="button" data-act="like" data-id="${esc(id)}">${this.liked.has(id) ? 'Unlike' : 'Like'}</button>`);
     items.push(`<button type="button" data-act="add-to-playlist" data-id="${esc(id)}">Add to playlist</button>`);
     if (playlist) items.push(`<button type="button" data-act="remove-from-playlist" data-id="${esc(id)}" data-playlist="${esc(playlist)}">Remove from this playlist</button>`);
@@ -1677,6 +1764,7 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       bar.querySelector<HTMLElement>('[data-bar-live]')!.hidden = !eng.live;
     }
     const perSongUrl = isCatalogueTrack(t.id) ? songUrl(this.shareOrigin(), t.id) : '';
+    const perStoryUrl = isCatalogueTrack(t.id) ? storyUrl(this.shareOrigin(), t.id) : '';
     for (const b of this.root.querySelectorAll<HTMLElement>('[data-now] [data-act="share"], [data-bar] [data-act="share"]')) {
       b.dataset.id = t.id;
       if (perSongUrl) b.dataset.url = perSongUrl;
@@ -1684,6 +1772,21 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       b.setAttribute('title', perSongUrl ? `Share ${t.title} (${perSongUrl})` : `Share ${t.title}`);
       if (!b.hasAttribute('data-now-share')) b.innerHTML = ICON.share;
     }
+    for (const b of this.root.querySelectorAll<HTMLElement>('[data-now] [data-act="story-share"], [data-bar] [data-act="story-share"]')) {
+      b.dataset.id = t.id;
+      if (perStoryUrl) b.dataset.url = perStoryUrl;
+    }
+    const lyrBox = this.now.querySelector<HTMLElement>('[data-lyrics]');
+    if (lyrBox && lyrBox.dataset.trackId !== t.id) {
+      renderLyricsPanel(lyrBox, t);
+    }
+    updateLyricsLive(
+      lyrBox,
+      this.bar.querySelector<HTMLElement>('[data-bar-lyric]'),
+      t,
+      eng.position(),
+      eng.duration(),
+    );
     for (const row of this.root.querySelectorAll<HTMLElement>('.wv-row[data-id]')) {
       row.classList.toggle('is-current', row.dataset.id === t.id);
     }
@@ -1804,6 +1907,13 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     if (durEl) durEl.textContent = endless ? 'loops' : eng.live ? `live · ${mmss(Math.max(0, dur - shown))} left` : mmss(dur);
     const prog = this.bar.querySelector<HTMLElement>('[data-bar-prog]');
     if (prog) prog.style.width = `${dur && !endless ? (shown / dur) * 100 : 0}%`;
+    updateLyricsLive(
+      this.now.querySelector<HTMLElement>('[data-lyrics]'),
+      this.bar.querySelector<HTMLElement>('[data-bar-lyric]'),
+      t,
+      shown,
+      dur,
+    );
     if (!this.now.hidden) {
       const q = this.now.querySelector<HTMLElement>('[data-queue-list]');
       if (q && q.dataset.index !== String(eng.index)) this.paintQueue();

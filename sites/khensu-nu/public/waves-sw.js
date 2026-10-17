@@ -2,7 +2,7 @@
 // open without a connection; audio you keep is already sealed in IndexedDB. Registered only when the host is
 // waves.khensu.nu (see src/scripts/waves/main.ts).
 
-const CACHE = 'nu-waves-v7';
+const CACHE = 'nu-waves-v8';
 const SHELL = ['/', '/waves.webmanifest', '/icon-192.png', '/icon-512.png', '/favicon.ico', '/seal-128.webp'];
 
 self.addEventListener('install', (event) => {
