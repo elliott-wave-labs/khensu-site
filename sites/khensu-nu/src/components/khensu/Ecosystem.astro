@@ -120,7 +120,7 @@ const samples = [
         <h3>Your handle & avatar — used on every post</h3>
         <div class="eco-row">
           <label>Display name<input id="eco-name" type="text" maxlength="40" value="You" /></label>
-          <label>Handle<input id="eco-handle-input" type="text" maxlength="30" value="you" /></label>
+          <label>Handle — 1–64 characters, any diacritics<input id="eco-handle-input" type="text" maxlength="128" value="you" placeholder="ė, ñü, ŵævẽš, 中文…" /></label>
         </div>
         <div class="eco-row">
           <label>Avatar style
@@ -304,9 +304,15 @@ const samples = [
     $('#eco-handle').textContent = '@' + state.profile.handle + '.khensu.nu';
     $('#eco-balance').textContent = money(balance());
   }
+  const graphemes = (s) => { try { return [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(s)].length; } catch { return [...s].length; } };
+  const normHandle = (raw) => raw.trim().replace(/^@/, '').normalize('NFKC').toLowerCase();
   $('#eco-profile-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    state.profile = { display: $('#eco-name').value.trim() || 'You', handle: ($('#eco-handle-input').value.trim() || 'you').replace(/^@/, '').replace(/[^a-z0-9._-]/gi, '').toLowerCase(), style: $('#eco-style').value, hue: Number($('#eco-hue').value) };
+    const handle = normHandle($('#eco-handle-input').value);
+    const n = graphemes(handle);
+    if (!handle || n < 1 || n > 64 || /[\s\/\\@:#?%]/.test(handle)) { toast('Handles are 1–64 characters — any language, any diacritics (ė, ñ, ü, 中文…). No spaces or / @ : in a handle.'); return; }
+    $('#eco-handle-input').value = handle;
+    state.profile = { display: $('#eco-name').value.trim() || 'You', handle, style: $('#eco-style').value, hue: Number($('#eco-hue').value) };
     save(); renderProfile(); renderFeed(); toast('Identity saved — it is on every post you make now.');
   });
   $('#eco-hue').addEventListener('input', () => avatarEl($('#eco-avatar-big'), $('#eco-name').value, $('#eco-hue').value));
