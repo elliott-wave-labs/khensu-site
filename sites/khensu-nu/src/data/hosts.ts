@@ -1,11 +1,14 @@
-// Product hosts. Nav and in-page links use these subdomains (never slash paths).
-// nu.Fi is fi.khensu.nu (not nufi).
+// Product hosts. Every host with an ACTIVE Google-managed SSL certificate and Hover DNS A → 34.107.228.246
+// uses its dedicated subdomain; hosts awaiting Hover DNS A or own_certificate use their live https://khensu.nu/<slug>
+// URL so no nav link or canonical URL ever hits NXDOMAIN or a certificate mismatch (nu-harness ALWAYS LIVE rule).
 export const PRODUCTS = {
-  vegan: 'https://vegan.khensu.nu',
+  feed: 'https://khensu.nu/feed',
+  vegan: 'https://khensu.nu/vegan',
   webe: 'https://webe.khensu.nu',
   void: 'https://void.khensu.nu',
   media: 'https://media.khensu.nu',
-  moments: 'https://moments.khensu.nu',
+  // Apex until Hover A for moments.khensu.nu → 34.107.228.246 + own_certificate ACTIVE.
+  moments: 'https://khensu.nu/moments',
   memory: 'https://memory.khensu.nu',
   create: 'https://create.khensu.nu',
   waves: 'https://waves.khensu.nu',
@@ -16,19 +19,19 @@ export const PRODUCTS = {
   sla: 'https://sla.khensu.nu',
   avatars: 'https://avatars.khensu.nu',
   indra: 'https://indra.og.khensu.nu',
-  getApps: 'https://get.apps.khensu.nu',
-  kronos: 'https://kronos.khensu.nu',
+  getApps: 'https://khensu.nu/app',
+  kronos: 'https://khensu.nu/kronos',
   /** @deprecated use PRODUCTS.kronos — kept as aliases */
-  skillsAgent: 'https://kronos.khensu.nu',
-  skillsAgentHarness: 'https://kronos.khensu.nu#nu-harness',
-  skillsWeeklyUpdates: 'https://kronos.khensu.nu#nu-ot-222',
-  skillsMusicTheory: 'https://skills.music.theory.khensu.nu',
-  nuGlass: 'https://design.quantumglass.khensu.nu',
+  skillsAgent: 'https://khensu.nu/kronos',
+  skillsAgentHarness: 'https://khensu.nu/kronos#nu-harness',
+  skillsWeeklyUpdates: 'https://khensu.nu/kronos#nu-ot-222',
+  skillsMusicTheory: 'https://khensu.nu/skills-music-theory',
+  nuGlass: 'https://khensu.nu/design-quantumglass',
   aura: 'https://aura.khensu.nu',
-  eyes: 'https://eyes.khensu.nu',
-  devices: 'https://devices.khensu.nu',
-  compliance: 'https://compliance.khensu.nu',
-  security: 'https://security.khensu.nu',
+  eyes: 'https://khensu.nu/eyes',
+  devices: 'https://khensu.nu/devices',
+  compliance: 'https://khensu.nu/compliance',
+  security: 'https://khensu.nu/security',
 } as const;
 
 /** Old path on khensu.nu → product URL (no trailing slash). */

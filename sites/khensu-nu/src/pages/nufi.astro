@@ -11,6 +11,7 @@ import NufiPhone from '../components/khensu/NufiPhone.astro';
 import NufiPledgeGraph from '../components/khensu/NufiPledgeGraph.astro';
 import NufiBurst from '../components/khensu/NufiBurst.astro';
 import Burst from '../components/creators/Burst.astro';
+import Ecosystem from '../components/khensu/Ecosystem.astro';
 import AnimatedBars from '../components/khensu/AnimatedBars.astro';
 import pay from '../data/creator-pay.json';
 import { BACKERS, DAILY_MET, total, usd } from '../data/nufi-campaign';
@@ -151,6 +152,8 @@ const feeCap = Math.ceil(BACKERS / 100);
         />
       </div>
     </section>
+
+    <Ecosystem mode="fi" title="ñũ.Fî payouts — live creator ledger" />
 
     <section class="section nf-compare" id="nufi-compare-section" aria-labelledby="nufi-compare-title">
       <div class="wrap">

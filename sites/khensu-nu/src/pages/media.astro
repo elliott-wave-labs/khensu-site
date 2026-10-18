@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import NuMedia from '../components/khensu/NuMedia.astro';
 import StatStrip from '../components/khensu/StatStrip.astro';
+import Ecosystem from '../components/khensu/Ecosystem.astro';
 import proReel from '../data/pro-reel.json';
 import i720 from '../data/iphone-720p.json';
 import ladReel from '../data/iphone-ladder-reel.json';
@@ -41,6 +42,8 @@ const fps = Number(ultra.note.match(/at (\d+) fps/)?.[1]);
       </p>
     </div>
   </section>
+
+  <Ecosystem mode="media" title="ñü.media library — your originals, ready to post" />
 
   <section class="section">
     <div class="wrap prose">

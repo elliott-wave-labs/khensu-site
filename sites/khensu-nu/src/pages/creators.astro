@@ -11,6 +11,7 @@ import FansSee from '../components/creators/FansSee.astro';
 import DataSaving from '../components/creators/DataSaving.astro';
 import OwnIt from '../components/creators/OwnIt.astro';
 import SocialCredits from '../components/khensu/SocialCredits.astro';
+import Ecosystem from '../components/khensu/Ecosystem.astro';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 import data from '../data/creator-pay.json';
 
@@ -67,6 +68,8 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
         />
       </div>
     </section>
+
+    <Ecosystem mode="create" title="Creator studio — post today, get paid today" />
 
     <Burst />
 

@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import Ecosystem from '../components/khensu/Ecosystem.astro';
+import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
+const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
+---
+<Base title="Feed — khėnsu.ñü" description="The khėnsu.ñü feed: post from ñü.mømëntš, tip creators 100%, buy packs 90/10, get paid in ñũ.Fî. On your device, no cloud feed.">
+  <ProductBar name="Feed · nu.network" explore="#ecosystem" action={appLabel} href={APP_STORE_URL} />
+  <Ecosystem mode="feed" title="The feed — post, watch, tip, get paid" />
+</Base>
