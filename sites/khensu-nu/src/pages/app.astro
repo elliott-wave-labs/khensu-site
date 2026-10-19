@@ -15,7 +15,7 @@ const apps = [
     shown: 'khėnsu.ñü',
     role: 'Messenger, feed, calls, go live, gifts',
     bundle: 'nu.khensu.ptah',
-    ipa: `${RELEASES}/download/0.1.0-build3/khensu.nu.ipa`,
+    ipa: `${RELEASES}/download/0.1.0-build6/khensu.nu.ipa`,
     href: GET_APPS,
   },
   {
@@ -23,7 +23,7 @@ const apps = [
     shown: 'ñü.ŵævẽš',
     role: 'Spatial music — spacetime bubble™',
     bundle: 'nu.khensu.waves',
-    ipa: `${RELEASES}/download/0.1.0-build3/nu.waves.ipa`,
+    ipa: `${RELEASES}/download/0.1.0-build6/nu.waves.ipa`,
     href: PRODUCTS.waves,
   },
   {
@@ -31,7 +31,7 @@ const apps = [
     shown: 'ñü.mømëntš',
     role: 'Templates, beat sync, on-device editor',
     bundle: 'nu.khensu.moments',
-    ipa: null as string | null,
+    ipa: `${RELEASES}/download/0.1.0-build6/nu.moments.ipa`,
     href: PRODUCTS.moments,
   },
 ];
@@ -105,7 +105,7 @@ const tiers = [
               <a class="btn primary" href={a.href}>Open</a>
               {a.ipa
                 ? <a class="btn" href={a.ipa}>IPA</a>
-                : <span class="soon">Site live · IPA next</span>}
+                : <span class="soon">Site live</span>}
             </div>
           </li>
         ))}

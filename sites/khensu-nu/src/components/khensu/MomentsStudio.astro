@@ -1,0 +1,206 @@
+---
+// Working in-browser ñü.mømëntš studio: real media, real looks, real captions,
+// real export (Canvas + MediaRecorder). Nothing is uploaded — files stay here.
+const samples = [
+  { id: 'venice', label: 'Venice golden hour (sample)', src: '/khensu/creators/hero.mp4', type: 'video' },
+  { id: 'fans', label: 'Fans 1080 (sample)', src: '/khensu/creators/fans-1080.mp4', type: 'video' },
+];
+---
+<section class="section ms" id="studio-section" aria-labelledby="ms-title">
+  <div class="wrap">
+    <p class="eyebrow">try it here · nothing uploads</p>
+    <h2 id="ms-title">The editor, running in this page.<br /><span class="dim">Your clips never leave this tab.</span></h2>
+    <p class="lede">Pick a sample or drop in your own photo/video, choose a template look, type a caption, then export.
+      This is the same recipe model as the app — look, caption and format rendered into the file. The native
+      app adds beat-synced multi-clip timelines, auto captions from speech, subject lift and carousels.</p>
+
+    <div class="ms-grid">
+      <form class="ms-card" id="ms-form">
+        <label>Media
+          <select id="ms-sample">
+            {samples.map(s => <option value={s.src} data-type={s.type}>{s.label}</option>)}
+            <option value="upload">My photo / video…</option>
+          </select>
+        </label>
+        <label class="ms-drop">Drop a photo or video — it stays on this device
+          <input id="ms-file" type="file" accept="video/*,image/*" />
+        </label>
+        <div class="ms-row">
+          <label>Template
+            <select id="ms-template">
+              <option value="pulse" data-look="saturate(1.5) contrast(1.1)" data-accent="#f0a8c8">Pulse · Digital Pop · fade</option>
+              <option value="film" data-look="sepia(.35) saturate(1.15) contrast(1.06)" data-accent="#f2d9b3">Film still · Film 35mm · dip</option>
+              <option value="night" data-look="saturate(.82) brightness(1.07) contrast(.94)" data-accent="#8cb3ff">Night bus · Haze · fade</option>
+              <option value="clean" data-look="none" data-accent="#ffffff">Clean cut · Natural · hard cut</option>
+              <option value="print" data-look="saturate(.75) contrast(1.22)" data-accent="#7ee0c8">Scrapbook · Printed · cut</option>
+            </select>
+          </label>
+          <label>Format
+            <select id="ms-format">
+              <option value="9:16">9:16 reel</option><option value="1:1">1:1 square</option>
+              <option value="4:5">4:5 story</option><option value="16:9">16:9 wide</option>
+            </select>
+          </label>
+        </div>
+        <label>Caption (burned into the export)
+          <input id="ms-caption" type="text" maxlength="60" value="on the beat" />
+        </label>
+        <label>Beat
+          <select id="ms-bpm"><option value="120">120 BPM</option><option value="92">92 BPM</option><option value="140">140 BPM</option><option value="0">Off</option></select>
+        </label>
+        <div class="ms-actions">
+          <button type="button" class="btn" id="ms-play">Pause</button>
+          <button type="submit" class="btn primary" id="ms-export">Export file</button>
+        </div>
+        <p class="ms-note" id="ms-status">Video exports as WebM from this browser (up to 15s of the clip); photos as JPG. In the app: MP4 reels, multi-clip beat sync, auto captions, subject lift, carousels to Photos.</p>
+      </form>
+
+      <div class="ms-card ms-stage">
+        <div class="ms-phone">
+          <canvas id="ms-canvas" width="720" height="1280"></canvas>
+          <video id="ms-video" src={samples[0].src} poster="/khensu/creators/hero.webp" autoplay muted loop playsinline preload="metadata" hidden></video>
+          <img id="ms-img" alt="" hidden />
+        </div>
+        <div class="ms-chips"><span id="ms-chip-template">Pulse · Digital Pop</span><span id="ms-chip-format">9:16</span><span>0 bytes uploaded</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ms .dim { color: var(--text-dim); font-weight: 300; }
+  .ms-grid { display: grid; gap: 1rem; margin-top: 2rem; }
+  @media (min-width: 920px) { .ms-grid { grid-template-columns: 1.05fr .95fr; } }
+  .ms-card { border: 1px solid var(--line); background: var(--bg-raised); border-radius: 24px; padding: 1.4rem; display: grid; gap: .9rem; align-content: start; }
+  .ms-card label { display: grid; gap: .4rem; font-weight: 600; font-size: .92rem; }
+  .ms-card input[type="text"], .ms-card select { font: inherit; font-weight: 400; padding: .7rem .8rem; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--text); width: 100%; }
+  .ms-row { display: grid; gap: .8rem; } @media (min-width: 560px) { .ms-row { grid-template-columns: 1fr 1fr; } }
+  .ms-drop { border: 1.5px dashed rgba(240,168,200,.55); border-radius: 16px; padding: 1rem; text-align: center; cursor: pointer; color: var(--text-dim); }
+  .ms-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
+  .ms-note { color: var(--text-faint); font-size: .88rem; line-height: 1.5; margin: 0; }
+  .ms-phone { border-radius: 26px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,.16); width: min(100%, 360px); margin: 0 auto; }
+  .ms-phone canvas { width: 100%; height: auto; display: block; }
+  .ms-chips { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
+  .ms-chips span { font-size: .78rem; border: 1px solid var(--line); border-radius: 999px; padding: .35rem .65rem; color: var(--text-dim); }
+</style>
+
+<script>
+  const $ = (s) => document.querySelector(s);
+  const canvas = $('#ms-canvas'), ctx = canvas.getContext('2d');
+  const video = $('#ms-video'), img = $('#ms-img');
+  let mode = 'video', objectURL = '', playing = true, started = performance.now();
+
+  const formats = { '9:16': [720, 1280], '1:1': [960, 960], '4:5': [960, 1200], '16:9': [1280, 720] };
+  function currentFilter() {
+    const o = $('#ms-template').selectedOptions[0];
+    return { filter: o.dataset.look, accent: o.dataset.accent, name: o.textContent };
+  }
+  function syncChips() {
+    const t = currentFilter();
+    $('#ms-chip-template').textContent = t.name.split('·').slice(0, 2).join('·');
+    $('#ms-chip-format').textContent = $('#ms-format').value;
+    const [w, h] = formats[$('#ms-format').value];
+    canvas.width = w; canvas.height = h;
+  }
+  function draw(now) {
+    const [W, H] = [canvas.width, canvas.height];
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    const src = mode === 'video' ? video : img;
+    const sw = mode === 'video' ? video.videoWidth : img.naturalWidth;
+    const sh = mode === 'video' ? video.videoHeight : img.naturalHeight;
+    if (sw > 0 && sh > 0) {
+      const scale = Math.max(W / sw, H / sh);
+      const dw = sw * scale, dh = sh * scale;
+      ctx.save();
+      const f = currentFilter().filter;
+      ctx.filter = f && f !== 'none' ? f : 'none';
+      ctx.drawImage(src, (W - dw) / 2, (H - dh) / 2, dw, dh);
+      ctx.restore();
+    }
+    // Caption burned at the bottom, template accent behind it.
+    const cap = $('#ms-caption').value.trim();
+    if (cap) {
+      ctx.save();
+      const fs = Math.round(W * 0.055);
+      ctx.font = `700 ${fs}px Inter, system-ui, sans-serif`;
+      const tw = Math.min(ctx.measureText(cap).width + fs * 1.2, W * 0.9);
+      const x = (W - tw) / 2, y = H - fs * 2.6;
+      ctx.globalAlpha = 0.88; ctx.fillStyle = currentFilter().accent;
+      ctx.beginPath(); ctx.roundRect(x, y, tw, fs * 1.7, fs * 0.4); ctx.fill();
+      ctx.globalAlpha = 1; ctx.fillStyle = '#101014'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(cap, W / 2, y + fs * 0.86, W * 0.86);
+      ctx.restore();
+    }
+    // Beat bars when a beat is on.
+    const bpm = Number($('#ms-bpm').value);
+    if (bpm) {
+      const n = 16, bw = W / n;
+      const beat = 60 / bpm;
+      for (let i = 0; i < n; i++) {
+        const ph = Math.abs(Math.sin((now / 1000) / beat * Math.PI + i * 0.7));
+        const h = 10 + ph * H * 0.045;
+        ctx.fillStyle = i % 2 ? '#7ee0c8' : '#f0a8c8';
+        ctx.fillRect(i * bw + 2, H - h, bw - 4, h);
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+
+  function setSource(src, type) {
+    mode = type;
+    if (type === 'image') { video.pause(); img.src = src; }
+    else { video.src = src; video.play().catch(() => {}); }
+  }
+  $('#ms-sample').addEventListener('change', (e) => {
+    if (e.target.value === 'upload') { $('#ms-file').click(); return; }
+    setSource(e.target.value, 'video'); started = performance.now();
+  });
+  $('#ms-file').addEventListener('change', () => {
+    const f = $('#ms-file').files[0]; if (!f) return;
+    if (objectURL) URL.revokeObjectURL(objectURL);
+    objectURL = URL.createObjectURL(f);
+    setSource(objectURL, f.type.startsWith('image') ? 'image' : 'video');
+    $('#ms-status').textContent = `Loaded “${f.name}” on this device only — 0 bytes uploaded.`;
+  });
+  ['ms-template', 'ms-format', 'ms-caption', 'ms-bpm'].forEach(id => document.getElementById(id).addEventListener('input', syncChips));
+  $('#ms-play').addEventListener('click', () => {
+    if (mode !== 'video') return;
+    playing = !playing;
+    playing ? video.play().catch(() => {}) : video.pause();
+    $('#ms-play').textContent = playing ? 'Pause' : 'Play';
+  });
+
+  $('#ms-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = (m) => { $('#ms-status').textContent = m; };
+    if (mode === 'image') {
+      canvas.toBlob((b) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b); a.download = 'nu.moments.jpg'; a.click();
+        status('Photo exported as JPG with the look and caption in it. In the app this is a carousel slide or a reel frame.');
+      }, 'image/jpeg', 0.92);
+      return;
+    }
+    if (!('MediaRecorder' in window) || !canvas.captureStream) { status('This browser cannot record canvas video — the app exports MP4 natively.'); return; }
+    status('Recording your export… keep this tab open.');
+    video.currentTime = 0; await video.play().catch(() => {});
+    const stream = canvas.captureStream(30);
+    try {
+      const vs = video.captureStream ? video.captureStream() : null;
+      vs?.getAudioTracks?.().forEach(t => stream.addTrack(t));
+    } catch {}
+    const rec = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm' });
+    const chunks = [];
+    rec.ondataavailable = (ev) => chunks.push(ev.data);
+    rec.onstop = () => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob(chunks, { type: 'video/webm' })); a.download = 'nu.moments.webm'; a.click();
+      status('Exported. The look, caption and beat bars are in the file. For MP4, multi-clip timelines, auto captions and music, get the app below.');
+    };
+    rec.start(200);
+    const stopAfter = Math.min((isFinite(video.duration) ? video.duration : 10), 15) * 1000;
+    setTimeout(() => rec.state !== 'inactive' && rec.stop(), stopAfter);
+  });
+  syncChips();
+</script>

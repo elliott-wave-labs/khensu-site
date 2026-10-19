@@ -8,22 +8,22 @@ const features = [
   {
     id: 'beat',
     title: 'Beat sync studio',
-    body: 'Drop in clips and a track you have the rights to. Shot cuts and beats land on your Neural Engine. No timeline required for the simple path — and no upload.',
+    body: 'Drop in clips and your own track — or generate a beat at 70–160 BPM on the device. Onset detection re-times every cut. Auto-fit scores your frames locally, puts the strongest shot first, then cuts to the beat.',
   },
   {
     id: 'templates',
     title: 'Designer templates',
-    body: 'Layouts for the way people post today. Every pack adapts to your shots on the device. Signed over webË, so relays never learn which template you opened.',
+    body: 'Six packs ship in the app today — Pulse, Scrapbook, Night bus, Clean cut, Film still, Tutorial. Each one applies its own look, transition and caption style to your clips in the preview and in the exported file.',
   },
   {
     id: 'video',
     title: 'Video editor',
-    body: 'Cut, grade, captions and finish on iPhone, iPad or Mac. Proxies for the timeline; export renders from the originals at native resolution.',
+    body: 'Split, duplicate, trim in-point and length, reorder, speed at 0.5×/1×/2×, per-clip mute, and four formats (9:16, 1:1, 4:5, 16:9) on iPhone, iPad or Mac. Export renders from the originals.',
   },
   {
     id: 'matte',
-    title: 'Remove background',
-    body: 'Subject lift with a soft edge for stickers, collages and template slots. The matte travels with the file; the original stays untouched.',
+    title: 'Subject lift',
+    body: 'Photos: Vision person segmentation on your device lifts the subject over a soft blurred backdrop. The original photo stays untouched in your library.',
   },
   {
     id: 'carousels',
@@ -33,21 +33,28 @@ const features = [
   {
     id: 'captions',
     title: 'Captions',
-    body: 'Scroll-stopping type styles you can tune. Speech-to-text and timing stay on this device. Nothing is sent to a caption server.',
+    body: 'Type them in Pop, Typewriter, Soft or Stamp — or let Auto captions recognise speech entirely on device. Every caption is burned into the preview and the export, exactly as you see it.',
   },
   {
     id: 'photo',
-    title: 'Photo editor',
-    body: 'Filters, soft retouch and curated presets. Every change is a recipe over the original, so you can re-render later with a better model.',
+    title: 'Photo & looks',
+    body: 'Film 35mm, Printed, Haze, Digital Pop, VHS and Mono run on your device and apply to video, photos and carousel slides alike. Every project is a recipe over the originals.',
   },
   {
     id: 'feed',
-    title: 'Share to the feed',
-    body: 'Post into nu.network without a second app. Outside export is HEVC, ProRes, H.264 or HEIC through the system share sheet.',
+    title: 'Export anywhere',
+    body: 'Save the reel or carousel slides straight to Photos, or share an MP4 anywhere through the system share sheet. Use the studio on this page to post into the feed below.',
   },
 ];
 
-const effects = ['PhotoBooth', 'Paper', 'Digital', 'Haze', 'Fish eye', 'Printed', 'Film', 'VHS'];
+const effects = [
+  { name: 'Film 35mm', img: '/khensu/creators/hero.webp', filter: 'sepia(.35) saturate(1.15) contrast(1.06)' },
+  { name: 'Digital Pop', img: '/khensu/creators/fans-1080.webp', filter: 'saturate(1.5) contrast(1.1)' },
+  { name: 'Haze', img: '/khensu/creators/compare-nu.webp', filter: 'saturate(.82) brightness(1.07) contrast(.94)' },
+  { name: 'Printed', img: '/khensu/creators/fans-4k.webp', filter: 'saturate(.75) contrast(1.22)' },
+  { name: 'VHS', img: '/khensu/creators/compare-h264.webp', filter: 'hue-rotate(18deg) saturate(1.35)' },
+  { name: 'Mono', img: '/khensu/aura/legacy.aura.jpg', filter: 'grayscale(1) contrast(1.05)' },
+];
 
 const carouselUses = [
   'Educational posts',
@@ -87,14 +94,8 @@ const vsRows = [
         ></video>
         <div class="mo-phone">
           <span class="mo-island"></span>
-          <div class="mo-screen">
-            <b>10:10</b>
-            <span class="mo-label">ñü.mømëntš</span>
-            <ul class="mo-beats" role="presentation">
-              <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
-            </ul>
-            <span class="mo-chip">beat sync · on device</span>
-          </div>
+          <img class="mo-app" src="/khensu/moments/app-home.jpg" alt="ñü.mømëntš home screen with the template catalogue" />
+          <span class="mo-chip">the real app · 0.1.0 (6)</span>
         </div>
       </div>
       <div class="wrap mo-copy">
@@ -124,18 +125,22 @@ const vsRows = [
       <h2 id="mo-hl-title">Made for creators who refuse the cloud.</h2>
       <div class="mo-hl-rail" role="list">
         <article class="mo-hl" role="listitem">
+          <img class="mo-hl-img" src="/khensu/creators/fans-1080.webp" alt="" loading="lazy" />
           <b>Beat sync in one tap</b>
           <span>Clips meet the song on the Neural Engine. Pro timing without a timeline.</span>
         </article>
         <article class="mo-hl" role="listitem">
+          <img class="mo-hl-img" src="/khensu/creators/hero.webp" alt="" loading="lazy" />
           <b>Templates that adapt</b>
           <span>Your shots, faces and motion pick the layout. The same pack never looks twice.</span>
         </article>
         <article class="mo-hl" role="listitem">
+          <img class="mo-hl-img" src="/khensu/creators/compare-nu.webp" alt="" loading="lazy" />
           <b>Private by construction</b>
           <span>No Private Cloud Compute. No caption server. No “improve with AI” upload.</span>
         </article>
         <article class="mo-hl" role="listitem">
+          <img class="mo-hl-img" src="/khensu/creators/fans-4k.webp" alt="" loading="lazy" />
           <b>Post to the feed</b>
           <span>Share into nu.network, or export HEVC and walk away. Your choice.</span>
         </article>
@@ -165,14 +170,11 @@ const vsRows = [
   <section class="section mo-effects" id="effects-section" data-scene="reveal">
     <div class="wrap">
       <p class="eyebrow">effects shop</p>
-      <h2>Looks that stop the scroll.<br /><span class="dim">Signed packs, private fetch.</span></h2>
-      <p class="lede">
-        Curated presets from film to print to haze. Creators publish packs on webË; you fetch them over the
-        mixnet, so the network never learns which look you used.
-      </p>
+      <h2>Looks that stop the scroll.<br /><span class="dim">Rendered on your device.</span></h2>
+      <p class="lede">These six looks ship in the app today and render into every preview and export. Each tile below is a real frame with that look applied.</p>
       <ul class="fx" role="list">
-        {effects.map((name, i) => (
-          <li style={`--i:${i}`}><b>{name}</b></li>
+        {effects.map((fx, i) => (
+          <li style={`--i:${i}`}><img src={fx.img} alt="" loading="lazy" style={`filter:${fx.filter}`} /><b>{fx.name}</b></li>
         ))}
       </ul>
     </div>
@@ -194,9 +196,9 @@ const vsRows = [
           </ul>
         </div>
         <div class="mo-carousel" aria-hidden="true">
-          <span class="slide s1"><i>01</i><b>recap</b></span>
-          <span class="slide s2"><i>02</i><b>detail</b></span>
-          <span class="slide s3"><i>03</i><b>close</b></span>
+          <span class="slide s1"><img src="/khensu/creators/hero.webp" alt="" loading="lazy" /><i>01</i><b>recap</b></span>
+          <span class="slide s2"><img src="/khensu/creators/fans-1080.webp" alt="" loading="lazy" /><i>02</i><b>detail</b></span>
+          <span class="slide s3"><img src="/khensu/aura/legacy.aura.jpg" alt="" loading="lazy" /><i>03</i><b>close</b></span>
         </div>
       </div>
     </div>
@@ -248,16 +250,16 @@ const vsRows = [
       <h2>Built for your clips.<br /><span class="dim">Not one size fits all.</span></h2>
       <RevealText
         parts={[
-          ['Every template adapts to your shots, your vibe and your mood. ', false],
+          ['Every template renders its look, transition and caption style into your shots. ', false],
           ['The same pack never looks the same twice.', true],
           [' Customize everything, and keep the original under the recipe.', false],
         ]}
       />
       <ul class="cards" role="list">
         <li><b>On your device</b><span>Shot detection, faces, motion, beats and aesthetic scoring run locally. No upload to score a clip.</span></li>
-        <li><b>Private packs</b><span>Templates are content-addressed over webË. Relays see ciphertext, not which template you chose.</span></li>
+        <li><b>Packs in the app</b><span>Six designer packs ship inside the app — no download, no account, no tracking of which one you opened. The studio above uses the same looks in your browser.</span></li>
         <li><b>Creators earn</b><span>Anyone can publish a template as a persona. Tips and sales go to them; app commerce stays a flat 10%.</span></li>
-        <li><b>Export your way</b><span>nu.media inside khėnsu.ñü, or HEVC, ProRes, H.264 and HEIC for everywhere else.</span></li>
+        <li><b>Export your way</b><span>MP4 reel or carousel slides to Photos, or anywhere through the share sheet. The browser studio on this page exports WebM/JPG.</span></li>
       </ul>
     </div>
   </section>
@@ -506,8 +508,7 @@ const vsRows = [
     scroll-snap-type: x mandatory;
     padding-bottom: 0.5rem;
   }
-  .fx li {
-    flex: 0 0 auto;
+  .fx li { position: relative; overflow: hidden; flex: 0 0 auto;
     scroll-snap-align: start;
     width: min(42vw, 160px);
     aspect-ratio: 3 / 4;
@@ -527,7 +528,12 @@ const vsRows = [
       radial-gradient(100% 80% at 10% 90%, rgba(240, 168, 200, 0.3), transparent 50%),
       #14161c;
   }
-  .fx b { font-size: 0.95rem; font-weight: 600; }
+  .fx b { font-size: 0.95rem; font-weight: 600; position: relative; z-index: 1; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
+  .fx img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .mo-app { width: 100%; height: calc(100% - 24px); object-fit: cover; object-position: top; border-radius: 20px; display: block; }
+  .mo-hl-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 16px; }
+  .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 20px; opacity: .85; }
+  .slide i, .slide b { position: relative; z-index: 1; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
 
   .split {
     margin-top: 2.5rem;
