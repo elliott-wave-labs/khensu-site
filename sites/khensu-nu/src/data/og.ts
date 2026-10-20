@@ -1,7 +1,7 @@
 // Link-preview cards, one per page on khensu.nu and dev.khensu.nu. `tools/og.sh` screenshots /og/<slug>/ to
 // public/og/<slug>.jpg (1200 x 630), the size Meta (Instagram, Facebook, WhatsApp), iMessage and X all crop well,
 // and the square ones (1080 x 1080) for Instagram link pages and posts. `bg` fills the card; `product` sits on the
-// right instead. `note` is a small sentence under the line (the materials); `foot` are small bold footnotes.
+// right instead; only the home and shield cards carry the phone. `note` is a small sentence under the line (the materials); `foot` are small bold footnotes.
 // `thumb` cards carry only the phone and a few big words, for the tiny thumbnails next to a link.
 // The marketing cards spell the names out in full: kħėñšü.ñü, šûñüłîñk.šħîēłð, ñü.îšħẽřü.
 export type Card = {
@@ -30,12 +30,12 @@ export const CARDS: Record<string, Card> = {
   home: { title: 'khėnsu.ñü', em: 'webË, private by design.', line: 'Post-quantum. Run by the people. suñůlink.shield, set with the ñü.isheru.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
   webe: { title: 'webË', em: 'A people-run internet.', line: 'Names, sites, feeds, payments and contracts, post-quantum and run by the people.', bg: EARTH, alt: 'The webË network wrapped around Earth at night' },
   void: { title: 'ñü.vœîð', em: '64 KiB chunks. One key each.', line: 'Eight copies, no file names, and a footer inside the ciphertext. A wrong key opens nothing.', bg: EARTH, alt: 'ñü.vœîð, stealth storage on khėnsu.ñü' },
-  media: { title: 'ñü.media', em: 'Same look, a fraction of the bits.', line: 'Photos and video measured against JPEG, HEIC, H.264, HEVC and AV1.', bg: '/khensu/codec/compare-720p.jpg', screen: '/khensu/creators/compare-nu.webp', alt: 'ñü.media against H.264 at the same bitrate' },
-  moments: { title: 'ñü.mømëntš', em: 'Templates. Beat sync. On your device.', line: 'A creator editor for stories and carousels. Nobody else sees your clips.', bg: '/khensu/creators/hero.webp', screen: '/khensu/creators/fans-1080.webp', alt: 'ñü.mømëntš, the on-device template and video editor on khėnsu.ñü' },
+  media: { title: 'ñü.media', em: 'Same look, a fraction of the bits.', line: 'Photos and video measured against JPEG, HEIC, H.264, HEVC and AV1.', bg: '/khensu/codec/compare-720p.jpg', alt: 'ñü.media against H.264 at the same bitrate' },
+  moments: { title: 'ñü.mømëntš', em: 'Templates. Beat sync. On your device.', line: 'A creator editor for stories and carousels. Nobody else sees your clips.', bg: '/khensu/creators/hero.webp', alt: 'ñü.mømëntš, the on-device template and video editor on khėnsu.ñü' },
   quality: { title: 'How we measure', em: 'Check every number.', line: 'The tests behind ñü.media, with public tools you can run yourself.', bg: '/khensu/codec/compare-aurora.jpg', alt: 'An aurora clip compared across codecs' },
-  memory: { title: 'ñü.řåł', em: 'Your private AI.', line: 'It learns what you’re looking forward to, on your device. No tracking, ever.', bg: EARTH, product: '/khensu/memory/phone_burgundy.webp', alt: 'iPhone showing khėnsu.ñü ñü.řåł planning a sailing trip in Greece' },
-  creators: { title: 'ñü.ċřêæțẽ', em: 'You own everything.', line: 'Your rights, your fans, and $10 per 1,000 plays with no cut.', bg: EARTH, product: '/khensu/renders/phone-front.webp', alt: 'ñü.ċřêæțẽ on khėnsu.ñü over Earth and Indra\'s Net' },
-  waves: { title: 'ñü.ŵævẽš', em: 'Every instrument, where it belongs.', line: 'Stereo becomes objects you can drag around you. Switch to the original or Opus 5.1 any time.', bg: EARTH, product: '/khensu/renders/og-brass.png', alt: 'ñü.ŵævẽš spatial audio on khėnsu.ñü, instruments placed around you over Earth' },
+  memory: { title: 'ñü.řåł', em: 'Your private AI.', line: 'It learns what you’re looking forward to, on your device. No tracking, ever.', bg: EARTH, alt: 'ñü.řåł, the private on-device AI on khėnsu.ñü, over Earth at night' },
+  creators: { title: 'ñü.ċřêæțẽ', em: 'You own everything.', line: 'Your rights, your fans, and $10 per 1,000 plays with no cut.', bg: EARTH, alt: 'ñü.ċřêæțẽ on khėnsu.ñü over Earth and Indra\'s Net' },
+  waves: { title: 'ñü.ŵævẽš', em: 'Every instrument, where it belongs.', line: 'Stereo becomes objects you can drag around you. Switch to the original or Opus 5.1 any time.', bg: EARTH, alt: 'ñü.ŵævẽš spatial audio on khėnsu.ñü, instruments placed around you over Earth' },
   'all-healing-tones': {
     title: 'All healing tones (3D)',
     em: '10 sounds in the 3D spacetime bubble™.',
@@ -57,7 +57,7 @@ export const CARDS: Record<string, Card> = {
   buy: { title: 'šûñüłîñk.šħîēłð', em: 'made in morocco.', line: 'post-quantum E2EE stealth transceiver shield²', note: SHIELD_NOTE, foot: SHIELD_FOOT, bg: EARTH, product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT },
   thumb: { title: 'šûñüłîñk.šħîēłð', line: 'post-quantum E2EE stealth transceiver shield node', product: '/khensu/renders/og-brass.png', alt: SHIELD_ALT, thumb: true },
   transfer: { title: 'Private transfer', em: 'Send 4K privately, free.', line: 'Native resolution, end to end. Against Dropbox and Aspera.', bg: '/khensu/codec/compare-nasa4k.jpg', alt: 'A 4K clip sent with khėnsu.ñü private transfer' },
-  app: { title: 'khėnsu.ñü', em: 'For iPhone, iPad and Mac.', line: 'Messages, calls, feeds and payments, post-quantum.', bg: EARTH, product: '/khensu/renders/og-maroon.png', alt: 'khėnsu.ñü on iPhone with suñůlink.shield' },
+  app: { title: 'khėnsu.ñü', em: 'For iPhone, iPad and Mac.', line: 'Messages, calls, feeds and payments, post-quantum.', bg: EARTH, alt: 'khėnsu.ñü for iPhone, iPad and Mac over Earth at night' },
   privacy: { title: 'Privacy', em: 'Nothing to collect.', line: 'No accounts on servers, no cookies, no tracking, no data to sell.', bg: EARTH, alt: 'The khėnsu.ñü mark over Earth at night' },
   security: { title: 'Security', em: 'Nothing to read.', line: 'Post-quantum encryption, a five-hop mixnet, and no server that can read anything.', bg: EARTH, alt: 'khėnsu.ñü security, over Earth at night' },
   compliance: { title: 'Compliance', em: 'GDPR and every major privacy law.', line: 'Nothing on servers to request, breach or hand over. FIPS 203 and 204, CNSA 2.0.', bg: EARTH, alt: 'khėnsu.ñü privacy law and standards compliance' },
@@ -151,11 +151,11 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     duration: 4
   },
   creators: {
-    bytes: 2800495,
-    hash: "sha-256=125bc286593ecd87b391db595ead9a1a805f185ad93ff1d45a9ec8328399b7ce",
+    bytes: 2907578,
+    hash: 'sha-256=047cf6a06441383785ad0548988db8f183af568efc5df3b41bd0ab4363895898',
     duration: 4,
-    wideBytes: 3667482,
-    wideHash: "sha-256=366f6cd54d07107ba6fd7ccdb44879a0a7b06fc6e66325c340b7a6bcc25aedd2"
+    wideBytes: 3929226,
+    wideHash: 'sha-256=bd56d0ac567409319b11a63c3db82f68789977402c223d0013627ff60cb73b3a',
   },
   waves: {
     bytes: 764849,
@@ -200,11 +200,11 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     wideHash: 'sha-256=c9e2e7346f2e6011bfe3b490499f7451547696226bde433d5d5495e977d31d53',
   },
   bi: {
-    bytes: 388831,
-    hash: 'sha-256=50107ce14d951430a4364912a5f94a15a299234286b365c7fc1c5ef2ade37cc7',
+    bytes: 430072,
+    hash: 'sha-256=27e4da71a5a9dd78fd146dea8e73654e2c8777510b0eae5e4dd54573750d5c11',
     duration: 3,
-    wideBytes: 281943,
-    wideHash: 'sha-256=77bf830769ea7ecc1db37a5ec2c1c54d108360e3d20507901b6a33947db18055',
+    wideBytes: 306523,
+    wideHash: 'sha-256=dab819238c2346221b066737f453609d98618c180497335b9de04f84e404a701',
   },
   devices: {
     bytes: 428045,
@@ -228,11 +228,11 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     wideHash: 'sha-256=547125ccc3eff12ce36bf299058abcaf56bf18d3c51d7a6dd7d01288876818a8',
   },
   app: {
-    bytes: 395400,
-    hash: 'sha-256=d8790b39cc248ad2c678c971960c7110701cf119d2b174f999d2a534b1a3cd0d',
+    bytes: 440643,
+    hash: 'sha-256=48764df7666e9395d87d823894346b8f521ac51c13a6c8266b71a1f5211d698c',
     duration: 3,
-    wideBytes: 286080,
-    wideHash: 'sha-256=0fe0897dda8dd602d9c771bda5e3373a2e739603d658da15a61b08b48dceb412',
+    wideBytes: 304716,
+    wideHash: 'sha-256=7a14019cb38dbe53f48f5d495cd78b6525aa1c4b2d343aeed27baa240bbeb5c1',
   },
   'design-quantumglass': {
     bytes: 435974,
@@ -256,11 +256,11 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     wideHash: 'sha-256=bb97a04e8e41a7dca57ba534731e884e43cbae923bf2c232337664fca5d5404d',
   },
   memory: {
-    bytes: 415668,
-    hash: 'sha-256=b51c50035fe96fd0d803d1458d3f8e17cee6d89461e1114bd2ef7f65ed8aa978',
+    bytes: 431058,
+    hash: 'sha-256=d49edc7ea8fea1137586128324657c368400635d93defc06d45305586d4661f8',
     duration: 3,
-    wideBytes: 293055,
-    wideHash: 'sha-256=ca042c73dda05f98657fda91f18063343091b6c4d30ca9c66a16321b30b4d530',
+    wideBytes: 298840,
+    wideHash: 'sha-256=62f7cd204f95a17f2c1bceb5950f4cb320edf5a9ea7929532dbad8108f9798b9',
   },
   moments: {
     bytes: 377629,
@@ -270,11 +270,11 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     wideHash: 'sha-256=3d68e45fa3f19a85fc2b556e3dce969eb9b124d93d452fa40c0db24e6a9f1229',
   },
   network: {
-    bytes: 392898,
-    hash: 'sha-256=bdb17e2b647d71fc8a35270000f4240d1ec06c7384a4e979249ab1f67e718610',
+    bytes: 432686,
+    hash: 'sha-256=05538d7935c26b879271635f02e14b3bfbb8e374b1f9b0604d559d13afbb1591',
     duration: 3,
-    wideBytes: 284449,
-    wideHash: 'sha-256=fcdc4c54214a1be31d4acbc2c549c9313793bf46aad63445dc2928cfab2b54ff',
+    wideBytes: 303879,
+    wideHash: 'sha-256=2a769271322fc2d896f0c4470a894b878ef2105c300c44bf8c8a298858d253e8',
   },
   'skills-music-theory': {
     bytes: 409387,
@@ -305,11 +305,11 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     wideHash: 'sha-256=8a6b8281d3ebd0e82ed321e3d4d89b63bdef5aef42abf8c9729aaf173f14bfec',
   },
   webe: {
-    bytes: 393308,
-    hash: 'sha-256=f2a21b7e7c1100966bd0c88de9f0f7ab24d28ca8498fe11ac21c5e1282ffb137',
+    bytes: 437581,
+    hash: 'sha-256=d8901f1b555990d6ff7b0f62d8eb47fedc12299d4d124f11cd3032ea45b0efd8',
     duration: 3,
-    wideBytes: 284307,
-    wideHash: 'sha-256=22e27dbe255d77cc24da58908660fcc7254a60c435e82ae8f9875ecf9075bb21',
+    wideBytes: 301485,
+    wideHash: 'sha-256=aaca004950d23d141ddc4e8860f795cab7be39559f710fb65c9d3eebb5c4809e',
   },
   compliance: {
     bytes: 438834,
@@ -319,11 +319,11 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     wideHash: 'sha-256=a996035b54c900585ccbba3113d8e9da227863ec524dc9401e9a3c6914635f22',
   },
   security: {
-    bytes: 398240,
-    hash: 'sha-256=534310f18a3650719bea7f68258931038c6605bfeae3e2d91d7f6ed466be4004',
+    bytes: 443561,
+    hash: 'sha-256=0b79a0673a2879ec1580c414700c89730dfff17ac46db61da182b69268cc6841',
     duration: 3,
-    wideBytes: 287891,
-    wideHash: 'sha-256=381f2756254c4c517e7e68662f207e5ddae6977e8e5d3ccfd9b3187e66aa3066',
+    wideBytes: 307259,
+    wideHash: 'sha-256=158c4f8ac00dd24a1a38ef0c62dc6c1a26c02bd946d761ce8a0e114b32f1b1dd',
   },
 };
 // The shield pages share the buy card's animation; every nav page has its own custom preview.

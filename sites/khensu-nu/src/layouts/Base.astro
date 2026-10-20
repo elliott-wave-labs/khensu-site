@@ -37,7 +37,7 @@ const canonical = canonicalUrl
     ? new URL(PATH_TO_PRODUCT[pathForCanon])
     : new URL(Astro.url.pathname, Astro.site);
 const card = ogCard && CARDS[ogCard] ? ogCard : cardFor(Astro.url.pathname);
-const ogCacheBust = '?v=indra4';
+const ogCacheBust = '?v=indra5';
 const ogImage = new URL(`/og/${card}.jpg${ogCacheBust}`, Astro.site);
 const preview = previewFor(card);
 const previewMeta = preview ? PREVIEWS[preview] : undefined;

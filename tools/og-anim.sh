@@ -2,15 +2,19 @@
 # Animated Indra cards for posts and chats: Earth time-lapsed under the phone turning once, the card's words on top.
 # Inter overlays, phone fully in frame, 4 s at 30 fps with motion-interpolated turn,
 # landscape 1200×630 for og:video and square 1080×1080 for nu:preview / Instagram.
+# Only home, buy and thumb carry the phone; creators is Earth and words alone (phone height 0).
 #
 # Landscape og:video is H.264 (avc1) so Apple Messages, Android, and most unfurlers can play it.
 # Square nu:preview stays HEVC (hvc1) for webË / Apple quality. design/indra.md.
 #
-# Writes for each of home, buy, thumb, creators, waves:
+# With slugs (sh tools/og-anim.sh creators) only those cards are made.
+# Writes for each of home, buy, thumb, creators:
 #   public/og/<slug>.mp4              landscape H.264 (og:video)
 #   public/og/<slug>-square.mp4       square HEVC (nu:preview)
 #   ~/Desktop/khensu-instagram/…      gif / h264 / hevc copies
 set -eu
+only=" $* "
+want() { [ "$only" = "  " ] || case "$only" in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
 site="$(cd "$(dirname "$0")/../sites/khensu-nu" && pwd)"
 out="${TMPDIR:-/tmp}/khensu-og"
 insta="$HOME/Desktop/khensu-instagram"
@@ -57,26 +61,36 @@ print(f'{scale} {w} {x} {y}')
 
 anim_one() {
   slug="$1"; name="$2"; phone_h="$3"; phone_top="$4"; out_w="$5"; out_h="$6"; tag="$7"
+  want "$slug" || return 0
   overlay="$out/$slug-overlay.png"
   # Landscape overlays are named <slug>-overlay-wide.png
   if [ "$out_w" != "$out_h" ]; then
     overlay="$out/$slug-overlay-wide.png"
   fi
   [ -s "$overlay" ] || { echo "missing $overlay; run tools/og.sh first" >&2; exit 1; }
-  read -r scale w x y <<EOF
+  base="$out/$slug-$tag-anim"
+  bg="[0:v]setpts=PTS*$speed,fps=$fps,scale=${out_w}:${out_h}:force_original_aspect_ratio=increase,crop=${out_w}:${out_h}[bg]"
+  if [ "$phone_h" = 0 ]; then
+    ffmpeg -y -v error \
+      -i "$earth" \
+      -loop 1 -framerate "$fps" -t "$dur" -i "$overlay" \
+      -filter_complex "$bg;[bg][1:v]overlay=0:0:shortest=1,format=yuv420p" \
+      -t "$dur" -r "$fps" -c:v libx264 -preset slow -crf 15 -pix_fmt yuv420p -movflags +faststart -tag:v avc1 "$base.mp4"
+  else
+    read -r scale w x y <<EOF
 $(place "$phone_h" "$phone_top" "$out_w" "$out_h")
 EOF
-  base="$out/$slug-$tag-anim"
-  # Phone: 48 turn frames, motion-interpolated to $fps over $dur so the spin is smooth.
-  turn_rate="$(python3 -c "print(48 / $dur)")"
-  # Blend interpolate 48 turn frames up to $fps — smooth enough, far faster than MCI.
-  phone_filter="minterpolate=fps=$fps:mi_mode=blend,scale=$w:-1:flags=lanczos"
-  ffmpeg -y -v error \
-    -i "$earth" \
-    -framerate "$turn_rate" -i "$turn" \
-    -loop 1 -framerate "$fps" -t "$dur" -i "$overlay" \
-    -filter_complex "[0:v]setpts=PTS*$speed,fps=$fps,scale=${out_w}:${out_h}:force_original_aspect_ratio=increase,crop=${out_w}:${out_h}[bg];[1:v]${phone_filter}[ph];[bg][ph]overlay=$x:$y:shortest=1[a];[a][2:v]overlay=0:0:shortest=1,format=yuv420p" \
-    -t "$dur" -r "$fps" -c:v libx264 -preset slow -crf 15 -pix_fmt yuv420p -movflags +faststart -tag:v avc1 "$base.mp4"
+    # Phone: 48 turn frames, motion-interpolated to $fps over $dur so the spin is smooth.
+    turn_rate="$(python3 -c "print(48 / $dur)")"
+    # Blend interpolate 48 turn frames up to $fps — smooth enough, far faster than MCI.
+    phone_filter="minterpolate=fps=$fps:mi_mode=blend,scale=$w:-1:flags=lanczos"
+    ffmpeg -y -v error \
+      -i "$earth" \
+      -framerate "$turn_rate" -i "$turn" \
+      -loop 1 -framerate "$fps" -t "$dur" -i "$overlay" \
+      -filter_complex "$bg;[1:v]${phone_filter}[ph];[bg][ph]overlay=$x:$y:shortest=1[a];[a][2:v]overlay=0:0:shortest=1,format=yuv420p" \
+      -t "$dur" -r "$fps" -c:v libx264 -preset slow -crf 15 -pix_fmt yuv420p -movflags +faststart -tag:v avc1 "$base.mp4"
+  fi
   ffmpeg -y -v error -i "$base.mp4" -c:v hevc_videotoolbox -q:v 65 -tag:v hvc1 -movflags +faststart "$base-hevc.mp4"
   ffmpeg -y -v error -i "$base.mp4" -vf "fps=$fps,split[a][b];[a]palettegen=max_colors=256:stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle" -loop 0 "$base.gif"
   if [ "$out_w" = "$out_h" ]; then
@@ -99,61 +113,14 @@ EOF
 anim_one buy khensu-nu-buy-square 420 72 1080 1080 square
 anim_one thumb khensu-nu-link-thumb 400 56 1080 1080 square
 anim_one home khensu-nu-square 420 72 1080 1080 square
-anim_one creators khensu-nu-creators-square 420 72 1080 1080 square
-anim_one waves khensu-nu-waves-square 420 72 1080 1080 square
+anim_one creators khensu-nu-creators-square 0 0 1080 1080 square
 # Landscape for Messages / Android og:video (phone on the right, fully in the 630-tall frame).
 anim_one buy khensu-nu-buy 400 115 1200 630 wide
 anim_one home khensu-nu-home 400 115 1200 630 wide
-anim_one creators khensu-nu-creators 400 115 1200 630 wide
-anim_one waves khensu-nu-waves 400 115 1200 630 wide
+anim_one creators khensu-nu-creators 0 0 1200 630 wide
 
 
 # Record byte counts and hashes in src/data/og.ts for the shipped previews.
-python3 - "$site" "$dur" <<'PY'
-import hashlib, json, re, sys
-from pathlib import Path
-site = Path(sys.argv[1])
-dur = int(float(sys.argv[2]))
-previews = {}
-for slug in ("home", "buy", "thumb", "creators", "waves"):
-    square = site / "public/og" / f"{slug}-square.mp4"
-    wide = site / "public/og" / f"{slug}.mp4"
-    if square.exists():
-        b = square.read_bytes()
-        entry = {
-            "bytes": len(b),
-            "hash": "sha-256=" + hashlib.sha256(b).hexdigest(),
-            "duration": dur,
-        }
-        if wide.exists():
-            wb = wide.read_bytes()
-            entry["wideBytes"] = len(wb)
-            entry["wideHash"] = "sha-256=" + hashlib.sha256(wb).hexdigest()
-        previews[slug] = entry
-ts = site / "src/data/og.ts"
-s = ts.read_text()
-def to_ts(obj, indent=2):
-    def walk(o, level):
-        sp = " " * (indent * level)
-        sp1 = " " * (indent * (level + 1))
-        if isinstance(o, dict):
-            lines = ["{"]
-            for i, (k, v) in enumerate(o.items()):
-                comma = "," if i < len(o) - 1 else ""
-                lines.append(f"{sp1}{k}: {walk(v, level+1)}{comma}")
-            lines.append(sp + "}")
-            return "\n".join(lines)
-        if isinstance(o, str):
-            return json.dumps(o)
-        return json.dumps(o)
-    return walk(obj, 0)
-ts_block = to_ts(previews)
-s2 = re.sub(
-    r"export const PREVIEWS: Record<string, \{[^}]+\}> = \{.*?\n\};",
-    f"export const PREVIEWS: Record<string, {{ bytes: number; hash: string; duration: number; wideBytes?: number; wideHash?: string }}> = {ts_block};",
-    s,
-    flags=re.S,
-)
-ts.write_text(s2)
-print("updated", ts, list(previews))
-PY
+set -- $only
+[ $# -gt 0 ] || set -- home buy thumb creators
+python3 "$(dirname "$0")/og-previews.py" "$@"
