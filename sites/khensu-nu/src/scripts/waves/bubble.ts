@@ -187,11 +187,12 @@ export class Bubble {
     this.swell = this.swell * 0.85 + Math.min(1, total / 3) * 0.15;
     if (!this.orb || !this.visible) return;
     const motion = !this.reduce.matches;
-    this.orb.facing(this.showFacing ? this.engine.pose : null);
+    this.orb.facing(this.showFacing && this.engine.mobility ? this.engine.pose : null, this.engine.listenerPos);
     this.orb.frame(
       motion ? now / 1000 : 0,
       objs.filter((o) => o.kind !== 'direct').map((o) => ({ pos: o.pos, level: motion ? o.level : 0 })),
       motion ? this.swell : 0,
+      this.engine.listenerPos,
     );
     for (const o of objs) {
       const n = this.nodes.get(o);

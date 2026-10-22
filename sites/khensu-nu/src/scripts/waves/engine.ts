@@ -3,7 +3,7 @@
 // can pull apart or swing around you; healing sounds are generated live. Everything meets in one room (reverb,
 // echo, your gain: nu.eq), under one limiter, and the listener turns with your head. Nothing leaves the device.
 
-import { VENUES, type Pos, type Track, type Venue, type Channel } from '../../data/waves';
+import { VENUES, type Pos, type Stem, type Track, type Venue, type Channel } from '../../data/waves';
 import { createVoice, clipBuffer, impulse, type Voice } from './gen';
 import { listenerVectors, type Pose } from './head';
 import { onAir } from './channels';
@@ -45,6 +45,10 @@ export type Obj = {
   key: string;
   kind: ObjKind;
   stem?: string;
+  /** Where this node came from when it was added from another song or bubble (nu.waves stem adding).
+   *  `srcStem` is a stem id, `mix` for a whole song as one node, or absent for a generated tone. */
+  srcTrack?: string;
+  srcStem?: string;
   label: string;
   pos: Pos;
   mark: string;
@@ -82,6 +86,18 @@ const clampPos = (p: Pos) => {
     p.x *= MAX_R / d;
     p.y *= MAX_R / d;
     p.z *= MAX_R / d;
+  }
+  return p;
+};
+
+/** The listener stays inside the bubble, a little short of the shell where sounds can sit. */
+const clampListener = (p: Pos) => {
+  const max = MAX_R * 0.8;
+  const d = Math.hypot(p.x, p.y, p.z);
+  if (d > max) {
+    p.x *= max / d;
+    p.y *= max / d;
+    p.z *= max / d;
   }
   return p;
 };
@@ -183,7 +199,24 @@ export class Engine {
   private dimUntil = 0;
   private dimFrom: { wet: number; volume: number; positions: Map<Obj, Pos> } | null = null;
   tone = { hold: 8, fade: 4, cross: 2 };
-  pose: Pose = { yaw: 0, pitch: 0, roll: 0 };
+  pose: Pose = { yaw: 0, pitch: 0, roll: 0, pos: { x: 0, y: 0, z: 0 } };
+  /** ñü.mobility (Immersive Mobility), on by default: the listener is locked inside the bubble, so
+   *  head turns and xyz movement move the listener through sounds that stay where they are in the
+   *  bubble. Off: every sensor is ignored and the sounds stay fixed in the ears (head-locked). */
+  mobility = true;
+  /** The listener's place in the bubble, metres: x right, y ahead, z up. Clamped inside the bubble.
+   *  Sensor place (camera / AirPods) plus wherever you have walked with the keys, combined. */
+  listenerPos: Pos = { x: 0, y: 0, z: 0 };
+  private sensorPos: Pos = { x: 0, y: 0, z: 0 };
+  private walkedPos: Pos = { x: 0, y: 0, z: 0 };
+  private syncListener() {
+    this.listenerPos = clampListener({
+      x: this.sensorPos.x + this.walkedPos.x,
+      y: this.sensorPos.y + this.walkedPos.y,
+      z: this.sensorPos.z + this.walkedPos.z,
+    });
+    this.pose = { ...this.pose, pos: { ...this.listenerPos } };
+  }
   selected: Obj | null = null;
   deck: Deck | null = null;
   error: string | null = null;
@@ -585,15 +618,52 @@ export class Engine {
     this.emit();
   }
 
-  // MARK: Head
+  // MARK: Head (ñü.mobility)
 
-  setPose(p: Pose) {
-    this.pose = p;
+  /** Turns Immersive Mobility on or off. Off eases the listener back to the centre, facing ahead,
+   *  and sensor poses stop reaching the listener at all — gyro, accelerometer, camera and AirPods
+   *  motion are ignored until it is turned back on. */
+  setMobility(on: boolean) {
+    this.mobility = on;
+    if (!on) {
+      this.pose = { yaw: 0, pitch: 0, roll: 0, pos: { x: 0, y: 0, z: 0 } };
+      this.sensorPos = { x: 0, y: 0, z: 0 };
+      this.walkedPos = { x: 0, y: 0, z: 0 };
+      this.listenerPos = { x: 0, y: 0, z: 0 };
+    }
     this.applyPose();
+    this.emit();
+  }
+  setPose(p: Pose) {
+    if (!this.mobility) return;
+    this.pose = p;
+    if (p.pos) {
+      this.sensorPos = { ...p.pos };
+      this.syncListener();
+    }
+    this.applyPose();
+  }
+  /** Moves the listener through the bubble (keys, a lean, a step). Metres, bubble axes. */
+  moveListener(d: Pos) {
+    if (!this.mobility) return;
+    this.walkedPos = { x: this.walkedPos.x + d.x, y: this.walkedPos.y + d.y, z: this.walkedPos.z + d.z };
+    this.syncListener();
+    this.applyPose();
+    this.emit();
+  }
+  /** Back to the centre of the bubble, where every listen starts. */
+  recentreListener() {
+    this.walkedPos = { x: 0, y: 0, z: 0 };
+    this.sensorPos = { x: 0, y: 0, z: 0 };
+    this.syncListener();
+    this.applyPose();
+    this.emit();
   }
   private applyPose() {
     if (!this.ctx) return;
-    const { forward, up } = listenerVectors(this.pose);
+    const pose = this.mobility ? this.pose : { yaw: 0, pitch: 0, roll: 0, pos: { x: 0, y: 0, z: 0 } };
+    const { forward, up } = listenerVectors(pose);
+    const at = this.mobility ? this.listenerPos : { x: 0, y: 0, z: 0 };
     const L = this.ctx.listener;
     const t = this.ctx.currentTime;
     if (L.forwardX) {
@@ -603,8 +673,13 @@ export class Engine {
       L.upX.setTargetAtTime(up.x, t, 0.02);
       L.upY.setTargetAtTime(up.y, t, 0.02);
       L.upZ.setTargetAtTime(up.z, t, 0.02);
+      // Same axis map as `place`: bubble (x right, y ahead, z up) → Web Audio (x, z, −y).
+      L.positionX.setTargetAtTime(at.x, t, 0.03);
+      L.positionY.setTargetAtTime(at.z, t, 0.03);
+      L.positionZ.setTargetAtTime(-at.y, t, 0.03);
     } else {
       L.setOrientation(forward.x, forward.y, forward.z, up.x, up.y, up.z);
+      L.setPosition(at.x, at.z, -at.y);
     }
   }
 
@@ -659,7 +734,9 @@ export class Engine {
     const d = this.deck;
     if (!d) return;
     for (const so of s.objs) {
-      const o = d.objs.find((x) => x.key === so.key || x.label === so.label || (so.key && x.stem && so.key.includes(x.stem)));
+      const o =
+        (so.src && d.objs.find((x) => x.srcTrack === so.src!.track && (x.srcStem ?? '') === (so.src!.stem ?? ''))) ||
+        d.objs.find((x) => x.key === so.key || x.label === so.label || (so.key && x.stem && so.key.includes(x.stem)));
       if (!o) continue;
       o.pos = { ...so.pos };
       this.place(o);
@@ -756,7 +833,7 @@ export class Engine {
     const offset = clampPos({ x: src.pos.x + 0.6, y: src.pos.y - 0.4, z: src.pos.z + 0.3 });
     const n = d.objs.filter((x) => x.kind === src.kind && x.stem === src.stem).length;
     const base = src.label.replace(/ \d+$/, '');
-    const o: Obj = { key: `${src.key}-${++d.serial}`, kind: src.kind, stem: src.stem, label: `${base} ${n + 1}`, pos: offset, mark: src.mark, clone: true, level: 0 };
+    const o: Obj = { key: `${src.key}-${++d.serial}`, kind: src.kind, stem: src.stem, srcTrack: src.srcTrack, srcStem: src.srcStem, label: `${base} ${n + 1}`, pos: offset, mark: src.mark, clone: true, level: 0 };
     if (src.el) {
       const el = this.element();
       el.src = src.el.currentSrc || src.el.src;
@@ -785,17 +862,17 @@ export class Engine {
   }
 
   /** Layers a generated healing tone or nature sound into the active spacetime bubble alongside whatever is playing. */
-  async addGenToBubble(track: PlayTrack) {
+  async addGenToBubble(track: PlayTrack): Promise<boolean> {
     const g = track.gen;
-    if (!g) return;
+    if (!g) return false;
     const ctx = this.graph();
     await ctx.resume();
     if (!this.deck) {
       await this.setQueue([track], 0, true);
-      return;
+      return true;
     }
     const d = this.deck;
-    if (d.objs.length >= 16) return;
+    if (d.objs.length >= 16) return false;
     const clip = g.type === 'clip' ? await clipBuffer(ctx, g.url) : undefined;
     const voice = createVoice(ctx, g, { loop: true, attack: 0.15, clip });
     voice.out.gain.value = 0.65;
@@ -806,6 +883,7 @@ export class Engine {
     const o: Obj = {
       key: `gen-${track.id}-${++d.serial}`,
       kind: track.spatial === 'direct' ? 'direct' : 'mono',
+      srcTrack: track.id,
       label: track.title,
       pos: jitter,
       mark: g.mark,
@@ -826,6 +904,67 @@ export class Engine {
     }
     this.selected = o;
     this.emit();
+    return true;
+  }
+
+  /**
+   * Layers one stem — or a whole other song as a single node — from any track in the library, or from
+   * another bubble (a recalled ñü.scene carries these nodes with it), into the playing spacetime
+   * bubble. The node loops and stays locked to the deck clock, is fully movable / cloneable /
+   * removable like a native stem, and never touches the playing track's own objects.
+   * Returns false when the bubble is full or the source has nothing playable on this device.
+   */
+  async addStemFromTrack(source: PlayTrack, stem?: Stem): Promise<boolean> {
+    if (!stem && source.gen) return this.addGenToBubble(source);
+    const ctx = this.graph();
+    await ctx.resume();
+    if (!this.deck) {
+      await this.setQueue([source], 0, true);
+      return true;
+    }
+    const d = this.deck;
+    if (d.objs.length >= 28) return false;
+    const el = this.element();
+    el.src = stem ? stem.url : pick(el, source.src ?? source.original ?? []);
+    if (!el.src) return false;
+    el.loop = true;
+    el.preload = 'auto';
+    const base = stem ? { ...(this.venue.stems[stem.id] ?? this.venue.mono) } : { ...this.venue.mono };
+    const pos = d.objs.some((x) => Math.hypot(x.pos.x - base.x, x.pos.y - base.y, x.pos.z - base.z) < 0.3)
+      ? clampPos({ x: base.x + 0.55, y: base.y - 0.35, z: base.z + 0.25 })
+      : clampPos(base);
+    const o: Obj = {
+      key: `xstem-${source.id}-${stem?.id ?? 'mix'}-${++d.serial}`,
+      kind: stem ? 'stem' : 'mono',
+      stem: stem?.id,
+      srcTrack: source.id,
+      srcStem: stem?.id ?? 'mix',
+      label: stem ? `${stem.label} · ${source.title}` : source.title,
+      pos,
+      mark: stem?.mark ?? '#7ee0ff',
+      clone: true,
+      level: 0,
+      el,
+    };
+    this.wire(d, o);
+    d.objs.push(o);
+    const syncPlay = () => {
+      const dur = el.duration;
+      const at = d.master?.currentTime ?? 0;
+      try {
+        el.currentTime = Number.isFinite(dur) && dur > 0 ? at % dur : at;
+      } catch { /* not seekable yet */ }
+      if (d.playing) el.play().catch(() => {});
+    };
+    if (el.readyState >= 1) syncPlay();
+    else el.addEventListener('loadedmetadata', syncPlay, { once: true });
+    if (d.playing && o.fade) {
+      o.fade.gain.value = 0;
+      this.rampTo(o.fade, 1, 0.6);
+    }
+    this.selected = o;
+    this.emit();
+    return true;
   }
 
   private wire(d: Deck, o: Obj) {

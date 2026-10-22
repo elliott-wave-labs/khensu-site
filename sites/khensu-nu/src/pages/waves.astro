@@ -27,7 +27,7 @@ const pageCanonical = trackId ? `https://waves.khensu.nu/${featured.id}` : 'http
 const pageOgCard = trackId === 'all-healing-tones' ? 'all-healing-tones' : trackId === 'all-chakras-3d' ? 'all-chakras-3d' : 'waves';
 const live = CHANNELS.filter((c) => c.kind === 'live');
 const musicAlbums = ALBUMS.filter((a) => a.artistId !== 'waves');
-const songTracks = TRACKS.filter((t) => t.kind === 'song');
+const songTracks = TRACKS.filter((t) => t.kind === 'song' && t.artistId !== 'mobygratis');
 const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id)!).filter(Boolean);
 ---
 
@@ -103,6 +103,10 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
                 <span>SharePlay</span>
               </button>
               <button type="button" class="wv-queue-btn" data-act="queue-toggle" aria-pressed="false">Queue</button>
+              <button type="button" class="wv-fs-btn" data-act="fullscreen" aria-pressed="false" title="Fullscreen player — bubble, stem cells and ñü.ÊQ only">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Fullscreen</span>
+              </button>
             </div>
             <div class="wv-lyrics" data-lyrics data-track-id={featured.id} role="region" aria-label="Synchronized lyrics and score cues">
               <div class="wv-lyrics-head">
@@ -153,6 +157,10 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
               <span class="wv-dir" data-dir="above">above</span>
               <span class="wv-dir" data-dir="below">below</span>
             </div>
+            <button type="button" class="wv-fs-open" data-act="fullscreen" aria-pressed="false" title="Fullscreen player — just the bubble, stem cells and ñü.ÊQ">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Fullscreen</span>
+              </button>
             <details class="wv-room-menu" data-room-menu>
               <summary class="wv-room-summary" aria-label="Room">
                 <span class="wv-room-eyebrow">Room</span>
@@ -225,6 +233,29 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
                 <label>Fade <input type="range" min="0.5" max="12" step="0.5" value="4" data-tone="fade" /><output data-tone-out="fade">4.0 s</output></label>
                 <label>Crossfade <input type="range" min="0" max="8" step="0.1" value="2" data-tone="cross" /><output data-tone-out="cross">2.0 s</output></label>
               </fieldset>
+              <fieldset class="wv-stem" data-stem-box>
+                <legend>Add a stem — any song, any bubble</legend>
+                <p class="wv-lib-note">Layer a single stem, a healing tone, or a whole song from your library into this bubble — not just a clone of what is already here. It loops in sync, and drags, clones and removes like a native stem. Save a ñü.scene and the borrowed stems travel with it into any other bubble.</p>
+                <div class="wv-stem-row">
+                  <select data-stem-pick aria-label="Stem or song to add to the spacetime bubble">
+                    <option value="">Choose a stem or song…</option>
+                    {TRACKS.filter((t) => t.stems?.length && !t.nonCommercial).map((t) => (
+                      <optgroup label={`${t.title} — stems`}>
+                        {t.stems!.map((s) => <option value={`stem:${t.id}:${s.id}`}>{s.label} · {t.title}</option>)}
+                      </optgroup>
+                    ))}
+                    <optgroup label="mobygratis — stems" data-stem-moby hidden></optgroup>
+                    <optgroup label="Songs — whole song as one cell">
+                      {TRACKS.filter((t) => !t.stems?.length && t.kind === 'song' && !t.pending).map((t) => <option value={`track:${t.id}`}>{t.title}</option>)}
+                    </optgroup>
+                    <optgroup label="Tones & sounds — generated live">
+                      {TRACKS.filter((t) => t.kind !== 'song').map((t) => <option value={`gen:${t.id}`}>{t.title}</option>)}
+                    </optgroup>
+                    <optgroup label="Your files" data-stem-files></optgroup>
+                  </select>
+                  <button type="button" class="wv-btn wv-btn-primary" data-act="stem-add"><span>Add to bubble</span></button>
+                </div>
+              </fieldset>
               <fieldset class="wv-fx">
                 <legend>ñü.ÊQ</legend>
                 <div class="wv-fx-presets" role="group" aria-label="ñü.ÊQ presets">
@@ -249,7 +280,11 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
                 </label>
               </fieldset>
               <fieldset class="wv-head" data-head-box>
-                <legend>Head tracking</legend>
+                <legend>ñü.mobility — Immersive Mobility</legend>
+                <p class="wv-lib-note">Locked inside the bubble, on by default: the sounds stay where they are in the room and you move through them — turn your head, lean, or walk with W A S D (R / F rise and sink). Turn it off and every sensor is ignored: the sounds stay fixed in your ears.</p>
+                <div class="wv-head-srcs" role="group" aria-label="Immersive Mobility">
+                  <button type="button" data-act="mobility" aria-pressed="true">ñü.mobility</button>
+                </div>
                 <div class="wv-head-srcs" role="group" aria-label="Head tracking source">
                   <button type="button" data-act="head" data-src="off" aria-pressed="true">Off</button>
                   <button type="button" data-act="head" data-src="device" aria-pressed="false">Phone</button>
@@ -260,7 +295,7 @@ const healingTracks = HEALING_ALL_IDS.map((id) => TRACKS.find((t) => t.id === id
                 <button type="button" class="wv-btn" data-act="recentre" hidden><span>Recentre</span></button>
               </fieldset>
             </details>
-            <figcaption>Drag a sound. Drag the spacetime bubble to look around. Turn on head tracking and the room turns with you.</figcaption>
+            <figcaption>Drag a sound. Drag the spacetime bubble to look around. ñü.mobility keeps you inside the bubble — the sounds stay put and you move through them.</figcaption>
           </figure>
         </div>
         <div class="wv-queue wrap" data-queue hidden>

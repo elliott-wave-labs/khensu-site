@@ -1,11 +1,19 @@
-// Head tracking: where your head points decides where the sounds are. Three sources, all on the device:
-// the phone's motion sensors (turn the phone as you would your head), the camera (a face detector built into the
-// browser, where it exists; frames never leave the device), and AirPods through the nu.waves app, which hands
-// the pose to this page. The pose goes to the Web Audio listener and nowhere else (nu-audio.md A6).
+// Head tracking for ñü.mobility (Immersive Mobility): where your head points, and where you are inside
+// the bubble, decide where the sounds are — the sounds themselves stay put. Three sources, all on the
+// device: the phone's motion sensors (turn the phone as you would your head), the camera (a face detector
+// built into the browser, where it exists; frames never leave the device, and your face's place and size
+// in the frame become your xyz in the bubble), and AirPods through the nu.waves app, which hands the pose
+// and a bounded lean estimate to this page. The pose goes to the Web Audio listener and nowhere else
+// (nu-audio.md A6). When ñü.mobility is off the engine ignores all of this — see engine.setMobility.
 
 export type HeadSource = 'off' | 'device' | 'camera' | 'airpods';
-/** Radians. Yaw positive turns right, pitch positive looks up, roll positive drops the right ear. */
-export type Pose = { yaw: number; pitch: number; roll: number };
+/** A place in the bubble, metres: x right, y ahead, z up. */
+export type Place = { x: number; y: number; z: number };
+/** Radians. Yaw positive turns right, pitch positive looks up, roll positive drops the right ear.
+ *  `pos` is the listener's place in the bubble (ñü.mobility xyz), same axes. */
+export type Pose = { yaw: number; pitch: number; roll: number; pos: Place };
+
+export const neutralPose = (): Pose => ({ yaw: 0, pitch: 0, roll: 0, pos: { x: 0, y: 0, z: 0 } });
 
 type Listener = (pose: Pose, source: HeadSource) => void;
 
@@ -15,7 +23,8 @@ const wrap = (a: number) => ((((a + Math.PI) % TAU) + TAU) % TAU) - Math.PI;
 declare global {
   interface Window {
     __wavesNative?: {
-      head?: (yaw: number, pitch: number, roll: number) => void;
+      /** yaw, pitch, roll (radians), then the listener's xyz in metres when the app can estimate it. */
+      head?: (yaw: number, pitch: number, roll: number, x?: number, y?: number, z?: number) => void;
       [k: string]: unknown;
     };
     webkit?: { messageHandlers?: Record<string, { postMessage: (m: unknown) => void }> };
@@ -38,11 +47,13 @@ export const hasCamera = () => typeof FaceDetector !== 'undefined' && !!navigato
 export class HeadTracker {
   source: HeadSource = 'off';
   /** Raw pose from the source, before smoothing. */
-  raw: Pose = { yaw: 0, pitch: 0, roll: 0 };
+  raw: Pose = neutralPose();
   /** Smoothed pose, updated each frame. */
-  pose: Pose = { yaw: 0, pitch: 0, roll: 0 };
+  pose: Pose = neutralPose();
   status = '';
-  private zero: Pose = { yaw: 0, pitch: 0, roll: 0 };
+  private zero: Pose = neutralPose();
+  /** Face width (frame fraction) at recentre, for the camera's move-toward / move-away axis. */
+  private zeroFaceW = 0;
   private listeners = new Set<Listener>();
   private stream: MediaStream | null = null;
   private video: HTMLVideoElement | null = null;
@@ -53,13 +64,15 @@ export class HeadTracker {
     if (heading == null) return;
     // Beta is the tilt of the phone toward or away from you; a small share of it reads as looking up or down.
     const pitch = e.beta == null ? 0 : ((e.beta - 90) * Math.PI) / 180;
-    this.setRaw({ yaw: (heading * Math.PI) / 180, pitch: Math.max(-0.6, Math.min(0.6, pitch * 0.35)), roll: 0 });
+    this.setRaw({ yaw: (heading * Math.PI) / 180, pitch: Math.max(-0.6, Math.min(0.6, pitch * 0.35)), roll: 0, pos: this.raw.pos });
   };
 
   constructor() {
     window.__wavesNative = window.__wavesNative ?? {};
-    window.__wavesNative.head = (yaw, pitch, roll) => {
-      if (this.source === 'airpods') this.setRaw({ yaw, pitch, roll });
+    window.__wavesNative.head = (yaw, pitch, roll, x, y, z) => {
+      if (this.source !== 'airpods') return;
+      const pos = x != null && y != null && z != null ? { x, y, z } : this.raw.pos;
+      this.setRaw({ yaw, pitch, roll, pos });
     };
   }
 
@@ -72,9 +85,12 @@ export class HeadTracker {
     this.raw = p;
   }
 
-  /** Makes the current direction "ahead". */
+  /** Makes the current direction "ahead" and the current place the bubble's centre.
+   *  Every source reports its place already centred (camera: frame centre and recentre face size;
+   *  AirPods: the app's lean estimate around zero), so only the direction needs a new zero here. */
   recentre() {
-    this.zero = { ...this.raw };
+    this.zero = { ...this.raw, pos: { x: 0, y: 0, z: 0 } };
+    this.zeroFaceW = 0;
   }
 
   async start(source: HeadSource): Promise<boolean> {
@@ -156,9 +172,20 @@ export class HeadTracker {
               yaw = -((cx - w / 2) / (w / 2)) * 0.9;
             }
             const pitch = -((cy - h / 2) / (h / 2)) * 0.5;
-            this.setRaw({ yaw, pitch, roll: 0 });
+            // ñü.mobility xyz from the face itself: lean sideways → x, duck or rise → z, and move
+            // toward or away from the camera (the face grows or shrinks) → y, ahead into the bubble.
+            // Zeroed at recentre; bounded so a face at the frame's edge is a step, not a teleport.
+            const faceW = box.width / w;
+            if (!this.zeroFaceW) this.zeroFaceW = faceW;
+            const clamp1 = (n: number, m: number) => Math.max(-m, Math.min(m, n));
+            const pos: Place = {
+              x: clamp1(-((cx - w / 2) / (w / 2)) * 1.1, 1.4),
+              y: clamp1((faceW / Math.max(0.05, this.zeroFaceW) - 1) * 1.8, 1.6),
+              z: clamp1(-((cy - h / 2) / (h / 2)) * 0.7, 0.9),
+            };
+            this.setRaw({ yaw, pitch, roll: 0, pos });
           } else if (++lost > 20) {
-            this.setRaw({ yaw: 0, pitch: 0, roll: 0 });
+            this.setRaw(neutralPose());
           }
         } catch {
           /* a frame can fail to decode; try the next one */
@@ -194,19 +221,38 @@ export class HeadTracker {
       this.video = null;
     }
     this.source = 'off';
-    this.raw = { yaw: 0, pitch: 0, roll: 0 };
-    this.zero = { yaw: 0, pitch: 0, roll: 0 };
-    this.pose = { yaw: 0, pitch: 0, roll: 0 };
+    this.raw = neutralPose();
+    this.zero = neutralPose();
+    this.pose = neutralPose();
+    this.zeroFaceW = 0;
   }
 
   /** Call once per animation frame: smooths the pose toward the source and tells listeners. */
   frame() {
     const k = this.source === 'airpods' ? 0.35 : 0.14;
-    const target: Pose = this.source === 'off' ? { yaw: 0, pitch: 0, roll: 0 } : { yaw: wrap(this.raw.yaw - this.zero.yaw), pitch: this.raw.pitch - this.zero.pitch, roll: this.raw.roll - this.zero.roll };
+    const target: Pose =
+      this.source === 'off'
+        ? neutralPose()
+        : {
+            yaw: wrap(this.raw.yaw - this.zero.yaw),
+            pitch: this.raw.pitch - this.zero.pitch,
+            roll: this.raw.roll - this.zero.roll,
+            pos: {
+              x: this.raw.pos.x - this.zero.pos.x,
+              y: this.raw.pos.y - this.zero.pos.y,
+              z: this.raw.pos.z - this.zero.pos.z,
+            },
+          };
+    const kp = Math.min(1, k * 0.7);
     this.pose = {
       yaw: wrap(this.pose.yaw + wrap(target.yaw - this.pose.yaw) * k),
       pitch: this.pose.pitch + (target.pitch - this.pose.pitch) * k,
       roll: this.pose.roll + (target.roll - this.pose.roll) * k,
+      pos: {
+        x: this.pose.pos.x + (target.pos.x - this.pose.pos.x) * kp,
+        y: this.pose.pos.y + (target.pos.y - this.pose.pos.y) * kp,
+        z: this.pose.pos.z + (target.pos.z - this.pose.pos.z) * kp,
+      },
     };
     for (const l of this.listeners) l(this.pose, this.source);
   }

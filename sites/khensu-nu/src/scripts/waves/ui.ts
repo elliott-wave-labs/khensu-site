@@ -12,7 +12,9 @@ import {
   HEALING_BINAURAL_IDS,
   HEALING_BOWL_IDS,
   HEALING_NATURE_IDS,
+  MOBYGRATIS_TRACKS,
   TRACKS,
+  lendsStems,
   albumOf,
   artistOf,
   trackOf,
@@ -155,6 +157,12 @@ export class App {
     this.bubble.onMoveObj = (idx, pos) => this.shareplay.broadcastMoveObj(idx, pos);
     this.shareplay.onChange = () => this.paintSharePlay();
     await this.loadState();
+    this.paintStemFiles();
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) this.now.classList.remove('wv-fs');
+      const on = !!document.fullscreenElement || this.now.classList.contains('wv-fs');
+      for (const b of this.now.querySelectorAll('[data-act="fullscreen"]')) b.setAttribute('aria-pressed', String(on));
+    });
     this.bind();
     e.on(() => {
       this.paintNow();
@@ -201,7 +209,8 @@ export class App {
     const loop = (now: number) => {
       e.frame(now);
       this.head.frame();
-      if (this.head.source !== 'off' || Math.abs(this.head.pose.yaw) + Math.abs(this.head.pose.pitch) > 1e-3) {
+      // ñü.mobility off: sensor poses never reach the listener (engine.setMobility already centred it).
+      if (e.mobility && (this.head.source !== 'off' || Math.abs(this.head.pose.yaw) + Math.abs(this.head.pose.pitch) > 1e-3)) {
         e.setPose(this.head.pose);
         this.ink.mark(this.head.pose.yaw / Math.PI, this.head.pose.pitch / Math.PI, 'head');
       }
@@ -218,6 +227,7 @@ export class App {
     requestAnimationFrame(loop);
     if (hasNative()) {
       lib.onNativeLibrary(() => {
+        this.paintStemFiles();
         if (parseRoute().name === 'library') void this.render();
       });
       lib.requestNativeLibrary();
@@ -252,6 +262,8 @@ export class App {
     e.crossfade = await s.get('crossfade', 0);
     e.repeat = await s.get<Repeat>('repeat', 'off');
     e.shuffle = await s.get('shuffle', false);
+    // ñü.mobility defaults on; only an explicit off on this device turns it off.
+    if (!(await s.get('mobility', true))) e.setMobility(false);
     Object.assign(e.tone, await s.get('tone', e.tone));
   }
 
@@ -266,6 +278,7 @@ export class App {
     void s.set('crossfade', e.crossfade);
     void s.set('repeat', e.repeat);
     void s.set('shuffle', e.shuffle);
+    void s.set('mobility', e.mobility);
     void s.set('tone', e.tone);
   }
 
@@ -309,6 +322,32 @@ export class App {
 
   private q(sel: string) {
     return this.root.querySelector<HTMLElement>(sel);
+  }
+  /** Your own files join the stem picker: any file in the library can be layered into the bubble. */
+  private paintStemFiles() {
+    const group = this.now.querySelector<HTMLOptGroupElement>('[data-stem-files]');
+    if (!group) return;
+    group.innerHTML = '';
+    for (const t of this.fileTracks()) {
+      const o = document.createElement('option');
+      o.value = `track:${t.id}`;
+      o.textContent = t.title;
+      group.appendChild(o);
+    }
+    group.hidden = !group.children.length;
+    const moby = this.now.querySelector<HTMLOptGroupElement>('[data-stem-moby]');
+    if (moby && !moby.children.length) {
+      for (const t of MOBYGRATIS_TRACKS) {
+        if (!lendsStems(t)) continue;
+        for (const s of t.stems!) {
+          const o = document.createElement('option');
+          o.value = `stem:${t.id}:${s.id}`;
+          o.textContent = `${s.label} · ${t.title}`;
+          moby.appendChild(o);
+        }
+      }
+      moby.hidden = !moby.children.length;
+    }
   }
   private tracksOf(ids: string[]): PlayTrack[] {
     return ids.map((id) => this.light(id)).filter((t): t is PlayTrack => !!t);
@@ -481,10 +520,12 @@ export class App {
       .map((t, i) => {
         const sub = [t.artistName, opts.showAlbum ? t.albumTitle : '', t.spec ? t.spec.replace(/ · generated.*$/, '') : '', this.kept.has(t.id) ? 'kept' : ''].filter(Boolean).join(' · ');
         const canLayer = t.kind === 'generator' && !t.gens?.length;
-        return `<li class="wv-row${t.id === cur ? ' is-current' : ''}" data-id="${esc(t.id)}">
+        const canLend = lendsStems(t) && t.id !== cur;
+        return `<li class="wv-row${t.id === cur ? ' is-current' : ''}${t.pending ? ' is-pending' : ''}" data-id="${esc(t.id)}">
   <button type="button" class="wv-row-play" data-act="play-track" data-id="${esc(t.id)}" data-i="${i}" aria-label="Play ${esc(t.title)}">${opts.art ? art(t.artUrl, this.cssArt(t), '', 96) : `<span class="wv-row-n">${i + 1}</span>`}<span class="wv-row-ic">${ICON.play}</span></button>
   <button type="button" class="wv-row-text" data-act="select-track" data-id="${esc(t.id)}" data-i="${i}"><b>${esc(t.title)}</b><small>${esc(sub)}</small></button>
   ${canLayer ? `<button type="button" class="wv-row-layer" data-act="add-to-bubble" data-id="${esc(t.id)}" title="Add ${esc(t.title)} into the spacetime bubble">+ 3D</button>` : ''}
+  ${canLend ? `<button type="button" class="wv-row-layer" data-act="add-stems" data-id="${esc(t.id)}" title="Add every stem of ${esc(t.title)} to the song you’re in">+ stems</button>` : ''}
   <button type="button" class="wv-row-share" data-act="share" data-id="${esc(t.id)}" title="Share ${esc(t.title)}" aria-label="Share ${esc(t.title)}">${ICON.share}</button>
   <span class="wv-row-dur">${t.loop ? '∞' : t.dur ? mmss(t.dur) : ''}</span>
   <button type="button" class="wv-row-more" data-act="menu" data-id="${esc(t.id)}" ${opts.playlist ? `data-playlist="${esc(opts.playlist)}"` : ''} aria-label="More for ${esc(t.title)}">${ICON.more}</button>
@@ -852,6 +893,28 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         this.engine.setVolume(this.engine.volume - 0.05);
         this.save();
       } else if (e.key === 'f' || e.key === 'F') void this.like(this.engine.track?.id || '');
+      else if (this.engine.mobility && /^[wasdrf]$/i.test(e.key) && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        // ñü.mobility: walk through the bubble. Steps follow where you face (head yaw, else ahead).
+        const step = e.shiftKey ? 0.6 : 0.25;
+        const yaw = this.engine.pose.yaw;
+        const fwd = { x: Math.sin(yaw), y: Math.cos(yaw) };
+        const right = { x: Math.cos(yaw), y: -Math.sin(yaw) };
+        const k = e.key.toLowerCase();
+        const d =
+          k === 'w'
+            ? { x: fwd.x * step, y: fwd.y * step, z: 0 }
+            : k === 's'
+              ? { x: -fwd.x * step, y: -fwd.y * step, z: 0 }
+              : k === 'a'
+                ? { x: -right.x * step, y: -right.y * step, z: 0 }
+                : k === 'd'
+                  ? { x: right.x * step, y: right.y * step, z: 0 }
+                  : k === 'r'
+                    ? { x: 0, y: 0, z: step }
+                    : { x: 0, y: 0, z: -step };
+        this.engine.moveListener(d);
+        this.paintHead();
+      }
     });
     addEventListener('online', () => {
       this.toast('Back online.');
@@ -912,6 +975,83 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
           this.bubble.sync();
           this.paintNow();
           this.toast(`${tr.title} added to the spacetime bubble.`);
+        }
+        break;
+      }
+      case 'add-stems': {
+        const tr = this.light(id);
+        if (!tr || !lendsStems(tr)) break;
+        if (!eng.track) {
+          this.toast('Play a song first, then add these stems into its bubble.');
+          break;
+        }
+        let n = 0;
+        for (const s of tr.stems!) {
+          if (!(await eng.addStemFromTrack(tr, s))) break;
+          n++;
+        }
+        this.bubble.sync();
+        this.paintNow();
+        const credit = tr.nonCommercial ? ' Music by mobygratis.' : '';
+        this.toast(n === tr.stems!.length ? `${tr.title}: all ${n} stems are in your bubble.${credit}` : n ? `${n} of ${tr.stems!.length} stems fit — the bubble is full.${credit}` : 'The bubble is full — remove a sound first.');
+        break;
+      }
+      case 'fullscreen': {
+        const more = this.now.querySelector<HTMLDetailsElement>('details.wv-more');
+        if (more) more.open = true;
+        const inFs = !!document.fullscreenElement || this.now.classList.contains('wv-fs');
+        if (inFs) {
+          this.now.classList.remove('wv-fs');
+          if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+        } else if (this.now.requestFullscreen) {
+          await this.now.requestFullscreen().catch(() => this.now.classList.add('wv-fs'));
+        } else {
+          this.now.classList.add('wv-fs');
+        }
+        const on = !!document.fullscreenElement || this.now.classList.contains('wv-fs');
+        for (const b of this.now.querySelectorAll('[data-act="fullscreen"]')) b.setAttribute('aria-pressed', String(on));
+        break;
+      }
+      case 'stem-add': {
+        const sel = this.now.querySelector<HTMLSelectElement>('[data-stem-pick]');
+        const v = sel?.value ?? '';
+        if (!v) {
+          this.toast('Pick a stem or a song first — anything in your library can live in this bubble.');
+          break;
+        }
+        try {
+          if (v.startsWith('stem:')) {
+            const rest = v.slice(5);
+            const sep = rest.lastIndexOf(':');
+            const src = this.light(rest.slice(0, sep));
+            const stem = src?.stems?.find((s) => s.id === rest.slice(sep + 1));
+            if (!src || !stem) break;
+            const added = await eng.addStemFromTrack(src, stem);
+            this.toast(added ? `${stem.label} from ${src.title} is in the bubble — drag it, clone it, or take it to another bubble in a ñü.scene.` : 'The bubble is full — remove a sound first.');
+          } else if (v.startsWith('gen:')) {
+            const src = this.light(v.slice(4));
+            if (!src) break;
+            if (src.gens?.length) {
+              for (const item of src.gens) {
+                await eng.addGenToBubble({ ...src, id: `${src.id}-${item.id}`, title: item.label, gen: item.gen, pos: item.pos, gens: undefined } as PlayTrack);
+              }
+              this.toast(`${src.title} — every sound is in the bubble.`);
+            } else {
+              await eng.addGenToBubble(src);
+              this.toast(`${src.title} added to the spacetime bubble.`);
+            }
+          } else if (v.startsWith('track:')) {
+            const id = v.slice(6);
+            const src = (await lib.resolve(id)) ?? this.light(id);
+            if (!src) break;
+            const added = await eng.addStemFromTrack(src);
+            this.toast(added ? `${src.title} is in the bubble as one node.` : 'The bubble is full — remove a sound first.');
+          }
+          this.bubble.sync();
+          this.paintNow();
+          if (sel) sel.value = '';
+        } catch {
+          this.toast('That stem could not be loaded on this device.');
         }
         break;
       }
@@ -1167,19 +1307,37 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
       case 'restore':
         eng.restoreObjs();
         break;
+      case 'mobility': {
+        const on = !eng.mobility;
+        eng.setMobility(on);
+        if (on && this.head.source === 'off') {
+          // Default source when one is available without a prompt the browser would block.
+          if (hasNative()) await this.head.start('airpods');
+          this.bubble.showFacing = this.head.source !== 'off';
+        }
+        this.save();
+        this.paintHead();
+        this.toast(on ? 'ñü.mobility on — you are inside the bubble. The sounds stay put; you move.' : 'ñü.mobility off — sensors ignored, the sounds stay in your ears.');
+        break;
+      }
       case 'head': {
         const src = (el.dataset.src as HeadSource) || 'off';
         const next = src === 'off' ? 'off' : src === this.head.source ? 'off' : src;
+        if (next !== 'off' && !eng.mobility) {
+          eng.setMobility(true);
+          this.save();
+        }
         const ok = await this.head.start(next);
         this.bubble.showFacing = this.head.source !== 'off';
-        if (this.head.source === 'off') eng.setPose({ yaw: 0, pitch: 0, roll: 0 });
+        if (this.head.source === 'off') eng.setPose({ yaw: 0, pitch: 0, roll: 0, pos: { x: 0, y: 0, z: 0 } });
         this.paintHead();
         if (!ok && this.head.status) this.toast(this.head.status);
         break;
       }
       case 'recentre':
         this.head.recentre();
-        this.toast('Ahead is where you are facing now.');
+        eng.recentreListener();
+        this.toast('Ahead is where you are facing now, back at the centre of the bubble.');
         break;
       case 'sleep-off':
         eng.setSleep(0);
@@ -1359,6 +1517,16 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
   }
 
   private playIds(ids: string[], start: number, autoplay = true) {
+    const pending = (id: string) => !!trackOf(id)?.pending;
+    if (pending(ids[start] ?? '')) {
+      this.toast('This mobygratis track’s stems are still on their way in. Everything else in the list plays now.');
+      return;
+    }
+    if (ids.some(pending)) {
+      const first = ids[start];
+      ids = ids.filter((id) => !pending(id));
+      start = Math.max(0, ids.indexOf(first));
+    }
     const tracks = this.tracksOf(ids);
     if (!tracks.length) return;
     const eng = this.engine;
@@ -1395,6 +1563,22 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     this.paintScenes();
   }
 
+  /** Re-adds, into the current bubble, any stem nodes this scene borrowed from other songs or
+   *  bubbles. The audio stays on this device: catalogue stems stream from the catalogue, your
+   *  files resolve from your own library, and anything missing here is simply skipped. */
+  private async materialiseScene(s: Scene) {
+    for (const so of s.objs) {
+      if (!so.src?.track) continue;
+      const have = this.engine.objs().some((o) => o.srcTrack === so.src!.track && (o.srcStem ?? '') === (so.src!.stem ?? ''));
+      if (have) continue;
+      const src = this.light(so.src.track) ?? (await lib.resolve(so.src.track));
+      if (!src) continue;
+      const stem = so.src.stem && so.src.stem !== 'mix' ? src.stems?.find((x) => x.id === so.src!.stem) : undefined;
+      if (so.src.stem && so.src.stem !== 'mix' && !stem && !src.gen) continue;
+      await this.engine.addStemFromTrack(src, stem);
+    }
+  }
+
   private async applySceneId(id: string) {
     const s = this.scenes.find((x) => x.id === id) || (await store.scenes.get(id));
     if (!s) return;
@@ -1405,7 +1589,9 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
         await this.engine.next();
       }
     }
+    await this.materialiseScene(s);
     this.engine.applyScene(s);
+    this.bubble.sync();
     this.toast(`Recalled “${s.name}”.`);
     this.openNow(true);
   }
@@ -1515,7 +1701,9 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     } else if (!this.engine.playing) {
       await this.engine.play();
     }
+    await this.materialiseScene(s);
     this.engine.applyScene(s);
+    this.bubble.sync();
     this.toast(`“${s.name}” playing on ${this.engine.track?.title ?? 'the stage'}.`);
     this.paintScenes();
     this.openNow(true);
@@ -1567,7 +1755,9 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     if (scene) {
       await store.scenes.put(scene);
       this.scenes = [scene, ...this.scenes.filter((x) => x.id !== scene.id)];
+      await this.materialiseScene(scene);
       this.engine.applyScene(scene);
+      this.bubble.sync();
       this.toast(`“${scene.name}” playing on ${this.engine.track?.title ?? 'the stage'}.`);
     }
     this.openNow(true);
@@ -2039,14 +2229,31 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     const box = this.now.querySelector<HTMLElement>('[data-head-box]');
     if (!box) return;
     const src = this.head.source;
+    const mob = box.querySelector<HTMLButtonElement>('[data-act="mobility"]');
+    if (mob) mob.setAttribute('aria-pressed', String(this.engine.mobility));
     for (const b of box.querySelectorAll<HTMLButtonElement>('[data-src]')) {
       b.setAttribute('aria-pressed', String(b.dataset.src === src));
       const s = b.dataset.src as HeadSource;
       b.hidden = (s === 'device' && !hasDeviceMotion()) || (s === 'camera' && !hasCamera()) || (s === 'airpods' && !hasNative());
     }
     const status = box.querySelector<HTMLElement>('[data-head-status]')!;
-    status.textContent = src === 'off' ? (hasNative() ? 'Off. Your AirPods, the camera or the phone can steer the sound.' : hasDeviceMotion() ? 'Off. Turn it on and the phone steers the sound as you turn.' : hasCamera() ? 'Off. The camera can follow your face, on this device only.' : 'Off. In the nu.waves app, AirPods steer the sound.') : this.head.status;
-    box.querySelector<HTMLButtonElement>('[data-act="recentre"]')!.hidden = src === 'off';
+    if (!this.engine.mobility) {
+      status.textContent = 'Off. Gyro, accelerometer, camera and AirPods motion are all ignored — the sounds stay fixed in your ears, as before.';
+    } else if (src === 'off') {
+      const at = this.engine.listenerPos;
+      const walked = Math.hypot(at.x, at.y, at.z) > 0.05 ? ` You are ${at.y >= 0 ? `${at.y.toFixed(1)} m in` : `${Math.abs(at.y).toFixed(1)} m back`}, ${Math.abs(at.x).toFixed(1)} m ${at.x >= 0 ? 'right' : 'left'}.` : '';
+      status.textContent =
+        (hasNative()
+          ? 'On — pick AirPods, the camera or the phone, and turn or lean: the sounds stay where they are and you move through them. W A S D walk, R / F rise and sink.'
+          : hasDeviceMotion()
+            ? 'On — pick Phone or Camera and turn: the sounds stay where they are and you move through them. W A S D walk, R / F rise and sink.'
+            : hasCamera()
+              ? 'On — pick Camera and turn or lean: the sounds stay where they are and you move through them. W A S D walk, R / F rise and sink.'
+              : 'On — W A S D walk through the sounds, R / F rise and sink. In the nu.waves app, AirPods add your head.') + walked;
+    } else {
+      status.textContent = this.head.status;
+    }
+    box.querySelector<HTMLButtonElement>('[data-act="recentre"]')!.hidden = src === 'off' && !this.engine.mobility;
   }
 
   private openSharePlayDialog() {
@@ -2087,7 +2294,10 @@ ${this.list(tracks, { art: true, showAlbum: true, playlist: p.id })}`;
     }
     if (sceneCode) {
       const sc = decodeShare(sceneCode);
-      if (sc) this.engine.applyScene(sc);
+      if (sc) {
+        await this.materialiseScene(sc);
+        this.engine.applyScene(sc);
+      }
     }
     if (Number.isFinite(startSec) && startSec >= 0) {
       this.engine.seek(startSec);

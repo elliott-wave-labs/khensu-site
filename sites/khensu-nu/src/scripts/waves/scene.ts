@@ -7,7 +7,17 @@ import { trackOf, type Pos } from '../../data/waves';
 import type { Fx, Mode, Obj } from './engine';
 
 export type SceneOrbit = { rate: number; radius: number; phase: number };
-export type SceneObj = { key: string; label: string; pos: Pos; gone?: boolean; orbit?: SceneOrbit | null };
+export type SceneObj = {
+  key: string;
+  label: string;
+  pos: Pos;
+  gone?: boolean;
+  orbit?: SceneOrbit | null;
+  /** Set when this node was added from another song or bubble: the track it came from, and the stem
+   *  id inside it (`mix` = the whole song as one node; absent = a generated tone from that track).
+   *  Recalling the scene — on any bubble — re-adds the node from that source first. */
+  src?: { track: string; stem?: string };
+};
 export type Scene = {
   id: string;
   name: string;
@@ -42,6 +52,7 @@ export const capture = (
     pos: { ...o.pos },
     gone: o.gone || undefined,
     orbit: o.orbit ? { rate: o.orbit.rate, radius: o.orbit.radius, phase: o.orbit.phase } : null,
+    src: o.srcTrack ? { track: o.srcTrack, stem: o.srcStem } : undefined,
   })),
   created: Date.now(),
   updated: Date.now(),
@@ -50,9 +61,18 @@ export const capture = (
 /** True when the track lives in the public catalogue (so a link can play it). */
 export const isCatalogueTrack = (id: string) => !!id && !!trackOf(id);
 
-/** Compact share payload (no id): about 200–800 bytes of JSON, then base64url. */
+/** Compact share payload (no id): about 200–800 bytes of JSON, then base64url.
+ *  `x` lists, per node key, where an added stem came from, so the node travels between bubbles. */
 export function encodeShare(s: Scene): string {
-  const bare = { n: s.name, t: s.trackId, v: s.venue, f: s.fx, m: s.mode, o: s.objs.map((x) => [x.key, +x.pos.x.toFixed(3), +x.pos.y.toFixed(3), +x.pos.z.toFixed(3), x.gone ? 1 : 0, x.orbit ? [+x.orbit.rate.toFixed(3), +x.orbit.radius.toFixed(3), +x.orbit.phase.toFixed(3)] : 0]) };
+  const bare = {
+    n: s.name,
+    t: s.trackId,
+    v: s.venue,
+    f: s.fx,
+    m: s.mode,
+    o: s.objs.map((x) => [x.key, +x.pos.x.toFixed(3), +x.pos.y.toFixed(3), +x.pos.z.toFixed(3), x.gone ? 1 : 0, x.orbit ? [+x.orbit.rate.toFixed(3), +x.orbit.radius.toFixed(3), +x.orbit.phase.toFixed(3)] : 0]),
+    x: s.objs.filter((x) => x.src).map((x) => [x.key, x.src!.track, x.src!.stem ?? '']),
+  };
   const json = JSON.stringify(bare);
   const b64 = btoa(unescape(encodeURIComponent(json))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   return b64;
@@ -69,7 +89,9 @@ export function decodeShare(code: string): Scene | null {
       f: Fx;
       m: Mode;
       o: [string, number, number, number, number, 0 | [number, number, number]][];
+      x?: [string, string, string][];
     };
+    const srcOf = new Map((bare.x ?? []).map(([key, track, stem]) => [key, { track, stem: stem || undefined }]));
     return {
       id: crypto.randomUUID?.() ?? `${Date.now().toString(36)}`,
       name: bare.n || 'shared scene',
@@ -83,6 +105,7 @@ export function decodeShare(code: string): Scene | null {
         pos: { x, y, z },
         gone: gone ? true : undefined,
         orbit: Array.isArray(orb) ? { rate: orb[0], radius: orb[1], phase: orb[2] } : null,
+        src: srcOf.get(key),
       })),
       created: Date.now(),
       updated: Date.now(),

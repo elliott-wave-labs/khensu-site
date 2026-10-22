@@ -1,8 +1,11 @@
 // The nu.waves catalogue: what plays on waves.khensu.nu and in the nu.waves app. One module feeds the
 // server-rendered page, the client bundle and /waves/catalogue.json (the app's feed). Every entry names its
-// licence; nothing here is anyone else's catalogue. Healing sounds are generated on the device from a short recipe,
+// licence; anything from outside (Musopen, mobygratis) is here under its own free licence and credited the way
+// that licence asks. Healing sounds are generated on the device from a short recipe,
 // so they cost no bytes and loop forever. Live channels are programmes pinned to the clock: everyone who tunes in
 // hears the same moment, from any device, with no server deciding what plays.
+
+import MOBYGRATIS from './mobygratis.json';
 
 export type Pos = { x: number; y: number; z: number };
 
@@ -115,6 +118,11 @@ export type Track = {
   licence: string;
   loop?: boolean;
   tags: string[];
+  /** Listed before its audio is hosted; it can't play or lend stems yet. */
+  pending?: boolean;
+  /** Free under a non-commercial licence: never sold, never paid per play, never behind a paywall. */
+  nonCommercial?: boolean;
+  bpm?: number;
 };
 
 export type Album = {
@@ -175,6 +183,8 @@ export type Venue = {
 
 const S = '/khensu/sounds';
 const W = '/khensu/waves';
+/** Large catalogues live in their own bucket so a site publish never deletes them. */
+const MEDIA = 'https://storage.googleapis.com/khensu-waves-media';
 const CC0 = 'CC0 1.0 (public domain dedication)';
 
 export const STEM_MARK: Record<string, string> = {
@@ -270,7 +280,65 @@ export const ARTISTS: Artist[] = [
     art: '',
     artClass: 'h1',
   },
+  {
+    id: 'mobygratis',
+    name: 'mobygratis',
+    kind: 'artist',
+    bio: 'Free instrumental music for creators, every track with its full multitrack stems. Play any of it in the spacetime bubble, or pull its drums, bass or keys into your own song. Free and non-commercial: never sold, never paid per play, and not for promoting right-wing politics, meat, dairy or other animal products.',
+    art: '',
+    artClass: 'h4',
+    links: [
+      { label: 'mobygratis.com', href: 'https://mobygratis.com/' },
+      { label: 'Licence', href: 'https://mobygratis.com/license-agreement' },
+    ],
+  },
 ];
+
+export const MOBYGRATIS_LICENCE = 'mobygratis licence · free, non-commercial · credit “Music by mobygratis”';
+
+type MobyEntry = {
+  id: string;
+  uuid: string;
+  title: string;
+  tags: string[];
+  bpm: number | null;
+  dur: number;
+  restricted?: boolean;
+  stems?: { id: string; label: string; file: string; kbps: number }[];
+};
+
+const MOBY_MARKS = ['#e8e4dc', '#7ec8ff', '#6dffbf', '#c8a2ff', '#ffd23c', '#ff8a3c', '#f4f1ea', '#38a8ff', '#ff4b4b', '#b07cff'];
+
+const mobyTrack = (m: MobyEntry): Track => {
+  const stems = (m.stems ?? []).map((s, i) => ({
+    id: s.id,
+    label: s.label,
+    url: `${MEDIA}/mobygratis/${m.id}/${s.file}`,
+    kbps: s.kbps,
+    mark: STEM_MARK[s.id] ?? MOBY_MARKS[i % MOBY_MARKS.length],
+  }));
+  return {
+    id: `mg-${m.id}`,
+    title: m.title,
+    artistId: 'mobygratis',
+    albumId: 'mobygratis-catalogue',
+    dur: m.dur,
+    kind: 'song',
+    spatial: 'stems',
+    stems: stems.length ? stems : undefined,
+    spec: stems.length ? `${stems.length} stems in 3D${m.bpm ? ` · ${m.bpm} BPM` : ''}` : `multitrack · stems arriving${m.bpm ? ` · ${m.bpm} BPM` : ''}`,
+    licence: m.restricted ? `${MOBYGRATIS_LICENCE} · Restricted Track: play only, no remix` : MOBYGRATIS_LICENCE,
+    tags: ['mobygratis', 'instrumental', ...m.tags],
+    pending: !stems.length,
+    nonCommercial: true,
+    bpm: m.bpm ?? undefined,
+  };
+};
+
+export const MOBYGRATIS_TRACKS: Track[] = (MOBYGRATIS.tracks as MobyEntry[]).map(mobyTrack);
+
+/** Whether a track's stems can be pulled into another song. Restricted Tracks play but are never remixed. */
+export const lendsStems = (t: Pick<Track, 'stems' | 'pending' | 'licence'>) => !!t.stems?.length && !t.pending && !t.licence.includes('Restricted Track');
 
 const chopinTrack = (id: string, title: string, file: string, dur: number, bytes: number, tags: string[]): Track => ({
   id,
@@ -492,6 +560,7 @@ export const TRACKS: Track[] = [
     licence: 'Wikimedia Commons · CC0',
     tags: ['effect', 'film'],
   },
+  ...MOBYGRATIS_TRACKS,
 ];
 
 export const HEALING_BOWL_IDS = ['solfeggio-528', 'solfeggio-432', 'bowl-396'];
@@ -546,6 +615,18 @@ export const ALBUMS: Album[] = [
     tracks: ['all-healing-tones', ...HEALING_BOWL_IDS, ...HEALING_BINAURAL_IDS, ...HEALING_NATURE_IDS],
     licence: 'Generated on your device',
     note: 'Solfeggio bowls, binaural beats, rain, ocean, forest and noise, generated live so they never repeat and never end.',
+  },
+  {
+    id: 'mobygratis-catalogue',
+    title: 'mobygratis',
+    artistId: 'mobygratis',
+    kind: 'collection',
+    year: 2026,
+    art: '',
+    artClass: 'h4',
+    tracks: MOBYGRATIS_TRACKS.map((t) => t.id),
+    licence: MOBYGRATIS_LICENCE,
+    note: `The full mobygratis catalogue, ${MOBYGRATIS.count} instrumentals, each split into its stems. Add any stem to your own song from the bubble. Tracks marked “stems arriving” play as soon as their audio is hosted.`,
   },
 ];
 

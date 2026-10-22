@@ -192,23 +192,28 @@ export function createOrb(canvas: HTMLCanvasElement, radius: number) {
       pitch = Math.max(-1.2, Math.min(1.35, pitch + dy * 0.006));
       placeCamera();
     },
-    /** Points the arrow where the listener faces (radians; yaw right-positive, pitch up-positive), or hides it. */
-    facing(pose: { yaw: number; pitch: number } | null) {
+    /** Points the arrow where the listener faces (radians; yaw right-positive, pitch up-positive), or hides it.
+     *  The arrow starts where the listener stands in the bubble (ñü.mobility). */
+    facing(pose: { yaw: number; pitch: number } | null, listener: Pos = { x: 0, y: 0, z: 0 }) {
       face.visible = !!pose;
       if (!pose) return;
+      const me = toWorld(listener);
       const len = radius * 0.55;
       const f = new Vector3(Math.sin(pose.yaw) * Math.cos(pose.pitch), Math.sin(pose.pitch), -Math.cos(pose.yaw) * Math.cos(pose.pitch));
-      const tip = f.clone().multiplyScalar(len);
+      const tip = me.clone().add(f.clone().multiplyScalar(len));
       const side = new Vector3(-f.z, 0, f.x).normalize().multiplyScalar(radius * 0.07);
-      const back = f.clone().multiplyScalar(len - radius * 0.12);
+      const back = me.clone().add(f.clone().multiplyScalar(len - radius * 0.12));
       const l = back.clone().add(side);
       const r = back.clone().sub(side);
-      facePos.set([0, 0, 0, tip.x, tip.y, tip.z, tip.x, tip.y, tip.z, l.x, l.y, l.z, tip.x, tip.y, tip.z, r.x, r.y, r.z]);
+      facePos.set([me.x, me.y, me.z, tip.x, tip.y, tip.z, tip.x, tip.y, tip.z, l.x, l.y, l.z, tip.x, tip.y, tip.z, r.x, r.y, r.z]);
       faceGeo.attributes.position.needsUpdate = true;
     },
-    frame(t: number, sources: Source[], swell: number) {
+    /** `listener` is where you stand in the bubble (ñü.mobility); the head dot and the threads move with you. */
+    frame(t: number, sources: Source[], swell: number, listener: Pos = { x: 0, y: 0, z: 0 }) {
       uniforms.uTime.value = t;
       uniforms.uSwell.value = swell;
+      const me = toWorld(listener);
+      headGeo.setAttribute('position', new BufferAttribute(new Float32Array([me.x, me.y, me.z]), 3));
       const loud = [...sources].sort((a, b) => b.level - a.level).slice(0, SOURCES);
       uniforms.uSrc.value.forEach((v, i) => {
         const s = loud[i];
@@ -221,7 +226,7 @@ export function createOrb(canvas: HTMLCanvasElement, radius: number) {
       threadPos.fill(0);
       sources.slice(0, SOURCES * 2).forEach((s, i) => {
         const w = toWorld(s.pos);
-        threadPos.set([0, 0, 0, w.x, w.y, w.z, w.x, w.y, w.z, w.x, 0, w.z], i * 12);
+        threadPos.set([me.x, me.y, me.z, w.x, w.y, w.z, w.x, w.y, w.z, w.x, 0, w.z], i * 12);
       });
       threadGeo.attributes.position.needsUpdate = true;
       threadGeo.setDrawRange(0, Math.min(sources.length, SOURCES * 2) * 4);
