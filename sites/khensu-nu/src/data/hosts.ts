@@ -7,11 +7,13 @@ export const PRODUCTS = {
   webe: 'https://webe.khensu.nu',
   void: 'https://void.khensu.nu',
   media: 'https://media.khensu.nu',
-  // Apex until Hover A for moments.khensu.nu → 34.107.228.246 + own_certificate ACTIVE.
-  moments: 'https://khensu.nu/moments',
+  moments: 'https://moments.khensu.nu',
   memory: 'https://memory.khensu.nu',
   create: 'https://create.khensu.nu',
   waves: 'https://waves.khensu.nu',
+  // nu.universes (header i.verse, part of nu.waves). iverse.khensu.nu is the main host; universes, rabbithole and
+  // portal.khensu.nu open the same page, all on cert moqom-aura-iverse-khensu-nu (Hover A verified 21 Oct 2026).
+  universes: 'https://iverse.khensu.nu',
   fi: 'https://fi.khensu.nu',
   bi: 'https://bi.khensu.nu',
   shield: 'https://shield.khensu.nu',
@@ -19,7 +21,7 @@ export const PRODUCTS = {
   sla: 'https://sla.khensu.nu',
   avatars: 'https://avatars.khensu.nu',
   indra: 'https://indra.og.khensu.nu',
-  getApps: 'https://khensu.nu/app',
+  getApps: 'https://get.apps.khensu.nu',
   kronos: 'https://khensu.nu/kronos',
   /** @deprecated use PRODUCTS.kronos — kept as aliases */
   skillsAgent: 'https://khensu.nu/kronos',
@@ -44,6 +46,7 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/memory': PRODUCTS.memory,
   '/creators': PRODUCTS.create,
   '/waves': PRODUCTS.waves,
+  '/universes': PRODUCTS.universes,
   '/sounds': PRODUCTS.waves,
   '/nufi': PRODUCTS.fi,
   '/bi': PRODUCTS.bi,

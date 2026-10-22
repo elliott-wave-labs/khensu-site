@@ -4,7 +4,9 @@ import ProductBar from '../components/khensu/ProductBar.astro';
 import MomentsPage from '../components/khensu/MomentsPage.astro';
 import MomentsStudio from '../components/khensu/MomentsStudio.astro';
 import Ecosystem from '../components/khensu/Ecosystem.astro';
+import { allowFeed } from '../data/feed';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
+allowFeed(Astro);
 
 const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
 ---
@@ -13,8 +15,9 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
   title="ñü.mømëntš"
   description="nu.moments: templates, beat sync, captions and a full video and photo editor on your device. Nobody else sees your clips."
 >
-  <ProductBar name="ñü.mømëntš" explore="#features-section" action={appLabel} href={APP_STORE_URL} />
-  <Ecosystem mode="create" title="ñü.mømëntš studio — cut it, post it, get paid" />
-  <MomentsStudio />
-  <MomentsPage />
+  <ProductBar name="ñü.mømëntš" explore="#templates-section" action={appLabel} href={APP_STORE_URL} />
+  <MomentsPage>
+    <MomentsStudio slot="studio" />
+    <Ecosystem slot="feed" mode="create" title="ñü.mømëntš studio — cut it, post it" />
+  </MomentsPage>
 </Base>

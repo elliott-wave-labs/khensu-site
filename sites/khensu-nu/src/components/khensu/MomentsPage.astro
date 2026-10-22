@@ -1,59 +1,126 @@
 ---
 import RevealText from './RevealText.astro';
 import { APP_STORE_URL, GET_APPS } from '../../data/app';
+import { MOMENTS_TEMPLATES } from '../../data/moments-templates';
 
 const appHref = APP_STORE_URL || GET_APPS;
+const tplCats = [...new Set(MOMENTS_TEMPLATES.map((t) => t.category))];
 
 const features = [
   {
-    id: 'beat',
-    title: 'Beat sync studio',
-    body: 'Drop in clips and your own track — or generate a beat at 70–160 BPM on the device. Onset detection re-times every cut. Auto-fit scores your frames locally, puts the strongest shot first, then cuts to the beat.',
+    id: 'timeline',
+    title: 'Frame-accurate editor',
+    body: 'A live preview with a scrubber, frame-by-frame stepping and split at the playhead. Trim, reorder, duplicate, speed from 0.25× to 4×, per-clip volume and mute, and reverse, made on the device. Text, stickers and effects sit in their own lanes under the clips.',
   },
   {
-    id: 'templates',
-    title: 'Designer templates',
-    body: 'Six packs ship in the app today — Pulse, Scrapbook, Night bus, Clean cut, Film still, Tutorial. Each one applies its own look, transition and caption style to your clips in the preview and in the exported file.',
+    id: 'camera',
+    title: 'Camera',
+    body: 'Record straight into a project for up to 10 minutes, in 1080p or 4K, at 30 or 60 fps, with HDR, torch, pinch zoom and front or back camera.',
   },
   {
-    id: 'video',
-    title: 'Video editor',
-    body: 'Split, duplicate, trim in-point and length, reorder, speed at 0.5×/1×/2×, per-clip mute, and four formats (9:16, 1:1, 4:5, 16:9) on iPhone, iPad or Mac. Export renders from the originals.',
+    id: 'text',
+    title: 'Text and stickers',
+    body: 'Sixteen fonts, any colour, outline or a box behind, size, rotation and opacity. Sixteen in and out animations, including pop, typewriter, bounce, whip and drop. Drag anything into place on the preview. Emoji stickers and drawing with Apple Pencil or a finger.',
   },
   {
-    id: 'matte',
-    title: 'Subject lift',
-    body: 'Photos: Vision person segmentation on your device lifts the subject over a soft blurred backdrop. The original photo stays untouched in your library.',
+    id: 'cutout',
+    title: 'Cutouts and green screen',
+    body: 'Lift the subject out of any photo as a reusable sticker. Drop the background behind a person in a clip, key out a green screen, or put a second photo or video on top as picture in picture. All with Vision on the device.',
   },
   {
-    id: 'carousels',
-    title: 'Carousels',
-    body: 'Swipeable scrapbook stories for trip dumps, tutorials and portfolios. Multi-slide templates you rearrange on the phone, then post to the Feed or export out.',
+    id: 'effects',
+    title: '56 effects, 16 filters',
+    body: 'Zoom pulse, heartbeat, shake, glitch, RGB split, VHS lines, light leak, glow, mirror, kaleidoscope, pixelate, tilt-shift and more. Search them, set intensity and speed, place them on part of the video or across all of it as an adjustment layer.',
+  },
+  {
+    id: 'adjust',
+    title: 'Adjust and relight',
+    body: 'Exposure, contrast, saturation, warmth and sharpen on each clip, plus relight, which lifts shadows and adds a soft key light. Photos get push in, pull out, pan and drift.',
+  },
+  {
+    id: 'animate',
+    title: '3D photo motion',
+    body: 'Turn a still into a short camera move: push in, pull out, sway, orbit, rise or vertigo. Depth comes from the photo itself when it was taken in Portrait, otherwise from a depth model that runs on the device, so near things move more than far things. A 3-second 1080p move renders in about 3 seconds on iPhone 15 Pro.',
+  },
+  {
+    id: 'restyle',
+    title: 'Restyle',
+    body: 'Remake a photo as animation, illustration or sketch with Apple Image Playground on the device, with an optional prompt. It needs Apple Intelligence, never uses ChatGPT or any outside model, and keeps the original so you can switch back.',
+  },
+  {
+    id: 'datamosh',
+    title: 'Datamosh',
+    body: 'Three ways to mosh a clip: from the clip before, where its last frame is dragged by the next clip’s motion until that clip snaps in; bloom, where one moment of motion keeps repeating; and melt, where the clip moves only by its own motion vectors. Motion is measured on the device in 16-pixel blocks, like a codec. Set the amount, bake it in, undo any time.',
+  },
+  {
+    id: 'keyframes',
+    title: 'Keyframes',
+    body: 'Animate any text, sticker or clip over time: position, scale, rotation and opacity for overlays; zoom, move, rotation and opacity for clips. Add a keyframe at the playhead, pick linear, ease in, ease out, ease in and out or hold, and drag on the preview to set each pose.',
   },
   {
     id: 'captions',
     title: 'Captions',
-    body: 'Type them in Pop, Typewriter, Soft or Stamp — or let Auto captions recognise speech entirely on device. Every caption is burned into the preview and the export, exactly as you see it.',
+    body: 'Auto captions recognise speech on the device from clip sound and your voice-over, with each word highlighted as it is spoken. Eight styles, any font, colour, size and position. Edit any line or add your own at the playhead.',
   },
   {
-    id: 'photo',
-    title: 'Photo & looks',
-    body: 'Film 35mm, Printed, Haze, Digital Pop, VHS and Mono run on your device and apply to video, photos and carousel slides alike. Every project is a recipe over the originals.',
+    id: 'audio',
+    title: 'Voice-over and voice effects',
+    body: 'Record a voice-over while the video plays. Enhance voice cuts rumble, lifts clarity and evens out the level. Ten voice effects: deep, chipmunk, robot, echo, big hall, radio, telephone, megaphone, alien and airy.',
   },
   {
-    id: 'feed',
-    title: 'Export anywhere',
-    body: 'Save the reel or carousel slides straight to Photos, or share an MP4 anywhere through the system share sheet. Use the studio on this page to post into the feed below.',
+    id: 'beat',
+    title: 'Beat sync',
+    body: 'Bring your own track or make a beat at 70–170 BPM on the device. Onset detection re-times every cut. Auto-fit puts the strongest shot first, then cuts to the beat.',
+  },
+  {
+    id: 'templates',
+    title: '36 templates in 20 categories',
+    body: 'Trending, memories, travel, beauty, love, sport, motivation, marketing, business, seasonal, holidays, hygge, food, style, collage, tutorial and more. Each sets the look, transition, layout, motion, effects and title. Search them, or apply one to clips you have already cut.',
+  },
+  {
+    id: 'collage',
+    title: 'Collages',
+    body: 'Eight layouts play clips side by side: top and bottom, side by side, one plus two, three stacked, a grid of four, filmstrip and framed, on any background colour.',
+  },
+  {
+    id: 'carousels',
+    title: 'Carousels',
+    body: '4:5 slides from photos and videos together: photos become stills and videos stay videos, with the same filter, text and stickers. Seamless mode spreads one picture across up to ten slides.',
+  },
+  {
+    id: 'organise',
+    title: 'For You, ideas, folders, kits',
+    body: 'For You suggests moments from your library by day, trip and favourites, only when you tap it and only from what is on the device. Keep an ideas board, sort projects into folders, and save your colours, fonts, captions and effects as a kit.',
+  },
+  {
+    id: 'export',
+    title: 'Export up to 4K60',
+    body: '720p, 1080p or 4K, at 24, 30 or 60 fps, HEVC or H.264, with no watermark. Save to Photos or share anywhere. Formats: 9:16, 1:1, 4:5 and 16:9 on iPhone, iPad and Mac.',
   },
 ];
 
 const effects = [
-  { name: 'Film 35mm', img: '/khensu/creators/hero.webp', filter: 'sepia(.35) saturate(1.15) contrast(1.06)' },
-  { name: 'Digital Pop', img: '/khensu/creators/fans-1080.webp', filter: 'saturate(1.5) contrast(1.1)' },
-  { name: 'Haze', img: '/khensu/creators/compare-nu.webp', filter: 'saturate(.82) brightness(1.07) contrast(.94)' },
-  { name: 'Printed', img: '/khensu/creators/fans-4k.webp', filter: 'saturate(.75) contrast(1.22)' },
-  { name: 'VHS', img: '/khensu/creators/compare-h264.webp', filter: 'hue-rotate(18deg) saturate(1.35)' },
-  { name: 'Mono', img: '/khensu/aura/legacy.aura.jpg', filter: 'grayscale(1) contrast(1.05)' },
+  { name: 'Film 35mm', img: '/khensu/moments/stills/s01-coast.webp', filter: 'sepia(.35) saturate(1.15) contrast(1.06)' },
+  { name: 'Digital Pop', img: '/khensu/moments/stills/s07-beauty.webp', filter: 'saturate(1.5) contrast(1.1)' },
+  { name: 'Haze', img: '/khensu/moments/stills/s02-lake.webp', filter: 'saturate(.82) brightness(1.07) contrast(.94)' },
+  { name: 'Printed', img: '/khensu/moments/stills/s15-product.webp', filter: 'saturate(.75) contrast(1.22)' },
+  { name: 'VHS', img: '/khensu/moments/stills/s03-neon.webp', filter: 'hue-rotate(18deg) saturate(1.35)' },
+  { name: 'Mono', img: '/khensu/moments/stills/s16-bts.webp', filter: 'grayscale(1) contrast(1.05)' },
+  { name: 'Noir', img: '/khensu/moments/stills/s09-boxing.webp', filter: 'grayscale(1) contrast(1.35) brightness(.92)' },
+  { name: 'Teal & orange', img: '/khensu/moments/stills/s11-autumn.webp', filter: 'hue-rotate(-12deg) saturate(1.3) contrast(1.1)' },
+  { name: 'Faded', img: '/khensu/moments/stills/s12-holiday.webp', filter: 'saturate(.7) contrast(.85) brightness(1.08)' },
+  { name: 'Instant', img: '/khensu/moments/stills/s10-couple.webp', filter: 'sepia(.2) saturate(1.2) brightness(1.05)' },
+  { name: 'Cool', img: '/khensu/moments/stills/s14-spooky.webp', filter: 'hue-rotate(20deg) saturate(.9)' },
+  { name: 'Pastel', img: '/khensu/moments/stills/s18-summer.webp', filter: 'saturate(.6) brightness(1.15) contrast(.9)' },
+];
+
+const fxNames = [
+  'Zoom pulse', 'Heartbeat', 'Shake', 'Earthquake', 'Slow zoom', 'Spin', 'Bounce', 'Strobe',
+  'Flash', 'Light leak', 'Glow', 'Bloom', 'Sparkle', 'Sun flare', 'Neon edges', 'Spotlight',
+  'Noir', 'Chrome', 'Faded', 'Instant', 'Tonal', 'Sepia', 'Invert', 'Rainbow shift', 'Thermal', 'Duotone', 'Posterize', 'Warm', 'Cool', 'Teal & orange',
+  'RGB split', 'Glitch', 'Film grain', 'VHS lines', 'Halftone', 'Letterbox', 'Vignette', 'Comic', 'Dot screen',
+  'Mirror', 'Mirror vertical', 'Quad', 'Kaleidoscope', 'Twirl', 'Bulge', 'Pinch', 'Pixelate', 'Hexagons', 'Crystal', 'Fisheye',
+  'Blur in', 'Zoom blur', 'Motion blur', 'Dreamy', 'Tilt-shift', 'Sharpen',
 ];
 
 const carouselUses = [
@@ -84,8 +151,8 @@ const vsRows = [
       <div class="mo-visual" aria-hidden="true">
         <video
           class="mo-reel"
-          src="/khensu/creators/hero.mp4"
-          poster="/khensu/creators/hero.webp"
+          src="/khensu/moments/hero-scenes.mp4"
+          poster="/khensu/moments/hero-scenes.webp"
           autoplay
           muted
           loop
@@ -94,8 +161,17 @@ const vsRows = [
         ></video>
         <div class="mo-phone">
           <span class="mo-island"></span>
-          <img class="mo-app" src="/khensu/moments/app-home.jpg" alt="ñü.mømëntš home screen with the template catalogue" />
-          <span class="mo-chip">the real app · 0.1.0 (6)</span>
+          <video
+            class="mo-app mo-reel-phone"
+            src="/khensu/moments/hero-templates.mp4"
+            poster="/khensu/moments/hero-templates.webp"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+          ></video>
+          <span class="mo-chip">the real app · 0.1.0 (9)</span>
         </div>
       </div>
       <div class="wrap mo-copy">
@@ -110,12 +186,62 @@ const vsRows = [
         />
         <div class="btn-row">
           <a class="btn primary" href={appHref}>Get the app</a>
-          <a class="btn" href="#features-section">Explore</a>
+          <a class="btn" href="#templates-section">Browse 36 templates</a>
         </div>
         <p class="mo-proof">
           No upload to score a clip. No tracking for ads. Tips 100% to the person.
         </p>
       </div>
+    </div>
+  </section>
+
+  <section class="section mo-templates" id="templates-section" aria-labelledby="mo-tpl-title">
+    <div class="wrap">
+      <p class="eyebrow">templates</p>
+      <h2 id="mo-tpl-title">36 templates.<br /><span class="dim">Tap one, drop your clips, post.</span></h2>
+      <RevealText
+        parts={[
+          ['Every template sets the look, transition, layout, motion, effects and title. ', false],
+          ['Your shots land on the beat in seconds.', true],
+          [' Change anything, save it as a kit, and your originals stay untouched.', false],
+        ]}
+      />
+      <div class="mo-cats" role="toolbar" aria-label="Filter templates by category">
+        <button type="button" class="on" data-cat="">All</button>
+        {tplCats.map((c) => <button type="button" data-cat={c}>{c}</button>)}
+      </div>
+      <ul class="mo-tpl" role="list" aria-label="Template samples">
+        {MOMENTS_TEMPLATES.map((t) => (
+          <li class={t.wide ? 'wide' : undefined} data-cat={t.category}>
+            <video
+              src={`/khensu/moments/templates/${t.id}.mp4`}
+              poster={`/khensu/moments/templates/${t.id}.webp`}
+              muted
+              loop
+              playsinline
+              preload="none"
+              aria-hidden="true"
+            ></video>
+            <span class="mo-tpl-cat">{t.category}</span>
+            <b>{t.title}</b>
+            <span class="mo-tpl-blurb">{t.blurb}</span>
+          </li>
+        ))}
+      </ul>
+      <div class="btn-row mo-tpl-cta">
+        <a class="btn primary" href={appHref}>Get the app and try them</a>
+        <a class="btn" href="#studio-section">Try a look in your browser</a>
+      </div>
+      <p class="footnote">
+        Every sample above was rendered by the app's own renderer, frame for frame what an export gives you. The
+        photos are generated sample images, animated with 3D photo motion on the device.
+      </p>
+      <ul class="cards" role="list">
+        <li><b>On your device</b><span>Beat detection, shot scoring, speech, cutouts and every frame of the render run locally. No upload to score a clip.</span></li>
+        <li><b>Inside the app</b><span>All 36 templates in 20 categories ship with the app: no download, no account, no tracking of which one you opened.</span></li>
+        <li><b>Creators earn</b><span>Anyone can publish a template as a persona. Tips and sales go to them; app commerce stays a flat 10%.</span></li>
+        <li><b>Export your way</b><span>Reels up to 4K60, or carousel slides with photos and videos together, to Photos or anywhere through the share sheet.</span></li>
+      </ul>
     </div>
   </section>
 
@@ -125,22 +251,22 @@ const vsRows = [
       <h2 id="mo-hl-title">Made for creators who refuse the cloud.</h2>
       <div class="mo-hl-rail" role="list">
         <article class="mo-hl" role="listitem">
-          <img class="mo-hl-img" src="/khensu/creators/fans-1080.webp" alt="" loading="lazy" />
+          <img class="mo-hl-img" src="/khensu/moments/stills/s08-sprint.webp" alt="" loading="lazy" />
           <b>Beat sync in one tap</b>
           <span>Clips meet the song on the Neural Engine. Pro timing without a timeline.</span>
         </article>
         <article class="mo-hl" role="listitem">
-          <img class="mo-hl-img" src="/khensu/creators/hero.webp" alt="" loading="lazy" />
-          <b>Templates that adapt</b>
-          <span>Your shots, faces and motion pick the layout. The same pack never looks twice.</span>
+          <img class="mo-hl-img" src="/khensu/moments/stills/s06-fit.webp" alt="" loading="lazy" />
+          <b>Templates you can bend</b>
+          <span>36 templates set the look, layout, motion and title. Change any of it, or save your own style as a kit.</span>
         </article>
         <article class="mo-hl" role="listitem">
-          <img class="mo-hl-img" src="/khensu/creators/compare-nu.webp" alt="" loading="lazy" />
+          <img class="mo-hl-img" src="/khensu/moments/stills/s13-fireworks.webp" alt="" loading="lazy" />
           <b>Private by construction</b>
           <span>No Private Cloud Compute. No caption server. No “improve with AI” upload.</span>
         </article>
         <article class="mo-hl" role="listitem">
-          <img class="mo-hl-img" src="/khensu/creators/fans-4k.webp" alt="" loading="lazy" />
+          <img class="mo-hl-img" src="/khensu/moments/stills/s19-friends.webp" alt="" loading="lazy" />
           <b>Post to the feed</b>
           <span>Share into nu.network, or export HEVC and walk away. Your choice.</span>
         </article>
@@ -164,6 +290,13 @@ const vsRows = [
           </li>
         ))}
       </ul>
+      <p class="footnote">
+        What stays with the social apps: their licensed music catalogues, trending audio, Reels insights and posting
+        straight into their feeds. nu.moments uses your own tracks or beats it makes on the device, and hands the
+        finished file to any app through the share sheet. 3D photo motion moves a camera through depth estimated on the
+        device; it doesn't invent new movement in the scene. Restyle makes a new picture inspired by your photo rather
+        than filtering it, and works on photos, not video.
+      </p>
     </div>
   </section>
 
@@ -171,11 +304,15 @@ const vsRows = [
     <div class="wrap">
       <p class="eyebrow">effects shop</p>
       <h2>Looks that stop the scroll.<br /><span class="dim">Rendered on your device.</span></h2>
-      <p class="lede">These six looks ship in the app today and render into every preview and export. Each tile below is a real frame with that look applied.</p>
+      <p class="lede">Sixteen filters and {fxNames.length} effects ship in the app and render into every preview and export through the same on-device renderer. The tiles show a few of the filters.</p>
       <ul class="fx" role="list">
+        <li><video src="/khensu/moments/datamosh.mp4" poster="/khensu/moments/datamosh.webp" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video><b>Datamosh</b></li>
         {effects.map((fx, i) => (
           <li style={`--i:${i}`}><img src={fx.img} alt="" loading="lazy" style={`filter:${fx.filter}`} /><b>{fx.name}</b></li>
         ))}
+      </ul>
+      <ul class="fx-names" role="list" aria-label="Effects in the app">
+        {fxNames.map((n) => <li>{n}</li>)}
       </ul>
     </div>
   </section>
@@ -196,13 +333,15 @@ const vsRows = [
           </ul>
         </div>
         <div class="mo-carousel" aria-hidden="true">
-          <span class="slide s1"><img src="/khensu/creators/hero.webp" alt="" loading="lazy" /><i>01</i><b>recap</b></span>
-          <span class="slide s2"><img src="/khensu/creators/fans-1080.webp" alt="" loading="lazy" /><i>02</i><b>detail</b></span>
-          <span class="slide s3"><img src="/khensu/aura/legacy.aura.jpg" alt="" loading="lazy" /><i>03</i><b>close</b></span>
+          <span class="slide s1"><img src="/khensu/moments/stills/s04-coffee.webp" alt="" loading="lazy" /><i>01</i><b>recap</b></span>
+          <span class="slide s2"><img src="/khensu/moments/stills/s05-pasta.webp" alt="" loading="lazy" /><i>02</i><b>detail</b></span>
+          <span class="slide s3"><img src="/khensu/moments/stills/s17-sunday.webp" alt="" loading="lazy" /><i>03</i><b>close</b></span>
         </div>
       </div>
     </div>
   </section>
+
+  <slot name="studio" />
 
   <section class="section" id="vs-section" data-scene="reveal" aria-labelledby="mo-vs-title">
     <div class="wrap">
@@ -244,26 +383,6 @@ const vsRows = [
     </div>
   </section>
 
-  <section class="section" id="templates-section" data-scene="reveal">
-    <div class="wrap">
-      <p class="eyebrow">templates</p>
-      <h2>Built for your clips.<br /><span class="dim">Not one size fits all.</span></h2>
-      <RevealText
-        parts={[
-          ['Every template renders its look, transition and caption style into your shots. ', false],
-          ['The same pack never looks the same twice.', true],
-          [' Customize everything, and keep the original under the recipe.', false],
-        ]}
-      />
-      <ul class="cards" role="list">
-        <li><b>On your device</b><span>Shot detection, faces, motion, beats and aesthetic scoring run locally. No upload to score a clip.</span></li>
-        <li><b>Packs in the app</b><span>Six designer packs ship inside the app — no download, no account, no tracking of which one you opened. The studio above uses the same looks in your browser.</span></li>
-        <li><b>Creators earn</b><span>Anyone can publish a template as a persona. Tips and sales go to them; app commerce stays a flat 10%.</span></li>
-        <li><b>Export your way</b><span>MP4 reel or carousel slides to Photos, or anywhere through the share sheet. The browser studio on this page exports WebM/JPG.</span></li>
-      </ul>
-    </div>
-  </section>
-
   <section class="section" id="pricing-section">
     <div class="wrap">
       <p class="eyebrow">pricing</p>
@@ -302,6 +421,7 @@ const vsRows = [
       </p>
     </div>
   </section>
+  <slot name="feed" />
 </div>
 
 <style>
@@ -528,7 +648,10 @@ const vsRows = [
       radial-gradient(100% 80% at 10% 90%, rgba(240, 168, 200, 0.3), transparent 50%),
       #14161c;
   }
+  .fx-names { list-style: none; margin: 1.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .fx-names li { font-size: 0.82rem; padding: 0.35rem 0.7rem; border-radius: 999px; border: 1px solid var(--line); color: var(--text-dim); }
   .fx b { font-size: 0.95rem; font-weight: 600; position: relative; z-index: 1; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
+  .fx video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .fx img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .mo-app { width: 100%; height: calc(100% - 24px); object-fit: cover; object-position: top; border-radius: 20px; display: block; }
   .mo-hl-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 16px; }
@@ -630,6 +753,44 @@ const vsRows = [
   }
   .cards b { font-weight: 600; }
   .cards span { color: var(--text-dim); font-size: 0.95rem; }
+  .mo-templates { padding-top: clamp(2rem, 5vw, 3.5rem); }
+  .mo-cats { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .mo-cats button {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .mo-cats button.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .mo-tpl li[hidden] { display: none; }
+  .mo-tpl-cta { margin-top: 2.5rem; }
+  .mo-tpl {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.25rem 1rem;
+  }
+  .mo-tpl li { display: grid; gap: 0.3rem; align-content: start; }
+  .mo-tpl li.wide { grid-column: span 2; }
+  .mo-tpl video {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    object-fit: cover;
+    border-radius: 16px;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    margin-bottom: 0.35rem;
+  }
+  .mo-tpl li.wide video { aspect-ratio: 16 / 9; align-self: center; }
+  .mo-tpl-cat { color: var(--text-faint); font-size: 0.75rem; text-transform: lowercase; letter-spacing: 0.02em; }
+  .mo-tpl b { font-weight: 600; font-size: 0.98rem; }
+  .mo-tpl-blurb { color: var(--text-dim); font-size: 0.85rem; line-height: 1.4; }
   .footnote { margin-top: 2.5rem; color: var(--text-faint); font-size: 0.88rem; max-width: 70ch; }
   .mono { font-family: var(--font-mono); font-size: 0.9em; }
 
@@ -644,9 +805,36 @@ const vsRows = [
 </style>
 
 <script>
-  const v = document.querySelector<HTMLVideoElement>('.mo-reel');
-  if (v && matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    v.removeAttribute('autoplay');
-    v.pause();
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLVideoElement>('.mo-reel, .mo-reel-phone, .fx video').forEach((v) => {
+      v.removeAttribute('autoplay');
+      v.pause();
+    });
   }
+
+  const samples = document.querySelectorAll<HTMLVideoElement>('.mo-tpl video');
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const el = e.target as HTMLVideoElement;
+          if (e.isIntersecting) el.play().catch(() => {});
+          else el.pause();
+        }
+      },
+      { rootMargin: '120px 0px', threshold: 0.25 },
+    );
+    samples.forEach((el) => io.observe(el));
+  }
+
+  const cats = document.querySelectorAll<HTMLButtonElement>('.mo-cats button');
+  cats.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.cat ?? '';
+      cats.forEach((b) => b.classList.toggle('on', b === btn));
+      document.querySelectorAll<HTMLLIElement>('.mo-tpl li').forEach((li) => {
+        li.hidden = cat !== '' && li.dataset.cat !== cat;
+      });
+    }),
+  );
 </script>

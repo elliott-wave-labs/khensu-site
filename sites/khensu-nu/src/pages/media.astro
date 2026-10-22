@@ -3,9 +3,11 @@ import Base from '../layouts/Base.astro';
 import NuMedia from '../components/khensu/NuMedia.astro';
 import StatStrip from '../components/khensu/StatStrip.astro';
 import Ecosystem from '../components/khensu/Ecosystem.astro';
+import { allowFeed } from '../data/feed';
 import proReel from '../data/pro-reel.json';
 import i720 from '../data/iphone-720p.json';
 import ladReel from '../data/iphone-ladder-reel.json';
+allowFeed(Astro);
 
 const kbit = (s: string) => Number(s.match(/([\d.]+) kbit\/s with sound/)?.[1]);
 const low = proReel.tiles.find((t) => t.id === 'low')!;

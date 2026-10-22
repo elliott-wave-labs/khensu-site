@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import { RESERVATION, SHIPS } from '../../data/stripe';
+---
+<Base title="Thank you — suñůlink.shield" description="Your suñůlink.shield pre-order is in." noindex>
+  <section class="page-head thanks" data-hero>
+    <div class="wrap">
+      <p class="eyebrow">suñůlink.shield</p>
+      <h1>Thank you.<br /><span class="dim">Your reservation is in.</span></h1>
+      <p class="lede">
+        Stripe emails your receipt now. Your ${RESERVATION} reservation locks the pre-sale price and holds your place in
+        the queue; we email you before it ships in {SHIPS}. To change or cancel before then, email
+        <a href="mailto:hello@elliottwave.studio">hello@elliottwave.studio</a>.
+      </p>
+      <div class="btn-row">
+        <a class="btn primary" href="https://shield.khensu.nu">Explore suñůlink.shield</a>
+        <a class="btn" href="/buy/">Back to the order page</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .thanks { min-height: calc(100svh - 65px); display: grid; align-content: center; padding: clamp(4rem, 10vw, 8rem) 0; }
+  .thanks h1 { font-size: clamp(2.6rem, 7vw, 5rem); letter-spacing: -0.035em; line-height: 1.08; margin: 0.4rem 0 1.2rem; }
+  .thanks .dim { color: var(--text-dim); font-weight: 300; }
+  .thanks .lede { max-width: 40rem; }
+</style>

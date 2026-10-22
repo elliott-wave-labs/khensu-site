@@ -12,8 +12,10 @@ import DataSaving from '../components/creators/DataSaving.astro';
 import OwnIt from '../components/creators/OwnIt.astro';
 import SocialCredits from '../components/khensu/SocialCredits.astro';
 import Ecosystem from '../components/khensu/Ecosystem.astro';
+import { allowFeed } from '../data/feed';
 import { APP_STORE_ID, APP_STORE_URL } from '../data/app';
 import data from '../data/creator-pay.json';
+allowFeed(Astro);
 
 const videoCredit = [
   { href: 'https://www.instagram.com/deemsterhotline/', credit: 'deemsterhotline', kind: 'instagram' as const },
@@ -69,7 +71,7 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
       </div>
     </section>
 
-    <Ecosystem mode="create" title="Creator studio — post today, get paid today" />
+    <Ecosystem mode="create" title="Creator studio — cut it, post it today" />
 
     <Burst />
 

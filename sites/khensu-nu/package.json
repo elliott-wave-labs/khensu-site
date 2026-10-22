@@ -13,10 +13,12 @@
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource/inter": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
+    "@mediapipe/tasks-vision": "0.10.21",
     "astro": "^7.3.5",
     "three": "^0.186.1"
   },
   "devDependencies": {
-    "@types/three": "^0.186.0"
+    "@types/three": "^0.186.0",
+    "puppeteer-core": "23.11.1"
   }
 }

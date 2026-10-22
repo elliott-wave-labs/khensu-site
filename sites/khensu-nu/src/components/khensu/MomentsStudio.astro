@@ -1,15 +1,17 @@
 ---
 // Working in-browser ñü.mømëntš studio: real media, real looks, real captions,
-// real export (Canvas + MediaRecorder). Nothing is uploaded — files stay here.
+// real export (Canvas + MediaRecorder). Nothing uploads until Post to feed.
 const samples = [
-  { id: 'venice', label: 'Venice golden hour (sample)', src: '/khensu/creators/hero.mp4', type: 'video' },
-  { id: 'fans', label: 'Fans 1080 (sample)', src: '/khensu/creators/fans-1080.mp4', type: 'video' },
+  { id: 'coast', label: 'Blue cove (sample)', src: '/khensu/moments/clips/s01.mp4', type: 'video' },
+  { id: 'neon', label: 'Neon street (sample)', src: '/khensu/moments/clips/s03.mp4', type: 'video' },
+  { id: 'fit', label: 'Fit check (sample)', src: '/khensu/moments/clips/s06.mp4', type: 'video' },
+  { id: 'dog', label: 'Dog in the park (sample)', src: '/khensu/moments/clips/s20.mp4', type: 'video' },
 ];
 ---
 <section class="section ms" id="studio-section" aria-labelledby="ms-title">
   <div class="wrap">
-    <p class="eyebrow">try it here · nothing uploads</p>
-    <h2 id="ms-title">The editor, running in this page.<br /><span class="dim">Your clips never leave this tab.</span></h2>
+    <p class="eyebrow">try it here · uploads only when you post</p>
+    <h2 id="ms-title">The editor, running in this page.<br /><span class="dim">Your clips stay in this tab until you post.</span></h2>
     <p class="lede">Pick a sample or drop in your own photo/video, choose a template look, type a caption, then export.
       This is the same recipe model as the app — look, caption and format rendered into the file. The native
       app adds beat-synced multi-clip timelines, auto captions from speech, subject lift and carousels.</p>
@@ -50,18 +52,20 @@ const samples = [
         </label>
         <div class="ms-actions">
           <button type="button" class="btn" id="ms-play">Pause</button>
-          <button type="submit" class="btn primary" id="ms-export">Export file</button>
+          <button type="submit" class="btn" id="ms-export">Export file</button>
+          <button type="button" class="btn primary" id="ms-post">Post to feed</button>
         </div>
+        <div class="ms-progress" id="ms-progress" hidden><i></i></div>
         <p class="ms-note" id="ms-status">Video exports as WebM from this browser (up to 15s of the clip); photos as JPG. In the app: MP4 reels, multi-clip beat sync, auto captions, subject lift, carousels to Photos.</p>
       </form>
 
       <div class="ms-card ms-stage">
         <div class="ms-phone">
           <canvas id="ms-canvas" width="720" height="1280"></canvas>
-          <video id="ms-video" src={samples[0].src} poster="/khensu/creators/hero.webp" autoplay muted loop playsinline preload="metadata" hidden></video>
+          <video id="ms-video" src={samples[0].src} poster="/khensu/moments/clips/s01.webp" autoplay muted loop playsinline preload="metadata" hidden></video>
           <img id="ms-img" alt="" hidden />
         </div>
-        <div class="ms-chips"><span id="ms-chip-template">Pulse · Digital Pop</span><span id="ms-chip-format">9:16</span><span>0 bytes uploaded</span></div>
+        <div class="ms-chips"><span id="ms-chip-template">Pulse · Digital Pop</span><span id="ms-chip-format">9:16</span><span>Uploads only when you post</span></div>
       </div>
     </div>
   </div>
@@ -78,6 +82,10 @@ const samples = [
   .ms-drop { border: 1.5px dashed rgba(240,168,200,.55); border-radius: 16px; padding: 1rem; text-align: center; cursor: pointer; color: var(--text-dim); }
   .ms-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
   .ms-note { color: var(--text-faint); font-size: .88rem; line-height: 1.5; margin: 0; }
+  .ms-note.err { color: #ff9a9a; }
+  .ms-progress { height: 6px; border-radius: 999px; background: rgba(255,255,255,.1); overflow: hidden; }
+  .ms-progress[hidden] { display: none; }
+  .ms-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #f0a8c8, #7ee0c8); transition: width .2s; }
   .ms-phone { border-radius: 26px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,.16); width: min(100%, 360px); margin: 0 auto; }
   .ms-phone canvas { width: 100%; height: auto; display: block; }
   .ms-chips { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
@@ -85,6 +93,7 @@ const samples = [
 </style>
 
 <script>
+  import { feedApi, postVideo, stageLabel, FeedError, showHandle, loadLocal, addLocalPost } from '../../scripts/feed-client';
   const $ = (s) => document.querySelector(s);
   const canvas = $('#ms-canvas'), ctx = canvas.getContext('2d');
   const video = $('#ms-video'), img = $('#ms-img');
@@ -171,36 +180,78 @@ const samples = [
     $('#ms-play').textContent = playing ? 'Pause' : 'Play';
   });
 
+  const status = (m, err = false) => { $('#ms-status').textContent = m; $('#ms-status').classList.toggle('err', err); };
+  // The last export, kept so Post to feed sends exactly the file you exported. Any change to the edit clears it.
+  let lastExport = null;
+  ['ms-template', 'ms-format', 'ms-caption', 'ms-bpm', 'ms-sample', 'ms-file'].forEach(id => document.getElementById(id).addEventListener('input', () => { lastExport = null; }));
+  $('#ms-file').addEventListener('change', () => { lastExport = null; });
+
+  const photoBlob = () => new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.92));
+  function record() {
+    return new Promise(async (resolve, reject) => {
+      if (!('MediaRecorder' in window) || !canvas.captureStream) { reject(new Error('This browser cannot record canvas video — the app exports MP4 natively.')); return; }
+      status('Recording your export… keep this tab open.');
+      video.currentTime = 0; await video.play().catch(() => {});
+      const stream = canvas.captureStream(30);
+      try {
+        const vs = video.captureStream ? video.captureStream() : null;
+        vs?.getAudioTracks?.().forEach(t => stream.addTrack(t));
+      } catch {}
+      const rec = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm' });
+      const chunks = [];
+      const seconds = Math.min((isFinite(video.duration) ? video.duration : 10), 15);
+      rec.ondataavailable = (ev) => chunks.push(ev.data);
+      rec.onstop = () => resolve({ blob: new Blob(chunks, { type: 'video/webm' }), duration: seconds });
+      rec.start(200);
+      setTimeout(() => rec.state !== 'inactive' && rec.stop(), seconds * 1000);
+    });
+  }
+
   $('#ms-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const status = (m) => { $('#ms-status').textContent = m; };
     if (mode === 'image') {
-      canvas.toBlob((b) => {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(b); a.download = 'nu.moments.jpg'; a.click();
-        status('Photo exported as JPG with the look and caption in it. In the app this is a carousel slide or a reel frame.');
-      }, 'image/jpeg', 0.92);
+      const b = await photoBlob();
+      lastExport = { blob: b, duration: 0 };
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b); a.download = 'nu.moments.jpg'; a.click();
+      status('Photo exported as JPG with the look and caption in it. In the app this is a carousel slide or a reel frame.');
       return;
     }
-    if (!('MediaRecorder' in window) || !canvas.captureStream) { status('This browser cannot record canvas video — the app exports MP4 natively.'); return; }
-    status('Recording your export… keep this tab open.');
-    video.currentTime = 0; await video.play().catch(() => {});
-    const stream = canvas.captureStream(30);
     try {
-      const vs = video.captureStream ? video.captureStream() : null;
-      vs?.getAudioTracks?.().forEach(t => stream.addTrack(t));
-    } catch {}
-    const rec = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm' });
-    const chunks = [];
-    rec.ondataavailable = (ev) => chunks.push(ev.data);
-    rec.onstop = () => {
+      lastExport = await record();
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob(chunks, { type: 'video/webm' })); a.download = 'nu.moments.webm'; a.click();
-      status('Exported. The look, caption and beat bars are in the file. For MP4, multi-clip timelines, auto captions and music, get the app below.');
-    };
-    rec.start(200);
-    const stopAfter = Math.min((isFinite(video.duration) ? video.duration : 10), 15) * 1000;
-    setTimeout(() => rec.state !== 'inactive' && rec.stop(), stopAfter);
+      a.href = URL.createObjectURL(lastExport.blob); a.download = 'nu.moments.webm'; a.click();
+      status('Exported. The look, caption and beat bars are in the file. Post to feed sends this same file.');
+    } catch (err) { status(err.message, true); }
+  });
+
+  let posting = false;
+  $('#ms-post').addEventListener('click', async () => {
+    if (posting) return;
+    const { api } = feedApi();
+    const caption = $('#ms-caption').value.trim();
+    const bar = $('#ms-progress');
+    posting = true; $('#ms-post').disabled = true;
+    try {
+      if (api && mode === 'image') { status('The feed takes video. Pick a video, or export this photo and share it from the app.', true); return; }
+      if (!lastExport) lastExport = mode === 'image' ? { blob: await photoBlob(), duration: 0 } : await record();
+      if (!api) {
+        await addLocalPost(lastExport.blob, caption, mode === 'image' ? 'nu.moments.jpg' : 'nu.moments.webm');
+        status('Posted on this device. The shared feed isn’t connected on this page; open /feed to see it.');
+        return;
+      }
+      const handle = loadLocal().profile.handle;
+      bar.hidden = false;
+      await postVideo(api, {
+        handle, caption, video: lastExport.blob, durationHint: lastExport.duration,
+        onProgress: (p) => { status(stageLabel(p)); bar.querySelector('i').style.width = `${Math.round(p.fraction * 100)}%`; },
+      });
+      status(`Posted to the feed as ${showHandle(handle)}.`);
+    } catch (err) {
+      status(err instanceof FeedError ? err.message : (err?.message || 'Something went wrong while posting. Try again.'), true);
+    } finally {
+      posting = false; $('#ms-post').disabled = false; bar.hidden = true; bar.querySelector('i').style.width = '0';
+    }
   });
   syncChips();
 </script>

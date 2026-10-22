@@ -5,40 +5,184 @@ import { PRODUCTS } from '../data/hosts';
 
 const DIOR_REF =
   'https://alleyesforme.com/en-us/products/dior-club-m1u?variant=54448997433683&country=US&currency=USD';
+
+const FRAMES = [
+  { id: 'strap', label: 'strap', line: 'Goggle glasses. One wraparound mirror shield, a thin rim, a wide strap for the run and short arms for dinner.' },
+  { id: 'shade', label: 'shade', line: 'The bold square. Thick acetate, a flat brow and soft corners.' },
+  { id: 'print', label: 'ñü print', line: 'Sharp cat-eye. The ÑÜ print is a mirror from outside and clear from inside.' },
+  { id: 'wayfarer', label: 'wayfarer', line: 'Wide flat brow, flared corners, a lens that narrows as it drops. Tilted forward, the way it should sit.' },
+  { id: 'round', label: 'round', line: 'Thin metal panto, round below and flatter on top, keyhole bridge, nose pads.' },
+];
+const ACETATE = [
+  ['black', 'gloss black', '#0b0b0d'], ['matte', 'matte black', '#1c1c1f'], ['havana', 'havana', 'linear-gradient(135deg,#7a4518,#2a1206 45%,#c4802f 70%,#3a1a08)'],
+  ['crystal', 'crystal', 'rgba(233,238,242,.45)'], ['bone', 'bone', '#e8dfcf'], ['cherry', 'cherry', '#8e1020'],
+  ['white', 'white', '#f4f4f2'], ['volt', 'volt', '#d8f02a'],
+];
+const METAL = [
+  ['gold', 'gold', 'linear-gradient(135deg,#f3d08c,#b8863e)'], ['silver', 'silver', 'linear-gradient(135deg,#f4f5f7,#9ea1a8)'],
+  ['gunmetal', 'gunmetal', 'linear-gradient(135deg,#7a7d85,#2f3136)'], ['rose', 'rose gold', 'linear-gradient(135deg,#f3c3ae,#b97a62)'],
+];
+const LENSES = [
+  ['smoke', 'smoke', '#16171a'], ['g15', 'g-15 green', '#28361f'], ['brown', 'brown gradient', 'linear-gradient(#2c1708,#8a5a36)'],
+  ['blue', 'blue mirror', 'linear-gradient(135deg,#9cc0ff,#2f6cf2 55%,#0d2a7a)'], ['fire', 'fire mirror', 'linear-gradient(135deg,#ffd27a,#ff5a14 55%,#8a1d05)'],
+  ['rose', 'rose', '#e79aa6'], ['clear', 'clear', 'rgba(255,255,255,.12)'],
+];
 ---
 
 <Base
   title="ñü.êýêš"
-  description="ñü.êýêš: clear autodim glasses, 4K cams, jawbone audio, EEG — same chips as suñůlink. Part of nu.devices. Vegan materials, skin-touch metal and stone."
+  description="ñü.êýêš: five frames — strap goggle, shade, ñü print, wayfarer and round. Try them on in your browser or in AR in the khėnsu.ñü app. Tracking stays on your device."
 >
   <div class="khensu eyes-page">
-    <ProductBar name="ñü.êýêš" action="The set" href={PRODUCTS.devices} explore="#glass" />
+    <ProductBar name="ñü.êýêš" action="Try on" href="#try-on-section" explore="#frames-section" />
 
     <section class="page-head eyes-hero" data-hero>
-      <div class="wrap">
-        <p class="eyebrow">ñü.êýêš · nu.devices</p>
-        <h1>
-          Clear glass.<br />
-          <em>Button for the sun.</em>
-        </h1>
-        <p class="lede">
-          Transparent by default, sun-reactive, side button autodim. <strong>4K</strong> cameras. Jawbone audio. Dry EEG.
-          Same chips as <a href={PRODUCTS.shield}>suñůlink.shield</a>. LLM stays on
-          <a href={PRODUCTS.memory}>ñü.řåł</a> in your pocket — not in the temples.
-          Wear it as a set on <a href={PRODUCTS.devices}>nu.devices</a>.
-        </p>
-        <div class="btn-row">
-          <a class="btn primary" href={PRODUCTS.devices}>Buy the set</a>
-          <a class="btn" href="#glass">Glass + cams</a>
-          <a class="btn" href={PRODUCTS.aura}>ñü.åůřâ</a>
-          <a class="btn" href={PRODUCTS.vegan}>nu.vegan</a>
+      <div class="wrap eyes-hero-grid">
+        <div class="eyes-stage">
+          <img class="eyes-still" src="/eyes/print.webp" width="900" height="570" alt="The ñü print frame in black with the ÑÜ mirror print on brown gradient lenses" fetchpriority="high" />
+          <canvas class="eyes-viewer" aria-label="The selected frame in 3D. Drag sideways to turn it."></canvas>
+        </div>
+        <div class="eyes-copy">
+          <p class="eyebrow">ñü.êýêš · nu.devices</p>
+          <h1>
+            Five frames.<br />
+            <em>Try them on.</em>
+          </h1>
+          <p class="lede">
+            Strap goggle, shade, ñü print, wayfarer and round. Pick the finish and the lens, then see them on your face
+            here or in AR in the khėnsu.ñü app. <strong>Your face never leaves your device.</strong>
+          </p>
+
+          <div class="pickers">
+            <div class="pick-row" role="group" aria-label="Frame">
+              {FRAMES.map((f) => (
+                <button type="button" class="chip" data-frame={f.id} data-label={f.label} aria-pressed={f.id === 'print' ? 'true' : 'false'}>{f.label}</button>
+              ))}
+            </div>
+            <div class="pick-row" role="group" aria-label="Frame finish" data-finishes="acetate">
+              <span class="pick-label">frame</span>
+              {ACETATE.map(([id, label, c]) => (
+                <button type="button" class="swatch" data-finish={id} aria-label={label} title={label} style={`--sw:${c}`} aria-pressed={id === 'black' ? 'true' : 'false'}></button>
+              ))}
+            </div>
+            <div class="pick-row" role="group" aria-label="Metal finish" data-finishes="metal" hidden>
+              <span class="pick-label">metal</span>
+              {METAL.map(([id, label, c]) => (
+                <button type="button" class="swatch" data-finish={id} aria-label={label} title={label} style={`--sw:${c}`} aria-pressed="false"></button>
+              ))}
+            </div>
+            <div class="pick-row" role="group" aria-label="Lens">
+              <span class="pick-label">lens</span>
+              {LENSES.map(([id, label, c]) => (
+                <button type="button" class="swatch lens" data-lens={id} aria-label={label} title={label} style={`--sw:${c}`} aria-pressed={id === 'brown' ? 'true' : 'false'}></button>
+              ))}
+            </div>
+            <div class="pick-row toggles">
+              <label class="toggle"><input type="checkbox" data-toggle="print" checked /> <span>ÑÜ print</span></label>
+              <label class="toggle" hidden><input type="checkbox" data-toggle="strap" /> <span>strap</span></label>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <a class="btn primary" href="#try-on-section">Try on</a>
+            <a class="btn" href="#app-section">AR in the app</a>
+            <a class="btn" href={PRODUCTS.devices}>The set</a>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="section" id="glass">
+    <section class="section" id="frames-section">
+      <div class="wrap">
+        <h2>The frames</h2>
+        <div class="frames-row">
+          {FRAMES.map((f) => (
+            <a class="frame-card" href="#try-on-section" data-pick={f.id}>
+              <img src={`/eyes/${f.id}.webp`} width="900" height="570" alt={`The ${f.label} frame`} loading="lazy" />
+              <b>{f.label}</b>
+              <span>{f.line}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section band" id="try-on-section">
+      <div class="wrap tryon" data-mode="idle">
+        <div class="tryon-copy">
+          <p class="eyebrow">try on · <span data-frame-name>ñü print</span></p>
+          <h2>
+            Your face.<br />
+            Your frame.
+          </h2>
+          <p>
+            Take a selfie, or turn on the camera where your browser allows it. Face tracking runs here, in your browser,
+            from files on this site. <strong>No photo, frame or face point is uploaded.</strong>
+          </p>
+          <div class="btn-row">
+            <label class="btn primary">
+              Take a selfie
+              <input class="tryon-file" type="file" accept="image/*" capture="user" hidden />
+            </label>
+            <button type="button" class="btn tryon-live">live camera</button>
+            <button type="button" class="btn tryon-save" disabled>save photo</button>
+          </div>
+          <label class="fit">
+            <span>size</span>
+            <input class="tryon-fit" type="range" min="0.86" max="1.14" step="0.01" value="1" />
+          </label>
+          <p class="tryon-status" role="status">Pick a frame above, then take a selfie.</p>
+        </div>
+        <div class="tryon-stage">
+          <canvas class="tryon-photo" width="1" height="1"></canvas>
+          <video class="tryon-video" playsinline muted></video>
+          <canvas class="tryon-overlay"></canvas>
+          <div class="tryon-empty" aria-hidden="true">
+            <img src="/eyes/strap.webp" width="900" height="570" alt="" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="print-section">
+      <div class="wrap print-grid">
+        <img src="/eyes/print.webp" width="900" height="570" alt="Close view of the ÑÜ mirror print on the lens" loading="lazy" />
+        <div class="prose">
+          <p class="eyebrow">ÑÜ print</p>
+          <h2>
+            A mirror from outside.<br />
+            Clear from inside.
+          </h2>
+          <p>
+            The ÑÜ mark and the four-point star are a thin mirror coating in a repeating print across the lens.
+            People looking at you see the marks catch the light. You look through them and see the world.
+            The print goes on any lens and any frame; it comes gold on gold and rose gold metal, silver on everything else.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band" id="app-section">
       <div class="wrap prose">
-        <h2>Glasses</h2>
+        <p class="eyebrow">khėnsu.ñü app</p>
+        <h2>
+          AR try-on.<br />
+          On your iPhone.
+        </h2>
+        <p>
+          In the khėnsu.ñü app, Settings opens ñü.êýêš. The front camera tracks your face with the TrueDepth sensor and
+          RealityKit draws the frame on it, with the arms going behind your head as you turn. On Mac and iPad without
+          face tracking, the same frames turn in 3D. The camera picture stays on the device.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href={PRODUCTS.getApps}>Get the app</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="glass-section">
+      <div class="wrap prose">
+        <h2>Glass and cameras</h2>
         <ul class="facts">
           <li><b>Lens.</b> Clear / transparent; tracks the sun; side button forces autodim.</li>
           <li><b>4K cams.</b> World-facing. Encrypted to the phone. Person detect on-device via nu.ral.</li>
@@ -50,7 +194,7 @@ const DIOR_REF =
       </div>
     </section>
 
-    <section class="section band" id="materials">
+    <section class="section band" id="materials-section">
       <div class="wrap prose">
         <h2>Natural · vegan · on skin</h2>
         <p>
@@ -64,6 +208,18 @@ const DIOR_REF =
   </div>
 </Base>
 
+<script>
+  import { mountPickers } from '../scripts/eyes/ui';
+  import { mountViewer } from '../scripts/eyes/viewer';
+  import { mountTryOn } from '../scripts/eyes/tryon';
+
+  mountPickers();
+  const canvas = document.querySelector<HTMLCanvasElement>('.eyes-viewer');
+  if (canvas) mountViewer(canvas);
+  const tryon = document.querySelector<HTMLElement>('.tryon');
+  if (tryon) mountTryOn(tryon);
+</script>
+
 <style>
   .eyes-hero h1 em {
     background: var(--aura);
@@ -73,6 +229,127 @@ const DIOR_REF =
     background-clip: text;
     color: transparent;
   }
+  .eyes-hero-grid {
+    display: grid;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    align-items: center;
+  }
+  @media (min-width: 700px) {
+    .eyes-hero-grid { grid-template-columns: 1.15fr 1fr; }
+  }
+  .eyes-stage {
+    position: relative;
+    aspect-ratio: 900 / 600;
+    width: 100%;
+  }
+  .eyes-stage > * {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .eyes-still { object-fit: contain; transition: opacity 0.6s; }
+  .eyes-viewer { touch-action: pan-y; cursor: grab; opacity: 0; transition: opacity 0.6s; }
+  .eyes-stage.ready .eyes-viewer { opacity: 1; }
+  .eyes-stage.ready .eyes-still { opacity: 0; }
+
+  .pickers { display: grid; gap: 0.7rem; margin: 1.4rem 0 1.2rem; }
+  .pick-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
+  .pick-row[hidden], .toggle[hidden] { display: none; }
+  .pick-label { width: 3.4rem; font-size: 0.82rem; color: rgba(255, 255, 255, 0.56); }
+  .chip {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+  }
+  .chip[aria-pressed='true'] { background: #fff; color: #000; border-color: #fff; }
+  .swatch {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--sw);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    padding: 0;
+  }
+  .swatch[aria-pressed='true'] { outline: 2px solid #fff; outline-offset: 3px; }
+  .swatch:focus-visible, .chip:focus-visible { outline: 2px solid #8ab4ff; outline-offset: 3px; }
+  .toggles { gap: 1.1rem; }
+  .toggle { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.9rem; cursor: pointer; }
+  .toggle input { accent-color: #fff; width: 1.05rem; height: 1.05rem; }
+
+  .frames-row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 30%);
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.6rem;
+  }
+  .frame-card {
+    scroll-snap-align: start;
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem 1rem 1.2rem;
+    border-radius: 28px;
+    background: #0f0f11;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.56);
+    text-decoration: none;
+  }
+  .frame-card img { width: 100%; height: auto; }
+  .frame-card b { color: #fff; font-size: 1.15rem; font-weight: 600; }
+  .frame-card:hover { border-color: rgba(255, 255, 255, 0.2); }
+
+  .tryon { display: grid; gap: clamp(1rem, 3vw, 2.5rem); align-items: center; }
+  @media (min-width: 820px) {
+    .tryon { grid-template-columns: 1fr 1.2fr; }
+  }
+  .tryon-copy p { color: rgba(255, 255, 255, 0.56); }
+  .tryon-copy strong { color: #fff; }
+  .tryon-status { font-size: 0.9rem; min-height: 2.6em; }
+  .fit { display: flex; align-items: center; gap: 0.8rem; margin: 1rem 0 0.4rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.56); }
+  .fit input { flex: 1; max-width: 16rem; accent-color: #fff; }
+  .tryon .btn-row label.btn { cursor: pointer; }
+  .tryon-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    max-height: 78vh;
+    margin: 0 auto;
+    border-radius: 28px;
+    overflow: hidden;
+    background: #050506;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .tryon-stage > canvas, .tryon-stage > video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: none;
+  }
+  .tryon[data-mode='photo'] .tryon-photo, .tryon[data-mode='photo'] .tryon-overlay,
+  .tryon[data-mode='live'] .tryon-video, .tryon[data-mode='live'] .tryon-overlay { display: block; }
+  .tryon[data-mode='live'] .tryon-video, .tryon[data-mode='live'] .tryon-overlay { transform: scaleX(-1); }
+  .tryon-empty { position: absolute; inset: 0; display: grid; place-items: center; padding: 8%; }
+  .tryon-empty img { width: 100%; height: auto; opacity: 0.85; }
+  .tryon:not([data-mode='idle']) .tryon-empty { display: none; }
+
+  .print-grid { display: grid; gap: clamp(1rem, 3vw, 2.5rem); align-items: center; }
+  @media (min-width: 820px) {
+    .print-grid { grid-template-columns: 1.1fr 1fr; }
+  }
+  .print-grid img { width: 100%; height: auto; mask-image: radial-gradient(closest-side, #000 70%, transparent); }
+
   .facts {
     list-style: none;
     padding: 0;

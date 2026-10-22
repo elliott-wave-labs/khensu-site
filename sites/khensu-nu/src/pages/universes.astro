@@ -1,0 +1,302 @@
+---
+import Base from '../layouts/Base.astro';
+// nu.universes (nu.u) — part of nu.waves. Live M33 tile-map background from ESA/Hubble.
+// Facts: ESA/Hubble heic1901, NASA Messier 33, ESO b13, EarthSky. See khensu-specs design/nu-universes.md.
+const HUBBLE = '/universes/m33-1800.webp';
+---
+<Base title="nu.universes" description="nu.u — Google Earth for galaxies and the whole universe, inside nu.waves. Fly the Triangulum Galaxy (M33) in gamma ray, UV, visible, infrared, radio, mantis-shrimp colours and sound. RealityKit + AR on iPhone, iPad and Mac.">
+  <section class="uu-hero" data-hero>
+    <img class="uu-bg" id="uu-bg" src={HUBBLE} alt="The Triangulum Galaxy (M33) — Hubble mosaic, 54 pointings, 665 million pixels" />
+    <div class="uu-shade"></div>
+    <div class="wrap uu-hero-in">
+      <p class="eyebrow">nu.waves · nu.universes</p>
+      <h1>nu.i.verse<br /><span>Google Earth for galaxies.</span></h1>
+      <p class="uu-lede">The whole universe since the Big Bang — and where real physics predicts it goes next. Start with the galaxy behind this page: the Triangulum Galaxy, M33, live from the Hubble archive. Music is only the audible band. Here you tune light the same way.</p>
+      <div class="uu-cta">
+        <a class="uu-btn primary" href="https://waves.khensu.nu">Open in nu.waves</a>
+        <a class="uu-btn" href="#map">Explore M33 ↓</a>
+      </div>
+      <p class="uu-credit">Background: M33 Hubble mosaic · 54 pointings · 665 Mpx · NASA, ESA (ESA/Hubble heic1901)</p>
+    </div>
+  </section>
+
+  <section class="wrap uu-sec" id="map">
+    <p class="eyebrow">Live map · real distances</p>
+    <h2>Like Google Maps, for the universe.</h2>
+    <p>One continuous 3D map, in parsecs, from Earth's orbit to the cosmic web. The planets are where NASA JPL's orbital elements put them today. 42,246 stars from the Hipparcos-based HYG catalogue sit at their measured distances. 869 nearby galaxies use measured distances from the Updated Nearby Galaxy Catalog, and 43,415 more are placed by redshift from the 2MASS Redshift Survey. M33 carries the real Hubble mosaic, at its real distance, size and tilt. Scroll to zoom, drag to turn, search to fly.</p>
+  </section>
+  <div class="uf" id="uf" tabindex="0" aria-label="3D map of the universe. Drag to turn, scroll or pinch to zoom.">
+    <canvas></canvas>
+    <div class="uf-labels" data-labels></div>
+    <div class="uf-top">
+      <input data-search list="uf-places" type="search" placeholder="Fly to: Earth, Sirius, Andromeda…" aria-label="Fly to a place" />
+      <datalist id="uf-places"></datalist>
+      <span class="uf-actions">
+      <button type="button" class="uf-fs" data-dir-open aria-pressed="false" aria-label="Directions">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 2.5 21.5 12 12 21.5 2.5 12Z M9 14v-3h5M12 8.5 14.5 11 12 13.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Directions</span>
+      </button>
+      <button type="button" class="uf-fs" id="uf-fs" aria-pressed="false" aria-label="Fullscreen">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Fullscreen</span>
+      </button>
+      </span>
+    </div>
+    <aside class="uf-dir" data-dir hidden aria-label="Directions">
+      <header><b>Directions</b><button type="button" class="uf-x" data-dir-close aria-label="Close directions">×</button></header>
+      <div class="uf-ends">
+        <label class="uf-end"><i class="uf-dot" aria-hidden="true"></i><span>From</span><input data-dir-from type="text" autocomplete="off" spellcheck="false" placeholder="Where you are" /></label>
+        <label class="uf-end"><i class="uf-pin" aria-hidden="true"></i><span>To</span><input data-dir-to type="text" autocomplete="off" spellcheck="false" placeholder="Search: Moon, Europa, Ceres, Halley, Andromeda…" /></label>
+        <button type="button" class="uf-swap" data-dir-swap aria-label="Swap From and To">⇅</button>
+      </div>
+      <div class="uf-modes" role="group" aria-label="How to travel">
+        <button type="button" data-mode="rabbithole" aria-pressed="true" title="Rabbitholes: instant jumps, with the spacetime bubble between them"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a1.5 1.5 0 1 1 1.5-1.5c0 3-4.5 3.4-5.5.5C7 7 11 4.5 14.5 6S19 12 15 15.5 5.5 17 4.5 12 7.5 2.5 13 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Rabbitholes</span><small></small></button>
+        <button type="button" data-mode="bubble" aria-pressed="false" title="Spacetime bubble: a warp drive, at the speed set in the fine print"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 9.5a4 4 0 0 1 3-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Bubble</span><small></small></button>
+        <button type="button" data-mode="light" aria-pressed="false" title="Light speed: 299,792 km/s"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 5 13h6l-1 9 8-11h-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Light</span><small></small></button>
+        <button type="button" data-mode="craft" aria-pressed="false" title="Fastest spacecraft: Parker Solar Probe's record speed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 3.5c3 0 6 3 6 6l-7 7-6-6zM7.5 10.5l-3 1-1.5 3 4-.5M13.5 16.5l-1 3-3 1.5.5-4M15 9h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Spacecraft</span><small></small></button>
+      </div>
+      <div class="uf-sum" aria-live="polite"><b data-dir-time></b><span data-dir-sub></span><button type="button" class="uf-warn" data-dir-warn></button></div>
+      <ol class="uf-steps" data-dir-steps aria-label="Steps"></ol>
+      <details class="uf-fine">
+        <summary>Fine print</summary>
+        <dl>
+          <dt>Rabbitholes</dt><dd>Wormholes between places: a jump takes no time. Between rabbitholes you travel by spacetime bubble.</dd>
+          <dt>Spacetime bubble</dt><dd>A warp bubble: allowed by general relativity on paper, not built. Pick how fast it goes, in multiples of light speed:
+            <select data-dir-speed aria-label="Bubble speed">
+              <option value="1">1× light speed</option>
+              <option value="1000">1,000× light speed</option>
+              <option value="1000000">1 million× light speed</option>
+              <option value="1000000000" selected>1 billion× light speed</option>
+              <option value="1000000000000">1 trillion× light speed</option>
+            </select></dd>
+          <dt>Light</dt><dd>299,792 km/s: the real limit for anything with mass, so this is the fastest real trip.</dd>
+          <dt>Spacecraft</dt><dd>Parker Solar Probe's record, <span data-dir-craft></span> (24 December 2024), held the whole way. Voyager 1, the fastest thing leaving the Solar System, does about 17 km/s.</dd>
+          <dt>Which rabbitholes are open</dt><dd><span data-dir-sky></span> Some open only while their galaxy is above your horizon, and some once you have been there. Your location and the places you have visited stay in this browser.
+            <span class="uf-ll"><label><span>Latitude</span><input data-dir-lat inputmode="decimal" placeholder="33.99" /></label><label><span>Longitude</span><input data-dir-lon inputmode="decimal" placeholder="-118.47" /></label></span></dd>
+        </dl>
+        <div class="uf-notes" data-dir-notes></div>
+        <p class="uf-src">Moons are at their measured distance and period; where each is along its orbit today is approximate. Asteroids and comets: NASA/JPL Small-Body Database.</p>
+      </details>
+      <button type="button" class="uf-go" data-dir-go disabled>Start</button>
+    </aside>
+    <div class="uf-focus" data-focus><b>Sun</b><span>Star · G2V</span><small>Loading the catalogues…</small></div>
+    <div class="uf-bottom">
+      <div class="uf-chips">
+        <button type="button" data-go="Earth">Earth</button>
+        <button type="button" data-go="Sun">Solar System</button>
+        <button type="button" data-go="Rigil Kentaurus">Alpha Centauri</button>
+        <button type="button" data-go="Milky Way">Milky Way</button>
+        <button type="button" data-go="Large Magellanic Cloud">LMC</button>
+        <button type="button" data-go="Andromeda Galaxy · M31">Andromeda</button>
+        <button type="button" data-go="Triangulum Galaxy · M33">M33</button>
+        <button type="button" data-go="Cosmic web">Cosmic web</button>
+      </div>
+      <p class="uf-readout" data-readout></p>
+    </div>
+  </div>
+  <div class="wrap">
+    <p class="uu-note">The Milky Way is a labelled model: nobody has photographed it from outside. Positions are from the catalogues, and the build script is <code>design/nu-universes/catalog.py</code> in khensu-specs. The app flies the same map in RealityKit, with AR: put M33 on your table, or point your phone at the real sky. At magnitude 5.7 M33 is a binocular challenge, 15° from Andromeda past the star Mirach.</p>
+  </div>
+
+  <section class="wrap uu-sec">
+    <p class="eyebrow">Wavelength</p>
+    <h2>Music is only the audible band.</h2>
+    <p>Gamma ray to radio is one spectrum, tuned like pitch. Pick a band — the same galaxy changes shape, because in ultraviolet it <em>is</em> a different shape.</p>
+    <div class="uu-bands" role="group" aria-label="Wavelength band">
+      <button type="button" data-band="gamma">Gamma ray</button>
+      <button type="button" data-band="xray">X-ray</button>
+      <button type="button" data-band="uv">UV</button>
+      <button type="button" data-band="visible" aria-pressed="true">Visible</button>
+      <button type="button" data-band="ir">Infrared</button>
+      <button type="button" data-band="radio">Radio</button>
+      <button type="button" data-band="mantis">Mantis · 19 channels</button>
+      <button type="button" data-band="sound">Sound</button>
+    </div>
+    <p class="uu-band-note" id="uu-band-note">Visible · true colour. The Hubble mosaic as your eyes would see it.</p>
+    <div class="uu-mantis" id="uu-mantis" hidden>
+      <p>Mantis shrimps keep 12 colour channels — ultraviolet to red — plus polarisation, in 16 photoreceptor types. nu.u renders 19 channels and re-projects them for your eyes: spectra you call one colour separate here. No new data was downloaded. The same galaxy, for a different animal.</p>
+      <div class="uu-strips" aria-hidden="true"><i style="--h:265"></i><i style="--h:250"></i><i style="--h:230"></i><i style="--h:210"></i><i style="--h:190"></i><i style="--h:160"></i><i style="--h:140"></i><i style="--h:120"></i><i style="--h:60"></i><i style="--h:35"></i><i style="--h:15"></i><i style="--h:0"></i></div>
+      <p class="uu-note">12 spectral strips, UV → red. In the app each strip is the real measured band.</p>
+    </div>
+  </section>
+
+  <section class="wrap uu-sec">
+    <p class="eyebrow">Time</p>
+    <h2>Since the Big Bang. And forward.</h2>
+    <p>Scrub 13.8 billion years: the cosmic microwave background cools from 3,000 K orange to today's 2.7 K microwaves, galaxies form and merge. Forward is prediction, labelled prediction — M33 drifts toward Andromeda, and in about 4 billion years may join the Andromeda–Milky Way encounter, be torn apart, or be thrown out. Physics decides; nu.u shows its working.</p>
+    <label class="uu-time"><span>Big Bang</span><input id="uu-time" type="range" min="0" max="23.8" step="0.1" value="13.8" /><span>+10 Gyr</span></label>
+    <p class="uu-band-note" id="uu-time-note">Today · 13.8 Gyr after the Big Bang</p>
+  </section>
+
+  <section class="wrap uu-sec">
+    <p class="eyebrow">Why stars twinkle</p>
+    <h2>Real physics. Three twinkles.</h2>
+    <div class="uu-cards">
+      <article><h3>The star itself</h3><p>Cepheids pulse — bluer as they brighten. Hubble used exactly those stars in M33 to prove it lies outside our galaxy. Eclipses dip, flares jump.</p></article>
+      <article><h3>Earth's air</h3><p>Turbulence bends starlight. That is the twinkle you know — planets, being discs, stay steady, and Sirius flashes colours. In space it stops.</p></article>
+      <article><h3>Counting photons</h3><p>Faint Hubble stars flicker because photons arrive one at a time. Zoom in far enough and you watch statistics.</p></article>
+    </div>
+  </section>
+
+  <section class="wrap uu-sec">
+    <p class="eyebrow">Get it</p>
+    <h2>Inside nu.waves, on your device.</h2>
+    <p>RealityKit and AR on iPhone, iPad and Mac (iOS 26). Nothing is processed on servers. Open nu.waves, tap <b>Universes</b>.</p>
+    <div class="uu-cta"><a class="uu-btn primary" href="https://waves.khensu.nu">Open nu.waves</a><a class="uu-btn" href="/app">Get the apps</a></div>
+    <p class="uu-note">Data: <a href="https://esahubble.org/news/heic1901/">ESA/Hubble heic1901</a> · <a href="https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-33/">NASA Messier 33</a> · <a href="https://www.eso.org/public/belgium-de/images/b13/?lang">ESO</a> · <a href="https://earthsky.org/clusters-nebulae-galaxies/triangulum-galaxy-m33-a-binocular-challenge/">EarthSky</a>. Spec: design/nu-universes.md in khensu-specs.</p>
+  </section>
+</Base>
+
+<style>
+.uu-hero{position:relative;min-height:92svh;display:flex;align-items:flex-end;overflow:hidden;background:#04060c}
+.uu-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter .6s}
+.uu-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,6,12,.25),rgba(4,6,12,.88))}
+.uu-hero-in{position:relative;padding:6rem 0 3rem}
+.uu-hero h1{font-size:clamp(3rem,9vw,7rem);line-height:.92;letter-spacing:-.04em;margin:.4rem 0}
+.uu-hero h1 span{color:#9db8ff}
+.uu-lede{max-width:620px;font-size:1.15rem;color:#dbe4ff}
+.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:.72rem;color:#8ea6e8}
+.uu-cta{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.2rem 0}
+.uu-btn{padding:.8rem 1.3rem;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;background:rgba(255,255,255,.08);backdrop-filter:blur(8px)}
+.uu-btn.primary{background:#fff;color:#04060c}
+.uu-credit,.uu-note{font-size:.82rem;color:#93a3c8}
+.uu-sec{padding:4.5rem 0 1rem}
+.uu-sec h2{font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-.03em;margin:.4rem 0 1rem}
+.uu-sec p{max-width:720px;color:#c6d2f2}
+.uf{position:relative;width:min(96vw,1800px);height:min(86svh,1100px);margin:1.5rem auto 0;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.14);background:#010208;touch-action:none;outline:none}
+.uf:focus-visible{border-color:rgba(157,184,255,.6)}
+.uf.is-full{position:fixed;inset:0;width:100vw;height:100svh;margin:0;border:0;border-radius:0;z-index:1000}
+.uf:fullscreen{width:100vw;height:100vh;border:0;border-radius:0}
+.uf canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.uf canvas:active{cursor:grabbing}
+.uf-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.uf-labels :global(.uf-tag){position:absolute;left:0;top:0;margin:8px 0 0 8px;padding:.18rem .55rem;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(4,8,18,.55);color:#dfe8ff;font:inherit;font-size:.72rem;white-space:nowrap;pointer-events:auto;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.uf-labels :global(.uf-tag:hover){background:rgba(255,255,255,.16)}
+.uf-top{position:absolute;top:1rem;left:1rem;right:1rem;display:flex;gap:.5rem;justify-content:space-between}
+.uf-top input{flex:0 1 340px;min-width:0;padding:.6rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(10,14,28,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;font:inherit}
+.uf-top input::placeholder{color:#93a3c8}
+.uf-actions{display:flex;gap:.5rem}
+.uf-fs[data-dir-open][aria-pressed="true"]{background:#fff;color:#04060c}
+.uf-dir{position:absolute;top:4.2rem;right:1rem;bottom:1rem;width:min(400px,calc(100% - 2rem));display:flex;flex-direction:column;gap:.7rem;padding:1rem 1rem .8rem;border-radius:22px;border:1px solid rgba(255,255,255,.16);background:rgba(4,8,18,.86);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#e6edff;font-size:.86rem;z-index:2;overflow:auto;overscroll-behavior:contain}
+.uf-dir[hidden]{display:none}
+.uf-dir header{display:flex;justify-content:space-between;align-items:center;font-size:1.05rem}
+.uf-x{border:0;background:none;color:#c6d2f2;font-size:1.4rem;line-height:1;cursor:pointer}
+.uf-ends{position:relative;display:grid;gap:.45rem;padding-right:2.6rem}
+.uf-end{position:relative;display:block}
+.uf-end > span{position:absolute;left:2.1rem;top:.32rem;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:#8ea6e8;pointer-events:none}
+.uf-end input{width:100%;min-width:0;padding:1.05rem .8rem .45rem 2.1rem;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:.92rem}
+.uf-end input:focus{outline:none;border-color:#9db8ff;background:rgba(157,184,255,.1)}
+.uf-dot,.uf-pin{position:absolute;left:.8rem;top:50%;width:.6rem;height:.6rem;margin-top:-.3rem;border-radius:50%;border:2px solid #9db8ff}
+.uf-pin{border-color:#ff7a7a;background:#ff7a7a;border-radius:50% 50% 50% 0;transform:rotate(-45deg)}
+.uf-ends::before{content:"";position:absolute;left:1.05rem;top:2.1rem;bottom:2.1rem;border-left:2px dotted rgba(255,255,255,.3)}
+.uf-swap{position:absolute;right:0;top:50%;transform:translateY(-50%);width:2.1rem;height:2.1rem;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;cursor:pointer}
+.uf-ends :global(.uf-pop){position:absolute;left:0;right:-2.6rem;top:100%;margin-top:.3rem;max-height:min(360px,50vh);overflow:auto;z-index:5;padding:.3rem;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(8,12,24,.97);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.uf-ends :global(.uf-pop button){display:grid;width:100%;text-align:left;padding:.4rem .7rem;border:0;border-radius:10px;background:none;color:#e6edff;font:inherit;cursor:pointer}
+.uf-ends :global(.uf-pop button:hover),.uf-ends :global(.uf-pop button[aria-selected]){background:rgba(157,184,255,.16)}
+.uf-ends :global(.uf-pop b){font-weight:500;font-size:.88rem}
+.uf-ends :global(.uf-pop small){color:#8ea6e8;font-size:.7rem}
+.uf-ends :global(.uf-pop-group){margin:.5rem .7rem .2rem;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:#8ea6e8 !important}
+.uf-ends :global(.uf-pop-head){margin:.35rem .7rem .1rem;font-size:.74rem;color:#c6d2f2 !important;font-weight:600}
+.uf-modes{display:grid;grid-template-columns:repeat(4,1fr);gap:.3rem}
+.uf-modes button{display:grid;justify-items:center;gap:.1rem;padding:.45rem .2rem;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:#c6d2f2;font:inherit;font-size:.72rem;cursor:pointer}
+.uf-modes svg{width:20px;height:20px}
+.uf-modes button[aria-pressed="true"]{background:#dbe6ff;color:#04060c;border-color:#dbe6ff}
+.uf-modes small{font-size:.64rem;opacity:.8;min-height:1em;line-height:1.2;text-align:center}
+.uf-sum{display:grid;gap:.15rem;padding:.2rem .1rem}
+.uf-sum b{font-size:1.6rem;font-weight:600;letter-spacing:-.02em;color:#fff}
+.uf-sum span{color:#c6d2f2;font-size:.8rem}
+.uf-warn{justify-self:start;padding:0;border:0;background:none;color:#ffb86b;font:inherit;font-size:.76rem;text-align:left;cursor:pointer}
+.uf-warn:empty{display:none}
+.uf-steps{margin:0;padding:0;list-style:none;display:grid;gap:0}
+.uf-steps :global(li){position:relative}
+.uf-steps :global(li:not(:last-child))::after{content:"";position:absolute;left:1.15rem;top:2.2rem;bottom:-.4rem;border-left:3px solid #7dd7ff;opacity:.55}
+.uf-steps :global(li:has(+ li .is-jump))::after{border-left-style:dashed;border-color:#ff7ad9}
+.uf-steps :global(button){width:100%;display:grid;grid-template-columns:2.3rem 1fr;column-gap:.6rem;row-gap:.1rem;padding:.6rem .6rem .6rem 0;text-align:left;border-radius:14px;border:1px solid transparent;background:none;color:#e6edff;font:inherit;cursor:pointer}
+.uf-steps :global(button i){grid-row:span 3;justify-self:center;width:1.7rem;height:1.7rem;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.78rem;font-weight:700;background:#7dd7ff;color:#04060c;position:relative;z-index:1}
+.uf-steps :global(button.is-jump i){background:#ff7ad9}
+.uf-steps :global(button.is-end i){background:#ff7a7a}
+.uf-steps :global(button b){font-size:.98rem;font-weight:600;line-height:1.25}
+.uf-steps :global(button span){color:#9db8ff;font-size:.78rem}
+.uf-steps :global(button small){color:#a9b6d6;font-size:.76rem;line-height:1.35}
+.uf-steps :global(button:hover){background:rgba(255,255,255,.06)}
+.uf-steps :global(button[aria-current]){background:rgba(157,184,255,.16);border-color:rgba(157,184,255,.55)}
+.uf-fine{border-top:1px solid rgba(255,255,255,.12);padding-top:.6rem;color:#93a3c8;font-size:.76rem}
+.uf-fine summary{cursor:pointer;color:#c6d2f2}
+.uf-fine dl{margin:.5rem 0 0;display:grid;gap:.15rem}
+.uf-fine dt{color:#dbe4ff;font-weight:600;margin-top:.45rem}
+.uf-fine dd{margin:0;line-height:1.4}
+.uf-fine select,.uf-ll input{display:block;width:100%;margin-top:.35rem;padding:.45rem .7rem;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font:inherit}
+.uf-ll{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.3rem}
+.uf-ll label span{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:#8ea6e8}
+.uf-notes :global(p){margin:.5rem 0 0;color:#ffb86b !important;font-size:.76rem;line-height:1.35}
+.uf-src{margin:.6rem 0 0;font-size:.7rem;color:#7d8cb0 !important}
+.uf-go{position:sticky;bottom:0;z-index:2;flex:none;padding:.8rem;border-radius:999px;border:0;background:#fff;color:#04060c;font:inherit;font-weight:600;cursor:pointer;box-shadow:0 -10px 24px rgba(4,8,18,.9)}
+.uf-go:disabled{opacity:.4;cursor:default}
+.uf.is-jump::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,rgba(255,122,217,.85),rgba(125,215,255,.25) 40%,transparent 70%);animation:uf-jump .7s ease-out forwards}
+@keyframes uf-jump{from{opacity:1;transform:scale(.4)}to{opacity:0;transform:scale(1.6)}}
+.uf-focus{position:absolute;top:4.2rem;left:1rem;max-width:min(360px,calc(100% - 2rem));padding:.8rem 1rem;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:rgba(4,8,18,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;display:grid;gap:.15rem;pointer-events:none}
+.uf-focus :global(span){color:#9db8ff;font-size:.8rem}
+.uf-focus :global(small){color:#c6d2f2;font-size:.78rem;line-height:1.35}
+.uf-bottom{position:absolute;left:1rem;right:1rem;bottom:1rem;display:grid;gap:.5rem}
+.uf-chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.uf-readout{margin:0;color:#93a3c8 !important;font-size:.78rem}
+.uf-chips button,.uf-fs,.uu-bands button{display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(10,14,28,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#e6edff;font:inherit;cursor:pointer}
+.uf-chips button:hover,.uf-fs:hover{background:rgba(255,255,255,.14)}
+.uf-fs[aria-pressed="true"]{background:rgba(255,255,255,.18)}
+@media (max-width:640px){.uf{height:78svh;border-radius:20px}.uf-fs span{display:none}.uf-dir{top:auto;left:.5rem;right:.5rem;bottom:.5rem;width:auto;max-height:78%}.uf.has-dir .uf-bottom,.uf.has-dir .uf-focus{display:none}.uf-chips{flex-wrap:nowrap;overflow-x:auto}.uf-focus{top:3.9rem}}
+.uu-bands{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.2rem 0}
+.uu-bands button[aria-pressed="true"]{background:#fff;color:#04060c}
+.uu-band-note{color:#ffb86b !important}
+.uu-strips{display:flex;gap:4px;height:90px;margin:1rem 0}
+.uu-strips i{flex:1;border-radius:8px;background:hsl(var(--h) 90% 55%)}
+.uu-time{display:flex;align-items:center;gap:1rem;max-width:720px}
+.uu-time input{flex:1}
+.uu-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1.5rem}
+.uu-cards article{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:1.2rem;background:rgba(255,255,255,.03)}
+</style>
+
+<script is:inline>
+const filters={gamma:'hue-rotate(240deg) saturate(2.2) contrast(1.3)',xray:'hue-rotate(200deg) saturate(1.8) brightness(1.15)',uv:'hue-rotate(255deg) saturate(2)',visible:'none',ir:'hue-rotate(-35deg) saturate(2) brightness(1.1)',radio:'hue-rotate(120deg) saturate(1.6)',mantis:'saturate(2.6) contrast(1.2)',sound:'saturate(1.2)'};
+const notes={gamma:'Gamma ray · false colour. At 2.7 million light-years M33 is mostly upper limits — the app tiles say so honestly.',xray:'X-ray · false colour. X-ray binaries and hot gas, invisible in the Hubble view.',uv:'Ultraviolet · false colour. The youngest stars light up; the spiral arms sharpen.',visible:'Visible · true colour. The Hubble mosaic as your eyes would see it.',ir:'Infrared · false colour. Dust lanes stop hiding star formation and start glowing.',radio:'Radio · false colour. The hydrogen disc reaches past the stars.',mantis:'Mantis · 19 channels. False colour — mapped for your eyes.',sound:'Sound · this field, transposed into hearing through nu.waves. Brightness is loudness; polarisation is place in the spacetime bubble.'};
+const bg=document.getElementById('uu-bg'), note=document.getElementById('uu-band-note'), mantis=document.getElementById('uu-mantis');
+document.querySelectorAll('[data-band]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-band]').forEach(x=>x.removeAttribute('aria-pressed'));
+  b.setAttribute('aria-pressed','true');
+  const k=b.dataset.band, f=filters[k]||'none';
+  bg.style.filter=f; note.textContent=notes[k]||'';
+  mantis.hidden = k!=='mantis';
+}));
+const time=document.getElementById('uu-time'), tn=document.getElementById('uu-time-note');
+time.addEventListener('input',()=>{
+  const v=parseFloat(time.value);
+  tn.textContent = v<0.01?'The Big Bang':v<0.1?'380,000 years · the CMB glows orange at 3,000 K':v<13.79?v.toFixed(1)+' Gyr after the Big Bang':v<=13.85?'Today · 13.8 Gyr after the Big Bang':'+'+(v-13.8).toFixed(1)+' Gyr · predicted — physics, labelled prediction';
+});
+</script>
+
+<script>
+import { startFlight } from '../scripts/universes/flight';
+import { startDirections } from '../scripts/universes/directions';
+const uf = document.getElementById('uf') as HTMLElement;
+const fs = document.getElementById('uf-fs') as HTMLButtonElement;
+const isFull = () => document.fullscreenElement === uf || uf.classList.contains('is-full');
+function sync() {
+  const on = isFull();
+  fs.setAttribute('aria-pressed', String(on));
+  fs.querySelector('span')!.textContent = on ? 'Exit' : 'Fullscreen';
+  document.documentElement.style.overflow = uf.classList.contains('is-full') ? 'hidden' : '';
+}
+fs.addEventListener('click', () => {
+  if (isFull()) {
+    if (document.fullscreenElement) document.exitFullscreen();
+    uf.classList.remove('is-full');
+  } else if (uf.requestFullscreen) {
+    uf.requestFullscreen().catch(() => uf.classList.add('is-full')).finally(sync);
+  } else {
+    uf.classList.add('is-full');
+  }
+  sync();
+});
+document.addEventListener('fullscreenchange', sync);
+uf.addEventListener('keydown', (e) => { if (e.key === 'Escape' && uf.classList.contains('is-full')) { uf.classList.remove('is-full'); sync(); } });
+new IntersectionObserver((es, o) => { if (es.some((e) => e.isIntersecting)) { o.disconnect(); startFlight(uf).then((f) => startDirections(uf, f)); } }, { rootMargin: '400px' }).observe(uf);
+</script>

@@ -3,7 +3,9 @@ import Base from '../layouts/Base.astro';
 import AvatarStudio from '../components/khensu/AvatarStudio.astro';
 import ProductBar from '../components/khensu/ProductBar.astro';
 import Ecosystem from '../components/khensu/Ecosystem.astro';
+import { allowFeed } from '../data/feed';
 import { PRODUCTS } from '../data/hosts';
+allowFeed(Astro);
 
 const SPEC = 'https://dev.khensu.nu/specs/nu-avatars/';
 ---

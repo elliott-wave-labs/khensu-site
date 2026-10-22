@@ -29,9 +29,9 @@ const apps = [
   {
     name: 'nu.moments',
     shown: 'ñü.mømëntš',
-    role: 'Templates, beat sync, on-device editor',
+    role: 'Video editor: effects, captions, voice-over, templates',
     bundle: 'nu.khensu.moments',
-    ipa: `${RELEASES}/download/0.1.0-build6/nu.moments.ipa`,
+    ipa: `${RELEASES}/download/0.1.0-build9/nu.moments.ipa`,
     href: PRODUCTS.moments,
   },
 ];
@@ -42,6 +42,7 @@ const products = [
   { href: PRODUCTS.moments, label: 'nu.moments', note: 'Creator editor' },
   { href: PRODUCTS.create, label: 'nu.create', note: 'Rights, fans, pay' },
   { href: PRODUCTS.waves, label: 'nu.waves', note: 'Spatial audio' },
+  { href: PRODUCTS.universes, label: 'i.verse', note: 'Fly the real universe' },
   { href: PRODUCTS.fi, label: 'nu.Fi', note: 'Private money' },
   { href: PRODUCTS.bi, label: 'nu.bi', note: 'Basic income' },
   { href: PRODUCTS.sla, label: 'SLA', note: '100% uptime' },
@@ -55,7 +56,7 @@ const products = [
 
 const tiers = [
   { name: 'Free', price: 'Free', body: 'Limited access. Video up to 540p. No cloud storage. Everything else in the apps stays open.' },
-  { name: 'Pro', price: '$5 / month / user', body: 'IAP, Stripe or nu.Fi. Full spectrum nu.aura. Higher resolution and storage.' },
+  { name: 'Pro', price: '$5 / month / user', body: 'In-app purchase or nu.Fi. Full spectrum nu.aura. Higher resolution and storage.' },
   { name: 'Ultra', price: '$200', body: 'Higher tier for power creators and nodes.' },
   { name: 'Akashic', price: '$1,111 / year', body: 'Full spectrum + annual Akashic. Lifetime buy: $2,222 — no storage or resolution limits.' },
 ];
@@ -145,7 +146,7 @@ const tiers = [
       </ul>
       <p class="note">
         Tips and gifts to streamers are always 100% to the person. Flat 10% only on in-app purchases and subscriptions
-        (never on tips). Pay with IAP, Stripe or <a href={PRODUCTS.fi}>nu.Fi</a>.
+        (never on tips). Pay with in-app purchase or <a href={PRODUCTS.fi}>nu.Fi</a>.
       </p>
     </div>
   </section>

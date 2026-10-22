@@ -36,6 +36,13 @@ export const CARDS: Record<string, Card> = {
   memory: { title: 'ñü.řåł', em: 'Your private AI.', line: 'It learns what you’re looking forward to, on your device. No tracking, ever.', bg: EARTH, alt: 'ñü.řåł, the private on-device AI on khėnsu.ñü, over Earth at night' },
   creators: { title: 'ñü.ċřêæțẽ', em: 'You own everything.', line: 'Your rights, your fans, and $10 per 1,000 plays with no cut.', bg: EARTH, alt: 'ñü.ċřêæțẽ on khėnsu.ñü over Earth and Indra\'s Net' },
   waves: { title: 'ñü.ŵævẽš', em: 'Every instrument, where it belongs.', line: 'Stereo becomes objects you can drag around you. Switch to the original or Opus 5.1 any time.', bg: EARTH, alt: 'ñü.ŵævẽš spatial audio on khėnsu.ñü, instruments placed around you over Earth' },
+  universes: {
+    title: 'nu.universes',
+    em: 'Google Earth for the universe.',
+    line: 'Fly from Earth to the cosmic web at real distances. NASA, ESA and 2MASS catalogues, in nu.waves.',
+    bg: '/universes/m33-1800.webp',
+    alt: 'nu.universes: the M33 Triangulum Galaxy in the Hubble mosaic, at its real distance on the 3D map',
+  },
   'all-healing-tones': {
     title: 'All healing tones (3D)',
     em: '10 sounds in the 3D spacetime bubble™.',
@@ -324,6 +331,13 @@ export const PREVIEWS: Record<string, { bytes: number; hash: string; duration: n
     duration: 3,
     wideBytes: 307259,
     wideHash: 'sha-256=158c4f8ac00dd24a1a38ef0c62dc6c1a26c02bd946d761ce8a0e114b32f1b1dd',
+  },
+  universes: {
+    bytes: 3601064,
+    hash: 'sha-256=06b1ee5b29d44fa3992661afbc3e73875a203ec8757bf79ef364e367906e30f0',
+    duration: 6,
+    wideBytes: 3623875,
+    wideHash: 'sha-256=0434930953e2bcf967d94b09bcf0009e57bddc8b85bbd44bf10a2c472b980881',
   },
 };
 // The shield pages share the buy card's animation; every nav page has its own custom preview.

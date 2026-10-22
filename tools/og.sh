@@ -44,7 +44,7 @@ if want home; then cp "$out/home.png" "$site/public/og.png"; fi
 # Square cards for Instagram link pages and posts, plus the thumbnail card.
 insta="$HOME/Desktop/khensu-instagram"
 mkdir -p "$insta"
-for slug in home buy shield bi thumb creators waves; do
+for slug in home buy shield bi thumb creators waves universes; do
   want "$slug" || continue
   shot 1080,1080 "$slug" "$out/$slug-square.png"
   sips -s format jpeg -s formatOptions 88 "$out/$slug-square.png" --out "$site/public/og/$slug-square.jpg" >/dev/null
@@ -61,13 +61,14 @@ desk bi khensu-bi-square
 desk thumb khensu-nu-link-thumb
 desk creators khensu-nu-creators-square
 desk waves khensu-nu-waves-square
+desk universes khensu-nu-universes-square
 if want thumb; then
   for px in 128 256 512; do
     sips -Z "$px" "$out/thumb-square.png" --out "$insta/khensu-nu-link-thumb-$px.png" >/dev/null
   done
 fi
 # Word overlays: square (anim squares) and wide (iMessage / Android landscape).
-for slug in home buy thumb creators waves; do
+for slug in home buy thumb creators waves universes; do
   want "$slug" || continue
   for try in 1 2 3; do
     rm -f "$out/$slug-overlay.png"
