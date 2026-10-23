@@ -16,6 +16,8 @@ Liquid Glass Neural Engine Face Touch Pro Max Air Ultra Ceramic Shield Secure En
 SwiftUI Go Wasm Elliott Wave Kickstarter Bitcoin Ethereum Monero Zcash Venmo Cash Chime Grammy Oscar Christmas
 Monday Tuesday Wednesday Thursday Friday Saturday Sunday January February March April May June July August September
 October November December English Unicode Fi Fî Bî IETF
+Titan Europa Enceladus NOAA Hopf Atman Brahman Quon
+
 `.split(/\s+/).filter(Boolean));
 
 const WORD = /(?<![\p{L}\p{N}])[\p{L}][\p{L}\p{M}\p{N}'’-]*/gu;

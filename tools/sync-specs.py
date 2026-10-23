@@ -25,6 +25,7 @@ DOCS = {
     "design/nu-aura.md": ("nu-aura", "ñü.åůřâ"),
     "design/nu-eyes.md": ("nu-eyes", "ñü.êýêš"),
     "design/nu-glass.md": ("nu-glass", "nu.glass"),
+    "design/nu-mirrora.md": ("nu-mirrora", "mîřrørå"),
     "FOUNDER-HANDOVER.md": ("founder-handover", "Founder handover"),
     "OPEN-SOURCE.md": ("open-source", "Open source"),
     "LICENSING.md": ("licensing", "Licensing"),

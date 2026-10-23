@@ -4,6 +4,7 @@
 export const PRODUCTS = {
   feed: 'https://khensu.nu/feed',
   vegan: 'https://khensu.nu/vegan',
+  mirrora: 'https://khensu.nu/mirrora',
   webe: 'https://webe.khensu.nu',
   void: 'https://void.khensu.nu',
   media: 'https://media.khensu.nu',
@@ -12,7 +13,8 @@ export const PRODUCTS = {
   create: 'https://create.khensu.nu',
   waves: 'https://waves.khensu.nu',
   // nu.universes (header i.verse, part of nu.waves). iverse.khensu.nu is the main host; universes, rabbithole and
-  // portal.khensu.nu open the same page, all on cert moqom-aura-iverse-khensu-nu (Hover A verified 21 Oct 2026).
+  // portal.khensu.nu open the same page; inverse.khensu.nu 301s to iverse (autocorrect typo). Cert
+  // moqom-aura-iverse-khensu-nu-2 (Hover A verified 21 Oct 2026; inverse added 23 Oct).
   universes: 'https://iverse.khensu.nu',
   fi: 'https://fi.khensu.nu',
   bi: 'https://bi.khensu.nu',
@@ -39,6 +41,7 @@ export const PRODUCTS = {
 /** Old path on khensu.nu → product URL (no trailing slash). */
 export const PATH_TO_PRODUCT: Record<string, string> = {
   '/vegan': PRODUCTS.vegan,
+  '/mirrora': PRODUCTS.mirrora,
   '/webe': PRODUCTS.webe,
   '/void': PRODUCTS.void,
   '/media': PRODUCTS.media,

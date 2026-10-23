@@ -99,6 +99,13 @@ export const CARDS: Record<string, Card> = {
     bg: EARTH,
     alt: 'nu.vegan kitchen on khėnsu.ñü',
   },
+  mirrora: {
+    title: 'mîřrørå',
+    em: 'Elliott’s Mirror.',
+    line: 'Many dimensions, one instance. A generic object with many pointers — each an atman, the same atman.',
+    bg: EARTH,
+    alt: 'mîřrørå — Elliott’s Mirror, quantum mirror theory on khėnsu.ñü',
+  },
   sla: { title: 'SLA', em: '100% uptime.', line: 'Dead-man\'s switch on. Activated 14 October 2026, 2:22 pm, Venice CA. We did it.', bg: EARTH, alt: 'khėnsu.ñü SLA: 100% uptime and dead-man\'s switch' },
   kronos: {
     title: 'Kronos',
