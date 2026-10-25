@@ -1,0 +1,61 @@
+---
+import Bi from '../bi.astro';
+import Creators from '../creators.astro';
+import Safety from '../safety.astro';
+import { SECTIONS } from '../../data/og';
+
+export function getStaticPaths() {
+  return SECTIONS.filter((section) => section.route).map((section) => ({
+    params: { slug: section.slug },
+    props: { section },
+  }));
+}
+
+interface Props {
+  section: (typeof SECTIONS)[number];
+}
+
+const { section } = Astro.props;
+const host =
+  section.page === 'bi'
+    ? 'https://bi.khensu.nu'
+    : section.page === 'create'
+      ? 'https://create.khensu.nu'
+      : 'https://khensu.nu';
+const canonicalUrl = `${host}/s/${section.slug}`;
+const ogCard = section.card ?? section.slug;
+---
+
+{
+  section.page === 'bi' && (
+    <Bi
+      ogCard={ogCard}
+      canonicalUrl={canonicalUrl}
+      title={section.title}
+      description={section.description}
+      scroll={section.anchor}
+    />
+  )
+}
+{
+  section.page === 'create' && (
+    <Creators
+      ogCard={ogCard}
+      canonicalUrl={canonicalUrl}
+      title={section.title}
+      description={section.description}
+      scroll={section.anchor}
+    />
+  )
+}
+{
+  section.page === 'safety' && (
+    <Safety
+      ogCard={ogCard}
+      canonicalUrl={canonicalUrl}
+      title={section.title}
+      description={section.description}
+      scroll={section.anchor}
+    />
+  )
+}

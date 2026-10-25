@@ -6,6 +6,22 @@ import Ecosystem from '../components/khensu/Ecosystem.astro';
 import { allowFeed } from '../data/feed';
 allowFeed(Astro);
 
+interface Props {
+  ogCard?: string;
+  canonicalUrl?: string;
+  title?: string;
+  description?: string;
+  scroll?: string;
+}
+
+const {
+  ogCard,
+  canonicalUrl,
+  title = 'ñũ.Bî: the ñü basic income',
+  description = 'nu.bi, the ñü basic income: everyone who runs a khėnsu.ñü node is paid in khėnsu.ñü coin, turned into USDC on arrival, for proved work at one worldwide rate, and an equal dividend for every person is in research. No location tracking, no biometrics, no registry of people.',
+  scroll,
+} = Astro.props;
+
 const DEV = 'https://dev.khensu.nu';
 const CONTACT = 'mailto:hello@elliottwave.studio?subject=%C3%B1%C3%BC.bi%20%E2%80%94%20government%20enquiry';
 
@@ -138,8 +154,10 @@ const thanks = [
 ---
 
 <Base
-  title="ñũ.Bî: the ñü basic income"
-  description="nu.bi, the ñü basic income: everyone who runs a khėnsu.ñü node is paid in khėnsu.ñü coin, turned into USDC on arrival, for proved work at one worldwide rate, and an equal dividend for every person is in research. No location tracking, no biometrics, no registry of people."
+  title={title}
+  description={description}
+  ogCard={ogCard}
+  canonicalUrl={canonicalUrl}
 >
   <div class="khensu bi">
     <section class="bi-hero" aria-labelledby="bi-title">
@@ -237,7 +255,7 @@ const thanks = [
       </div>
     </section>
 
-    <section class="section" aria-label="Two stages">
+    <section class="section" id="bi-stages" aria-label="Two stages">
       <div class="wrap">
         <div class="bi-two">
           {stages.map((s, i) => (
@@ -282,7 +300,7 @@ const thanks = [
       </div>
     </section>
 
-    <section class="section" aria-labelledby="bi-fair-title">
+    <section class="section" id="bi-fair" aria-labelledby="bi-fair-title">
       <div class="wrap">
         <p class="eyebrow">fair everywhere</p>
         <h2 id="bi-fair-title">One rate for the whole world.<br /><span class="dim">Worth the most where it’s needed most.</span></h2>
@@ -292,7 +310,7 @@ const thanks = [
       </div>
     </section>
 
-    <section class="section" aria-labelledby="bi-src-title">
+    <section class="section" id="bi-sources" aria-labelledby="bi-src-title">
       <div class="wrap">
         <p class="eyebrow">where the money comes from</p>
         <h2 id="bi-src-title">Real customers.<br /><span class="dim">Never ads, data or token sales.</span></h2>
@@ -306,7 +324,7 @@ const thanks = [
       </div>
     </section>
 
-    <section class="section" aria-labelledby="bi-safe-title">
+    <section class="section" id="bi-safe" aria-labelledby="bi-safe-title">
       <div class="wrap">
         <p class="eyebrow">safeguards</p>
         <h2 id="bi-safe-title">A basic income without surveillance.</h2>
@@ -353,7 +371,7 @@ const thanks = [
       </div>
     </section>
 
-    <section class="section" aria-labelledby="bi-status-title">
+    <section class="section" id="bi-status" aria-labelledby="bi-status-title">
       <div class="wrap">
         <p class="eyebrow">where it stands</p>
         <h2 id="bi-status-title">What’s decided,<br /><span class="dim">and what isn’t yet.</span></h2>
@@ -373,6 +391,13 @@ const thanks = [
         </p>
       </div>
     </section>
+    {scroll && (
+      <script is:inline define:vars={{ scroll }}>
+        const go = () => document.getElementById(scroll)?.scrollIntoView({ block: 'start' });
+        if (document.readyState === 'complete') go();
+        else window.addEventListener('load', go);
+      </script>
+    )}
   </div>
 </Base>
 

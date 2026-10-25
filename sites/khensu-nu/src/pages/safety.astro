@@ -1,0 +1,302 @@
+---
+import Base from '../layouts/Base.astro';
+import SafetyDemo from '../components/khensu/SafetyDemo.astro';
+import FramePass from '../components/khensu/FramePass.astro';
+import StatStrip from '../components/khensu/StatStrip.astro';
+
+interface Props {
+  ogCard?: string;
+  canonicalUrl?: string;
+  title?: string;
+  description?: string;
+  scroll?: string;
+}
+
+const {
+  ogCard = 'safety',
+  canonicalUrl,
+  title = 'The violet flame',
+  description = 'The violet flame is the transmuting fire of Lumeria. Each frame is checked on your device, and nudity, gore or an attack is blurred before you see it. First offense: a 1 month ban from the public forum.',
+  scroll,
+} = Astro.props;
+---
+
+<Base
+  title={title}
+  description={description}
+  ogCard={ogCard}
+  canonicalUrl={canonicalUrl}
+>
+  <section class="page-head" data-hero>
+    <div class="wrap">
+      <p class="eyebrow">the violet flame · nu.network</p>
+      <h1><span class="aura-text">The violet flame.</span><br /><span class="dim">Covered before you see it.</span></h1>
+      <StatStrip
+        items={[
+          { n: 0, label: 'Copies of a flagged picture sent to us, or to Apple, to make the warning' },
+          { n: 1, unit: 'month', label: 'First offense. Banned from the public forum' },
+        ]}
+      >
+        The violet flame. Each frame is checked on this device. A clear frame plays. Nudity, gore or an attack is blurred before you see it.
+        The first offense bans them from the public forum for a month.
+      </StatStrip>
+      <p class="lede">
+        The violet flame is the transmuting fire of Lumeria. Priests and priestesses of the sacred fire used it in the
+        temples: discord went into the flame, and the energy came back as light. Human rights and creators come first.
+        A clear frame plays. Nudity, gore, or an attack on people for who they are, hits the flame on your device and
+        blurs before you see it. The public forum bans them.
+      </p>
+      <SafetyDemo />
+    </div>
+  </section>
+
+  <section class="section" id="safety-nudity">
+    <div class="wrap">
+    <div class="split">
+      <div>
+        <p class="eyebrow">nudity</p>
+        <h2><span class="aura-text">Blurred before you see it.</span><br /><span class="dim">On this device.</span></h2>
+      </div>
+      <div class="prose">
+        <p>
+          <a href="https://support.apple.com/en-us/105071">Sensitive Content Warning</a> helps you avoid an unwanted
+          sensitive photo or video. If a photo or video might contain nudity or gore and violence, it is blurred before
+          you view it. You choose Show, or you look at the resources and block.
+        </p>
+        <p>
+          The check is Apple’s Sensitive Content Analysis. It runs on your device. On a live stream, each frame goes
+          through the video-stream analyzer before it is shown, including on the host’s preview. A clear frame plays.
+          When the analyzer finds nudity, or gore and violence, that frame blurs immediately, before you see it. The
+          frames before it stay clear. Apple does not receive a detection, and does not get the frame. Neither do we.
+        </p>
+        <p>
+          Gore and violence detection is on iOS 27, iPadOS 27 and macOS 27. A child account follows Communication
+          Safety. The app respects the setting in Privacy &amp; Security. Teen accounts from Declared Age Range get
+          sensitive images blurred, and no messages from strangers.
+        </p>
+      </div>
+    </div>
+    <FramePass />
+    </div>
+  </section>
+
+  <section class="section" id="safety-hate">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">hate speech</p>
+        <h2><span class="aura-text">An attack on people</span><br /><span class="dim">for who they are.</span></h2>
+      </div>
+      <div class="prose">
+        <p>
+          Hate speech is an attack on a person or a group for who they are. Race, colour, ethnic or national origin,
+          sex, gender, sexual orientation, religion, disability and age are covered. Apple’s warning does not cover
+          words, so this check runs beside it, on the device.
+        </p>
+        <p>
+          If a guest says it in the middle of a stream, the picture blurs and the sound drops at that moment, until you
+          tap Show. The warning names the kind of attack. It does not quote the words.
+        </p>
+        <p>
+          The host sees the same cover on their own preview, so they know a guest tripped it. Show and Block are your
+          choice on this device. The public forum ban is the account, and it is instant.
+        </p>
+        <p>
+          A list you subscribe to, from a community or a newsroom, can hide more. A label informs. It does not delete
+          the post. Nudity, gore, and an attack on people for who they are ban the person from the public forum.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="safety-rule">
+    <div class="wrap">
+      <p class="eyebrow">the violet flame</p>
+      <h2><span class="aura-text">Human rights and creators first.</span><br /><span class="dim">We are no-nonsense.</span></h2>
+      <div class="prose rule">
+        <p>
+          Creation and play can happen on some other toxic platforms. We are no-nonsense. We prioritize the high vibe
+          of the community over racism, misogyny, bullying, and just random drama dumb-fuckery.
+        </p>
+        <p>
+          Three strikes, then a year. The first offense is an instant ban from the public forum for 1 month. The
+          second is 3 months. The third is 6 months. While the ban lasts they are blocked from the public forum, and
+          they lose nu.waves, except the sound healing tones, First Attempt, and the classical composers.
+        </p>
+        <p>
+          The fourth offense bans them from public discourse for 1 year. The fifth is permanent: that person, that
+          wallet, and that device are banned from public discourse. The count never resets, even years later.
+        </p>
+      </div>
+      <ol class="ladder">
+        <li><b>1</b><span>1st offense<br />1 month</span></li>
+        <li><b>3</b><span>2nd<br />3 months</span></li>
+        <li><b>6</b><span>3rd<br />6 months</span></li>
+        <li><b>1 year</b><span>4th<br />public discourse</span></li>
+        <li><b>permanent</b><span>5th<br />you, your wallet, your device</span></li>
+      </ol>
+      <p class="fine">
+        Private messages stay private. The frame never leaves the device. The post stays on the network. Stock apps do
+        not show that person in public discourse until the ban ends. A permanent ban does not end. Money already in the
+        wallet stays spendable.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="safety-facts">
+    <div class="wrap">
+      <p class="eyebrow">facts</p>
+      <h2><span class="aura-text">A label sits on the post.</span><br /><span class="dim">The post stays.</span></h2>
+      <div class="grid three">
+        <article class="glass">
+          <h3 class="aura-text">Your lists</h3>
+          <p>Anyone can publish a label list. Newsrooms, fact-checkers and communities already do. You subscribe to the ones you want, and ignore the rest.</p>
+        </article>
+        <article class="glass">
+          <h3 class="aura-text">Where people disagree</h3>
+          <p>A consensus label is shown only when raters who usually disagree agree on it. Every device computes the same label. The ratings are public.</p>
+        </article>
+        <article class="glass">
+          <h3 class="aura-text">What a label can say</h3>
+          <p>Factual, with sources. Opinion. Misleading. Fraud or scam. Spam. Adult. Graphic violence. Satire. Made with AI. A label informs. It does not delete.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="safety-exception">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">the narrow exception</p>
+        <h2><span class="aura-text">One thing is not speech.</span></h2>
+      </div>
+      <div class="prose">
+        <p>
+          Child sexual abuse material, and other content illegal everywhere, is refused by hash. Node operators do not
+          cache those addresses. The app does not show them. The list is public, append-only and limited to that
+          content, so it cannot quietly become a political filter.
+        </p>
+        <p>
+          <a href="/security">Security</a> is how the messages stay unreadable.
+          <a href="/feed">The feed</a> is where a post meets this cover.
+          <a href="https://media.khensu.nu">nu.media</a> is the clip under the warning.
+        </p>
+      </div>
+    </div>
+    </section>
+    {scroll && (
+      <script is:inline define:vars={{ scroll }}>
+        const go = () => document.getElementById(scroll)?.scrollIntoView({ block: 'start' });
+        if (document.readyState === 'complete') go();
+        else window.addEventListener('load', go);
+      </script>
+    )}
+</Base>
+
+<style>
+  .dim {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .page-head .lede {
+    margin: clamp(1.6rem, 4vw, 2.4rem) 0 0;
+    max-width: 46rem;
+  }
+  h2 {
+    margin-bottom: 0;
+  }
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .prose p {
+    color: var(--text-dim);
+    margin: 0 0 1rem;
+  }
+  .prose p:last-child {
+    margin-bottom: 0;
+  }
+  .glass {
+    padding: 1.3rem 1.4rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .glass h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  .glass p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .grid.three {
+    margin-top: 1.6rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  }
+  .rule {
+    max-width: 46rem;
+    margin-top: 1.4rem;
+  }
+  .rule p {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 1.15rem;
+    line-height: 1.45;
+  }
+  .ladder {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin: 1.6rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ladder li {
+    padding: 1rem 0.8rem 0.9rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+  }
+  .ladder li:nth-child(n + 4) b {
+    font-size: clamp(1.15rem, 2vw, 1.65rem);
+    letter-spacing: -0.03em;
+  }
+  .ladder b {
+    display: block;
+    color: #fff;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .ladder span {
+    display: block;
+    margin-top: 0.45rem;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+  .fine {
+    margin: 1rem 0 0;
+    max-width: 68ch;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+  @media (max-width: 800px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
+    }
+    .ladder {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 420px) {
+    .ladder {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

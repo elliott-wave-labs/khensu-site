@@ -1,0 +1,440 @@
+---
+// The nu.media light-on-black clip, covered the way a feed or live stream is covered.
+// The footage is the public demo. The sheet is the warning: nudity, or hate speech from a guest.
+const DIR = '/khensu/codec/glowkey/';
+---
+
+<div class="demo">
+  <input id="kind-nudity" type="radio" name="safety-kind" checked />
+  <input id="kind-hate" type="radio" name="safety-kind" />
+  <input id="safety-show" type="checkbox" />
+  <input id="safety-block" type="checkbox" />
+
+  <div class="switch" role="radiogroup" aria-label="What this warning is for">
+    <label for="kind-nudity">Nudity</label>
+    <label for="kind-hate">Hate speech</label>
+  </div>
+
+  <div class="frame">
+    <div class="media">
+      <img src={`${DIR}rick.jpg`} alt="" class="poster" />
+      <video class="src fg" muted loop playsinline preload="auto" crossorigin="anonymous" src={`${DIR}iss-aurora.mp4`} aria-hidden="true"></video>
+      <video class="src bg" muted loop playsinline preload="auto" crossorigin="anonymous" src={`${DIR}rick.mp4`} aria-hidden="true"></video>
+      <canvas aria-label="The nu.media light demo, aurora laid over a performance, covered until you choose Show"></canvas>
+      <svg class="lyrics" viewBox="0 0 1600 900" aria-hidden="true">
+        <defs>
+          <linearGradient id="safety-aurora" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1600" y2="0">
+            <stop offset="0" stop-color="#22f59a" />
+            <stop offset="0.3" stop-color="#18e0c8" />
+            <stop offset="0.55" stop-color="#3b9dff" />
+            <stop offset="0.8" stop-color="#8b5cff" />
+            <stop offset="1" stop-color="#ff4fd8" />
+            <animateTransform attributeName="gradientTransform" type="translate" values="-500 0; 500 0; -500 0" dur="9s" repeatCount="indefinite" />
+          </linearGradient>
+          <filter id="safety-glow" x="-20%" y="-60%" width="140%" height="220%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b1" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b2" />
+            <feMerge><feMergeNode in="b1" /><feMergeNode in="b2" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#safety-glow)">
+          <text class="line l1" x="800" y="250">Never gonna give you up</text>
+          <text class="line l2" x="800" y="250">Never gonna let you down</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="sheet">
+      <div class="card warn" role="status">
+        <p class="kicker">sensitive content</p>
+        <p class="title nudity-only">This may include nudity.</p>
+        <p class="title hate-only">This may include hate speech.</p>
+        <p class="nudity-only">This frame may include nudity. It was blurred on your device before you saw it.</p>
+        <p class="hate-only">Hate speech is an attack on people for who they are. The picture stays covered, and on a stream the sound drops, until you choose. The warning does not repeat the words.</p>
+        <div class="actions">
+          <label class="btn primary" for="safety-show">Show</label>
+          <label class="btn" for="safety-block">Block</label>
+        </div>
+        <p class="fine">Checked on this device. Nothing here is sent to us or to Apple.</p>
+      </div>
+
+      <div class="card blocked" role="status">
+        <p class="kicker">blocked for you</p>
+        <p class="title">Hidden on your device.</p>
+        <p class="nudity-only">This guest stays blurred for you. Everyone else still has their own choice. The post stays on the network.</p>
+        <p class="hate-only">This guest stays covered and silent for you. Everyone else still has their own choice. The post stays on the network.</p>
+        <div class="actions">
+          <label class="btn primary" for="safety-block">Undo</label>
+        </div>
+      </div>
+
+      <label class="cover" for="safety-show">Cover</label>
+    </div>
+  </div>
+
+  <p class="note">
+    The clip underneath is the light-on-black demo from <a href="https://media.khensu.nu">nu.media</a>. This page has no nudity and no slurs. Show lifts the cover. Block keeps it on for you.
+    Light: NASA, ISS Expedition 29 aurora time-lapse, 17 September 2011, public domain. Background: Rick Astley, “Never Gonna Give You Up” (1987), © Sony Music Entertainment, a short silent excerpt.
+  </p>
+</div>
+
+<script>
+  const VERT = `attribute vec2 p; varying vec2 uv; void main(){ uv = vec2(p.x, -p.y) * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
+  const FRAG = `
+    precision mediump float;
+    uniform sampler2D fg, bg;
+    uniform float t;
+    uniform vec2 texel;
+    varying vec2 uv;
+    float lum(vec3 c) { return max(c.r, max(c.g, c.b)); }
+    float key(vec3 c) { return smoothstep(0.05, 0.32, lum(c)); }
+    vec3 aurora(float x) {
+      x = fract(x);
+      vec3 a = vec3(0.133, 0.961, 0.604), b = vec3(0.094, 0.878, 0.784), c = vec3(0.231, 0.616, 1.0),
+           d = vec3(0.545, 0.361, 1.0), e = vec3(1.0, 0.31, 0.847);
+      x *= 4.0;
+      return x < 1.0 ? mix(a, b, x) : x < 2.0 ? mix(b, c, x - 1.0) : x < 3.0 ? mix(c, d, x - 2.0) : mix(d, e, x - 3.0);
+    }
+    void main() {
+      vec3 f = texture2D(fg, uv).rgb;
+      vec3 b = texture2D(bg, uv).rgb;
+      float a = key(f);
+      vec3 glow = vec3(0.0);
+      float near = 0.0;
+      for (int i = 0; i < 12; i++) {
+        float ang = float(i) * 0.5236;
+        vec2 dir = vec2(cos(ang), sin(ang));
+        vec3 s1 = texture2D(fg, uv + dir * texel * 14.0).rgb;
+        vec3 s2 = texture2D(fg, uv + dir * texel * 38.0).rgb;
+        float k1 = key(s1), k2 = key(s2);
+        near += k1;
+        glow += s1 * k1 * 0.5 + s2 * k2;
+      }
+      near /= 12.0;
+      glow /= 18.0;
+      float pulse = 0.85 + 0.15 * sin(t * 1.7) + 0.08 * sin(t * 4.3 + uv.x * 6.0);
+      vec2 q = uv - 0.5;
+      float g1 = exp(-8.0 * dot(q - vec2(-0.25 + 0.12 * sin(t * 0.31), 0.22 + 0.08 * cos(t * 0.27)), q - vec2(-0.25 + 0.12 * sin(t * 0.31), 0.22 + 0.08 * cos(t * 0.27))));
+      float g2 = exp(-9.0 * dot(q - vec2(0.28 + 0.1 * cos(t * 0.23), -0.18 + 0.1 * sin(t * 0.37)), q - vec2(0.28 + 0.1 * cos(t * 0.23), -0.18 + 0.1 * sin(t * 0.37))));
+      vec3 tint = aurora(uv.y * 0.6 + t * 0.03 + 0.15 * sin(uv.x * 3.0 + t * 0.3));
+      vec3 back = b * (0.5 + 0.2 * (1.0 - length(q) * 1.4));
+      back *= 1.0 - 0.55 * near;
+      back = back * (1.0 - 0.25 * (g1 + g2)) + (aurora(t * 0.02) * g1 + aurora(t * 0.02 + 0.5) * g2) * 0.12;
+      vec3 light = f * a * 1.05 * pulse;
+      vec3 bloom = mix(glow, tint * lum(glow), 0.45) * 0.9 * pulse;
+      vec3 o = light + bloom + back * (1.0 - a);
+      gl_FragColor = vec4(o / (1.0 + max(o.r, max(o.g, o.b)) * 0.25), 1.0);
+    }
+  `;
+
+  const root = document.querySelector<HTMLElement>('.demo');
+  if (root) {
+    const fgV = root.querySelector<HTMLVideoElement>('video.fg')!;
+    const bgV = root.querySelector<HTMLVideoElement>('video.bg')!;
+    const canvas = root.querySelector('canvas')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const gl = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: false });
+    if (gl && !reduced) {
+      const sh = (type: number, src: string) => {
+        const s = gl.createShader(type)!;
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+      };
+      const prog = gl.createProgram()!;
+      gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
+      gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+      gl.linkProgram(prog);
+      if (gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        gl.useProgram(prog);
+        gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+        const loc = gl.getAttribLocation(prog, 'p');
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+        const tex = [0, 1].map((u) => {
+          const tx = gl.createTexture();
+          gl.activeTexture(gl.TEXTURE0 + u);
+          gl.bindTexture(gl.TEXTURE_2D, tx);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          return tx;
+        });
+        gl.uniform1i(gl.getUniformLocation(prog, 'fg'), 0);
+        gl.uniform1i(gl.getUniformLocation(prog, 'bg'), 1);
+        const tLoc = gl.getUniformLocation(prog, 't');
+        const texel = gl.getUniformLocation(prog, 'texel');
+        const frame = root.querySelector('.frame')!;
+        let visible = false;
+        let running = false;
+        const draw = (now: number) => {
+          const w = Math.round(canvas.clientWidth * Math.min(devicePixelRatio, 2));
+          const h = Math.round(canvas.clientHeight * Math.min(devicePixelRatio, 2));
+          if (canvas.width !== w || canvas.height !== h) {
+            canvas.width = w;
+            canvas.height = h;
+          }
+          gl.viewport(0, 0, w, h);
+          [fgV, bgV].forEach((vid, u) => {
+            gl.activeTexture(gl.TEXTURE0 + u);
+            gl.bindTexture(gl.TEXTURE_2D, tex[u]);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, vid);
+          });
+          gl.uniform1f(tLoc, now / 1000);
+          gl.uniform2f(texel, 1 / 1920, 1 / 1080);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          canvas.classList.add('live');
+        };
+        const loop = (now: number) => {
+          if (!visible) {
+            running = false;
+            return;
+          }
+          if (fgV.readyState >= 2 && bgV.readyState >= 2) draw(now);
+          requestAnimationFrame(loop);
+        };
+        new IntersectionObserver(([e]) => {
+          visible = e.isIntersecting;
+          if (visible) {
+            fgV.play().catch(() => {});
+            bgV.play().catch(() => {});
+            if (!running) {
+              running = true;
+              requestAnimationFrame(loop);
+            }
+          } else {
+            fgV.pause();
+            bgV.pause();
+          }
+        }).observe(frame);
+      }
+    }
+  }
+</script>
+
+<style>
+  .demo {
+    position: relative;
+    margin-top: clamp(1.8rem, 4vw, 2.8rem);
+  }
+  .demo > input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+  }
+  .switch {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.8rem;
+  }
+  .switch label {
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.92rem;
+    cursor: pointer;
+  }
+  .demo:has(#kind-nudity:checked) label[for='kind-nudity'],
+  .demo:has(#kind-hate:checked) label[for='kind-hate'] {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.34);
+  }
+  #kind-nudity:focus-visible ~ .switch label[for='kind-nudity'],
+  #kind-hate:focus-visible ~ .switch label[for='kind-hate'],
+  #safety-show:focus-visible ~ .frame label[for='safety-show'],
+  #safety-block:focus-visible ~ .frame label[for='safety-block'] {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+  .frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 28px;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  }
+  .media {
+    position: absolute;
+    inset: -8%;
+    filter: blur(42px) brightness(0.55) saturate(1.2);
+    transform: scale(1.06);
+    transition: filter 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .demo:has(#safety-show:checked):not(:has(#safety-block:checked)) .media {
+    filter: none;
+    transform: none;
+  }
+  .src {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .poster,
+  canvas,
+  .lyrics {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  canvas {
+    opacity: 0;
+  }
+  canvas:global(.live) {
+    opacity: 1;
+  }
+  .lyrics {
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  .line {
+    font-family: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+    font-size: 132px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-anchor: middle;
+    fill: url(#safety-aurora);
+    fill-opacity: 0;
+    stroke: url(#safety-aurora);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 2600;
+    stroke-dashoffset: 2600;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: write 9s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  }
+  .l2 {
+    animation-delay: 4.5s;
+  }
+  @keyframes write {
+    0% { opacity: 0; stroke-dashoffset: 2600; fill-opacity: 0; transform: translateY(0) scale(0.96); }
+    2% { opacity: 1; }
+    24% { stroke-dashoffset: 0; fill-opacity: 0; transform: scale(0.98); }
+    31% { fill-opacity: 0.85; transform: scale(1.04); }
+    35% { transform: scale(1); }
+    44% { opacity: 1; fill-opacity: 0.85; transform: translateY(0) scale(1); }
+    50% { opacity: 0; fill-opacity: 0.4; transform: translateY(-40px) scale(1.02); stroke-dashoffset: 0; }
+    100% { opacity: 0; stroke-dashoffset: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line { animation: none; }
+    .l1 { opacity: 1; stroke-dashoffset: 0; fill-opacity: 0.85; }
+    .media { transition: none; }
+  }
+  .sheet {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: clamp(0.8rem, 2vw, 1.6rem);
+  }
+  .card {
+    width: min(28rem, 100%);
+    padding: 1.25rem 1.3rem 1.1rem;
+    border-radius: 22px;
+    background: rgba(16, 16, 20, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 24px 70px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
+  .kicker {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .title {
+    margin: 0 0 0.45rem;
+    color: #fff;
+    font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+  .card p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+  .card .title {
+    color: #fff;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 1rem;
+  }
+  .actions .btn {
+    cursor: pointer;
+  }
+  .fine {
+    margin-top: 0.85rem !important;
+    font-size: 0.78rem !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+  }
+  .blocked,
+  .cover {
+    display: none;
+  }
+  .demo:has(#kind-hate:checked) .nudity-only,
+  .demo:has(#kind-nudity:checked) .hate-only,
+  .demo:has(#safety-show:checked) .warn,
+  .demo:has(#safety-block:checked) .warn {
+    display: none;
+  }
+  .demo:has(#safety-block:checked) .blocked {
+    display: block;
+  }
+  .demo:has(#safety-show:checked):not(:has(#safety-block:checked)) .cover {
+    display: inline-flex;
+  }
+  .cover {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    background: rgba(16, 16, 20, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  .note {
+    margin: 0.9rem 0 0;
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    max-width: 68ch;
+  }
+  @media (max-width: 700px) {
+    .frame {
+      border-radius: 22px;
+    }
+    .title {
+      font-size: 1.25rem;
+    }
+    .card p {
+      font-size: 0.9rem;
+    }
+  }
+</style>

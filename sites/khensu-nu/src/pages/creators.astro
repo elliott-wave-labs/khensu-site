@@ -46,11 +46,29 @@ const fund = [
   { t: 'Your rights stay yours.', b: 'Backers get the rewards you offer, such as a ticket, a download or a signed copy. They don’t get your film, your masters or a share of your income.' },
 ];
 const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
+
+interface Props {
+  ogCard?: string;
+  canonicalUrl?: string;
+  title?: string;
+  description?: string;
+  scroll?: string;
+}
+
+const {
+  ogCard,
+  canonicalUrl,
+  title = 'ñü.ċřêæțẽ: for creators',
+  description = 'Creators on khėnsu.ñü keep everything: no platform cut on views, gifts, tickets or sales, tips 100% to you, a 42¢ minimum payout, instant payouts, and every right to your work. Plus Sounds, nu.media video at less data, and nufi funding.',
+  scroll,
+} = Astro.props;
 ---
 
 <Base
-  title="ñü.ċřêæțẽ: for creators"
-  description="Creators on khėnsu.ñü keep everything: no platform cut on views, gifts, tickets or sales, tips 100% to you, a 42¢ minimum payout, instant payouts, and every right to your work. Plus Sounds, nu.media video at less data, and nufi funding."
+  title={title}
+  description={description}
+  ogCard={ogCard}
+  canonicalUrl={canonicalUrl}
 >
   <div class="khensu cr">
     <CrHero />
@@ -236,6 +254,13 @@ const appLabel = APP_STORE_ID ? 'Download on the App Store' : 'Get the app';
         </p>
       </div>
     </section>
+    {scroll && (
+      <script is:inline define:vars={{ scroll }}>
+        const go = () => document.getElementById(scroll)?.scrollIntoView({ block: 'start' });
+        if (document.readyState === 'complete') go();
+        else window.addEventListener('load', go);
+      </script>
+    )}
   </div>
 </Base>
 

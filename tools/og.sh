@@ -35,6 +35,8 @@ shot() {
 for dir in "$out"/dist/og/*/; do
   slug="$(basename "$dir")"
   case "$slug" in overlay) continue ;; esac
+  # bi, create sections and the violet flame are drawn by tools/og-sections.swift.
+  case "$slug" in bi|bi-*|create-*|safety|safety-*) continue ;; esac
   want "$slug" || continue
   shot 1200,630 "$slug" "$out/$slug.png"
   sips -s format jpeg -s formatOptions 88 "$out/$slug.png" --out "$site/public/og/$slug.jpg" >/dev/null
@@ -44,7 +46,7 @@ if want home; then cp "$out/home.png" "$site/public/og.png"; fi
 # Square cards for Instagram link pages and posts, plus the thumbnail card.
 insta="$HOME/Desktop/khensu-instagram"
 mkdir -p "$insta"
-for slug in home buy shield bi thumb creators waves universes; do
+for slug in home buy shield thumb creators waves universes; do
   want "$slug" || continue
   shot 1080,1080 "$slug" "$out/$slug-square.png"
   sips -s format jpeg -s formatOptions 88 "$out/$slug-square.png" --out "$site/public/og/$slug-square.jpg" >/dev/null
@@ -57,7 +59,6 @@ desk() {
 }
 desk home khensu-nu-square
 desk buy khensu-nu-buy-square
-desk bi khensu-bi-square
 desk thumb khensu-nu-link-thumb
 desk creators khensu-nu-creators-square
 desk waves khensu-nu-waves-square
