@@ -10,105 +10,51 @@ const DROPBOX =
 
 <Base
   title="mîřrørå"
-  description="mîřrørå — Elliott’s Mirror, quantum mirror theory. Many dimensions, one instance: a generic object with many pointers. Each pointer is an atman, and they are the same atman. Tardigrades, jelly boxes, sulfur life, the 3-sphere and the tesseract."
+  description="mîřrørå — Elliott’s Mirror, quantum mirror theory. Many dimensions, one instance: a generic object with many pointers. Each pointer is an atman, and they are the same atman."
 >
   <div class="khensu mr-page" id="mr-root">
-    <ProductBar name="mîřrørå" action="The theory" href="#mirror-section" explore="#bears-section" />
+    <ProductBar name="mîřrørå" action="The essay" href="#essay-section" explore="#shapes-section" />
 
-    <section class="mr-hero" data-hero>
-      <div class="mr-hero-media" aria-hidden="true">
-        <video
-          class="mr-reel"
-          src="/mirrora/tardigrade.mp4"
-          poster="/mirrora/tardigrade.jpg"
-          autoplay
-          muted
-          loop
-          playsinline
-        ></video>
-        <div class="mr-hero-veil"></div>
-      </div>
-      <div class="wrap mr-hero-in">
-        <p class="eyebrow">Elliott’s Mirror · quantum mirror theory</p>
-        <h1>
-          mîřrørå<br />
-          <em>immortal water bears.</em>
-        </h1>
-        <p class="lede">
-          Tardigrades sit at the top because they already do what the theory says life is: one instance, many states.
-          They dry to a tun, freeze, boil, leave the atmosphere, and wake as the same animal. Not a replica. The same
-          pointer, back on.
-        </p>
-        <div class="btn-row">
-          <a class="btn primary" href="#mirror-section">Elliott’s Mirror</a>
-          <a class="btn" href="#bears-section">Water bears</a>
-          <a class="btn" href="#shapes-section">3-sphere · tesseract</a>
+    <section class="mr-hero" data-hero id="mirror-section">
+      <div class="wrap mr-hero-grid">
+        <div class="mr-hero-copy">
+          <p class="eyebrow">Elliott’s Mirror · quantum mirror theory</p>
+          <h1>
+            mîřrørå<br />
+            <em>One instance.</em>
+          </h1>
+          <p class="lede">
+            Many dimensions are one object. The quon is that object. Every atman is a pointer to it, and every atman is
+            the same atman. You are a deep link to the same app.
+          </p>
+          <div class="btn-row">
+            <a class="btn primary" href="#essay-section">The essay</a>
+            <a class="btn" href="#shapes-section">3-sphere · tesseract</a>
+          </div>
         </div>
-      </div>
-    </section>
-
-    <section class="section" id="bears-section">
-      <div class="wrap">
-        <p class="eyebrow">tardigrades</p>
-        <h2>
-          Water bears that pause.<br />
-          <em>The clock stops.</em>
-        </h2>
-        <p>
-          They are not comic-book immortals. They enter cryptobiosis — the tun — and metabolism falls so far the clock
-          itself pauses. Rehydrate them and the same animal walks. Recorded extremes include about −272.8 °C, above
-          100 °C, vacuum, organic solvents, 7.5 GPa, and gamma doses on the order of a thousand times a human lethal
-          dose. In 2007, on FOTON-M3, they were the first animals to survive space vacuum, UV and cosmic radiation
-          together, and then wake.
-        </p>
-        <div class="mr-cards">
-          <article>
-            <h3>The tun</h3>
-            <p>Anhydrobiosis. Almost no water. A third state between life and death, reversible.</p>
-          </article>
-          <article>
-            <h3>Space</h3>
-            <p>FOTON-M3, 2007. Vacuum, UV, cosmic rays. Same water bear, later.</p>
-          </article>
-          <article>
-            <h3>Pressure</h3>
-            <p>7.5 GPa — deeper than the bottom of any ocean, and they still come back.</p>
-          </article>
-          <article>
-            <h3>The pointer</h3>
-            <p>A paused body is not a copy. It is the same atman, flipped to standby.</p>
-          </article>
-        </div>
-        <figure class="mr-vid">
-          <video src="/mirrora/tardigrade.mp4" poster="/mirrora/tardigrade.jpg" controls playsinline preload="metadata"></video>
-          <figcaption>
-            A tardigrade at about 100×. Dmitry Brant, <a href="https://commons.wikimedia.org/wiki/File:Tardigrade_in_real_time.ogv">Wikimedia Commons</a>, CC BY-SA 4.0.
-          </figcaption>
+        <figure class="mr-stage mr-hero-stage">
+          <canvas id="mr-pointers" aria-label="One glowing quon in the centre, with named pointers around it."></canvas>
+          <figcaption>One allocation. Many names. Change the object and every pointer sees it, because there is only one object.</figcaption>
         </figure>
       </div>
     </section>
 
-    <section class="section band" id="mirror-section">
+    <section class="section" id="quon-section">
       <div class="wrap">
-        <p class="eyebrow">Elliott’s Mirror</p>
+        <p class="eyebrow">the quon</p>
         <h2>
-          Many dimensions.<br />
-          <em>One instance.</em>
+          Many names.<br />
+          <em>One memory.</em>
         </h2>
         <p>
           mirrora is a quantum mirror theory. Worlds that look separate are one generic object with many pointers. Each
-          pointer is an atman. Each atman is the same atman. You are not a replica of the whole. You are a deep link to
-          the same app.
+          pointer is an atman. Each atman is the same atman.
         </p>
         <p>
           The one object is the <strong>quon</strong> — the singularity. The PDF also writes QUOS, said “qu-ose”, like
           cosmos. Zero, here, is a flipped-off mirror attribute on a given axis. The maths of 0 and 1 stay. The claim is
-          about identity, not arithmetic.
+          about identity.
         </p>
-        <div class="mr-stage">
-          <canvas id="mr-pointers" aria-label="One glowing quon in the centre, with named pointers around it."></canvas>
-          <p class="mr-cap">One allocation. Many names. Change the object and every pointer sees it, because there is only one object.</p>
-        </div>
         <pre class="mr-code" tabindex="0"><code>type Quon = {'{'} … {'}'}          // the one instance
 const you: Atman = quon
 const me: Atman = quon
@@ -189,82 +135,6 @@ const me: Atman = quon
       </div>
     </section>
 
-    <section class="section band" id="sulfur-section">
-      <div class="wrap">
-        <p class="eyebrow">extremophiles</p>
-        <h2>
-          Life that eats sulfur.<br />
-          <em>And lives in the wrong temperature.</em>
-        </h2>
-        <p>
-          At black smokers, chemolithoautotrophs oxidise hydrogen sulfide and feed whole cities of tube worms. No sun.
-          The vent is the kitchen.           <i>Geogemma barossii</i> (strain 121) grows at 121 °C — above the usual
-          autoclave. Antarctic brine keeps membranes fluid below 0 °C. The tun of a tardigrade has been taken near
-          −273 °C. Earth already runs life at the edges of the thermometer, on sulfur instead of sugar.
-        </p>
-        <figure class="mr-vid">
-          <video src="/mirrora/vent.mp4" poster="/mirrora/vent.jpg" controls playsinline preload="metadata"></video>
-          <figcaption>
-            An active hydrothermal vent, first imaged on the 2016 Deepwater Exploration of the Marianas.
-            NOAA Ocean Exploration, public domain.
-          </figcaption>
-        </figure>
-        <div class="mr-cards">
-          <article>
-            <h3>Sulfur</h3>
-            <p>Hydrogen sulfide in, organic carbon out. The vent is a factory, not a landscape.</p>
-          </article>
-          <article>
-            <h3>strain 121</h3>
-            <p>Strain 121 grows where we sterilise. Heat is a habitat.</p>
-          </article>
-          <article>
-            <h3>Below zero</h3>
-            <p>Psychrophiles in brine. The clock runs slow. It still runs.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="jelly-section">
-      <div class="wrap">
-        <p class="eyebrow">jelly boxes</p>
-        <h2>
-          A cube of water.<br />
-          <em>A membrane around chemistry.</em>
-        </h2>
-        <p>
-          Box jellyfish are cubes of jelly with twenty-four eyes. Deep-sea medusae, comb jellies, salps and pyrosomes are
-          transparent boxes of seawater that swim. A cell is already a jelly box: a lipid bag around a reaction. Whatever
-          chemistry a non-carbon life would run, it still needs a compartment — a box that keeps the inside from becoming
-          the ocean.
-        </p>
-        <figure class="mr-vid">
-          <video src="/mirrora/jelly.mp4" poster="/mirrora/jelly.jpg" controls playsinline preload="metadata"></video>
-          <figcaption>
-            <i>Crossota millsae</i>, a deep-sea jelly at 1,015 m off Puerto Rico, tentacles out in every
-            direction. NOAA Okeanos Explorer, public domain.
-          </figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section class="section band" id="carbon-section">
-      <div class="wrap">
-        <p class="eyebrow">beyond carbon</p>
-        <h2>
-          Other chemistries.<br />
-          <em>Same pointer problem.</em>
-        </h2>
-        <p>
-          Silicon chains, ammonia as the solvent on Titan, sulfur lakes, even fluorine or boron on paper — these are
-          hypotheses. We have not found them. Earth’s extremes show how far carbon already goes: sulfur kitchens, ice
-          brines, dry tuns, vacuum. If another chemistry wakes, mirrora says it is not a second universe. It is another
-          pointer to the same quon.
-        </p>
-      </div>
-    </section>
-
     <section class="section" id="essay-section">
       <div class="wrap">
         <p class="eyebrow">the essay</p>
@@ -285,7 +155,110 @@ const me: Atman = quon
       </div>
     </section>
 
-    <section class="section band" id="sources-section">
+    <section class="section band" id="life-section">
+      <div class="wrap">
+        <p class="eyebrow">related</p>
+        <h2>
+          Other creatures.<br />
+          <em>The same pointer.</em>
+        </h2>
+        <p>
+          Water bears, sulfur kitchens, jelly boxes and other chemistries are related pictures of Elliott’s Mirror.
+          A paused body, a vent city and a cube of seawater are each one instance in another state.
+        </p>
+
+        <article class="mr-life">
+          <h3>Water bears</h3>
+          <p>
+            Tardigrades enter cryptobiosis — the tun — and metabolism falls so far the clock itself pauses. Rehydrate
+            them and the same animal walks. Recorded extremes include about −272.8 °C, above 100 °C, vacuum, organic
+            solvents, 7.5 GPa, and gamma doses on the order of a thousand times a human lethal dose. In 2007, on
+            FOTON-M3, they were the first animals to survive space vacuum, UV and cosmic radiation together, and then wake.
+          </p>
+          <div class="mr-cards">
+            <article>
+              <h3>The tun</h3>
+              <p>Anhydrobiosis. Almost no water. A third state between life and death, reversible.</p>
+            </article>
+            <article>
+              <h3>Space</h3>
+              <p>FOTON-M3, 2007. Vacuum, UV, cosmic rays. Same water bear, later.</p>
+            </article>
+            <article>
+              <h3>Pressure</h3>
+              <p>7.5 GPa — deeper than the bottom of any ocean, and they still come back.</p>
+            </article>
+            <article>
+              <h3>The pointer</h3>
+              <p>A paused body is the same atman, flipped to standby.</p>
+            </article>
+          </div>
+          <figure class="mr-vid">
+            <video src="/mirrora/tardigrade.mp4" poster="/mirrora/tardigrade.jpg" controls playsinline preload="metadata"></video>
+            <figcaption>
+              A tardigrade at about 100×. Dmitry Brant, <a href="https://commons.wikimedia.org/wiki/File:Tardigrade_in_real_time.ogv">Wikimedia Commons</a>, CC BY-SA 4.0.
+            </figcaption>
+          </figure>
+        </article>
+
+        <article class="mr-life">
+          <h3>Sulfur and heat</h3>
+          <p>
+            At black smokers, chemolithoautotrophs oxidise hydrogen sulfide and feed whole cities of tube worms. The vent
+            is the kitchen. <i>Geogemma barossii</i> (strain 121) grows at 121 °C. Antarctic brine keeps membranes fluid
+            below 0 °C. The tun of a tardigrade has been taken near −273 °C.
+          </p>
+          <div class="mr-cards">
+            <article>
+              <h3>Sulfur</h3>
+              <p>Hydrogen sulfide in, organic carbon out. The vent is a factory.</p>
+            </article>
+            <article>
+              <h3>strain 121</h3>
+              <p>Strain 121 grows where we sterilise. Heat is a habitat.</p>
+            </article>
+            <article>
+              <h3>Below zero</h3>
+              <p>Psychrophiles in brine. The clock runs slow. It still runs.</p>
+            </article>
+          </div>
+          <figure class="mr-vid">
+            <video src="/mirrora/vent.mp4" poster="/mirrora/vent.jpg" controls playsinline preload="metadata"></video>
+            <figcaption>
+              An active hydrothermal vent, first imaged on the 2016 Deepwater Exploration of the Marianas.
+              NOAA Ocean Exploration, public domain.
+            </figcaption>
+          </figure>
+        </article>
+
+        <article class="mr-life">
+          <h3>Jelly boxes</h3>
+          <p>
+            Box jellyfish are cubes of jelly with twenty-four eyes. Deep-sea medusae, comb jellies, salps and pyrosomes
+            are transparent boxes of seawater that swim. A cell is already a jelly box: a lipid bag around a reaction.
+            Another chemistry still needs a compartment, a box that keeps the inside from becoming the ocean.
+          </p>
+          <figure class="mr-vid">
+            <video src="/mirrora/jelly.mp4" poster="/mirrora/jelly.jpg" controls playsinline preload="metadata"></video>
+            <figcaption>
+              <i>Crossota millsae</i>, a deep-sea jelly at 1,015 m off Puerto Rico, tentacles out in every
+              direction. NOAA Okeanos Explorer, public domain.
+            </figcaption>
+          </figure>
+        </article>
+
+        <article class="mr-life">
+          <h3>Other chemistries</h3>
+          <p>
+            Silicon chains, ammonia as the solvent on Titan, sulfur lakes, fluorine or boron on paper — these are
+            hypotheses. Earth’s extremes show how far carbon already goes: sulfur kitchens, ice brines, dry tuns, vacuum.
+            Another chemistry, if it wakes, is another pointer to the same quon.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="sources-section">
       <div class="wrap">
         <h2>Sources</h2>
         <ul class="mr-src">
@@ -310,34 +283,26 @@ const me: Atman = quon
 <style>
   .mr-hero {
     position: relative;
-    min-height: min(92svh, 880px);
     display: grid;
-    align-items: end;
+    align-items: center;
     overflow: hidden;
     background: #000;
   }
-  .mr-hero-media {
-    position: absolute;
-    inset: 0;
+  .mr-hero-grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2.75rem);
+    align-items: center;
+    padding-top: clamp(6.5rem, 14vw, 9rem);
+    padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
   }
-  .mr-reel {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(1.15) contrast(1.08);
+  .mr-hero-stage {
+    margin: 0;
+    border-radius: 28px;
   }
-  .mr-hero-veil {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(90deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.28) 55%, rgba(0, 0, 0, 0.5) 100%),
-      linear-gradient(to top, #000 0%, transparent 42%);
-  }
-  .mr-hero-in {
-    position: relative;
-    z-index: 1;
-    padding-bottom: clamp(3rem, 8vw, 6rem);
-    padding-top: clamp(6rem, 14vw, 10rem);
+  .mr-hero-stage canvas {
+    height: min(46vh, 420px);
+    touch-action: pan-y;
+    cursor: default;
   }
   .mr-hero h1 em {
     background: var(--aura);
@@ -409,6 +374,14 @@ const me: Atman = quon
   .mr-stage.tall canvas {
     height: min(56vh, 460px);
   }
+  .mr-hero .mr-hero-stage {
+    margin: 0;
+  }
+  .mr-hero .mr-hero-stage canvas {
+    height: min(46vh, 420px);
+    touch-action: pan-y;
+    cursor: default;
+  }
   .mr-stage figcaption,
   .mr-cap {
     margin: 0;
@@ -442,17 +415,30 @@ const me: Atman = quon
   .mr-page i {
     font-style: italic;
   }
+  .mr-life {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    padding-top: clamp(2rem, 4vw, 2.75rem);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .mr-life > h3 {
+    margin: 0 0 0.7rem;
+    font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+  }
   .mr-page .band {
     background: #0b0b0d;
   }
+  @media (min-width: 700px) {
+    .mr-hero-grid {
+      grid-template-columns: 1.05fr 0.95fr;
+    }
+    .mr-hero-stage {
+      order: -1;
+    }
+    .mr-hero .mr-hero-stage canvas {
+      height: min(68vh, 620px);
+    }
+  }
   @media (min-width: 880px) {
-    .mr-hero {
-      align-items: center;
-    }
-    .mr-hero-in {
-      max-width: 38rem;
-      margin-left: var(--gutter);
-    }
     .mr-pair {
       grid-template-columns: 1fr 1fr;
     }
@@ -464,14 +450,6 @@ const me: Atman = quon
     }
     .mr-cards.two {
       grid-template-columns: 1fr;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .mr-reel {
-      display: none;
-    }
-    .mr-hero-media {
-      background: #000 url('/mirrora/tardigrade.jpg') center / cover;
     }
   }
 </style>

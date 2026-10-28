@@ -82,7 +82,7 @@ function dragRotate(canvas: HTMLCanvasElement, state: { ax: number; ay: number }
 }
 
 // ---------- pointers: one object, many names ----------
-const NAMES = ['you', 'elliott', 'tardigrade', 'this page', 'a star', 'a rock', 'the quon'];
+const NAMES = ['you', 'elliott', 'tardigrade', 'this page', 'a star', 'a rock'];
 
 function pointers(canvas: HTMLCanvasElement) {
   const spin = { t: 0 };
