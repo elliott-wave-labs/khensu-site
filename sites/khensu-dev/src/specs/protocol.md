@@ -141,10 +141,12 @@ The credential carries no keys. Members fetch the referenced entry (via PIR, sec
 ### 3.5 Handles
 
 ```
-handle_norm       = NFKC-casefold(handle), [a-z0-9_]{3,32}
+handle_norm       = NFKC-casefold(handle)
 handle_commitment = H(Label("handle") || handle_norm || address)
 handle_index      = H256(Label("handle index") || handle_norm)
 ```
+
+A handle is **3–64 grapheme clusters** (UAX #29) after NFKC-casefold, at most 256 bytes of UTF-8. Any Unicode letter or number and any diacritic (combining mark) is allowed — `ñü`, `ŵævẽš`, CJK, Arabic, emoji-free scripts alike; `_`, `-` and `.` may appear inside. The one exception to the three-character minimum is the founder handle `ė` (U+0117), the username for the account whose mailbox is e@khensu.nu. `Ė`, `ė` and `e` plus combining dot above are that one handle. It does not fold into `e`, and no other one- or two-character handle is valid. Normalising before hashing means `É`, `é` and `e` + combining acute are the same handle, so diacritic spellings cannot be double-claimed; registration also checks the Unicode confusable skeleton so a lookalike of a claimed handle cannot be claimed. Handles resolve through `handle_index` (PIR, section 9), not through DNS: where the punycode form would exceed a 63-octet DNS label, the handle is reached by its `khensu.nu/@handle` link and QR code rather than as a raw subdomain label.
 
 The log stores the commitment; the PIR database is keyed by `handle_index` and returns `(address, log_index, commitment opening)`. A handle can stop being served (disputes) without rewriting the log; it is never reassigned.
 

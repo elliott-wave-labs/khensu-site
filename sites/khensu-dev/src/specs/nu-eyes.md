@@ -23,10 +23,10 @@ Reference (sale listing, not our product): [Dior Club M1U](https://alleyesforme.
 
 | SKU | Sell |
 | --- | --- |
-| Non–gem set | $444 |
-| Gem-cut emerald / peer | $44k |
-| Diamond | $4.4m |
-| Moldavite ×3 | $44m (display / museum / public) |
+| Healing stones | $444 |
+| Gem cut: emerald (heart), ruby (sacral), blue sapphire | $44k |
+| Diamond encrusted | $4.4m |
+| Moldavite encrusted | $44m |
 | Wedding / fashion precious | spot metal × **1.08–1.15** + labour; gem invoice × **1.10–1.20** |
 | Club tech mask | cost + **5%** warranty (shield pattern) |
 

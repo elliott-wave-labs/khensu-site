@@ -22,7 +22,7 @@ That is the product. Not a private Messages API. Not a sticker pack. The gift ma
 
 No special app, no stickers, no `LPLinkMetadata` code on our side. Messages already does this when the page is honest about video — on **iOS, iPadOS, macOS and visionOS**.
 
-1. Paste a khėnsu.ñü URL that emits video previews — today home, buy, shield, **create** (`create.khensu.nu`), **waves** (`waves.khensu.nu`), and **nu.indra.og** (`indra.og.khensu.nu`).
+1. Paste a khėnsu.ñü URL that emits video previews. The page roots are home, buy, shield, **create** (`create.khensu.nu`), **ñũ.Bî** (`bi.khensu.nu`), **the violet flame** (`safety.khensu.nu`), **waves** (`waves.khensu.nu`), and **nu.indra.og** (`indra.og.khensu.nu`). A section has its own card at `/s/<slug>` on that host, for example `https://bi.khensu.nu/s/bi-how`, `https://create.khensu.nu/s/create-old` and `https://safety.khensu.nu/s/safety-nudity`. A `#hash` is not sent to the server, so Messages uses the page card unless the link is the `/s/` path. Nav and canonicals use the subdomain, never `https://khensu.nu/<page>`.
 2. Wait a second. The card should **autoplay muted and loop**.
 3. If you still see a still: Messages caches hard. New thread, or `https://khensu.nu/?v=2`, or remove the old bubble and paste again. The receiver downloads the MP4 on their own connection.
 

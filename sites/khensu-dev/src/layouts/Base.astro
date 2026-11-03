@@ -31,20 +31,26 @@ const ogAlt = CARDS[card].alt;
 const DOCS = [
   { href: '/', label: 'Overview' },
   { href: '/architecture', label: 'Architecture' },
+  { href: 'https://security.khensu.nu', label: 'Security design' },
   { href: '/webe', label: 'webË' },
   { href: '/contracts', label: 'Contracts' },
   { href: '/work', label: 'Earn with your node' },
   { href: '/node', label: 'Run a node' },
   { href: '/shell', label: 'suñůlink.shield' },
+  { href: '/auth', label: 'How auth works' },
+  { href: '/keys', label: 'Auth key update' },
   { href: '/specs/protocol', label: 'Protocol' },
   { href: '/specs/webe', label: 'webË specification' },
   { href: '/specs/threat-model', label: 'Threat model' },
   { href: '/specs/work', label: 'Network work' },
   { href: '/specs/app-commerce', label: 'App commerce' },
   { href: '/specs/nu-media', label: 'ñü.media design' },
+  { href: '/specs/nu-mirrora', label: 'mîřrørå' },
+  { href: '/specs/post-release', label: 'After release' },
   { href: '/repositories', label: 'Repositories and licences' },
   { href: '/contribute', label: 'Contribute' },
-  { href: '/security', label: 'Security' },
+  { href: 'https://help.khensu.nu', label: 'Help us' },
+  { href: '/security', label: 'Report a vulnerability' },
   { href: '/specs/compliance', label: 'Compliance' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -108,10 +114,29 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
           <img class="seal" src="/seal-128.webp" alt="" width="26" height="26" />
           <span><Name /> <small>developers</small></span>
         </a>
+        <form class="doc-search" role="search" action="/" method="get">
+          <label class="sr" for="doc-q">search the docs</label>
+          <svg class="doc-search-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="7" cy="7" r="4.25" fill="none" stroke="currentColor" stroke-width="1.4"></circle>
+            <path d="M10.2 10.2 L13.2 13.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path>
+          </svg>
+          <input
+            id="doc-q"
+            name="q"
+            type="search"
+            placeholder="search"
+            autocomplete="off"
+            enterkeyhint="search"
+            aria-autocomplete="list"
+            aria-controls="doc-search-results"
+            aria-expanded="false"
+          />
+          <div id="doc-search-results" class="doc-search-panel" role="listbox" hidden></div>
+        </form>
         <nav aria-label="Primary">
           <ul>
             <li><a href="/node">Run a node</a></li>
-            <li><a href="/security">Security</a></li>
+            <li><a href="https://security.khensu.nu">Security</a></li>
             <li><a href="https://khensu.nu">khėnsu.ñü</a></li>
           </ul>
         </nav>
@@ -144,6 +169,177 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <script>
       import '../../../_shared/aura-buttons.ts';
     </script>
+    <script>
+      const form = document.querySelector('.doc-search');
+      const input = document.getElementById('doc-q');
+      const panel = document.getElementById('doc-search-results');
+      if (form && input && panel && input instanceof HTMLInputElement) {
+        let index = null;
+        let loading = null;
+        let active = 0;
+        let shown = [];
+
+        const fold = (s) =>
+          s
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/\p{M}/gu, '')
+            .replace(/[-_/]+/g, ' ');
+
+        const tokensOf = (q) =>
+          fold(q.replace(/\bmixnets?\b/gi, 'mixnet').replace(/\bpost[-\s]?quantum\b/gi, 'post quantum').replace(/\bpq\b/gi, 'post quantum'))
+            .split(/\s+/)
+            .filter((t) => t.length > 1);
+
+        const load = () => {
+          if (index) return Promise.resolve(index);
+          if (!loading) {
+            loading = fetch('/search-index.json')
+              .then((r) => r.json())
+              .then((data) => {
+                index = data;
+                return data;
+              });
+          }
+          return loading;
+        };
+
+        const score = (hit, tokens) => {
+          const section = fold(hit.section || '');
+          const title = fold(hit.title || '');
+          const text = fold(hit.text || '');
+          const hay = `${section} ${title} ${text}`;
+          const has = (blob, t) => blob.includes(t) || (t === 'mixnet' && blob.includes('mix') && blob.includes('network'));
+          let s = 0;
+          for (const t of tokens) {
+            if (!has(hay, t)) return -1;
+            if (has(section, t)) s += 6;
+            else if (has(title, t)) s += 3;
+            else s += 1;
+            if (section.startsWith(t)) s += 2;
+          }
+          if (tokens.every((t) => has(section, t))) s += 4;
+          const path = (hit.href || '').split('#')[0];
+          if (['/', '/architecture', '/auth', '/keys', '/webe', '/security', '/specs/protocol', '/specs/threat-model'].includes(path)) s += 2;
+          return s;
+        };
+
+        const close = () => {
+          panel.hidden = true;
+          panel.replaceChildren();
+          input.setAttribute('aria-expanded', 'false');
+          input.removeAttribute('aria-activedescendant');
+          shown = [];
+        };
+
+        const render = (hits) => {
+          shown = hits;
+          active = 0;
+          panel.replaceChildren();
+          if (!hits.length) {
+            const empty = document.createElement('p');
+            empty.textContent = 'nothing matches';
+            panel.append(empty);
+          } else {
+            hits.forEach((hit, i) => {
+              const a = document.createElement('a');
+              a.href = hit.href;
+              a.id = `doc-hit-${i}`;
+              a.setAttribute('role', 'option');
+              const strong = document.createElement('strong');
+              strong.textContent = hit.section;
+              const small = document.createElement('small');
+              small.textContent = hit.title === hit.section ? hit.href : `${hit.title} · ${hit.href.split('#')[0]}`;
+              a.append(strong, small);
+              if (hit.text) {
+                const snip = document.createElement('span');
+                snip.textContent = hit.text.slice(0, 140);
+                a.append(snip);
+              }
+              panel.append(a);
+            });
+          }
+          mark();
+          panel.hidden = false;
+          input.setAttribute('aria-expanded', 'true');
+        };
+
+        const mark = () => {
+          const options = panel.querySelectorAll('[role="option"]');
+          options.forEach((el, i) => {
+            if (i === active) el.setAttribute('aria-selected', 'true');
+            else el.removeAttribute('aria-selected');
+          });
+          const current = options[active];
+          if (current) input.setAttribute('aria-activedescendant', current.id);
+          else input.removeAttribute('aria-activedescendant');
+        };
+
+        const run = async () => {
+          const tokens = tokensOf(input.value);
+          if (!tokens.length) {
+            close();
+            return;
+          }
+          const hits = await load();
+          const ranked = hits
+            .map((hit) => ({ hit, s: score(hit, tokens) }))
+            .filter((row) => row.s >= 0)
+            .sort((a, b) => b.s - a.s || a.hit.section.localeCompare(b.hit.section))
+            .slice(0, 8)
+            .map((row) => row.hit);
+          render(ranked);
+        };
+
+        input.addEventListener('input', () => {
+          run();
+        });
+        input.addEventListener('focus', () => {
+          if (input.value.trim()) run();
+        });
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            close();
+            input.blur();
+            return;
+          }
+          if (panel.hidden || !shown.length) return;
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            active = (active + 1) % shown.length;
+            mark();
+          } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            active = (active - 1 + shown.length) % shown.length;
+            mark();
+          } else if (event.key === 'Enter') {
+            event.preventDefault();
+            const href = shown[active]?.href;
+            if (href) location.href = href;
+          }
+        });
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const href = shown[0]?.href;
+          if (href) location.href = href;
+        });
+        document.addEventListener('click', (event) => {
+          if (!form.contains(event.target)) close();
+        });
+        document.addEventListener('keydown', (event) => {
+          if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+          const tag = document.activeElement?.tagName;
+          if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+          event.preventDefault();
+          input.focus();
+        });
+        const q = new URLSearchParams(location.search).get('q');
+        if (q) {
+          input.value = q;
+          run();
+        }
+      }
+    </script>
   </body>
 </html>
 
@@ -175,7 +371,94 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     align-items: center;
     justify-content: space-between;
     height: 64px;
-    gap: 1rem;
+    gap: 0.85rem;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .doc-search {
+    position: relative;
+    flex: 1 1 11rem;
+    max-width: 16rem;
+    min-width: 7.5rem;
+  }
+  .doc-search-icon {
+    position: absolute;
+    left: 0.7rem;
+    top: 50%;
+    width: 0.9rem;
+    height: 0.9rem;
+    transform: translateY(-50%);
+    color: var(--text-faint);
+    pointer-events: none;
+  }
+  .doc-search input {
+    width: 100%;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.88rem;
+    padding: 0 0.85rem 0 2rem;
+  }
+  .doc-search input::placeholder {
+    color: var(--text-faint);
+  }
+  .doc-search input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+  .doc-search-panel {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    left: 0;
+    width: min(26rem, calc(100vw - 2rem));
+    max-height: min(70vh, 28rem);
+    overflow: auto;
+    padding: 0.35rem;
+    border-radius: 14px;
+    border: 1px solid var(--line-strong);
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    z-index: 8;
+  }
+  .doc-search-panel a {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.55rem 0.7rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .doc-search-panel a[aria-selected='true'],
+  .doc-search-panel a:hover {
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+  .doc-search-panel strong {
+    font-weight: 500;
+    font-size: 0.92rem;
+  }
+  .doc-search-panel small,
+  .doc-search-panel span,
+  .doc-search-panel p {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+  .doc-search-panel p {
+    margin: 0.35rem 0.7rem 0.5rem;
   }
   .brand {
     display: inline-flex;
@@ -274,6 +557,22 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     color: var(--text-faint);
     max-width: none;
     margin: 0;
+  }
+  @media (max-width: 720px) {
+    .bar {
+      flex-wrap: wrap;
+      height: auto;
+      min-height: 64px;
+      padding: 0.65rem 0;
+    }
+    .doc-search {
+      order: 3;
+      flex: 1 1 100%;
+      max-width: none;
+    }
+    nav {
+      margin-left: auto;
+    }
   }
   @media (max-width: 560px) {
     .brand small {

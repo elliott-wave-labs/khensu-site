@@ -1,10 +1,11 @@
-// Product hosts. Every host with an ACTIVE Google-managed SSL certificate and Hover DNS A → 34.107.228.246
-// uses its dedicated subdomain; hosts awaiting Hover DNS A or own_certificate use their live https://khensu.nu/<slug>
-// URL so no nav link or canonical URL ever hits NXDOMAIN or a certificate mismatch (nu-harness ALWAYS LIVE rule).
+// Product hosts. Nav, footer product links and canonicals always use the subdomain
+// (https://safety.khensu.nu), never https://khensu.nu/<page>. A missing A record is a Hover
+// request (A → 34.107.228.246, no AAAA), not a reason to fall back to an apex path.
+// New hosts use own_certificate = true. Never join the shared products pack on day one.
 export const PRODUCTS = {
-  feed: 'https://khensu.nu/feed',
-  vegan: 'https://khensu.nu/vegan',
-  mirrora: 'https://khensu.nu/mirrora',
+  feed: 'https://feed.khensu.nu',
+  vegan: 'https://vegan.khensu.nu',
+  mirrora: 'https://mirrora.khensu.nu',
   webe: 'https://webe.khensu.nu',
   void: 'https://void.khensu.nu',
   media: 'https://media.khensu.nu',
@@ -16,6 +17,9 @@ export const PRODUCTS = {
   // portal.khensu.nu open the same page; inverse.khensu.nu 301s to iverse (autocorrect typo). Cert
   // moqom-aura-iverse-khensu-nu-2 (Hover A verified 21 Oct 2026; inverse added 23 Oct).
   universes: 'https://iverse.khensu.nu',
+  // nu.e.u. Nav, footer and canonical are the subdomain. Apex /nueu still serves the page.
+  // u, neue, new and nu 301 there. Never the shared products pack.
+  nueu: 'https://nueu.khensu.nu',
   fi: 'https://fi.khensu.nu',
   bi: 'https://bi.khensu.nu',
   shield: 'https://shield.khensu.nu',
@@ -24,18 +28,28 @@ export const PRODUCTS = {
   avatars: 'https://avatars.khensu.nu',
   indra: 'https://indra.og.khensu.nu',
   getApps: 'https://get.apps.khensu.nu',
-  kronos: 'https://khensu.nu/kronos',
+  kronos: 'https://kronos.khensu.nu',
   /** @deprecated use PRODUCTS.kronos — kept as aliases */
-  skillsAgent: 'https://khensu.nu/kronos',
-  skillsAgentHarness: 'https://khensu.nu/kronos#nu-harness',
-  skillsWeeklyUpdates: 'https://khensu.nu/kronos#nu-ot-222',
-  skillsMusicTheory: 'https://khensu.nu/skills-music-theory',
-  nuGlass: 'https://khensu.nu/design-quantumglass',
-  aura: 'https://aura.khensu.nu',
-  eyes: 'https://khensu.nu/eyes',
-  devices: 'https://khensu.nu/devices',
-  compliance: 'https://khensu.nu/compliance',
-  security: 'https://khensu.nu/security',
+  skillsAgent: 'https://kronos.khensu.nu',
+  skillsAgentHarness: 'https://kronos.khensu.nu#nu-harness',
+  skillsWeeklyUpdates: 'https://kronos.khensu.nu#nu-ot-222',
+  skillsMusicTheory: 'https://skills.music.theory.khensu.nu',
+  nuGlass: 'https://design.quantumglass.khensu.nu',
+  // ŒĄ.ÑÜ fashion house. Nav label ŒA/aura. Main host oea.khensu.nu (dig A verified
+  // 25 Oct 2026). aura.khensu.nu 301s here. Own cert moqom-oea-aura-iverse-khensu-nu
+  // (oea added to the aura/iverse SAN; never the shared products pack).
+  oea: 'https://oea.khensu.nu',
+  aura: 'https://oea.khensu.nu',
+  eyes: 'https://eyes.khensu.nu',
+  devices: 'https://devices.khensu.nu',
+  // Both hosts are on the moments SAN and already serve these pages. Nav and footer
+  // use the subdomain. Apex /compliance and /security stay up as fallbacks.
+  compliance: 'https://compliance.khensu.nu',
+  security: 'https://security.khensu.nu',
+  safety: 'https://safety.khensu.nu',
+  // Help Us: join the foundation. Apex /help serves the page until help.khensu.nu has
+  // its Hover A record and own cert.
+  help: 'https://help.khensu.nu',
 } as const;
 
 /** Old path on khensu.nu → product URL (no trailing slash). */
@@ -50,6 +64,7 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/creators': PRODUCTS.create,
   '/waves': PRODUCTS.waves,
   '/universes': PRODUCTS.universes,
+  '/nueu': PRODUCTS.nueu,
   '/sounds': PRODUCTS.waves,
   '/nufi': PRODUCTS.fi,
   '/bi': PRODUCTS.bi,
@@ -67,9 +82,12 @@ export const PATH_TO_PRODUCT: Record<string, string> = {
   '/skills-agent-weekly': PRODUCTS.skillsWeeklyUpdates,
   '/skills-music-theory': PRODUCTS.skillsMusicTheory,
   '/design-quantumglass': PRODUCTS.nuGlass,
-  '/aura': PRODUCTS.aura,
+  '/aura': PRODUCTS.oea,
+  '/oea': PRODUCTS.oea,
   '/eyes': PRODUCTS.eyes,
   '/devices': PRODUCTS.devices,
   '/compliance': PRODUCTS.compliance,
   '/security': PRODUCTS.security,
+  '/safety': PRODUCTS.safety,
+  '/help': PRODUCTS.help,
 };

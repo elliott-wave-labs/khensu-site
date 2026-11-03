@@ -5,7 +5,9 @@ source: 'OPEN-SOURCE.md'
 
 # Open source — khėnsu.ñü
 
-All first-party khėnsu.ñü repositories are **public** as of the founder handover on **14 October 2026**. Full notice: [`FOUNDER-HANDOVER.md`](/specs/founder-handover). Dead-man's switch: [`DEAD-MANS-SWITCH.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/DEAD-MANS-SWITCH.md). Licences: [`LICENSING.md`](/specs/licensing).
+First-party khėnsu.ñü repositories became **public** with the founder handover on **14 October 2026**. Since **17 October 2026** the node (`khensu-tatenan`) and the chain (`khensu-chain`) are private and ship as signed binaries; every other repository below is public. Those two are the only code repositories the dead-man's switch still holds. Full notice: [`FOUNDER-HANDOVER.md`](/specs/founder-handover) §9. Dead-man's switch: [`DEAD-MANS-SWITCH.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/DEAD-MANS-SWITCH.md). Licences: [`LICENSING.md`](/specs/licensing).
+
+MOQOM is public too, as of **26 October 2026**: [github.com/moqom-cloud](https://github.com/moqom-cloud), including [moqom-swift](https://github.com/moqom-cloud/moqom-swift). The licence split is unchanged. Apache-2.0 covers the SDKs, the protocol crates and [moqom-security](https://github.com/moqom-cloud/moqom-security). `moqom-relay`, `moqom-recorder`, the control plane and MOTOM stay proprietary (`LICENSING.md`); the repositories are public, and that does not relicense them.
 
 ## Clone
 
@@ -13,8 +15,6 @@ All first-party khėnsu.ñü repositories are **public** as of the founder hando
 git clone https://github.com/elliott-wave-labs/khensu-specs.git
 git clone https://github.com/elliott-wave-labs/khensu-core.git
 git clone https://github.com/elliott-wave-labs/khensu-apple.git
-git clone https://github.com/elliott-wave-labs/khensu-tatenan.git
-git clone https://github.com/elliott-wave-labs/khensu-chain.git
 git clone https://github.com/elliott-wave-labs/khensu-services.git
 git clone https://github.com/elliott-wave-labs/khensu-devnet.git
 git clone https://github.com/elliott-wave-labs/khensu-site.git

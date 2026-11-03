@@ -5,7 +5,7 @@ source: 'design/nu-mirrora.md'
 
 # mîřrørå — Elliott’s Mirror, quantum mirror theory
 
-**Status: built 23 October 2026.** Essay written 18–19 October 2026 (Venice Beach). Shown as **mîřrørå** in headings, buttons, labels, header nav and the footer. Code, files and the path stay `mirrora`. Running text uses **mirrora** and **Elliott’s Mirror**. Address: `nu:khensu.nu/mirrora` (apex `https://khensu.nu/mirrora`). Distinct from îňðřæ.ōġ.
+**Status: built 23 October 2026.** Essay written 18–19 October 2026 (Venice Beach). Shown as **mîřrørå** in headings, buttons and labels. Hidden from header nav and the footer until the essay is cleaned up. Code, files and identifiers stay `mirrora`. Running text uses **mirrora** and **Elliott’s Mirror**. Host: `mirrora.khensu.nu` (`nu:mirrora.khensu.nu`). Apex `https://khensu.nu/mirrora` stays live. Distinct from îňðřæ.ōġ.
 
 Related: `design/lore.md` §5 (tat tvam asi), §10 (the isheru mirror), `design/indra.md` (Indra’s net), `design/nu-universes.md` (3-sphere), the essay [`mirrora.pdf`](https://khensu.nu/mirrora/mirrora.pdf) and the Dropbox original.
 
@@ -15,7 +15,8 @@ Related: `design/lore.md` §5 (tat tvam asi), §10 (the isheru mirror), `design/
 | Also called | Elliott’s Mirror, quantum mirror theory |
 | Running text | `mirrora`, Elliott’s Mirror |
 | Code | `mirrora` |
-| Host | apex `/mirrora` (no new product host until Hover A + own cert) |
+| Host | `mirrora.khensu.nu` (`nu:mirrora.khensu.nu`); apex `/mirrora` also live |
+| Nav | hidden from header and footer until the essay is cleaned up |
 | Essay | 18–19 Oct 2026, Elliott Staffer, Venice CA |
 
 ---
@@ -55,9 +56,13 @@ The interactive 3-sphere is the Hopf fibration, stereographically projected — 
 
 ## 4. Life on the page
 
-The page opens on **tardigrades** (water bears): not comic-book immortals, animals that *pause*. Cryptobiosis (the tun) stops the clock; rehydration starts it. They have been taken through space vacuum, UV and cosmic radiation (FOTON-M3, 2007) and woken as the same animal — the same pointer.
+The page opens on **Elliott’s Mirror**: one quon, many pointers, the 3-sphere, the tesseract and the three time axes. That is the hero and the body of the page.
 
-Then:
+Water bears, sulfur life, jelly boxes and other chemistries are **one section at the bottom** (`#life-section`). They are related pictures of the same claim.
+
+Tardigrades (water bears) are animals that *pause*. Cryptobiosis (the tun) stops the clock; rehydration starts it. They have been taken through space vacuum, UV and cosmic radiation (FOTON-M3, 2007) and woken as the same animal — the same pointer.
+
+In that same section:
 
 - **Sulfur and heat.** Chemolithoautotrophs at hydrothermal vents oxidise hydrogen sulfide. Tube worms live on that chemistry. *Geogemma barossii* (strain 121) grows at 121 °C.
 - **Cold.** Psychrophiles in Antarctic brine keep membranes fluid below 0 °C. Tardigrades have been recorded near −273 °C in the tun.

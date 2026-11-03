@@ -1,6 +1,7 @@
 ---
 // The /feed player: one video per screen with snap scrolling on phones, a centred column on wider screens. Reads the
 // shared feed when a service is configured (src/data/feed.ts) and the posts on this device otherwise.
+import { PRODUCTS } from '../../data/hosts';
 const demo = { src: '/khensu/creators/hero.mp4', poster: '/khensu/creators/hero.webp' };
 ---
 <section class="fp" id="feed-player" data-hero aria-label="Feed" data-demo-src={demo.src} data-demo-poster={demo.poster}>
@@ -8,6 +9,7 @@ const demo = { src: '/khensu/creators/hero.mp4', poster: '/khensu/creators/hero.
     <div class="fp-top">
       <h1 class="fp-title">For you</h1>
       <span class="fp-mode" id="fp-mode">Shared feed</span>
+      <a class="fp-safety" href={PRODUCTS.safety}>safety</a>
       <button type="button" class="fp-postbtn" id="fp-open">＋ Post</button>
     </div>
     <div class="fp-scroller" id="fp-scroller" tabindex="0" aria-label="Posts. Swipe or use the arrow keys."></div>
@@ -24,6 +26,7 @@ const demo = { src: '/khensu/creators/hero.mp4', poster: '/khensu/creators/hero.
       <label>Caption<textarea id="fp-caption" rows="2" maxlength="220" placeholder="Say something about it"></textarea></label>
       <div class="fp-progress" id="fp-progress" hidden><i></i></div>
       <p class="fp-status" id="fp-status" role="status" aria-live="polite"></p>
+      <p class="fp-where">Feed posts are public. Takedown requests go to <a href="mailto:e@khensu.nu?subject=Takedown">e@khensu.nu</a>.</p>
       <div class="fp-actions">
         <button type="button" class="btn" id="fp-cancel">Cancel</button>
         <button type="submit" class="btn primary" id="fp-submit">Post</button>
@@ -48,7 +51,8 @@ const demo = { src: '/khensu/creators/hero.mp4', poster: '/khensu/creators/hero.
   .fp-title { margin: 0; font-size: 1.15rem; font-weight: 600; letter-spacing: -0.02em; }
   .fp-mode { font-size: 0.75rem; color: rgba(255, 255, 255, 0.75); padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(24, 24, 28, 0.55); border: 1px solid rgba(255, 255, 255, 0.14); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); }
   .fp-mode.test { border-color: rgba(255, 200, 90, 0.6); color: #ffd98a; }
-  .fp-postbtn { pointer-events: auto; margin-left: auto; font: inherit; font-weight: 600; color: #04110d; background: var(--accent, #7ee0c8); border: 0; border-radius: 999px; padding: 0.5rem 1rem; cursor: pointer; }
+  .fp-safety { pointer-events: auto; margin-left: auto; font-size: 0.78rem; font-weight: 500; color: #fff; text-decoration: none; padding: 0.4rem 0.75rem; border-radius: 999px; background: rgba(24, 24, 28, 0.55); border: 1px solid rgba(255, 255, 255, 0.16); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); }
+  .fp-postbtn { pointer-events: auto; font: inherit; font-weight: 600; color: #04110d; background: var(--accent, #7ee0c8); border: 0; border-radius: 999px; padding: 0.5rem 1rem; cursor: pointer; }
   .fp-scroller { height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; overscroll-behavior: contain; scrollbar-width: none; outline: none; }
   .fp-scroller::-webkit-scrollbar { display: none; }
   :global(.fp-item) { position: relative; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: grid; }

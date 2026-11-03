@@ -1,11 +1,14 @@
 ---
-interface Props { mode?: string; title?: string }
+import { PRODUCTS } from '../../data/hosts';
+interface Sample { id: string; name: string; src: string; poster: string; type: string }
+interface Props { mode?: string; title?: string; samples?: Sample[] }
 const { mode = 'feed', title = 'Creator ecosystem — post, cut, keep your originals' } = Astro.props;
-const samples = [
+const defaultSamples: Sample[] = [
   { id: 'sample-hero', name: 'Venice golden hour', src: '/khensu/creators/hero.mp4', poster: '/khensu/creators/hero.webp', type: 'video' },
   { id: 'sample-fans', name: 'Fans 1080', src: '/khensu/creators/fans-1080.mp4', poster: '/khensu/creators/fans-1080.webp', type: 'video' },
-  { id: 'sample-aura', name: 'Aura runway', src: '/khensu/aura/legacy.aura.mp4', poster: '/khensu/aura/legacy.aura.jpg', type: 'video' },
+  { id: 'sample-aura', name: 'OEA runway', src: '/khensu/aura/ibiza-welcome.mp4', poster: '/khensu/aura/beach.jpg', type: 'video' },
 ];
+const samples = Astro.props.samples ?? defaultSamples;
 ---
 <section class="eco" id="ecosystem" data-mode={mode} data-samples={JSON.stringify(samples)} aria-labelledby="eco-title">
   <div class="wrap">
@@ -35,6 +38,7 @@ const samples = [
         <div><h3>For you</h3><p id="eco-feed-sub">The newest posts from everyone. Tap ♥ or share anywhere.</p></div>
         <div class="eco-feedtools">
           <a class="btn primary" href="/feed/">Full screen</a>
+          <a class="btn" href={PRODUCTS.safety}>safety</a>
           <button type="button" class="btn" id="eco-export" data-local-only>Export post pack</button>
           <label class="btn eco-import" data-local-only>Import pack<input id="eco-import" type="file" accept="application/json" hidden /></label>
         </div>
@@ -62,7 +66,7 @@ const samples = [
             <label>Template pack
               <select id="eco-template">
                 <option>Venice Golden Hour</option><option>90s Film Diary</option>
-                <option>Runway Editorial · nu.aura</option><option>Cyber Glass · nu.glass</option>
+                <option>Runway Editorial · OEA</option><option>Cyber Glass · nu.glass</option>
                 <option>Scrapbook Dump</option><option>Beat-Cut Reel</option>
               </select>
             </label>
@@ -86,6 +90,7 @@ const samples = [
           <button class="btn primary eco-postbtn" type="submit" id="eco-postbtn">Post to feed →</button>
           <div class="eco-progress" id="eco-progress" hidden><i></i></div>
           <p class="eco-note" id="eco-post-status">Non-destructive recipe. Original kept. Generated detail is off unless you turn it on.</p>
+          <p class="eco-note">Feed posts are public. Report a post from its menu; takedown requests go to <a href="mailto:e@khensu.nu?subject=Takedown">e@khensu.nu</a>.</p>
         </form>
 
         <div class="eco-card eco-stagecard">
@@ -122,11 +127,11 @@ const samples = [
         <h3>Your handle & avatar — used on every post</h3>
         <div class="eco-row">
           <label>Display name<input id="eco-name" type="text" maxlength="40" value="You" /></label>
-          <label>Handle — 1–64 characters, any diacritics<input id="eco-handle-input" type="text" maxlength="128" value="you" placeholder="ė, ñü, ŵævẽš, 中文…" /></label>
+          <label>Handle — 3–64 characters, any diacritics. The founder handle is ė.<input id="eco-handle-input" type="text" maxlength="128" value="you" placeholder="waves, elliott, 中文…" /></label>
         </div>
         <div class="eco-row">
           <label>Avatar style
-            <select id="eco-style"><option>Glass</option><option>Aura</option><option>Ink</option><option>Toon</option><option>Pixel</option></select>
+            <select id="eco-style"><option>Glass</option><option>OEA</option><option>Ink</option><option>Toon</option><option>Pixel</option></select>
           </label>
           <label>Colour <input id="eco-hue" type="range" min="0" max="360" value="285" /></label>
         </div>

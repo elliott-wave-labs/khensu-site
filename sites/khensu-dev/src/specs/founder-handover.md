@@ -119,3 +119,13 @@ Contact: hello@elliottwave.studio
 | Spec | `PROTOCOL.md` §12.5–12.7 |
 
 Cryptographic founder-threshold signature on a `FounderHandover` struct will be attached when the chain accepts that message. Until then, public git history and this file are the record.
+
+---
+
+## 9. Amendment — 17 October 2026
+
+`khensu-tatenan` (node) and `khensu-chain` (chain, token, shielded pool) are **private** again from 17 October 2026. Node software ships as signed binaries for Mac, Raspberry Pi 5 and inside the khėnsu.ñü app. Everything else in §2 stays public.
+
+- Code published between 14 and 17 October stays licensed under AGPL-3.0-only to anyone who received it; making a repository private does not withdraw that licence or the patent grant in §3.
+- The private heads are part of the sealed escrow in `PROTOCOL.md` §12.7 and `DEAD-MANS-SWITCH.md`: when the switch fires, they are released with the rest.
+- Protocol behaviour stays fully specified in public (`PROTOCOL.md`, `PAYMENTS.md`, `khensu-core`), so clients and audits never depend on reading node or chain code.

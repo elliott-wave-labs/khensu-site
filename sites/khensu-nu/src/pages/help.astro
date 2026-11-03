@@ -1,0 +1,128 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductBar from '../components/khensu/ProductBar.astro';
+import { PRODUCTS } from '../data/hosts';
+
+const SLACK = 'https://join.slack.com/t/fdation/shared_invite/zt-4dgleu0fq-GEZDhIq4u_kF~wzbFpXNNw';
+
+const ways = [
+  {
+    name: 'Run a node',
+    note: 'A Mac or a Raspberry Pi 5 carries mixnet traffic, mailboxes and call relays, and is paid for the work.',
+    href: `${PRODUCTS.webe}#run-a-node-section`,
+    cta: 'Run a node',
+  },
+  {
+    name: 'Write code',
+    note: 'Every public repository takes pull requests. Start with the contributor guide and the specs.',
+    href: 'https://dev.khensu.nu/contribute',
+    cta: 'Contribute',
+  },
+  {
+    name: 'Create',
+    note: 'Post music, video and art on ñü.ċřêæțẽ. Tips go 100% to you.',
+    href: PRODUCTS.create,
+    cta: 'Open ñü.ċřêæțẽ',
+  },
+  {
+    name: 'Find bugs',
+    note: 'Report vulnerabilities privately. Report harmful content from any post.',
+    href: PRODUCTS.security,
+    cta: 'Report a vulnerability',
+  },
+  {
+    name: 'Tell people',
+    note: 'Share khėnsu.ñü with someone who needs private messaging or a basic income.',
+    href: 'https://khensu.nu',
+    cta: 'khensu.nu',
+  },
+];
+---
+
+<Base
+  title="Help us · khėnsu.ñü"
+  description="Help build khėnsu.ñü: join the foundation on Slack, run a node, write code, create and report bugs."
+>
+  <div class="khensu help-page">
+    <ProductBar name="Help us" action="Join the foundation" href={SLACK} explore="#ways" />
+
+    <section class="page-head help-hero" data-hero>
+      <div class="wrap">
+        <p class="eyebrow">Help us · foundation</p>
+        <h1>
+          Help us build it.<br />
+          <em>Join the foundation.</em>
+        </h1>
+        <p class="lede">
+          khėnsu.ñü is a gift to humanity and all beings: freedom, privacy and a universal basic income, so people
+          everywhere can create, build and live securely. The foundation is where the people building it talk, plan and
+          ship.
+        </p>
+        <div class="btn-row">
+          <a class="btn primary" href={SLACK} rel="noopener">Join the foundation on Slack</a>
+          <a class="btn" href="#ways">Other ways to help</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ways">
+      <div class="wrap">
+        <h2>Ways to help</h2>
+        <div class="help-grid">
+          {ways.map((w) => (
+            <article>
+              <h3>{w.name}</h3>
+              <p>{w.note}</p>
+              <a href={w.href}>{w.cta}</a>
+            </article>
+          ))}
+        </div>
+        <p class="help-foot">
+          Developer docs: <a href="https://dev.khensu.nu">dev.khensu.nu</a> · Safety:
+          <a href={PRODUCTS.safety}>the violet flame</a> · Contact: <a href="mailto:e@khensu.nu">e@khensu.nu</a>
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .help-hero h1 em {
+    background: var(--aura);
+    background-size: 300% 100%;
+    animation: aura-flow var(--aura-flow-dur, 8s) linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .help-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .help-grid article {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.2rem 1.15rem;
+    border-radius: 1.1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .help-grid h3 {
+    margin: 0;
+    font-size: 1.08rem;
+  }
+  .help-grid p {
+    margin: 0;
+    flex: 1;
+    color: var(--text-dim);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+  .help-foot {
+    margin-top: 1.75rem;
+    color: var(--text-dim);
+    max-width: 40rem;
+  }
+</style>

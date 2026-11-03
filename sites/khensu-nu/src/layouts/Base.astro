@@ -37,7 +37,7 @@ const canonical = canonicalUrl
     ? new URL(PATH_TO_PRODUCT[pathForCanon])
     : new URL(Astro.url.pathname, Astro.site);
 const card = ogCard && CARDS[ogCard] ? ogCard : cardFor(Astro.url.pathname);
-const ogCacheBust = '?v=indra5';
+const ogCacheBust = '?v=nube1';
 const ogImage = new URL(`/og/${card}.jpg${ogCacheBust}`, Astro.site);
 const preview = previewFor(card);
 const previewMeta = preview ? PREVIEWS[preview] : undefined;
@@ -51,23 +51,26 @@ const ogAlt = CARDS[card].alt;
 
 const nav = [
   { href: PRODUCTS.avatars, label: 'avatars' },
-  { href: PRODUCTS.aura, label: 'aura' },
   { href: PRODUCTS.bi, label: 'bi' },
   { href: PRODUCTS.create, label: 'create' },
   { href: PRODUCTS.devices, label: 'devices' },
+  { href: PRODUCTS.nueu, label: 'e.u' },
   { href: PRODUCTS.eyes, label: 'eyes' },
   { href: PRODUCTS.feed, label: 'feed' },
   { href: PRODUCTS.fi, label: 'Fi' },
   { href: PRODUCTS.getApps, label: 'get.apps' },
   { href: PRODUCTS.nuGlass, label: 'glass' },
+  { href: PRODUCTS.help, label: 'help' },
   { href: PRODUCTS.universes, label: 'i.verse' },
   { href: PRODUCTS.indra, label: 'indra.og' },
   { href: PRODUCTS.kronos, label: 'kronos' },
   { href: PRODUCTS.media, label: 'media' },
-  { href: PRODUCTS.mirrora, label: 'mîřrørå' },
   { href: PRODUCTS.moments, label: 'moments' },
   { href: PRODUCTS.network, label: 'network' },
+  { href: PRODUCTS.oea, label: 'ŒA/aura' },
   { href: PRODUCTS.memory, label: 'ral' },
+  { href: PRODUCTS.safety, label: 'safety' },
+  { href: PRODUCTS.security, label: 'security' },
   { href: PRODUCTS.skillsMusicTheory, label: 'skills.music.theory' },
   { href: PRODUCTS.sla, label: 'sla' },
   { href: PRODUCTS.vegan, label: 'vegan' },
@@ -77,10 +80,16 @@ const nav = [
   { href: PRODUCTS.webe, label: 'webË' },
   { href: PRODUCTS.compliance, label: 'Compliance', minor: true },
   { href: `${PRODUCTS.webe}#run-a-node-section`, label: 'Run a node' },
-  { href: PRODUCTS.security, label: 'Security', minor: true },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const currentProduct = PATH_TO_PRODUCT[path];
+const sectionProduct = path.startsWith('/s/bi')
+  ? PRODUCTS.bi
+  : path.startsWith('/s/create')
+    ? PRODUCTS.create
+    : path.startsWith('/s/safety')
+      ? PRODUCTS.safety
+      : undefined;
+const currentProduct = PATH_TO_PRODUCT[path] ?? sectionProduct;
 const navCurrent = (href: string) => {
   const base = href.split('#')[0];
   if (currentProduct && base === currentProduct) return 'page' as const;
@@ -223,12 +232,12 @@ const navCurrent = (href: string) => {
           <li><a href={PRODUCTS.webe}>webË</a></li>
           <li><a href={PRODUCTS.void}>ñü.vœîð</a></li>
           <li><a href={PRODUCTS.avatars}>ñü.ævätåřş</a></li>
-          <li><a href={PRODUCTS.aura}>ñü.åůřâ</a></li>
+          <li><a href={PRODUCTS.oea}>ŒĄ.ÑÜ</a></li>
           <li><a href={PRODUCTS.devices}>nu.devices</a></li>
+          <li><a href={PRODUCTS.nueu}>nu.e.u</a></li>
           <li><a href={PRODUCTS.eyes}>ñü.êýêš</a></li>
           <li><a href={PRODUCTS.vegan}>nu.vegan</a></li>
           <li><a href={PRODUCTS.media}>ñü.media</a></li>
-          <li><a href={PRODUCTS.mirrora}>mîřrørå</a></li>
           <li><a href={PRODUCTS.moments}>ñü.mømëntš</a></li>
           <li><a href={PRODUCTS.memory}>ñü.řåł</a></li>
           <li><a href={PRODUCTS.create}>ñü.ċřêæțẽ</a></li>
@@ -246,10 +255,12 @@ const navCurrent = (href: string) => {
           <li><a href={PRODUCTS.network}>ñü.ñetwork</a></li>
           <li><a href={PRODUCTS.bi}>ñũ.Bî basic income</a></li>
           <li><a href="/privacy">Privacy</a></li>
-          <li><a href="/compliance">Compliance</a></li>
+          <li><a href={PRODUCTS.compliance}>Compliance</a></li>
           <li><a href="https://dev.khensu.nu">Developers</a></li>
           <li><a href="https://dev.khensu.nu/shell">suñůlink.shield specs</a></li>
-          <li><a href="/security">Security</a></li>
+          <li><a href={PRODUCTS.security}>Security</a></li>
+          <li><a href={PRODUCTS.safety}>Safety</a></li>
+          <li><a href={PRODUCTS.help}>Help us</a></li>
           <li><a href="https://elliottwave.studio">elliottwave.studio lab</a></li>
         </ul>
       </div>

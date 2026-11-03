@@ -128,10 +128,12 @@ const graphemes = (s: string) => {
   }
 };
 export const normHandle = (raw: string) => raw.trim().replace(/^@/, '').replace(/\.khensu\.nu$/i, '').normalize('NFKC').toLowerCase();
+const founderHandle = (handle: string) => handle.normalize('NFC') === 'ė';
+
 export function handleProblem(handle: string): string {
   const n = graphemes(handle);
-  if (!handle || n < 1 || n > 64 || /[\s/\\@:#?%]/.test(handle)) {
-    return 'Handles are 1–64 characters in any language, with any diacritics, and no spaces or / @ : # ? %.';
+  if (!handle || n > 64 || (n < 3 && !founderHandle(handle)) || /[\s/\\@:#?%]/.test(handle)) {
+    return 'Handles are 3–64 characters in any language, with any diacritics, and no spaces or / @ : # ? %. The founder handle is ė.';
   }
   return '';
 }

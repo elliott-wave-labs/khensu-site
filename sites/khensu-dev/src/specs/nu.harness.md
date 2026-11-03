@@ -22,7 +22,7 @@ Product hosts share `moqom-products-*` on the sites HTTPS proxy. A **PROVISIONIN
    2. Create the own cert; attach it to `moqom-sites` **with all existing ACTIVE certs kept**.
    3. Stay on the apply: poll until own cert `ACTIVE`, and every 30s confirm `bi.khensu.nu` still `CN=bi.khensu.nu` + HTTP 200. If bi breaks, detach the new certs immediately.
    4. Only then call the host shipped.
-6. **Done means matching CN.** Apex (`https://khensu.nu/avatars`) is not product-host HTTPS. Do not mark `avatars.khensu.nu` / `indra.og.khensu.nu` done until:
+6. **Done means matching CN.** Apex (`https://khensu.nu/avatars`) is not product-host HTTPS and is not a nav href. Header nav, footer product links and canonicals use the subdomain. A missing host is a Hover A record (`34.107.228.246`, no AAAA) to give Elliott, then `own_certificate = true` after dig matches. The violet flame host is `safety.khensu.nu`. Flame and violet are names, not hosts. Do not mark `avatars.khensu.nu` / `indra.og.khensu.nu` done until:
    ```bash
    echo | openssl s_client -connect HOST:443 -servername HOST 2>/dev/null \
      | openssl x509 -noout -subject   # must contain HOST, not elliottwave.dev
@@ -30,7 +30,7 @@ Product hosts share `moqom-products-*` on the sites HTTPS proxy. A **PROVISIONIN
    ```
 7. Multi-label hosts (`indra.og.khensu.nu`) are **not** covered by `*.khensu.nu`. Add an explicit A (Hover + Cloud DNS zone `khensu-nu`).
 
-SLA page: [https://khensu.nu/sla](https://khensu.nu/sla) (`sla.khensu.nu` only after DNS + own cert ACTIVE). Full public notice: [`PUBLIC.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/PUBLIC.md).
+SLA nav: [https://sla.khensu.nu](https://sla.khensu.nu). [https://khensu.nu/sla](https://khensu.nu/sla) stays as a fallback page, not the nav href. Full public notice: [`PUBLIC.md`](https://github.com/elliott-wave-labs/khensu-specs/blob/main/PUBLIC.md).
 
 ## When to use
 
@@ -39,7 +39,7 @@ khensu.ñü sites, product hosts, GitHub repos under elliott-wave-labs, App Stor
 ## Fixed rules
 
 1. **Publish sites immediately.** Never hold for a patent filing.
-2. **Keep code public.** First-party `khensu-*` repos stay public.
+2. **Keep code public.** `moqom-cloud` and first-party `khensu-*` repos stay public. The only private code repos are `khensu-tatenan` and `khensu-chain` (dead-man's switch, private since 17 Oct 2026, `FOUNDER-HANDOVER.md` §9). moqom-cloud went public 26 Oct 2026, including [moqom-swift](https://github.com/moqom-cloud/moqom-swift).
 3. **Install without stores.** Safari PWA, GitHub IPA sideload, `xcodegen` / Xcode. Team ID `LHS49D8RYY`.
 4. **Desktop vs mobile.** Desktop perfect → only `@media` mobile rules.
 5. **Display names.** People see khėnsu.ñü, ñü.ŵævẽš, …; code/URLs stay ASCII.
