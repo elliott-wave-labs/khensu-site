@@ -5,9 +5,9 @@ source: 'design/nu-mirrora.md'
 
 # mîřrørå — Elliott’s Mirror, quantum mirror theory
 
-**Status: built 23 October 2026.** Essay written 18–19 October 2026 (Venice Beach). Shown as **mîřrørå** in headings, buttons and labels. Hidden from header nav and the footer until the essay is cleaned up. Code, files and identifiers stay `mirrora`. Running text uses **mirrora** and **Elliott’s Mirror**. Host: `mirrora.khensu.nu` (`nu:mirrora.khensu.nu`). Apex `https://khensu.nu/mirrora` stays live. Distinct from îňðřæ.ōġ.
+**Status: built 23 October 2026.** Essay written 18–19 October 2026 (Venice Beach). Shown as **mîřrørå** in headings, buttons and labels. In the header nav and the footer since 4 November 2026; the essay itself is not linked while Elliott revises it. Code, files and identifiers stay `mirrora`. Running text uses **mirrora** and **Elliott’s Mirror**. Host: `mirrora.khensu.nu` (`nu:mirrora.khensu.nu`). Apex `https://khensu.nu/mirrora` stays live. Distinct from îňðřæ.ōġ.
 
-Related: `design/lore.md` §5 (tat tvam asi), §10 (the isheru mirror), `design/indra.md` (Indra’s net), `design/nu-universes.md` (3-sphere), the essay [`mirrora.pdf`](https://khensu.nu/mirrora/mirrora.pdf) and the Dropbox original.
+Related: `design/lore.md` §5 (tat tvam asi), §10 (the isheru mirror), `design/indra.md` (Indra’s net), `design/nu-universes.md` (3-sphere), and the essay (unpublished while it is revised).
 
 | Item | Value |
 | --- | --- |
@@ -16,7 +16,7 @@ Related: `design/lore.md` §5 (tat tvam asi), §10 (the isheru mirror), `design/
 | Running text | `mirrora`, Elliott’s Mirror |
 | Code | `mirrora` |
 | Host | `mirrora.khensu.nu` (`nu:mirrora.khensu.nu`); apex `/mirrora` also live |
-| Nav | hidden from header and footer until the essay is cleaned up |
+| Nav | header and footer, label mîřrørå (after media) |
 | Essay | 18–19 Oct 2026, Elliott Staffer, Venice CA |
 
 ---
@@ -27,7 +27,7 @@ mirrora is a theory of many dimensions that are **one instance**.
 
 The picture is a programmer’s, not a jeweller’s:
 
-- There is one generic object — the **quon** (the singularity; the PDF also writes QUOS, “qu-ose”).
+- There is one generic object — the **quon** (the singularity; the essay also writes QUOS, “qu-ose”).
 - There are many **pointers** to that object. Each pointer is an **atman**.
 - Every atman is the same atman. You are not a replica of the whole. You are a deep link to the same app.
 
