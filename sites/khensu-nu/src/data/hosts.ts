@@ -3,6 +3,10 @@
 // request (A → 34.107.228.246, no AAAA), not a reason to fall back to an apex path.
 // New hosts use own_certificate = true. Never join the shared products pack on day one.
 export const PRODUCTS = {
+  // nocap and postcap serve the same page (/khensu-nu/nocap), with no redirect between them: separate links for
+  // marketing. Both Hover A → 34.107.228.246 verified 4 Nov 2026.
+  nocap: 'https://nocap.khensu.nu',
+  postcap: 'https://postcap.khensu.nu',
   feed: 'https://feed.khensu.nu',
   vegan: 'https://vegan.khensu.nu',
   mirrora: 'https://mirrora.khensu.nu',
@@ -54,6 +58,7 @@ export const PRODUCTS = {
 
 /** Old path on khensu.nu → product URL (no trailing slash). */
 export const PATH_TO_PRODUCT: Record<string, string> = {
+  '/nocap': PRODUCTS.nocap,
   '/vegan': PRODUCTS.vegan,
   '/mirrora': PRODUCTS.mirrora,
   '/webe': PRODUCTS.webe,

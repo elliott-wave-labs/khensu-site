@@ -50,6 +50,7 @@ const ogVideoH = previewMeta?.wideBytes ? '630' : '1080';
 const ogAlt = CARDS[card].alt;
 
 const nav = [
+  { href: PRODUCTS.nocap, label: 'cap → postcap' },
   { href: PRODUCTS.avatars, label: 'avatars' },
   { href: PRODUCTS.bi, label: 'bi' },
   { href: PRODUCTS.create, label: 'create' },
@@ -184,6 +185,10 @@ const navCurrent = (href: string) => {
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
+    <p class="alpha-bar">
+      <b>Free, open-source alpha.</b> Benchmarks are real, measured in Claude Opus 5.5 test runs.{' '}
+      <a href={PRODUCTS.nocap}>Less data, less energy: nocap →</a>
+    </p>
     <header class="site-header">
       <div class="wrap bar">
         <a href="/" class="brand" aria-label="khėnsu.ñü, home">
@@ -227,8 +232,10 @@ const navCurrent = (href: string) => {
         <div>
           <p class="foot-brand"><Name /></p>
           <p class="foot-tag">The first app on webe. From <a href="https://elliottwave.studio">elliottwave.studio lab</a>.</p>
+          <p class="foot-tag">Free, open-source alpha release.</p>
         </div>
         <ul class="foot-links">
+          <li><a href={PRODUCTS.nocap}>capitalism → postcap</a></li>
           <li><a href={PRODUCTS.webe}>webË</a></li>
           <li><a href={PRODUCTS.void}>ñü.vœîð</a></li>
           <li><a href={PRODUCTS.avatars}>ñü.ævätåřş</a></li>
@@ -323,6 +330,27 @@ const navCurrent = (href: string) => {
     color: var(--bg);
     padding: 0.5rem 1rem;
     border-radius: 6px;
+  }
+  .alpha-bar {
+    position: relative;
+    z-index: 6;
+    margin: 0;
+    max-width: none;
+    padding: 0.4rem 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    background: linear-gradient(90deg, rgba(126, 224, 200, 0.12), rgba(240, 168, 200, 0.12));
+    border-bottom: 1px solid var(--line);
+  }
+  .alpha-bar b {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .alpha-bar a {
+    color: #7ee0c8;
+    text-decoration: none;
+    white-space: nowrap;
   }
   .site-header {
     position: sticky;
